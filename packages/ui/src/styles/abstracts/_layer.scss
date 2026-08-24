@@ -1,0 +1,7 @@
+// CSS Cascade Layers 순서 선언 (단일 출처).
+//
+// 라이브러리 CSS 전체를 레이어 안에 넣으면, 소비자가 작성한 레이어 없는(unlayered) CSS 가
+// 상세도와 무관하게 항상 우선한다. → "라이브러리 스타일이 안 덮인다" 문제와 !important 남용을 제거.
+//
+// 모든 entry 파일이 이 파일을 최상단에서 @use 한다. 중복 선언되어도 최초 선언이 순서를 결정한다.
+@layer nui.tokens, nui.base, nui.components, nui.utilities;

@@ -1,0 +1,21 @@
+// 네임스페이스 프리픽스 단일 출처.
+// 모든 클래스/CSS 변수는 예외 없이 이 프리픽스를 거친다.
+// 소비자 프로젝트의 .button / .field / .is-error 등과의 충돌을 원천 차단하기 위함.
+$prefix: "nui" !default;
+
+// 클래스명 조립:  #{cls("button")}         -> .nui-button
+@function cls($name) {
+  @return ".#{$prefix}-#{$name}";
+}
+
+// CSS 변수 조립:  #{v("color-primary-500")} -> --nui-color-primary-500
+@function v($name) {
+  @return --#{$prefix}-#{$name};
+}
+
+// 컴포넌트 토큰 참조 (2계층):
+//   token("button-bg", "color-primary-500")
+//   -> var(--nui-button-bg, var(--nui-color-primary-500))
+@function token($component-token, $seed-token) {
+  @return var(#{v($component-token)}, var(#{v($seed-token)}));
+}

@@ -1,0 +1,22 @@
+{
+  "enabledMcpjsonServers": ["context7", "playwright"],
+  "language": "korean",
+  "permissions": {
+    "allow": [
+      "mcp__context7",
+      "mcp__playwright",
+      "Bash(git *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Read(**)",
+      "Write(**)"
+    ],
+    "deny": [
+      "Bash(git push *)",
+      "Bash(npm publish *)",
+      "Bash(rm -rf *)",
+      "Write(./.env)",
+      "Write(./.env.*)"
+    ]
+  }
+}

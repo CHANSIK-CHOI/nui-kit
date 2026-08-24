@@ -1,0 +1,26 @@
+// 문서 사이트 전용 전역 스타일.
+// ⚠️ 이 파일은 패키지에 배포되지 않는다 — 라이브러리 CSS 와 철저히 분리한다.
+:root {
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--nui-font-family-base);
+  font-size: var(--nui-font-size-md);
+  line-height: var(--nui-line-height-base);
+  color: var(--nui-color-text);
+  background: var(--nui-color-surface);
+  -webkit-font-smoothing: antialiased;
+}

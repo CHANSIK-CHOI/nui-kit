@@ -1,0 +1,5 @@
+// → styles/tokens.css
+// 온디맨드 사용 시 반드시 1회 import 해야 하는 변수 전용 파일.
+// 어떤 셀렉터에도 스타일을 적용하지 않는다 (변수 선언만).
+@use "abstracts/layer";
+@use "tokens/seed";
