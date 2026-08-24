@@ -3,19 +3,38 @@
 // 소비자 프로젝트의 .button / .field / .is-error 등과의 충돌을 원천 차단하기 위함.
 $prefix: "nui" !default;
 
-// 클래스명 조립:  #{cls("button")}         -> .nui-button
+// 클래스명 조립:  #{cls("button")}          -> .nui-button
 @function cls($name) {
   @return ".#{$prefix}-#{$name}";
 }
 
-// CSS 변수 조립:  #{v("color-primary-500")} -> --nui-color-primary-500
+// 상태 클래스:    #{state("disabled")}      -> .nui-is-disabled
+@function state($name) {
+  @return ".#{$prefix}-is-#{$name}";
+}
+
+// 공개 CSS 변수:  #{v("color-primary")}     -> --nui-color-primary
+// 소비자가 덮어써도 되는 커스터마이징 훅.
 @function v($name) {
   @return --#{$prefix}-#{$name};
 }
 
-// 컴포넌트 토큰 참조 (2계층):
-//   token("button-bg", "color-primary-500")
-//   -> var(--nui-button-bg, var(--nui-color-primary-500))
-@function token($component-token, $seed-token) {
-  @return var(#{v($component-token)}, var(#{v($seed-token)}));
+// 내부 CSS 변수:  #{iv("button-main")}      -> --nui-_button-main
+//
+// ⚠️ 왜 공개 변수와 분리하는가:
+//   Cascade 순서는 origin → importance → layer → specificity 다.
+//   즉 소비자의 unlayered `:root { --nui-button-main: red }` 는
+//   우리 레이어의 `.nui-button--primary { --nui-button-main: ... }` 보다 항상 우선한다.
+//   variant 가 갈아끼우는 내부 변수를 공개 훅과 같은 이름으로 두면
+//   소비자가 그 이름을 건드린 순간 모든 variant 가 무력화된다.
+//   따라서 variant 내부 배선은 `--nui-_*` 로 격리하고, 공개 훅만 v() 로 노출한다.
+@function iv($name) {
+  @return --#{$prefix}-_#{$name};
+}
+
+// 2계층 참조: 공개 훅이 있으면 그것을, 없으면 기본값을 쓴다.
+//   hook("button-bg", var(--nui-_button-main))
+//   -> var(--nui-button-bg, var(--nui-_button-main))
+@function hook($public-token, $fallback) {
+  @return var(#{v($public-token)}, #{$fallback});
 }

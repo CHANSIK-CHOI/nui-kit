@@ -1,0 +1,8 @@
+@use "../abstracts" as *;
+
+@layer nui.utilities {
+  // 스크린리더 전용 텍스트 (원본 .a11y-hidden 대체)
+  #{cls("sr-only")} {
+    @include a11y-hidden;
+  }
+}

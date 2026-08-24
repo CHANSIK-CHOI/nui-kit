@@ -1,0 +1,66 @@
+@use "sass:list";
+@use "sass:meta";
+@use "prefix" as *;
+
+// 타이포 토큰 적용. font-size 는 토큰 자체가 반응형이므로 미디어쿼리가 필요 없다.
+// $weight 는 토큰 키("semi-bold"), $line-height / $letter-spacing 은 원시값으로 덮어쓴다.
+@mixin typo($scale, $weight: null, $line-height: null, $letter-spacing: null) {
+  font-size: var(#{v("font-size-#{$scale}")});
+
+  @if $weight == null {
+    font-weight: var(#{v("font-weight-#{$scale}")});
+  } @else {
+    font-weight: var(#{v("font-weight-#{$weight}")});
+  }
+
+  @if $line-height == null {
+    line-height: var(#{v("line-height-#{$scale}")});
+  } @else {
+    line-height: $line-height;
+  }
+
+  @if $letter-spacing == null {
+    letter-spacing: var(#{v("letter-spacing-#{$scale}")});
+  } @else {
+    letter-spacing: $letter-spacing;
+  }
+}
+
+// 스크린리더 전용
+@mixin a11y-hidden {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+@mixin box($w: null, $h: $w) {
+  width: $w;
+  height: $h;
+}
+
+// duration/easing 토큰 기반 transition
+@mixin motion($properties, $duration: "base", $easing: "standard") {
+  @if meta.type-of($properties) != list {
+    $properties: ($properties);
+  }
+
+  $result: ();
+
+  @each $property in $properties {
+    $result: list.append(
+      $result,
+      #{$property}
+        var(#{v("duration-#{$duration}")})
+        var(#{v("easing-#{$easing}")}),
+      comma
+    );
+  }
+
+  transition: $result;
+}

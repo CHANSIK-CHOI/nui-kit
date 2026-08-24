@@ -1,131 +1,237 @@
 @use "../abstracts/prefix" as *;
+@use "../abstracts/breakpoints" as bp;
 
-// ─────────────────────────────────────────────────────────────
-// Seed 토큰 (전역 계층)
+// ═══════════════════════════════════════════════════════════════════
+// Seed 토큰 — 전역 계층
 //
-// 이 값들은 "스타일을 적용"하지 않고 "값을 선언"만 한다.
-// 따라서 :root 에 두어도 소비자 프로젝트의 렌더링에 영향이 없다.
-// 단, --nui- 프리픽스가 반드시 보장되어야 한다.
+// 값을 "선언"만 하고 어떤 셀렉터에도 스타일을 "적용"하지 않는다.
+// 따라서 :root 에 두어도 소비자 프로젝트 렌더링에 영향이 없다.
 //
-// 커스터마이징:
-//   전체 테마 교체 → 여기 seed 값을 덮어쓴다
-//   부분 테마      → 임의의 조상 요소에서 재선언하면 상속으로 하위에만 적용된다
+// ⚠️ rem 기준 변경 (원본 대비)
+//   원본 프로젝트는 `html { font-size: 8px→10px }` 를 깔고 1.6rem = 16px 로 썼다.
+//   배포 라이브러리는 reset 을 내보내지 않으므로 그 전제가 성립하지 않는다.
+//   (소비자의 기본 16px 루트에서 1.6rem 은 25.6px 이 되어 전부 깨진다)
+//   → 모든 치수를 16px 루트 기준으로 환산했다. 실제 픽셀값은 원본과 동일하다.
+//   → px 하드코딩 대신 rem 을 유지하므로 사용자 글꼴 확대 접근성도 보존된다.
 //
-// ⚠️ 0단계 초안. 실제 값 확정은 1단계(스타일 시스템 재정비)에서 진행한다.
-// ─────────────────────────────────────────────────────────────
+// 커스터마이징
+//   전체 테마 → 여기 seed 값을 덮어쓴다
+//   부분 테마 → 임의 조상 요소에서 재선언하면 상속으로 하위에만 적용된다
+// ═══════════════════════════════════════════════════════════════════
 @layer nui.tokens {
   :root {
-    // ── color / brand
-    #{v("color-primary-50")}: #eff6ff;
-    #{v("color-primary-100")}: #dbeafe;
-    #{v("color-primary-300")}: #93c5fd;
-    #{v("color-primary-500")}: #3b82f6;
-    #{v("color-primary-600")}: #2563eb;
-    #{v("color-primary-700")}: #1d4ed8;
+    // ── typography / family
+    // 라이브러리는 폰트를 배포하지 않는다. 기본은 소비자 앱의 폰트를 상속한다.
+    #{v("font-family-base")}: inherit;
 
-    // ── color / neutral
-    #{v("color-gray-50")}: #f9fafb;
-    #{v("color-gray-100")}: #f3f4f6;
+    // ── color / absolute
+    #{v("color-black")}: #000;
+    #{v("color-white")}: #fff;
+
+    // ── color / gray scale
+    #{v("color-gray-100")}: #f5f7fa;
     #{v("color-gray-200")}: #e5e7eb;
     #{v("color-gray-300")}: #d1d5db;
     #{v("color-gray-400")}: #9ca3af;
     #{v("color-gray-500")}: #6b7280;
+    #{v("color-gray-600")}: #4b5563;
     #{v("color-gray-700")}: #374151;
-    #{v("color-gray-900")}: #111827;
+    #{v("color-gray-800")}: #1f2937;
+
+    // ── color / brand
+    #{v("color-primary-bright")}: #dcfce7;
+    #{v("color-primary")}: #1ca673;
+    #{v("color-primary-dark")}: #014029;
+    #{v("color-secondary-bright")}: #ffe4e6;
+    #{v("color-secondary")}: #d92b2b;
+    #{v("color-point-bright")}: #fef9c3;
+    #{v("color-point")}: #f29b30;
 
     // ── color / status
-    #{v("color-danger-500")}: #ef4444;
-    #{v("color-warning-500")}: #f59e0b;
-    #{v("color-success-500")}: #22c55e;
-    #{v("color-info-500")}: #0ea5e9;
+    #{v("color-error")}: #dc2626;
+    #{v("color-error-soft")}: #fee2e2;
+    #{v("color-success")}: #16a34a;
+    #{v("color-success-soft")}: #dcfce7;
+    #{v("color-warning")}: #d97706;
+    #{v("color-warning-soft")}: #fef3c7;
+    #{v("color-info")}: #0284c7;
+    #{v("color-info-soft")}: #e0f2fe;
 
-    // ── color / semantic alias
-    #{v("color-text")}: var(#{v("color-gray-900")});
-    #{v("color-text-muted")}: var(#{v("color-gray-500")});
-    #{v("color-text-disabled")}: var(#{v("color-gray-400")});
-    #{v("color-surface")}: #ffffff;
-    #{v("color-surface-subtle")}: var(#{v("color-gray-50")});
-    #{v("color-border")}: var(#{v("color-gray-300")});
-    #{v("color-border-strong")}: var(#{v("color-gray-500")});
-    #{v("color-focus-ring")}: var(#{v("color-primary-500")});
-    #{v("color-overlay")}: rgb(0 0 0 / 45%);
+    // ── color / text ramp
+    #{v("text-color-1")}: #111827;
+    #{v("text-color-2")}: #4b5563;
+    #{v("text-color-3")}: #6b7280;
+    #{v("text-color-4")}: #9ca3af;
 
-    // ── typography
-    #{v("font-family-base")}:
-      "Pretendard",
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      Roboto,
-      "Helvetica Neue",
-      Arial,
-      sans-serif;
-    #{v("font-size-xs")}: 12px;
-    #{v("font-size-sm")}: 13px;
-    #{v("font-size-md")}: 14px;
-    #{v("font-size-lg")}: 16px;
-    #{v("font-size-xl")}: 18px;
-    #{v("font-weight-regular")}: 400;
-    #{v("font-weight-medium")}: 500;
-    #{v("font-weight-bold")}: 700;
-    #{v("line-height-tight")}: 1.35;
-    #{v("line-height-base")}: 1.5;
+    // ── color / line ramp
+    #{v("line-color-1")}: #1f2937;
+    #{v("line-color-2")}: #d1d5db;
+    #{v("line-color-3")}: #e5e7eb;
+    #{v("line-color-4")}: #f3f4f6;
 
-    // ── spacing (4px scale)
-    #{v("space-0")}: 0;
-    #{v("space-1")}: 4px;
-    #{v("space-2")}: 8px;
-    #{v("space-3")}: 12px;
-    #{v("space-4")}: 16px;
-    #{v("space-5")}: 20px;
-    #{v("space-6")}: 24px;
-    #{v("space-8")}: 32px;
-    #{v("space-10")}: 40px;
+    // ── color / background ramp
+    #{v("bg-color-1")}: #ffffff;
+    #{v("bg-color-2")}: #f9fafb;
+    #{v("bg-color-3")}: #f3f4f6;
+    #{v("bg-color-4")}: #e5e7eb;
+
+    // ── semantic / text
+    #{v("text-primary")}: var(#{v("text-color-1")});
+    #{v("text-secondary")}: var(#{v("text-color-2")});
+    #{v("text-tertiary")}: var(#{v("text-color-3")});
+    #{v("text-quaternary")}: var(#{v("text-color-4")});
+    #{v("text-brand")}: var(#{v("color-primary-dark")});
+    #{v("text-danger")}: var(#{v("color-error")});
+    #{v("text-inverse")}: rgb(255 255 255 / 92%);
+    #{v("text-inverse-strong")}: var(#{v("color-white")});
+
+    // ── semantic / surface
+    #{v("surface-neutral-soft")}: rgb(17 24 39 / 4%);
+    #{v("surface-neutral-subtle")}: rgb(17 24 39 / 6%);
+
+    // ── control state (입력 컨트롤 공통 배선)
+    #{v("control-text")}: var(#{v("text-primary")});
+    #{v("control-text-muted")}: var(#{v("text-secondary")});
+    #{v("control-text-placeholder")}: var(#{v("text-tertiary")});
+    #{v("control-text-disabled")}: var(#{v("text-tertiary")});
+    #{v("control-text-error")}: var(#{v("text-danger")});
+    #{v("control-icon")}: var(#{v("text-tertiary")});
+    #{v("control-icon-strong")}: var(#{v("text-primary")});
+    #{v("control-bg")}: var(#{v("bg-color-1")});
+    #{v("control-bg-disabled")}: var(#{v("bg-color-2")});
+    #{v("control-bg-readonly")}: var(#{v("bg-color-2")});
+    #{v("control-bg-subtle")}: var(#{v("bg-color-3")});
+    #{v("control-border")}: var(#{v("line-color-2")});
+    #{v("control-border-hover")}: var(#{v("text-tertiary")});
+    #{v("control-border-disabled")}: var(#{v("line-color-3")});
+    #{v("control-border-error")}: var(#{v("color-error")});
+    #{v("control-accent")}: var(#{v("color-primary")});
+
+    // ── accessibility
+    #{v("focus-color")}: var(#{v("control-accent")});
+
+    // ── spacing (원본 10px 루트 기준 → 16px 루트 환산, 실제 px 동일)
+    #{v("space-2xs")}: 0.25rem; // 4px
+    #{v("space-xs")}: 0.5rem; // 8px
+    #{v("space-sm")}: 0.75rem; // 12px
+    #{v("space-md")}: 1rem; // 16px
+    #{v("space-lg")}: 1.5rem; // 24px
+    #{v("space-xl")}: 2rem; // 32px
+    #{v("space-2xl")}: 3rem; // 48px
+
+    // ── size / icon
+    #{v("size-icon-sm")}: 0.625rem; // 10px
+    #{v("size-icon-md")}: 0.875rem; // 14px
+    #{v("size-icon-lg")}: 1rem; // 16px
+    #{v("size-icon-xl")}: 1.125rem; // 18px
+    #{v("size-icon-2xl")}: 1.25rem; // 20px
+    #{v("size-icon-3xl")}: 1.5rem; // 24px
+
+    // ── size / control height
+    #{v("size-control-sm")}: 2rem; // 32px
+    #{v("size-control-md")}: 2.25rem; // 36px
+    #{v("size-control-lg")}: 2.5rem; // 40px
+    #{v("size-control-xl")}: 3rem; // 48px
+    #{v("size-field")}: 3.5rem; // 56px
 
     // ── radius
-    #{v("radius-sm")}: 4px;
-    #{v("radius-md")}: 8px;
-    #{v("radius-lg")}: 12px;
-    #{v("radius-full")}: 9999px;
+    #{v("radius-xs")}: 0.3125rem; // 5px
+    #{v("radius-sm")}: 0.5rem; // 8px
+    #{v("radius-md")}: 0.75rem; // 12px
+    #{v("radius-lg")}: 1rem; // 16px
+    #{v("radius-xl")}: 1.5rem; // 24px
+    #{v("radius-pill")}: 999px;
+    #{v("radius-round")}: 50%;
 
-    // ── control height (입력 요소 공통 리듬)
-    #{v("control-height-sm")}: 32px;
-    #{v("control-height-md")}: 40px;
-    #{v("control-height-lg")}: 48px;
+    // ── elevation
+    #{v("shadow-soft")}: 0 0.75rem 1.75rem rgb(17 24 39 / 6%);
+    #{v("shadow-base")}: 0 1.125rem 2.5rem rgb(17 24 39 / 8%);
+    #{v("shadow-strong")}: 0 1.5rem 3.125rem rgb(17 24 39 / 8%);
+    #{v("shadow-press")}: 0 0.5rem 1rem rgb(17 24 39 / 12%);
+    #{v("shadow-overlay")}: 0 1.125rem 3rem rgb(17 24 39 / 14%);
+    #{v("shadow-dropdown")}: 0 1rem 2rem rgb(15 23 42 / 12%);
+    #{v("shadow-toast")}: 0 0.875rem 2rem rgb(17 24 39 / 22%);
+    #{v("shadow-focus")}: 0 0 0 0.25rem rgb(28 166 115 / 14%);
+    #{v("shadow-focus-error")}: 0 0 0 0.25rem rgb(220 38 38 / 12%);
 
     // ── border
     #{v("border-width")}: 1px;
+    #{v("border-width-focus")}: 2px;
     #{v("focus-ring-width")}: 2px;
-    #{v("focus-ring-offset")}: 2px;
+    #{v("focus-ring-offset")}: 0.25rem;
 
-    // ── elevation
-    #{v("shadow-sm")}: 0 1px 2px rgb(0 0 0 / 6%);
-    #{v("shadow-md")}: 0 4px 12px rgb(0 0 0 / 10%);
-    #{v("shadow-lg")}: 0 12px 32px rgb(0 0 0 / 14%);
+    // ── typography scale (모바일 기준값 — desktop 은 아래 미디어쿼리에서 재선언)
+    #{v("font-size-label")}: 0.75rem; // 12px
+    #{v("font-size-body-sm")}: 0.875rem; // 14px
+    #{v("font-size-body")}: 1rem; // 16px
+    #{v("font-size-title")}: 1.25rem; // 20px
+    #{v("font-size-display")}: 2rem; // 32px
+
+    #{v("font-weight-regular")}: 400;
+    #{v("font-weight-medium")}: 500;
+    #{v("font-weight-semi-bold")}: 600;
+    #{v("font-weight-bold")}: 700;
+    #{v("font-weight-extra-bold")}: 800;
+
+    #{v("font-weight-label")}: var(#{v("font-weight-semi-bold")});
+    #{v("font-weight-body-sm")}: var(#{v("font-weight-regular")});
+    #{v("font-weight-body")}: var(#{v("font-weight-regular")});
+    #{v("font-weight-title")}: var(#{v("font-weight-bold")});
+    #{v("font-weight-display")}: var(#{v("font-weight-extra-bold")});
+
+    #{v("line-height-label")}: 1.45;
+    #{v("line-height-body-sm")}: 1.65;
+    #{v("line-height-body")}: 1.6;
+    #{v("line-height-title")}: 1.18;
+    #{v("line-height-display")}: 1.02;
+
+    #{v("letter-spacing-label")}: 0.08em;
+    #{v("letter-spacing-body-sm")}: -0.01em;
+    #{v("letter-spacing-body")}: -0.02em;
+    #{v("letter-spacing-title")}: -0.04em;
+    #{v("letter-spacing-display")}: -0.06em;
 
     // ── motion
-    #{v("duration-fast")}: 120ms;
-    #{v("duration-base")}: 200ms;
-    #{v("duration-slow")}: 320ms;
+    #{v("duration-quick")}: 0.12s;
+    #{v("duration-fast")}: 0.18s;
+    #{v("duration-base")}: 0.2s;
+    #{v("duration-slow")}: 0.24s;
+    #{v("duration-deliberate")}: 0.32s;
+
+    #{v("easing-linear")}: linear;
     #{v("easing-standard")}: cubic-bezier(0.2, 0, 0, 1);
-    #{v("easing-enter")}: cubic-bezier(0, 0, 0, 1);
-    #{v("easing-exit")}: cubic-bezier(0.3, 0, 1, 1);
+    #{v("easing-emphasized")}: cubic-bezier(0.16, 1, 0.3, 1);
+    #{v("easing-exit")}: cubic-bezier(0.4, 0, 1, 1);
 
     // ── z-index (오버레이 계층 단일 출처)
-    #{v("z-dropdown")}: 1000;
-    #{v("z-sticky")}: 1010;
-    #{v("z-overlay")}: 1020;
-    #{v("z-popup")}: 1030;
-    #{v("z-toast")}: 1040;
-    #{v("z-tooltip")}: 1050;
+    #{v("z-sticky")}: 10;
+    #{v("z-tooltip")}: 20;
+    #{v("z-dimmed")}: 200;
+    #{v("z-layer")}: 1010;
+    #{v("z-overlay-dimmed")}: 1020;
+    #{v("z-overlay-layer")}: 1030;
+    #{v("z-loader")}: 9999;
   }
 
-  // 접근성 — 모션 최소화 환경에서 duration 을 무력화한다.
+  // 데스크톱 타이포 스케일.
+  // 미디어쿼리 안이라도 nui.tokens 레이어이므로, 소비자의 unlayered 재선언이 항상 우선한다.
+  @include bp.respond-to("desktop") {
+    :root {
+      #{v("font-size-label")}: 0.8125rem; // 13px
+      #{v("font-size-body-sm")}: 0.9375rem; // 15px
+      #{v("font-size-title")}: 1.5rem; // 24px
+      #{v("font-size-display")}: 3rem; // 48px
+    }
+  }
+
+  // 모션 최소화 환경 — duration 무력화
   @media (prefers-reduced-motion: reduce) {
     :root {
+      #{v("duration-quick")}: 1ms;
       #{v("duration-fast")}: 1ms;
       #{v("duration-base")}: 1ms;
       #{v("duration-slow")}: 1ms;
+      #{v("duration-deliberate")}: 1ms;
     }
   }
 }

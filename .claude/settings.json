@@ -1,10 +1,11 @@
 {
-  "enabledMcpjsonServers": ["context7", "playwright"],
+  "enabledMcpjsonServers": ["context7", "playwright", "chrome-devtools"],
   "language": "korean",
   "permissions": {
     "allow": [
       "mcp__context7",
       "mcp__playwright",
+      "mcp__chrome-devtools",
       "Bash(git *)",
       "Bash(npm *)",
       "Bash(npx *)",

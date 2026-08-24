@@ -1,0 +1,21 @@
+@use "sass:map";
+
+// 브레이크포인트는 CSS 변수로 만들 수 없다 (media query 가 var() 를 못 읽는다).
+// 따라서 유일하게 컴파일 타임에 고정되는 토큰이다.
+$breakpoints: (
+  "mobile": 768px,
+  "tablet": 800px,
+  "desktop": 1328px,
+) !default;
+
+@mixin respond-to($key) {
+  $bp: map.get($breakpoints, $key);
+
+  @if $bp == null {
+    @error "Unknown breakpoint: #{$key}";
+  }
+
+  @media (min-width: $bp) {
+    @content;
+  }
+}

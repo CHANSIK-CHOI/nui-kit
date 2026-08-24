@@ -1,0 +1,24 @@
+@use "../abstracts/prefix" as *;
+
+// ═══════════════════════════════════════════════════════════════════
+// 스코프 정규화
+//
+// 라이브러리는 전역 reset 을 배포하지 않는다(소비자 오염 방지).
+// 그러나 컴포넌트 스타일은 box-sizing: border-box 를 전제로 치수를 계산한다.
+// 따라서 "우리 프리픽스가 붙은 요소에 한해서만" 정규화를 적용한다.
+//
+// 셀렉터가 nui- 클래스를 가진 요소만 고르므로 소비자 마크업에는 절대 닿지 않는다.
+// ═══════════════════════════════════════════════════════════════════
+@layer nui.base {
+  [class^="#{$prefix}-"],
+  [class*=" #{$prefix}-"] {
+    box-sizing: border-box;
+  }
+
+  [class^="#{$prefix}-"]::before,
+  [class^="#{$prefix}-"]::after,
+  [class*=" #{$prefix}-"]::before,
+  [class*=" #{$prefix}-"]::after {
+    box-sizing: border-box;
+  }
+}

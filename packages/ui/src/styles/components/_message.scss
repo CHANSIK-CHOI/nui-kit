@@ -1,0 +1,33 @@
+@use "../abstracts" as *;
+
+// 폼 컨트롤 하단 안내/에러 메시지. Textfield 등이 내부적으로 렌더한다.
+@layer nui.components {
+  #{cls("message")} {
+    margin-top: var(#{v("space-xs")});
+    padding-left: var(#{v("space-xs")});
+
+    &__msg {
+      display: block;
+      color: var(#{v("text-secondary")});
+
+      @include typo("label", "regular", 1.55, 0);
+    }
+
+    &__msg--error {
+      display: flex;
+      align-items: center;
+      color: var(#{v("text-danger")});
+    }
+
+    &__error-icon {
+      #{iv("icon-color")}: var(#{v("text-danger")});
+
+      display: block;
+      flex-shrink: 0;
+      width: var(#{v("size-icon-lg")});
+      height: var(#{v("size-icon-lg")});
+      margin-right: var(#{v("space-2xs")});
+      color: var(#{iv("icon-color")});
+    }
+  }
+}

@@ -1,0 +1,242 @@
+@use "../abstracts" as *;
+
+// ─────────────────────────────────────────────────────────────
+// Button / IconButton / ButtonLink / ButtonGroup
+//
+// 공개 커스터마이징 훅 (덮어써도 안전)
+//   색상    : --nui-button-bg          기본(black) 버튼 배경
+//             --nui-button-primary-bg  / --nui-button-secondary-bg / --nui-button-point-bg
+//             --nui-button-color       라벨 색
+//   치수    : --nui-button-radius / -min-height / -min-width / -padding-x
+//
+// ⚠️ variant 별로 훅을 따로 둔 이유:
+//   훅을 하나(--nui-button-bg)만 두면 소비자가 그걸 :root 에 설정한 순간
+//   primary/secondary/point 까지 전부 같은 색이 된다.
+//   (unlayered 선언이 우리 레이어의 variant 규칙보다 항상 우선하므로 막을 수 없다)
+//   → variant 마다 자기 훅을 갖고, 내부 배선(--nui-_*)으로 합류시킨다.
+//
+// 내부 배선 (--nui-_*) 은 덮어쓰지 말 것.
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("button")} {
+    #{iv("button-main")}: #{hook("button-bg", var(#{v("text-primary")}))};
+    #{iv("button-fg")}: #{hook(
+        "button-color",
+        var(#{v("text-inverse-strong")})
+      )};
+    #{iv("button-shadow")}: var(#{v("shadow-soft")});
+    #{iv("button-shadow-hover")}: var(#{v("shadow-base")});
+    #{iv("button-shadow-active")}: var(#{v("shadow-press")});
+
+    // UA 기본 스타일 무력화 (전역 reset 미배포 대응 — 이 셀렉터 안에서만 적용)
+    appearance: none;
+    margin: 0;
+    font-family: var(#{v("font-family-base")});
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: #{hook("button-min-width", 7.5rem)}; // 120px
+    min-height: #{hook("button-min-height", var(#{v("size-field")}))};
+    padding: 0 #{hook("button-padding-x", var(#{v("space-lg")}))};
+    overflow-wrap: initial;
+    background: var(#{iv("button-main")});
+    border: var(#{v("border-width")}) solid var(#{iv("button-main")});
+    border-radius: #{hook("button-radius", var(#{v("radius-xs")}))};
+    box-shadow: var(#{iv("button-shadow")});
+
+    @include motion(
+      (background-color, border-color, color, box-shadow, transform, opacity)
+    );
+
+    &:focus-visible {
+      outline: var(#{v("focus-ring-width")}) solid var(#{v("focus-color")});
+      outline-offset: var(#{v("focus-ring-offset")});
+      box-shadow: var(#{v("shadow-focus")}), var(#{iv("button-shadow-hover")});
+    }
+
+    &:not([disabled]):hover {
+      box-shadow: var(#{iv("button-shadow-hover")});
+      transform: translateY(-1px);
+    }
+
+    &:not([disabled]):active {
+      box-shadow: var(#{iv("button-shadow-active")});
+      transform: translateY(1px);
+    }
+
+    &__wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(#{v("space-2xs")});
+      width: 100%;
+      height: 100%;
+      color: var(#{iv("button-fg")});
+      text-align: center;
+
+      @include typo("body", "semi-bold", 1.2, -0.01em);
+    }
+
+    &__icon {
+      display: block;
+      flex-shrink: 0;
+      width: var(#{v("size-icon-2xl")});
+      height: var(#{v("size-icon-2xl")});
+    }
+
+    // ── size
+    &--medium {
+      min-height: #{hook("button-min-height", var(#{v("size-control-xl")}))};
+    }
+
+    &--small {
+      min-height: #{hook("button-min-height", var(#{v("size-control-md")}))};
+      padding: 0 #{hook("button-padding-x", var(#{v("space-md")}))};
+    }
+
+    &--small &__icon {
+      width: var(#{v("size-icon-lg")});
+      height: var(#{v("size-icon-lg")});
+    }
+
+    &--small &__wrap {
+      @include typo("body-sm", "semi-bold", 1.2, -0.01em);
+    }
+
+    // ── shape
+    &--round {
+      border-radius: #{hook("button-radius", var(#{v("radius-pill")}))};
+    }
+
+    // ── color (variant 별 전용 훅)
+    &--primary {
+      #{iv("button-main")}: #{hook(
+          "button-primary-bg",
+          var(#{v("color-primary")})
+        )};
+    }
+
+    &--secondary {
+      #{iv("button-main")}: #{hook(
+          "button-secondary-bg",
+          var(#{v("color-secondary")})
+        )};
+    }
+
+    &--point {
+      #{iv("button-main")}: #{hook("button-point-bg", var(#{v("color-point")}))};
+    }
+
+    // ── variant
+    &--line {
+      #{iv("button-fg")}: var(#{iv("button-main")});
+      #{iv("button-shadow")}: none;
+      #{iv("button-shadow-hover")}: none;
+      #{iv("button-shadow-active")}: none;
+
+      background-color: transparent;
+      border-color: var(#{iv("button-main")});
+    }
+
+    &--text {
+      #{iv("button-fg")}: var(#{iv("button-main")});
+      #{iv("button-shadow")}: none;
+      #{iv("button-shadow-hover")}: none;
+      #{iv("button-shadow-active")}: none;
+
+      display: flex;
+      width: 100%;
+      min-height: auto;
+      padding: var(#{v("space-2xs")}) var(#{v("space-sm")});
+      background-color: transparent;
+      border: none;
+
+      #{cls("button")}__wrap {
+        justify-content: flex-start;
+        font-weight: var(#{v("font-weight-regular")});
+      }
+    }
+
+    // ── disabled
+    &[disabled] {
+      #{iv("button-main")}: var(#{v("control-bg-disabled")});
+      #{iv("button-fg")}: var(#{v("control-text-muted")});
+
+      box-shadow: none;
+      opacity: 0.72;
+      cursor: not-allowed;
+
+      &#{cls("button")}--line {
+        #{iv("button-main")}: var(#{v("control-border-disabled")});
+        #{iv("button-fg")}: var(#{v("control-text-placeholder")});
+      }
+    }
+
+    &--line:not([disabled]):hover {
+      background-color: var(#{v("surface-neutral-soft")});
+    }
+
+    &--line:not([disabled]):active {
+      background-color: var(#{v("surface-neutral-subtle")});
+    }
+
+    &--text:not([disabled]):hover {
+      opacity: 0.72;
+      transform: none;
+    }
+
+    &--text:not([disabled]):active {
+      opacity: 0.56;
+      transform: none;
+    }
+  }
+
+  // ── IconButton (정사각 고정)
+  #{cls("button")}--icon {
+    min-width: auto;
+    min-height: auto;
+    width: var(#{v("size-field")});
+    height: var(#{v("size-field")});
+
+    &#{cls("button")}--medium {
+      width: var(#{v("size-control-xl")});
+      height: var(#{v("size-control-xl")});
+    }
+
+    &#{cls("button")}--small {
+      width: var(#{v("size-control-md")});
+      height: var(#{v("size-control-md")});
+    }
+  }
+
+  // ── ButtonGroup
+  // ⚠️ 원본의 camelCase `.buttonGroup` → kebab-case `.nui-button-group` 으로 정규화.
+  //    프로젝트 내 `.checkbox-group` 등과 표기가 갈려 있던 것을 통일했다.
+  #{cls("button-group")} {
+    width: 100%;
+
+    &__wrap {
+      display: flex;
+      gap: var(#{v("space-xs")});
+    }
+
+    &__item {
+      flex-grow: 1;
+      flex-basis: calc(50% - var(#{v("space-xs")}));
+    }
+
+    &__item > #{cls("button")} {
+      width: 100%;
+    }
+
+    &__item--auto {
+      flex-grow: 0;
+      flex-basis: auto;
+      width: fit-content;
+      max-width: 100%;
+    }
+  }
+}

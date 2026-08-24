@@ -1,0 +1,212 @@
+@use "../abstracts" as *;
+@use "message";
+
+// ─────────────────────────────────────────────────────────────
+// Textfield (Search / Password 파생 포함)
+//
+// 공개 훅: --nui-textfield-height / -radius / -border-color / -bg
+// 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("textfield")} {
+    width: 100%;
+
+    &__wrap {
+      display: flex;
+      align-items: center;
+      height: #{hook("textfield-height", var(#{v("size-field")}))};
+      background-color: #{hook("textfield-bg", var(#{v("control-bg")}))};
+      border: var(#{v("border-width")}) solid
+        #{hook("textfield-border-color", var(#{v("control-border")}))};
+      border-radius: #{hook("textfield-radius", var(#{v("radius-sm")}))};
+
+      @include motion(
+        (border-color, background-color, box-shadow, border-width),
+        "fast"
+      );
+    }
+
+    &__input-box {
+      flex-grow: 1;
+      min-width: 0;
+      height: 100%;
+    }
+
+    &__actions {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      height: 100%;
+      padding: 0 var(#{v("space-md")});
+    }
+
+    &__btn {
+      // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
+      appearance: none;
+      margin: 0;
+      padding: 0;
+      background-color: transparent;
+      border: 0;
+      font-family: var(#{v("font-family-base")});
+      cursor: pointer;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(#{v("size-icon-3xl")});
+      height: var(#{v("size-icon-3xl")});
+      margin-left: var(#{v("space-xs")});
+      color: var(#{v("control-icon")});
+      border-radius: var(#{v("radius-round")});
+
+      @include motion((color, background-color, opacity), "fast");
+      transition:
+        color var(#{v("duration-fast")}) var(#{v("easing-standard")}),
+        background-color var(#{v("duration-fast")}) var(#{v("easing-standard")}),
+        transform var(#{v("duration-quick")}) var(#{v("easing-standard")}),
+        opacity var(#{v("duration-fast")}) var(#{v("easing-standard")});
+    }
+
+    &__btn:first-child {
+      margin-left: 0;
+    }
+
+    &__btn #{cls("icon")} {
+      width: 100%;
+      height: 100%;
+    }
+
+    &__input {
+      // UA 기본 스타일 무력화 — 원본은 전역 reset 에 의존했으나
+      // 라이브러리는 reset 을 배포하지 않으므로 컴포넌트가 스스로 정규화한다.
+      appearance: none;
+      margin: 0;
+      background-color: transparent;
+      border: 0;
+      border-radius: 0;
+      font-family: var(#{v("font-family-base")});
+
+      width: 100%;
+      height: 100%;
+      padding: 0 var(#{v("space-2xs")}) 0 var(#{v("space-md")});
+      color: var(#{v("control-text")});
+      caret-color: var(#{v("control-text")});
+
+      @include typo("body", "regular", 1.5);
+    }
+
+    &__input:focus,
+    &__input:focus-visible {
+      outline: none;
+    }
+
+    &__input::placeholder {
+      color: var(#{v("control-text-placeholder")});
+
+      @include typo("body", "regular", 1.5);
+    }
+
+    &__unit {
+      margin-left: var(#{v("space-xs")});
+      color: var(#{v("control-text")});
+
+      @include motion(color, "fast");
+      @include typo("body", "regular", 1.5);
+    }
+
+    &__clear {
+      color: var(#{v("control-icon")});
+    }
+
+    // ── interaction
+    &:not(#{state("disabled")}):not(#{state("readonly")}):hover &__wrap {
+      border-color: var(#{v("control-border-hover")});
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")}):focus-within &__wrap {
+      border-color: var(#{v("focus-color")});
+      border-width: var(#{v("border-width-focus")});
+      box-shadow: var(#{v("shadow-focus")});
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")}) &__btn:hover {
+      color: var(#{v("control-icon-strong")});
+      background-color: var(#{v("control-bg-subtle")});
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")}) &__btn:active {
+      transform: scale(0.94);
+    }
+
+    // ── disabled
+    &#{state("disabled")} &__wrap {
+      background-color: var(#{v("control-bg-disabled")});
+      border-color: var(#{v("control-border-disabled")});
+    }
+
+    &__input[disabled] {
+      color: var(#{v("control-text-disabled")});
+      cursor: not-allowed;
+    }
+
+    &__btn[disabled] {
+      opacity: 0.2;
+      cursor: not-allowed;
+    }
+
+    &#{state("disabled")} &__unit {
+      color: var(#{v("control-text-muted")});
+    }
+
+    // ── readonly
+    &#{state("readonly")} &__wrap {
+      background-color: var(#{v("control-bg-readonly")});
+      border-color: var(#{v("control-border-disabled")});
+
+      #{cls("textfield")}__btn {
+        opacity: 0.6;
+      }
+
+      #{cls("textfield")}__input {
+        color: var(#{v("control-text-muted")});
+        cursor: default;
+      }
+
+      #{cls("textfield")}__unit {
+        color: var(#{v("control-text-muted")});
+      }
+    }
+
+    // ── error
+    &#{state("error")} &__wrap {
+      background-color: var(#{v("control-bg")});
+      border-color: var(#{v("control-border-error")});
+    }
+
+    &#{state("error")} &__input {
+      caret-color: var(#{v("control-text-error")});
+    }
+
+    &#{state("error")} &__unit {
+      color: var(#{v("control-text-error")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")}):not(#{state("readonly")}):hover
+      &__wrap {
+      border-color: var(#{v("control-border-error")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")}):not(
+        #{state("readonly")}
+      ):focus-within
+      &__wrap {
+      border-color: var(#{v("control-border-error")});
+      box-shadow: var(#{v("shadow-focus-error")});
+    }
+
+    // ── modifier
+    &--text-right &__input {
+      text-align: right;
+    }
+  }
+}

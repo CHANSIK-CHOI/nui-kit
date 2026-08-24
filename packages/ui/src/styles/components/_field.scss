@@ -1,0 +1,108 @@
+@use "../abstracts" as *;
+
+// ─────────────────────────────────────────────────────────────
+// Field / Field.Item / Field.Grid / Field.Label / Field.Description
+//
+// 공개 훅: --nui-field-grid-columns (기본 2)
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("field")} {
+    display: flex;
+    width: 100%;
+    gap: var(#{v("space-sm")});
+
+    &--row {
+      flex-direction: row;
+    }
+
+    &--column {
+      flex-direction: column;
+    }
+
+    &--align-start {
+      align-items: flex-start;
+    }
+
+    &--align-center {
+      align-items: center;
+    }
+
+    &__label {
+      color: var(#{v("text-primary")});
+
+      @include typo("body-sm", "medium", 1.5, -0.01em);
+    }
+
+    label#{cls("field")}__label {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    &#{state("error")} > &__label,
+    &__item#{state("error")} > &__label {
+      color: var(#{v("text-danger")});
+    }
+
+    &__description {
+      margin: -0.125rem 0 0; // -2px
+      color: var(#{v("text-secondary")});
+
+      @include typo("label", "regular", 1.55, 0);
+    }
+
+    &__message {
+      margin-top: -0.125rem; // -2px
+
+      #{cls("message")} {
+        margin-top: 0;
+      }
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(#{v("space-md")});
+      width: 100%;
+
+      @include respond-to("mobile") {
+        grid-template-columns: repeat(
+          var(#{v("field-grid-columns")}, 2),
+          minmax(0, 1fr)
+        );
+      }
+
+      > #{cls("field")},
+      > #{cls("field")}__item {
+        min-width: 0;
+      }
+    }
+
+    &__item {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      gap: var(#{v("space-sm")});
+
+      &--row {
+        flex-direction: row;
+      }
+
+      &--column {
+        flex-direction: column;
+      }
+
+      &--align-start {
+        align-items: flex-start;
+      }
+
+      &--align-center {
+        align-items: center;
+      }
+
+      > #{cls("field")}__description,
+      > #{cls("field")}__message {
+        flex: 1 1 100%;
+      }
+    }
+  }
+}

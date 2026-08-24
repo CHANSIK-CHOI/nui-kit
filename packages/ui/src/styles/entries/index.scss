@@ -1,10 +1,14 @@
 // → styles/index.css
-// 전체 번들. 토큰 + 전 컴포넌트 스타일.
+// 전체 번들. 토큰 + 스코프 정규화 + 전 컴포넌트 스타일 + 유틸.
 // reset(preflight)은 의도적으로 포함하지 않는다 — 소비자 프로젝트 오염 방지.
 @use "abstracts/layer";
 @use "tokens/seed";
+@use "base/normalize";
 
-// 1단계 파일럿부터 컴포넌트 스타일을 여기에 순차 등록한다.
-// @use "components/button";
-// @use "components/field";
-// @use "components/textfield";
+// components — 파일럿 3개
+@use "components/button";
+@use "components/field";
+@use "components/textfield";
+
+// utilities
+@use "utilities/a11y";
