@@ -60,8 +60,9 @@
     "build:styles": "sass --no-source-map --style=compressed --load-path=src/styles src/styles/entries:styles",
     "dev:styles": "sass --watch --no-source-map --load-path=src/styles src/styles/entries:styles",
     "typecheck": "tsc --noEmit",
-    "verify": "publint --strict && attw --pack . --profile esm-only",
-    "prepublishOnly": "npm run build"
+    "verify": "npm run verify:css && publint --strict && attw --pack . --profile esm-only",
+    "prepublishOnly": "npm run build",
+    "verify:css": "node scripts/check-css-isolation.mjs"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

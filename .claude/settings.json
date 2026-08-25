@@ -2,6 +2,7 @@
   "enabledMcpjsonServers": ["context7", "playwright", "chrome-devtools"],
   "language": "korean",
   "permissions": {
+    "defaultMode": "plan",
     "allow": [
       "mcp__context7",
       "mcp__playwright",
@@ -17,7 +18,39 @@
       "Bash(npm publish *)",
       "Bash(rm -rf *)",
       "Write(./.env)",
-      "Write(./.env.*)"
+      "Write(./.env.*)",
+      "Edit(../next-ui-components-guide/**)",
+      "Write(../next-ui-components-guide/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/format-on-edit.sh"
+          },
+          { "type": "command", "command": "bash .claude/hooks/style-guard.sh" }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/changeset-reminder.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/typecheck.sh",
+            "timeout": 180
+          }
+        ]
+      }
     ]
   }
 }
