@@ -1,0 +1,10 @@
+@use "../abstracts" as *;
+
+@layer nui.components {
+  #{cls("icon")} {
+    display: block;
+    flex-shrink: 0;
+    width: 100%;
+    height: 100%;
+  }
+}

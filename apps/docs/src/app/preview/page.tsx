@@ -1,100 +1,87 @@
-// ⚠️ 1단계 스타일 검증용 임시 페이지.
-//    실제 React 컴포넌트는 2단계에서 이전하며, 이 페이지는 4단계에서 문서 페이지로 대체된다.
-//    여기서는 CSS 만 검증하므로 의도적으로 raw markup 을 사용한다.
-import type { CSSProperties, ReactNode } from "react";
+// ⚠️ 2단계 검증용 임시 페이지. 4단계에서 정식 문서 페이지로 대체된다.
+//    실제 배포 패키지(@chansikchoi/next-ui)를 그대로 import 해서
+//    배럴 / 서브패스 / RHF 서브패스 / Context 공유가 모두 동작하는지 확인한다.
+import type { CSSProperties } from "react";
 
-export const metadata = { title: "Style Preview" };
+// ① 배럴 import
+import {
+  Button,
+  ButtonGroup,
+  ButtonGroupItem,
+  IconButton,
+  Field,
+  FieldLabel,
+  FieldDescription,
+  FieldGrid,
+} from "@chansikchoi/next-ui";
+// ② 서브패스 import — 같은 Context 를 공유해야 한다
+import { Textfield } from "@chansikchoi/next-ui/textfield";
+import { DelIcon } from "@chansikchoi/next-ui/icon";
 
-const row: CSSProperties = {
-  display: "flex",
-  gap: "0.5rem",
-  alignItems: "center",
-  flexWrap: "wrap",
-  marginBottom: "1.5rem",
-};
+import { RhfDemo } from "./RhfDemo";
+
+export const metadata = { title: "Component Preview" };
 
 const h2: CSSProperties = {
   fontSize: "var(--nui-font-size-body)",
   marginTop: "2rem",
   marginBottom: "0.5rem",
 };
-
-function Btn({
-  children,
-  className = "",
-  disabled,
-}: {
-  children: ReactNode;
-  className?: string;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      className={`nui-button ${className}`}
-      disabled={disabled}
-    >
-      <span className="nui-button__wrap">{children}</span>
-    </button>
-  );
-}
-
-function Input({
-  id,
-  placeholder,
-  defaultValue,
-  unit,
-}: {
-  id?: string;
-  placeholder?: string;
-  defaultValue?: string;
-  unit?: string;
-}) {
-  return (
-    <div className="nui-textfield__wrap">
-      <div className="nui-textfield__input-box">
-        <input
-          id={id}
-          className="nui-textfield__input"
-          placeholder={placeholder}
-          defaultValue={defaultValue}
-        />
-      </div>
-      <div className="nui-textfield__actions">
-        {unit ? <span className="nui-textfield__unit">{unit}</span> : null}
-      </div>
-    </div>
-  );
-}
+const row: CSSProperties = {
+  display: "flex",
+  gap: "0.5rem",
+  alignItems: "center",
+  flexWrap: "wrap",
+  marginBottom: "1rem",
+};
 
 export default function PreviewPage() {
   return (
     <main style={{ padding: "3rem 1.5rem", maxWidth: 880, margin: "0 auto" }}>
       <h1 style={{ fontSize: "var(--nui-font-size-title)" }}>
-        1단계 스타일 검증
+        2단계 컴포넌트 검증
       </h1>
 
-      <h2 style={h2}>Button — color</h2>
+      <h2 style={h2}>Button — color (배럴 import)</h2>
       <div style={row}>
-        <Btn>black</Btn>
-        <Btn className="nui-button--primary">primary</Btn>
-        <Btn className="nui-button--secondary">secondary</Btn>
-        <Btn className="nui-button--point">point</Btn>
+        <Button>black</Button>
+        <Button color="primary">primary</Button>
+        <Button color="secondary">secondary</Button>
+        <Button color="point">point</Button>
       </div>
 
-      <h2 style={h2}>Button — variant / size / disabled</h2>
+      <h2 style={h2}>Button — variant / shape / size</h2>
       <div style={row}>
-        <Btn className="nui-button--line nui-button--primary">line</Btn>
-        <Btn className="nui-button--text">text</Btn>
-        <Btn className="nui-button--round nui-button--primary">round</Btn>
-        <Btn className="nui-button--small">small</Btn>
-        <Btn className="nui-button--medium">medium</Btn>
-        <Btn disabled>disabled</Btn>
+        <Button variant="line" color="primary">
+          line
+        </Button>
+        <Button variant="text">text</Button>
+        <Button shape="round" color="primary">
+          round
+        </Button>
+        <Button size="medium">medium</Button>
+        <Button size="small">small</Button>
+        <Button disabled>disabled</Button>
+        <Button icon={<DelIcon />}>with icon</Button>
+      </div>
+
+      <h2 style={h2}>IconButton</h2>
+      <div style={row}>
+        <IconButton aria-label="삭제">
+          <DelIcon />
+        </IconButton>
+        <IconButton
+          variant="line"
+          color="primary"
+          aria-label="삭제"
+          size="small"
+        >
+          <DelIcon />
+        </IconButton>
       </div>
 
       <h2 style={h2}>
-        커스터마이징 훅 — --nui-button-bg 는 기본 버튼만, variant 는 자기 훅을
-        따름
+        커스터마이징 훅 — --nui-button-bg 는 기본 버튼만, variant 는 자기 훅
       </h2>
       <div
         style={
@@ -105,68 +92,69 @@ export default function PreviewPage() {
           } as CSSProperties
         }
       >
-        <Btn>훅으로 덮어쓴 버튼</Btn>
-        <Btn className="nui-button--primary">primary 는 영향 없음</Btn>
+        <Button>훅으로 덮어쓴 버튼</Button>
+        <Button color="primary">primary 는 영향 없음</Button>
       </div>
 
-      <h2 style={h2}>Field + Textfield</h2>
-      <div className="nui-field nui-field--column" style={{ marginBottom: 24 }}>
-        <label className="nui-field__label" htmlFor="pv-1">
-          이름
-        </label>
-        <div className="nui-textfield">
-          <Input id="pv-1" placeholder="내용을 입력해주세요" />
-        </div>
-        <p className="nui-field__description">설명 텍스트입니다.</p>
-      </div>
+      <h2 style={h2}>Field + Textfield (Context 공유 — 서브패스 import)</h2>
+      <p
+        style={{
+          color: "var(--nui-color-text-secondary)",
+          fontSize: "var(--nui-font-size-label)",
+        }}
+      >
+        이 페이지는 Server Component 다 — dot notation 대신 named export
+        (FieldLabel / FieldGrid …)를 쓴다. dot notation 은 아래 RHF
+        데모(Client)에서 검증한다.
+      </p>
+      <Field>
+        <FieldLabel>이름</FieldLabel>
+        <Textfield placeholder="내용을 입력해주세요" />
+        <FieldDescription>
+          Field 가 생성한 id 가 label / input / description 에 자동 연결됩니다.
+        </FieldDescription>
+      </Field>
 
-      <div className="nui-field nui-field--column">
-        <label className="nui-field__label" htmlFor="pv-2">
-          에러 상태
-        </label>
-        <div className="nui-textfield nui-is-error">
-          <Input id="pv-2" defaultValue="잘못된 값" unit="원" />
-          <div className="nui-message">
-            <span className="nui-message__msg nui-message__msg--error">
-              에러 메시지입니다.
-            </span>
-          </div>
-        </div>
-      </div>
+      <div style={{ height: 20 }} />
 
-      <div className="nui-field nui-field--column" style={{ marginTop: 24 }}>
-        <label className="nui-field__label" htmlFor="pv-3">
-          disabled / readonly
-        </label>
-        <div className="nui-textfield nui-is-disabled">
-          <Input id="pv-3" placeholder="disabled" />
-        </div>
-        <div className="nui-textfield nui-is-readonly">
-          <Input placeholder="readonly" />
-        </div>
-      </div>
+      <Field errorMessage="필수 입력 항목입니다.">
+        <FieldLabel>에러 상태</FieldLabel>
+        {/* Textfield 는 controlled 컴포넌트 — defaultValue 는 타입에서 제외되어 있다 */}
+        <Textfield placeholder="금액" unit="원" />
+      </Field>
 
-      <h2 style={h2}>Field.Grid (데스크톱 2열)</h2>
-      <div className="nui-field__grid">
-        <div className="nui-textfield">
-          <Input placeholder="좌측" />
-        </div>
-        <div className="nui-textfield">
-          <Input placeholder="우측" />
-        </div>
-      </div>
+      <div style={{ height: 20 }} />
+
+      <Field>
+        <FieldLabel>disabled / readonly</FieldLabel>
+        <Textfield placeholder="disabled" disabled />
+        <Textfield placeholder="readonly" readOnly />
+      </Field>
+
+      <h2 style={h2}>Field.Grid (columns=2)</h2>
+      <FieldGrid columns={2}>
+        <Field>
+          <FieldLabel>좌측</FieldLabel>
+          <Textfield placeholder="좌측" />
+        </Field>
+        <Field>
+          <FieldLabel>우측</FieldLabel>
+          <Textfield placeholder="우측" />
+        </Field>
+      </FieldGrid>
+
+      <h2 style={h2}>RHF 래퍼 (@chansikchoi/next-ui/rhf)</h2>
+      <RhfDemo />
 
       <h2 style={h2}>ButtonGroup</h2>
-      <div className="nui-button-group">
-        <div className="nui-button-group__wrap">
-          <div className="nui-button-group__item">
-            <Btn className="nui-button--line">취소</Btn>
-          </div>
-          <div className="nui-button-group__item">
-            <Btn className="nui-button--primary">확인</Btn>
-          </div>
-        </div>
-      </div>
+      <ButtonGroup>
+        <ButtonGroupItem>
+          <Button variant="line">취소</Button>
+        </ButtonGroupItem>
+        <ButtonGroupItem>
+          <Button color="primary">확인</Button>
+        </ButtonGroupItem>
+      </ButtonGroup>
     </main>
   );
 }

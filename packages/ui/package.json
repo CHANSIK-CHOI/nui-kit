@@ -31,6 +31,22 @@
       "types": "./dist/rhf.d.ts",
       "default": "./dist/rhf.js"
     },
+    "./button": {
+      "types": "./dist/button.d.ts",
+      "default": "./dist/button.js"
+    },
+    "./field": {
+      "types": "./dist/field.d.ts",
+      "default": "./dist/field.js"
+    },
+    "./textfield": {
+      "types": "./dist/textfield.d.ts",
+      "default": "./dist/textfield.js"
+    },
+    "./icon": {
+      "types": "./dist/icon.d.ts",
+      "default": "./dist/icon.js"
+    },
     "./styles/*.css": "./styles/*.css",
     "./package.json": "./package.json"
   },
@@ -50,10 +66,14 @@
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "react-hook-form": ">=7.50.0"
+    "react-hook-form": ">=7.50.0",
+    "next": ">=14"
   },
   "peerDependenciesMeta": {
     "react-hook-form": {
+      "optional": true
+    },
+    "next": {
       "optional": true
     }
   },
@@ -75,6 +95,7 @@
     "react-hook-form": "^7.71.2",
     "sass": "1.103.1",
     "tsup": "8.5.1",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "next": "16.3.2"
   }
 }

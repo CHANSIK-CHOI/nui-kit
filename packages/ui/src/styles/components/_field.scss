@@ -60,16 +60,16 @@
 
     &__grid {
       display: grid;
-      grid-template-columns: 1fr;
       gap: var(#{v("space-md")});
       width: 100%;
 
-      @include respond-to("mobile") {
-        grid-template-columns: repeat(
-          var(#{v("field-grid-columns")}, 2),
-          minmax(0, 1fr)
-        );
-      }
+      // ⏸️ 모바일 1열 붕괴(브레이크포인트)는 보류 — 별도 단계에서 일괄 적용.
+      //    현재는 컬럼 수를 항상 적용한다. 1열이 필요하면
+      //    --nui-field-grid-columns: 1 로 제어한다.
+      grid-template-columns: repeat(
+        var(#{v("field-grid-columns")}, 2),
+        minmax(0, 1fr)
+      );
 
       > #{cls("field")},
       > #{cls("field")}__item {

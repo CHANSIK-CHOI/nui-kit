@@ -1,4 +1,7 @@
 // → styles/field.css  (온디맨드: tokens.css 와 함께 import)
+// Field.Message 가 Message 를 렌더하므로 message / icon 스타일을 함께 포함한다.
 @use "abstracts/layer";
 @use "base/normalize";
+@use "components/icon";
+@use "components/message";
 @use "components/field";

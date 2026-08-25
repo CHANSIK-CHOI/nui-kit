@@ -1,4 +1,6 @@
 // → styles/textfield.css  (온디맨드: tokens.css 와 함께 import)
+// message / icon 스타일을 내부적으로 함께 포함한다 (Textfield 가 둘 다 렌더하므로).
 @use "abstracts/layer";
 @use "base/normalize";
+@use "components/icon";
 @use "components/textfield";

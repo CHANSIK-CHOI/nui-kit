@@ -18,7 +18,8 @@ npm install @chansikchoi/next-ui
 "peerDependencies": {
   "react": "^18 || ^19",
   "react-dom": "^18 || ^19",
-  "react-hook-form": ">=7.50.0"   // optional — /rhf 사용 시에만
+  "react-hook-form": ">=7.50.0",  // optional — /rhf 사용 시에만
+  "next": ">=14"                  // optional — ButtonLink 사용 시에만
 }
 ```
 
@@ -82,11 +83,50 @@ CSS 변수 2계층 구조. `!important` 없이 덮어쓸 수 있습니다.
 
 ```tsx
 // 배럴
-import { Button } from "@chansikchoi/next-ui";
+import { Button, Field, Textfield } from "@chansikchoi/next-ui";
 
-// react-hook-form 래퍼
+// 컴포넌트별 서브패스 (트리셰이킹)
+import { Button } from "@chansikchoi/next-ui/button";
+import { Textfield } from "@chansikchoi/next-ui/textfield";
+
+// react-hook-form 래퍼 (react-hook-form 설치 필요)
 import { RHFTextfield } from "@chansikchoi/next-ui/rhf";
 ```
+
+배럴로 가져오든 서브패스로 가져오든 **같은 React Context 를 공유**하므로
+`Field` + `Textfield` 조합을 서로 다른 경로에서 import 해도 정상 동작합니다.
+
+### ⚠️ Server Component 에서 쓸 때 — dot notation 불가
+
+모든 컴포넌트는 `"use client"` 로 배포됩니다. Server Component 에서 이들을 import 하면
+React 는 client reference 프록시로 치환하는데, **정적 프로퍼티(dot notation)는 `undefined`
+가 됩니다.** 그래서 서브 컴포넌트를 named export 로도 함께 제공합니다.
+
+```tsx
+// ❌ Server Component — 런타임 에러 (Element type is invalid)
+<Field.Label>이름</Field.Label>
+
+// ✅ Server Component — named export 사용
+import { Field, FieldLabel } from "@chansikchoi/next-ui";
+<FieldLabel>이름</FieldLabel>
+
+// ✅ Client Component ("use client") — dot notation 사용 가능
+<Field.Label>이름</Field.Label>
+```
+
+| dot notation | named export |
+| --- | --- |
+| `Field.Item` | `FieldItem` |
+| `Field.Grid` | `FieldGrid` |
+| `Field.Label` | `FieldLabel` |
+| `Field.Description` | `FieldDescription` |
+| `Field.Message` | `FieldMessage` |
+| `ButtonGroup.Item` | `ButtonGroupItem` |
+
+### ButtonLink 와 `next`
+
+`ButtonLink` 만 `next/link` 를 사용합니다. `next` 는 optional peer 이므로
+`ButtonLink` 를 쓰지 않으면 설치할 필요가 없습니다.
 
 ## 라이선스
 
