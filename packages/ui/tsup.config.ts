@@ -8,6 +8,10 @@ export default defineConfig({
     button: "src/button.ts",
     field: "src/field.ts",
     textfield: "src/textfield.ts",
+    textarea: "src/textarea.ts",
+    checkbox: "src/checkbox.ts",
+    radio: "src/radio.ts",
+    switch: "src/switch.ts",
     icon: "src/icon.ts",
   },
   // App Router 전용 라이브러리 — ESM 단일 포맷.

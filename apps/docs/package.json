@@ -8,7 +8,8 @@
     "build": "npm run generate && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "generate": "node scripts/extract-props.mjs && node scripts/extract-tokens.mjs"
+    "generate": "node scripts/extract-props.mjs && node scripts/extract-tokens.mjs",
+    "verify:console": "node scripts/check-console.mjs"
   },
   "dependencies": {
     "@chansikchoi/next-ui": "*",
@@ -25,6 +26,7 @@
     "@types/node": "^24.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "playwright": "^1.62.1",
     "sass": "1.103.1",
     "typescript": "^5.9.3"
   }

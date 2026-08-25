@@ -22,7 +22,8 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build:ui && npm run verify:pkg && changeset publish",
-    "refs:check": "node scripts/check-refs.mjs"
+    "refs:check": "node scripts/check-refs.mjs",
+    "verify:console": "npm run verify:console -w docs"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.1",

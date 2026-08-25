@@ -1,0 +1,267 @@
+@use "../abstracts" as *;
+
+// ─────────────────────────────────────────────────────────────
+// Checkbox / Radio / Switch  (공통 골격 + 각각의 표시부)
+//
+// 구조: <span.block> <input.block__input(투명)> <span.block__control> </span>
+//   실제 input 을 투명하게 덮어 접근성·키보드 조작을 유지하고,
+//   시각 표현은 형제 요소가 담당한다 (`appearance: none` 대신 이 방식을 쓰는 이유는
+//   OS 별 렌더 차이를 완전히 배제하기 위함).
+//
+// 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("checkbox")},
+  #{cls("radio")},
+  #{cls("switch")} {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    cursor: pointer;
+
+    &#{state("disabled")} {
+      cursor: not-allowed;
+    }
+
+    &#{state("readonly")} {
+      cursor: default;
+    }
+
+    &__input {
+      // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
+      appearance: none;
+
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: inherit;
+
+      &:focus-visible + #{cls("checkbox")}__control,
+      &:focus-visible + #{cls("radio")}__control,
+      &:focus-visible + #{cls("switch")}__control {
+        border-color: var(#{v("focus-color")});
+        box-shadow: var(#{v("shadow-focus-strong")});
+      }
+    }
+
+    &__control {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: var(#{v("text-inverse-strong")});
+      background-color: var(#{v("control-bg")});
+      border: var(#{v("border-width")}) solid var(#{v("control-border")});
+
+      @include motion((border-color, background-color, box-shadow, color));
+    }
+
+    &__indicator {
+      display: inline-block;
+      opacity: 0;
+
+      @include motion((opacity, transform, background-color));
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")}):not(
+        #{state("error")}
+      ):hover
+      &__control {
+      border-color: var(#{v("control-accent")});
+    }
+
+    &#{state("error")} &__control {
+      border-color: var(#{v("control-border-error")});
+    }
+
+    &#{state("disabled")} &__control {
+      background-color: var(#{v("control-bg-subtle")});
+      border-color: var(#{v("control-border-disabled")});
+    }
+
+    &#{state("readonly")} &__control {
+      background-color: var(#{v("control-bg-readonly")});
+    }
+  }
+
+  #{cls("checkbox")},
+  #{cls("radio")} {
+    width: #{hook("selector-size", var(#{v("size-selector")}))};
+    height: #{hook("selector-size", var(#{v("size-selector")}))};
+  }
+
+  // ── 그룹 레이아웃
+  #{cls("checkbox-group")},
+  #{cls("radio-group")} {
+    display: flex;
+    gap: var(#{v("space-sm")});
+
+    &--row {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+
+      // Field 는 기본이 width:100% 라 그대로 두면 가로 배치가 무의미해진다
+      // (각 항목이 한 줄을 차지해 세로로 쌓인다).
+      > #{cls("field")} {
+        width: auto;
+      }
+    }
+
+    &--column {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  // ── Checkbox
+  #{cls("checkbox")} {
+    &__control {
+      border-radius: var(#{v("radius-sm")});
+    }
+
+    &__indicator {
+      width: var(#{v("size-dot-xs")});
+      height: var(#{v("size-icon-sm")});
+      border-right: 0.125rem solid currentColor;
+      border-bottom: 0.125rem solid currentColor;
+      transform: rotate(45deg) scale(0.6);
+      transform-origin: center;
+    }
+
+    &__input:checked + #{cls("checkbox")}__control {
+      background-color: var(#{v("control-accent")});
+      border-color: var(#{v("control-accent")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")})
+      #{cls("checkbox")}__input:checked
+      + #{cls("checkbox")}__control {
+      background-color: var(#{v("control-accent-error")});
+      border-color: var(#{v("control-accent-error")});
+    }
+
+    &#{state("disabled")}
+      #{cls("checkbox")}__input:checked
+      + #{cls("checkbox")}__control {
+      background-color: var(#{v("control-selection-disabled")});
+      border-color: var(#{v("control-selection-disabled")});
+    }
+
+    &__input:checked
+      + #{cls("checkbox")}__control
+      #{cls("checkbox")}__indicator {
+      opacity: 1;
+      transform: rotate(45deg) scale(1);
+    }
+  }
+
+  // ── Radio
+  #{cls("radio")} {
+    &__control {
+      border-radius: var(#{v("radius-round")});
+    }
+
+    &__indicator {
+      width: var(#{v("size-dot-sm")});
+      height: var(#{v("size-dot-sm")});
+      background-color: currentColor;
+      border-radius: var(#{v("radius-round")});
+      transform: scale(0.4);
+    }
+
+    &__input:checked + #{cls("radio")}__control {
+      color: var(#{v("control-accent")});
+      background-color: var(#{v("control-bg")});
+      border-color: var(#{v("control-accent")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")})
+      #{cls("radio")}__input:checked
+      + #{cls("radio")}__control {
+      color: var(#{v("control-accent-error")});
+      border-color: var(#{v("control-accent-error")});
+    }
+
+    &#{state("disabled")}
+      #{cls("radio")}__input:checked
+      + #{cls("radio")}__control {
+      color: var(#{v("control-selection-disabled")});
+      border-color: var(#{v("control-selection-disabled")});
+    }
+
+    &__input:checked + #{cls("radio")}__control #{cls("radio")}__indicator {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  // ── Switch
+  #{cls("switch")} {
+    width: #{hook("switch-width", var(#{v("size-switch-track-w")}))};
+    height: #{hook("switch-height", var(#{v("size-switch-track-h")}))};
+
+    &__control {
+      justify-content: flex-start;
+      padding: var(#{v("space-2xs")});
+      background-color: var(#{v("control-border-disabled")});
+      border-color: var(#{v("control-border-disabled")});
+      border-radius: var(#{v("radius-pill-fluid")});
+    }
+
+    &__thumb {
+      display: inline-block;
+      width: var(#{v("size-icon-2xl")});
+      height: var(#{v("size-icon-2xl")});
+      background-color: var(#{v("text-inverse-strong")});
+      border-radius: var(#{v("radius-round")});
+      box-shadow: var(#{v("shadow-thumb")});
+
+      @include motion((transform, background-color));
+    }
+
+    &__input:checked + #{cls("switch")}__control {
+      background-color: var(#{v("control-accent")});
+      border-color: var(#{v("control-accent")});
+    }
+
+    &__input:checked + #{cls("switch")}__control #{cls("switch")}__thumb {
+      transform: translateX(var(#{v("size-icon-2xl")}));
+    }
+
+    &#{state("error")}:not(#{state("disabled")})
+      #{cls("switch")}__input:checked
+      + #{cls("switch")}__control {
+      background-color: var(#{v("control-accent-error")});
+      border-color: var(#{v("control-accent-error")});
+    }
+
+    &#{state("disabled")} #{cls("switch")}__control {
+      background-color: var(#{v("control-border-disabled")});
+      border-color: var(#{v("control-border-disabled")});
+    }
+
+    &#{state("disabled")}
+      #{cls("switch")}__input:checked
+      + #{cls("switch")}__control {
+      background-color: var(#{v("control-selection-disabled")});
+      border-color: var(#{v("control-selection-disabled")});
+    }
+
+    // ⚠️ error / disabled 와 상세도가 같아 소스 순서만으로는 readonly 가 이겨버린다.
+    //    상태 우선순위는 disabled > error > readonly 이므로 명시적으로 제외한다.
+    //    (readonly 는 "바꿀 수 없다"일 뿐이라 색은 평상시와 같아야 하지만,
+    //     에러·비활성 표시를 덮어서는 안 된다)
+    &#{state("readonly")}:not(#{state("error")}):not(#{state("disabled")})
+      #{cls("switch")}__input:checked
+      + #{cls("switch")}__control {
+      background-color: var(#{v("control-accent")});
+      border-color: var(#{v("control-accent")});
+    }
+  }
+}

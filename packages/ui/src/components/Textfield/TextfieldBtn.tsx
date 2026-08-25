@@ -3,14 +3,16 @@
 import cn from "classnames";
 import type { ButtonHTMLAttributes } from "react";
 import { px } from "../../internal/prefix.js";
-import { DelIcon } from "../Icon/index.js";
+import { DelIcon, SearchIcon, ShowPwIcon, HidePwIcon } from "../Icon/index.js";
 
 const block = px("textfield");
 
-// 파일럿 범위에서는 clear 만 사용한다.
-// showPw / hidePw / search / date 는 각 컴포넌트(Password/Search/Datepicker) 이식 시 추가한다.
+// date 는 Datepicker 이식 시 추가한다.
 const ICON_MAP = {
   clear: <DelIcon />,
+  search: <SearchIcon />,
+  showPw: <ShowPwIcon />,
+  hidePw: <HidePwIcon />,
 } as const;
 
 export type TextfieldBtnIcon = keyof typeof ICON_MAP;

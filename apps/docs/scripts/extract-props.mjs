@@ -92,6 +92,38 @@ const TARGETS = [
     file: "components/Textfield/TextfieldBtn.tsx",
     type: "TextfieldBtnProps",
   },
+  {
+    name: "Search",
+    file: "components/Textfield/Search.tsx",
+    type: "SearchProps",
+  },
+  {
+    name: "Password",
+    file: "components/Textfield/Password.tsx",
+    type: "PasswordProps",
+  },
+  {
+    name: "Textarea",
+    file: "components/Textarea/Textarea.tsx",
+    type: "TextareaProps",
+  },
+  {
+    name: "Checkbox",
+    file: "components/Checkbox/Checkbox.tsx",
+    type: "CheckboxProps",
+  },
+  {
+    name: "CheckboxGroup",
+    file: "components/Checkbox/CheckboxGroup.tsx",
+    type: "CheckboxGroupProps",
+  },
+  { name: "Radio", file: "components/Radio/Radio.tsx", type: "RadioProps" },
+  {
+    name: "RadioGroup",
+    file: "components/Radio/RadioGroup.tsx",
+    type: "RadioGroupProps",
+  },
+  { name: "Switch", file: "components/Switch/Switch.tsx", type: "SwitchProps" },
   { name: "Icon", file: "components/Icon/Icon.tsx", type: "IconProps" },
 ];
 

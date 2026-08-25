@@ -28,6 +28,12 @@ export const NAV: NavSection[] = [
       { title: "Button", href: "/components/button" },
       { title: "Field", href: "/components/field" },
       { title: "Textfield", href: "/components/textfield" },
+      { title: "Textarea", href: "/components/textarea" },
+      { title: "Search", href: "/components/search" },
+      { title: "Password", href: "/components/password" },
+      { title: "Checkbox", href: "/components/checkbox" },
+      { title: "Radio", href: "/components/radio" },
+      { title: "Switch", href: "/components/switch" },
     ],
   },
 ];

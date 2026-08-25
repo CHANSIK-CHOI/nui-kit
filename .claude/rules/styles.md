@@ -95,7 +95,22 @@ z-index 는 전부 `tokens/_seed.scss` 의 CSS 변수다.
 > 사용처가 없다. 반응형은 별도 단계에서 일괄 적용한다 — 개별 컴포넌트에서
 > 임의로 미디어쿼리를 넣지 않는다.
 
-## 7. 서드파티 스타일은 우리 스코프 안에서만 덮는다
+## 7. 상태 우선순위를 소스 순서에 의존하지 않는다 ★
+
+`.nui-is-error` / `.nui-is-disabled` / `.nui-is-readonly` 는 **상세도가 같다.**
+따라서 나중에 쓴 규칙이 이긴다 — 파일 안에서 순서를 바꾸면 색이 조용히 뒤바뀐다.
+
+실제로 Switch 에서 `readonly` 가 `error` 를 덮어, 에러 상태 스위치가 초록으로
+렌더된 적이 있다. 타입 검사·CSS 격리 검사 모두 통과했고 브라우저에서만 드러났다.
+
+**우선순위: `disabled` > `error` > `readonly`.** `:not()` 으로 명시한다.
+
+```scss
+&#{state("error")}:not(#{state("disabled")}) { … }
+&#{state("readonly")}:not(#{state("error")}):not(#{state("disabled")}) { … }
+```
+
+## 8. 서드파티 스타일은 우리 스코프 안에서만 덮는다
 
 ```scss
 #{cls("datepicker")} .rdp-day { }   // ✅
