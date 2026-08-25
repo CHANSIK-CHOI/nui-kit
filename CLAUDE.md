@@ -82,6 +82,10 @@ npm run verify:pkg     # verify:css + publint + attw
 npm run build:ui       # tsup + tsc + sass
 npm run build:docs     # generate(props/토큰 추출) + next build
 npm run refs:check     # Context7 캐시 신선도
+
+# dev server 가 떠 있어야 하는 것 (npm run dev)
+npm run verify:console     # 전 페이지 콘솔 에러·경고
+npm run verify:select-rhf  # RHF 연동 Select 의 remount 회귀
 ```
 
 **문서는 손으로 쓰지 않는 부분이 있다.** `apps/docs/scripts/extract-props.mjs` 가 컴포넌트

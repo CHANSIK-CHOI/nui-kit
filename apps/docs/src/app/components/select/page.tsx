@@ -1,5 +1,6 @@
 import { PropsTable } from "@/components/PropsTable";
 import { SelectDemo } from "./SelectDemo";
+import { RHFSelectDemo } from "./RHFSelectDemo";
 
 export const metadata = { title: "Select" };
 
@@ -35,6 +36,8 @@ const OPTIONS = [
       </div>
 
       <SelectDemo />
+
+      <RHFSelectDemo />
 
       <h2>스타일 커스터마이징</h2>
       <p>
