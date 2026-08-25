@@ -88,6 +88,8 @@
     #{v("surface-neutral-soft")}: rgb(17 24 39 / 4%);
     #{v("surface-neutral-subtle")}: rgb(17 24 39 / 6%);
     #{v("surface-panel-strong")}: rgb(255 255 255 / 96%);
+    #{v("surface-inverse")}: rgb(17 24 39 / 96%);
+    #{v("surface-toast-error")}: rgb(127 29 29 / 96%);
     #{v("surface-overlay-dim")}: rgb(17 24 39 / 54%);
     #{v("gradient-panel-soft")}: linear-gradient(
       180deg,
@@ -116,6 +118,7 @@
     #{v("control-border-disabled")}: var(#{v("line-color-3")});
     #{v("control-border-error")}: var(#{v("color-error")});
     #{v("control-accent")}: var(#{v("color-primary")});
+    #{v("control-accent-soft")}: var(#{v("color-primary-bright")});
     #{v("control-accent-error")}: var(#{v("color-error")});
     #{v("control-selection-disabled")}: var(#{v("line-color-2")});
 
@@ -178,6 +181,9 @@
     #{v("shadow-toast")}: 0 0.875rem 2rem rgb(17 24 39 / 22%);
     #{v("shadow-thumb")}: 0 0.125rem 0.375rem rgb(15 23 42 / 18%);
     #{v("shadow-inset-soft")}: inset 0 1px 0 rgb(255 255 255 / 76%);
+    #{v("shadow-inset-inverse")}: inset 0 1px 0 rgb(255 255 255 / 8%);
+    #{v("shadow-ring-brand")}: 0 0 0 0.25rem rgb(220 252 231 / 18%);
+    #{v("shadow-ring-error")}: 0 0 0 0.25rem rgb(254 226 226 / 18%);
     #{v("shadow-focus")}: 0 0 0 0.25rem rgb(28 166 115 / 14%);
     #{v("shadow-focus-strong")}: 0 0 0 0.25rem rgb(28 166 115 / 16%);
     #{v("shadow-focus-error")}: 0 0 0 0.25rem rgb(220 38 38 / 12%);
@@ -238,6 +244,7 @@
     #{v("z-layer")}: 1010;
     #{v("z-overlay-dimmed")}: 1020;
     #{v("z-overlay-layer")}: 1030;
+    #{v("z-toast")}: 1031; // 팝업보다 위 — 팝업 안에서 띄운 토스트도 보여야 한다
     #{v("z-loader")}: 9999;
   }
 

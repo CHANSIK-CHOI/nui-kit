@@ -1,0 +1,80 @@
+@use "../abstracts" as *;
+
+// ─────────────────────────────────────────────────────────────
+// Toast
+// 구조: .nui-toast-portal(고정 레이어) > .nui-toast-stack(하단 정렬) > .nui-toast
+// 공개 훅: --nui-toast-width / -radius / -bg
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  // ToastHost 가 portal 컨테이너에 직접 붙이는 클래스
+  #{cls("toast-portal")} {
+    position: fixed;
+    inset: 0;
+    z-index: var(#{v("z-toast")});
+    // 레이어 자체는 클릭을 통과시킨다 — 토스트 카드만 pointer-events 를 되살린다
+    pointer-events: none;
+  }
+
+  #{cls("toast-stack")} {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(#{v("space-sm")});
+    padding: 0 var(#{v("surface-space-card")})
+      calc(var(#{v("surface-space-card")}) + env(safe-area-inset-bottom))
+      var(#{v("surface-space-card")});
+  }
+
+  #{cls("toast")} {
+    display: flex;
+    align-items: flex-start;
+    gap: var(#{v("space-sm")});
+    width: #{hook("toast-width", min(100%, 26.25rem))};
+    padding: var(#{v("space-sm")}) var(#{v("surface-space-compact")});
+    color: var(#{v("text-inverse-strong")});
+    background: #{hook("toast-bg", var(#{v("surface-inverse")}))};
+    border-radius: #{hook("toast-radius", var(#{v("radius-lg")}))};
+    box-shadow: var(#{v("shadow-toast")}), var(#{v("shadow-inset-inverse")});
+    pointer-events: auto;
+
+    &__indicator {
+      flex-shrink: 0;
+      width: var(#{v("size-icon-sm")});
+      height: var(#{v("size-icon-sm")});
+      margin-top: 0.3125rem;
+      background: var(#{v("control-accent-soft")});
+      border-radius: var(#{v("radius-pill")});
+      box-shadow: var(#{v("shadow-ring-brand")});
+    }
+
+    &__content {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    &__message {
+      display: -webkit-box;
+      overflow: hidden;
+      color: inherit;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+
+      @include typo("body-sm", "medium", 1.5);
+    }
+
+    &--error {
+      background: #{hook("toast-bg", var(#{v("surface-toast-error")}))};
+
+      #{cls("toast")}__indicator {
+        background: var(#{v("color-error-soft")});
+        box-shadow: var(#{v("shadow-ring-error")});
+      }
+    }
+  }
+}

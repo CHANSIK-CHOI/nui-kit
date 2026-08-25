@@ -14,6 +14,8 @@
 @use "components/textarea";
 @use "components/choice";
 @use "components/popup";
+@use "components/toast";
+@use "components/tooltip";
 
 // utilities
 @use "utilities/a11y";

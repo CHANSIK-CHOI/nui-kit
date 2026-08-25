@@ -1,0 +1,120 @@
+@use "../abstracts" as *;
+
+// ─────────────────────────────────────────────────────────────
+// Tooltip
+//
+// 트리거를 감싸는 relative 컨테이너 안에서 absolute 로 띄운다 (portal 아님).
+// placement 는 prop 값(카멜)을 kebab 클래스로 옮겨 쓴다 — top-center 등.
+//
+// 공개 훅: --nui-tooltip-bg / -radius / -max-width
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("tooltip")} {
+    position: relative;
+    display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
+    vertical-align: middle;
+
+    &__trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 100%;
+    }
+
+    &__panel {
+      position: absolute;
+      z-index: var(#{v("z-tooltip")});
+      width: max-content;
+      max-width: #{hook("tooltip-max-width", min(17.5rem, calc(100vw - 2rem)))};
+    }
+
+    &__bubble {
+      position: relative;
+      padding: var(#{v("space-xs")}) var(#{v("space-sm")});
+      background-color: #{hook("tooltip-bg", var(#{v("surface-inverse")}))};
+      border-radius: #{hook("tooltip-radius", var(#{v("radius-md")}))};
+      box-shadow: var(#{v("shadow-dropdown")});
+    }
+
+    &__content {
+      display: block;
+      color: var(#{v("text-inverse-strong")});
+      white-space: normal;
+      word-break: keep-all;
+
+      @include typo("body-sm", "regular", 1.6, 0);
+    }
+
+    &__arrow {
+      position: absolute;
+      width: var(#{v("size-icon-sm")});
+      height: var(#{v("size-icon-sm")});
+      background-color: #{hook("tooltip-bg", var(#{v("surface-inverse")}))};
+      transform: rotate(45deg);
+    }
+
+    // ── 패널 위치
+    &--top-center &__panel {
+      bottom: calc(100% + var(#{v("space-sm")}));
+      left: 50%;
+      translate: -50% 0;
+    }
+
+    &--top-left &__panel {
+      bottom: calc(100% + var(#{v("space-sm")}));
+      left: 0;
+    }
+
+    &--top-right &__panel {
+      right: 0;
+      bottom: calc(100% + var(#{v("space-sm")}));
+    }
+
+    &--bottom-center &__panel {
+      top: calc(100% + var(#{v("space-sm")}));
+      left: 50%;
+      translate: -50% 0;
+    }
+
+    &--bottom-left &__panel {
+      top: calc(100% + var(#{v("space-sm")}));
+      left: 0;
+    }
+
+    &--bottom-right &__panel {
+      top: calc(100% + var(#{v("space-sm")}));
+      right: 0;
+    }
+
+    // ── 화살표 위치
+    &--top-center &__arrow,
+    &--top-left &__arrow,
+    &--top-right &__arrow {
+      bottom: -0.3125rem;
+    }
+
+    &--bottom-center &__arrow,
+    &--bottom-left &__arrow,
+    &--bottom-right &__arrow {
+      top: -0.3125rem;
+    }
+
+    &--top-center &__arrow,
+    &--bottom-center &__arrow {
+      left: 50%;
+      margin-left: -0.3125rem;
+    }
+
+    &--top-left &__arrow,
+    &--bottom-left &__arrow {
+      left: var(#{v("space-md")});
+    }
+
+    &--top-right &__arrow,
+    &--bottom-right &__arrow {
+      right: var(#{v("space-md")});
+    }
+  }
+}

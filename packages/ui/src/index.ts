@@ -17,3 +17,5 @@ export * from "./components/Checkbox/index.js";
 export * from "./components/Radio/index.js";
 export * from "./components/Switch/index.js";
 export * from "./components/Popup/index.js";
+export * from "./components/Toast/index.js";
+export * from "./components/Tooltip/index.js";

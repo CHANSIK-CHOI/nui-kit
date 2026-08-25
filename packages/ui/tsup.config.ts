@@ -13,6 +13,8 @@ export default defineConfig({
     radio: "src/radio.ts",
     switch: "src/switch.ts",
     popup: "src/popup.ts",
+    toast: "src/toast.ts",
+    tooltip: "src/tooltip.ts",
     icon: "src/icon.ts",
   },
   // App Router 전용 라이브러리 — ESM 단일 포맷.

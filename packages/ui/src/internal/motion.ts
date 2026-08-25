@@ -61,6 +61,15 @@ export const motionTransition = {
     duration: motionDuration.fast,
     ease: motionEase.exit,
   } satisfies Transition,
+  // tooltip / popover — 가볍고 빠르게
+  popover: {
+    duration: motionDuration.fast,
+    ease: motionEase.standard,
+  } satisfies Transition,
+  popoverExit: {
+    duration: motionDuration.quick,
+    ease: motionEase.exit,
+  } satisfies Transition,
   toast: {
     duration: motionDuration.slow,
     ease: motionEase.emphasized,

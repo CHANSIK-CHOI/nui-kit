@@ -144,6 +144,16 @@ const TARGETS = [
     file: "components/Popup/Popup.types.ts",
     type: "LayerPopupProps",
   },
+  {
+    name: "Toast",
+    file: "components/Toast/Toast.types.ts",
+    type: "ToastProps",
+  },
+  {
+    name: "Tooltip",
+    file: "components/Tooltip/Tooltip.tsx",
+    type: "TooltipProps",
+  },
   { name: "Icon", file: "components/Icon/Icon.tsx", type: "IconProps" },
 ];
 
