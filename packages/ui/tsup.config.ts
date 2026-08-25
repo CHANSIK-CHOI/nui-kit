@@ -16,6 +16,7 @@ export default defineConfig({
     toast: "src/toast.ts",
     tooltip: "src/tooltip.ts",
     accordion: "src/accordion.ts",
+    select: "src/select.ts",
     icon: "src/icon.ts",
   },
   // App Router 전용 라이브러리 — ESM 단일 포맷.

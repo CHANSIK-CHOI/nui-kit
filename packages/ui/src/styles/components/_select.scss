@@ -1,0 +1,361 @@
+@use "../abstracts" as *;
+@use "message";
+
+// ─────────────────────────────────────────────────────────────
+// Select / MultiSelect (react-select 래핑)
+//
+// react-select 은 `unstyled` + `classNamePrefix="nui-select"` 로 구동한다.
+// 따라서 아래 클래스는 전부 react-select 이 생성하는 `nui-select__*` 이며
+// 서드파티 클래스(`css-*`)를 전역에서 덮지 않는다 (rules/styles.md §8).
+//
+// ⚠️ emotion 과의 캐스케이드
+//   `unstyled` 여도 react-select 은 일부 속성(control 의 min-height·transition,
+//   option 의 display·cursor 등)을 emotion 클래스로 남긴다. emotion 클래스는
+//   레이어 밖(unlayered)이라 `@layer nui.components` 인 우리 규칙을 **상세도와
+//   무관하게 항상 이긴다.** 그래서 충돌 속성은 `Select.utils.ts` 의
+//   `getResolvedSelectStyles()` 가 emotion 쪽에서 걷어내고, 여기서 책임진다.
+//   두 파일은 함께 움직인다 — 한쪽만 고치면 조용히 깨진다.
+//
+// 공개 훅: --nui-select-height / -radius / -border-color / -bg
+// 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("select")} {
+    width: 100%;
+
+    &__container {
+      width: 100%;
+    }
+
+    // ── control (emotion 이 min-height / transition / cursor / justify-content /
+    //    flex-wrap 을 넘겨준 자리)
+    &__control {
+      min-height: #{hook("select-height", var(#{v("size-field")}))};
+      background-color: #{hook("select-bg", var(#{v("control-bg")}))};
+      border: var(#{v("border-width")}) solid
+        #{hook("select-border-color", var(#{v("control-border")}))};
+      border-radius: #{hook("select-radius", var(#{v("radius-sm")}))};
+      cursor: pointer;
+
+      @include motion(
+        (border-color, background-color, box-shadow, border-width),
+        "fast"
+      );
+    }
+
+    // ── value container
+    //   display 는 react-select 이 소유한다 (단일=grid / 다중=flex 로 전환하며
+    //   placeholder·single-value 의 grid-area 배치가 여기에 의존한다).
+    &__value-container {
+      // 높이는 control 의 min-height 가 소유한다.
+      // 여기에도 같은 min-height 를 주면 border-box 기준으로 컨트롤이
+      // `min-height + border*2` 로 밀린다 (56px → 58px).
+      padding: var(#{v("space-xs")}) var(#{v("space-2xs")}) var(#{v("space-xs")})
+        var(#{v("space-md")});
+      gap: var(#{v("space-xs")});
+      min-width: 0;
+    }
+
+    &__input-container {
+      margin: 0;
+      padding: 0;
+      color: var(#{v("control-text")});
+
+      @include typo("body", "regular", 1.5);
+    }
+
+    &__input-container input {
+      // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
+      appearance: none;
+      border: 0;
+      border-radius: 0;
+      background-color: transparent;
+      font-family: var(#{v("font-family-base")});
+      color: var(#{v("control-text")});
+      caret-color: var(#{v("control-text")});
+    }
+
+    &__input-container input:focus,
+    &__input-container input:focus-visible {
+      outline: none;
+    }
+
+    &__single-value {
+      color: var(#{v("control-text")});
+
+      @include typo("body", "regular", 1.5);
+    }
+
+    &__placeholder {
+      color: var(#{v("control-text-placeholder")});
+
+      @include typo("body", "regular", 1.5);
+    }
+
+    // ── indicators
+    //   높이는 react-select 의 `align-self: stretch` 가 컨트롤을 따라가게 둔다.
+    //   원본은 여기에 고정 높이(58px)를 줘서 컨트롤이 56px → 60px 로 밀렸다
+    //   (같은 파일에서 `__indicators` 를 두 번 선언해 뒤엣것이 이긴 결과다).
+    //   Textfield 와 높이를 맞추기 위해 고정 높이를 두지 않는다.
+    &__indicators {
+      padding: 0 var(#{v("space-md")});
+    }
+
+    &__clear-indicator {
+      background-color: var(#{v("control-bg-subtle")});
+    }
+
+    &__clear-indicator,
+    &__dropdown-indicator {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(#{v("size-icon-3xl")});
+      height: var(#{v("size-icon-3xl")});
+      margin-left: var(#{v("space-xs")});
+      padding: var(#{v("space-2xs")});
+      border-radius: var(#{v("radius-round")});
+      color: var(#{v("control-icon")});
+      cursor: pointer;
+      transition:
+        color var(#{v("duration-fast")}) var(#{v("easing-standard")}),
+        background-color var(#{v("duration-fast")}) var(#{v("easing-standard")}),
+        transform var(#{v("duration-quick")}) var(#{v("easing-standard")}),
+        opacity var(#{v("duration-fast")}) var(#{v("easing-standard")});
+    }
+
+    &__clear-indicator:first-child,
+    &__dropdown-indicator:first-child {
+      margin-left: 0;
+    }
+
+    &__dropdown-indicator svg,
+    &__clear-indicator svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    &__control--menu-is-open &__dropdown-indicator svg {
+      transform: rotate(180deg);
+    }
+
+    // ── menu
+    //   position / top / width 는 react-select 이 소유한다 (배치 계산).
+    //   max-height 도 react-select 이 `maxMenuHeight` prop 으로 소유한다 —
+    //   여기서 덮으면 메뉴 위치 계산과 어긋난다.
+    &__menu {
+      margin-top: var(#{v("space-xs")});
+      padding: var(#{v("space-xs")});
+      border: var(#{v("border-width")}) solid
+        var(#{v("control-border-disabled")});
+      border-radius: var(#{v("radius-md")});
+      background-color: var(#{v("control-bg")});
+      box-shadow: var(#{v("shadow-dropdown")});
+      z-index: var(#{v("z-tooltip")});
+    }
+
+    &__menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(#{v("space-2xs")});
+    }
+
+    &__group {
+      display: flex;
+      flex-direction: column;
+      gap: var(#{v("space-2xs")});
+    }
+
+    &__group-heading {
+      padding: var(#{v("space-xs")}) var(#{v("space-sm")}) var(#{v("space-2xs")});
+      color: var(#{v("text-tertiary")});
+      text-transform: none;
+
+      @include typo("label", "medium", 1.5, 0);
+    }
+
+    // ── option (emotion 이 display / cursor 를 넘겨준 자리)
+    &__option {
+      display: flex;
+      align-items: center;
+      min-height: var(#{v("size-control-option")});
+      padding: 0 var(#{v("space-sm")});
+      border-radius: var(#{v("radius-sm")});
+      color: var(#{v("text-primary")});
+      cursor: pointer;
+
+      @include motion((background-color, color), "fast");
+      @include typo("body", "regular", 1.5);
+    }
+
+    &__option--is-focused {
+      background-color: var(#{v("control-bg-subtle")});
+    }
+
+    &__option--is-selected {
+      background-color: var(#{v("control-accent-soft")});
+      color: var(#{v("control-selection-text")});
+      font-weight: var(#{v("font-weight-medium")});
+    }
+
+    // 선택된 행에도 커서 피드백을 준다.
+    // `--is-selected` 가 `--is-focused` 와 상세도가 같아 뒤에 온 쪽이 이기므로,
+    // 둘을 함께 만족하는 셀렉터로 한 단계 위에서 명시한다.
+    &__option--is-selected#{cls("select")}__option--is-focused {
+      background-color: var(#{v("control-accent-soft")});
+      box-shadow: inset 0 0 0 var(#{v("border-width")})
+        var(#{v("control-accent")});
+    }
+
+    &__option--is-disabled {
+      color: var(#{v("text-quaternary")});
+      cursor: not-allowed;
+    }
+
+    // ── multi value (emotion 이 display 를 넘겨준 자리)
+    &__multi-value {
+      display: inline-flex;
+      align-items: center;
+      border-radius: var(#{v("radius-pill-fluid")});
+      background-color: var(#{v("control-bg-subtle")});
+      color: var(#{v("text-primary")});
+    }
+
+    &__multi-value__label {
+      padding: var(#{v("space-xs")}) var(#{v("space-2xs")}) var(#{v("space-xs")})
+        var(#{v("space-sm")});
+
+      @include typo("body-sm", "medium", 1.35, -0.01em);
+    }
+
+    &__multi-value__remove {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(#{v("space-xs")}) var(#{v("space-xs")}) var(#{v("space-xs")})
+        var(#{v("space-2xs")});
+      color: var(#{v("text-secondary")});
+      cursor: pointer;
+
+      @include motion((color, background-color), "fast");
+    }
+
+    &__multi-value__remove svg {
+      width: var(#{v("size-icon-md")});
+      height: var(#{v("size-icon-md")});
+    }
+
+    &__menu-notice {
+      padding: var(#{v("space-md")}) var(#{v("space-sm")});
+      color: var(#{v("text-tertiary")});
+      // emotion 이 unstyled 에서도 남기는 유일한 속성이지만, 우리가 명시해
+      // 라이브러리 기본값에 기대지 않는다.
+      text-align: center;
+
+      @include typo("body-sm", "regular", 1.6);
+    }
+
+    // ── interaction
+    //
+    // ⚠️ hover 에서 포커스 상태를 **명시적으로 배제**한다.
+    //    Textfield 는 hover 와 focus 를 둘 다 블록(`:hover` / `:focus-within`)에
+    //    붙여 상세도가 같지만, Select 의 포커스는 react-select 이 element 에 붙이는
+    //    `--is-focused` 클래스라 블록 `:hover` 쪽이 항상 1 높다. 그대로 두면 마우스로
+    //    연 Select 가 "초록 포커스 글로우 + 회색 hover 테두리" 로 렌더된다.
+    //    (rules/styles.md §7 — 상태 우선순위를 상세도·소스 순서에 의존하지 않는다)
+    &:not(#{state("disabled")}):not(#{state("readonly")}):hover
+      &__control:not(#{cls("select")}__control--is-focused) {
+      border-color: var(#{v("control-border-hover")});
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__control--is-focused {
+      border-color: var(#{v("focus-color")});
+      border-width: var(#{v("border-width-focus")});
+      box-shadow: var(#{v("shadow-focus")});
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__clear-indicator:hover,
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__dropdown-indicator:hover {
+      color: var(#{v("control-icon-strong")});
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__clear-indicator:active,
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__dropdown-indicator:active,
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__multi-value__remove:active {
+      transform: scale(0.94);
+    }
+
+    // ── 상태 우선순위: disabled > error > readonly (rules/styles.md §7)
+    //    상세도가 같으므로 :not() 으로 명시한다. 소스 순서에 의존하지 않는다.
+
+    // ── disabled
+    &#{state("disabled")} &__control {
+      background-color: var(#{v("control-bg-disabled")});
+      border-color: var(#{v("control-border-disabled")});
+      cursor: not-allowed;
+    }
+
+    &#{state("disabled")} &__placeholder,
+    &#{state("disabled")} &__single-value,
+    &#{state("disabled")} &__clear-indicator,
+    &#{state("disabled")} &__dropdown-indicator {
+      color: var(#{v("control-text-disabled")});
+    }
+
+    &#{state("disabled")} &__clear-indicator,
+    &#{state("disabled")} &__dropdown-indicator {
+      opacity: 0.2;
+    }
+
+    &#{state("disabled")} &__multi-value {
+      opacity: 0.7;
+    }
+
+    // ── error
+    &#{state("error")}:not(#{state("disabled")}) &__control {
+      background-color: var(#{v("control-bg")});
+      border-color: var(#{v("control-border-error")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")}):not(#{state("readonly")}):hover
+      &__control:not(#{cls("select")}__control--is-focused) {
+      border-color: var(#{v("control-border-error")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")}):not(#{state("readonly")})
+      &__control--is-focused {
+      border-color: var(#{v("control-border-error")});
+      box-shadow: var(#{v("shadow-focus-error")});
+    }
+
+    // ── readonly
+    &#{state("readonly")}:not(#{state("error")}):not(#{state("disabled")})
+      &__control {
+      background-color: var(#{v("control-bg-readonly")});
+      border-color: var(#{v("control-border-disabled")});
+    }
+
+    &#{state("readonly")}:not(#{state("disabled")}) &__control {
+      cursor: default;
+    }
+
+    &#{state("readonly")}:not(#{state("disabled")}) &__single-value,
+    &#{state("readonly")}:not(#{state("disabled")}) &__placeholder,
+    &#{state("readonly")}:not(#{state("disabled")}) &__clear-indicator,
+    &#{state("readonly")}:not(#{state("disabled")}) &__dropdown-indicator {
+      color: var(#{v("control-text-muted")});
+    }
+
+    &#{state("readonly")}:not(#{state("disabled")}) &__clear-indicator,
+    &#{state("readonly")}:not(#{state("disabled")}) &__dropdown-indicator {
+      opacity: 0.6;
+      cursor: default;
+    }
+  }
+}

@@ -1,0 +1,5 @@
+// → styles/select.css  (온디맨드: tokens.css 와 함께 import)
+// message 스타일을 내부적으로 함께 포함한다 (Select 가 렌더하므로).
+@use "abstracts/layer";
+@use "base/normalize";
+@use "components/select";

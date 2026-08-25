@@ -145,42 +145,43 @@ npm run refs:check     # Context7 캐시 신선도
 | Popup | PopupBase / Alert / Confirm / LayerPopup / BottomSheet / FullPopup / PopupHost | ✅ |
 | Feedback | Toast / ToastHost / Tooltip | ✅ |
 | Disclosure | Accordion | ✅ |
-| **Select** | **Select / MultiSelect (+RHF 2종)** | ⬜ **다음 작업** |
-| **Datepicker** | **Datepicker / DateRangePicker / DateMultiplePicker (+RHF 3종)** | ⬜ |
+| Select | Select / MultiSelect (+RHF 2종) | ✅ |
+| **Datepicker** | **Datepicker / DateRangePicker / DateMultiplePicker (+RHF 3종)** | ⬜ **다음 작업** |
 
 RHF 래퍼는 이식된 컴포넌트 전부에 대해 `/rhf` 서브패스로 제공 중이다.
 
 ---
 
-## 다음 작업 — Select · Datepicker (서드파티 래핑)
-
-앞선 계열들과 성격이 다르다. **처음으로 서드파티 라이브러리의 스타일을 덮어야 한다.**
+## 다음 작업 — Datepicker (서드파티 래핑)
 
 ### 원본 위치
 
 ```
-../next-ui-components-guide/src/components/Select/      Select, MultiSelect, RHF*
 ../next-ui-components-guide/src/components/Datepicker/  Datepicker, DateRangePicker,
                                                         DateMultiplePicker, DatepickerBase,
                                                         Datepicker.utils, RHF*
-../next-ui-components-guide/src/styles/components/_select.scss
 ../next-ui-components-guide/src/styles/components/_datepicker.scss
 ```
 
-### 핵심 과제 — `rules/styles.md` §8 의 첫 시험대
+### 핵심 과제 — `rules/styles.md` §8 의 진짜 시험대
 
-원본은 `.rdp-day` 같은 **react-day-picker 클래스를 전역에서 덮고 있다.**
-그대로 배포하면 소비자가 같은 라이브러리를 쓸 때 그쪽까지 깨진다.
+Select 은 원본이 이미 `unstyled` + `classNamePrefix` 를 쓰고 있어서 전역 침범이
+애초에 없었다. **Datepicker 는 다르다.** 원본이 `.rdp-day` 같은
+react-day-picker 클래스를 **전역에서 덮고 있다.** 그대로 배포하면 소비자가 같은
+라이브러리를 쓸 때 그쪽까지 깨진다.
 
 ```scss
 #{cls("datepicker")} .rdp-day { }   // ✅ 우리 스코프 안에서만
 .rdp-day { }                        // ❌ 전역 침범
 ```
 
-`react-select` 는 emotion 기반이라 클래스 오버라이드가 통하지 않을 수 있다.
-`classNames` prop 또는 `styles` prop 으로 우리 토큰을 주입하는 방식을 먼저 검토할 것.
-**Context7 캐시 규칙을 따른다** (`rules/references.md`) — 두 라이브러리 문서를
+react-day-picker v9 는 `classNames` prop 을 지원한다 — 클래스를 통째로 우리
+`nui-datepicker__*` 로 바꿔 끼우면 Select 과 같은 구조가 된다. **그 방식을 먼저
+검토할 것.** `.rdp-*` 를 자손 셀렉터로 덮는 건 차선이다.
+
+**Context7 캐시 규칙을 따른다** (`rules/references.md`) — react-day-picker 문서를
 `.claude/references/` 에 받아두고 7일간 재사용한다.
+`.claude/references/websites-react-select/` 에 Select 작업 때 받은 2건이 있다.
 
 ### 반복 절차 (앞 계열에서 확립된 순서)
 
@@ -190,7 +191,7 @@ RHF 래퍼는 이식된 컴포넌트 전부에 대해 `/rhf` 서브패스로 제
 3. 스타일 이식 — 프리픽스 / @layer / 공개훅·내부배선 분리 / camelCase→kebab
 4. entries/<name>.scss 추가 + entries/index.scss 등록
 5. 컴포넌트 이식 — "use client" / px()·pv() / .js 확장자 / 합성이면 named export 동반
-6. 배럴 4곳 갱신: components/<N>/index.ts, src/<n>.ts, tsup.config.ts entry,
+6. 배럴 5곳 갱신: components/<N>/index.ts, src/<n>.ts, tsup.config.ts entry,
    package.json exports, src/index.ts (RHF 는 src/rhf.ts)
 7. apps/docs/scripts/extract-props.mjs TARGETS 등록
 8. 문서 페이지 + 데모(Client Component) 작성, nav.ts / components/page.tsx 등록
@@ -209,9 +210,31 @@ RHF 래퍼는 이식된 컴포넌트 전부에 대해 `/rhf` 서브패스로 제
 | portal 컨테이너 | 없으면 조용히 렌더 안 됨 | Host 가 직접 생성 |
 | controlled 경고 | `checked` + `disabled` 만으로는 React 경고 | `readOnly` 를 DOM 에 전달 |
 | Prettier 재포맷 | 문자열 치환이 **조용히** 실패 | 포맷된 파일은 부분 치환 대신 전체 재작성 |
+| **서드파티 CSS-in-JS** | **emotion 클래스가 우리 `@layer` 를 항상 이긴다** | **충돌 속성만 라이브러리 쪽에서 제거 → CSS 로 넘긴다** |
+| **중첩 min-height** | **자식에도 같은 min-height 를 주면 border 만큼 밀린다** | **높이는 한 요소만 소유** |
+| **서드파티 aria 덮어쓰기** | **라이브러리가 `aria-describedby` 를 자체 계산** | **컨테이너 컴포넌트에서 자식 aria 를 병합** |
+| **`forwardRef` 타입 추론** | **`--emitDeclarationOnly` 만 TS2883 으로 실패** | **`ForwardRefExoticComponent` 명시** |
 
 **정적 검사를 전부 통과하고 브라우저에서만 드러난 결함이 계열마다 나왔다.**
 `verify:console` 과 playwright 조작 검증을 생략하지 말 것.
+
+#### Select 계열에서 배운 것 — 서드파티 CSS-in-JS 를 감쌀 때
+
+`@layer nui.components` 는 소비자가 우리를 쉽게 덮게 해주는 장치인데,
+**같은 성질 때문에 서드파티 emotion/styled-components 도 우리를 덮는다.**
+상세도를 아무리 올려도 진다 (cascade 는 `layer` 를 `specificity` 보다 먼저 본다).
+
+원본 프로젝트는 `@layer` 를 쓰지 않아 상세도 싸움이었고 `!important` 로 뚫었다.
+우리는 `!important` 를 쓰면 소비자 커스터마이징까지 막으므로 쓰지 않는다.
+→ **라이브러리의 `styles` API 로 충돌 속성만 걷어내고 CSS 가 책임진다.**
+   (`Select.utils.ts` 의 `CSS_OWNED_PROPERTIES` 참조)
+
+단, **기능 스타일은 걷어내면 안 된다** — 메뉴 배치(`position`/`top`/`width`),
+`maxMenuHeight`, `valueContainer` 의 `display` 전환 등. 이런 값은 CSS 로 덮지 말고
+라이브러리의 prop 으로 조정한다.
+
+`Select.utils.ts` 와 `styles/components/_select.scss` 는 **짝을 이룬다.**
+한쪽만 고치면 조용히 깨진다.
 
 ---
 

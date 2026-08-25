@@ -179,6 +179,12 @@ const TARGETS = [
     file: "components/Accordion/AccordionPanel.tsx",
     type: "AccordionPanelProps",
   },
+  { name: "Select", file: "components/Select/Select.tsx", type: "SelectProps" },
+  {
+    name: "MultiSelect",
+    file: "components/Select/MultiSelect.tsx",
+    type: "MultiSelectProps",
+  },
   { name: "Icon", file: "components/Icon/Icon.tsx", type: "IconProps" },
 ];
 

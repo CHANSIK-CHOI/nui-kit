@@ -75,6 +75,10 @@
       "types": "./dist/accordion.d.ts",
       "default": "./dist/accordion.js"
     },
+    "./select": {
+      "types": "./dist/select.d.ts",
+      "default": "./dist/select.js"
+    },
     "./icon": {
       "types": "./dist/icon.d.ts",
       "default": "./dist/icon.js"

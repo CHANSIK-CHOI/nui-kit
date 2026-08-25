@@ -128,6 +128,57 @@ import { Field, FieldLabel } from "@chansikchoi/next-ui";
 `ButtonLink` 만 `next/link` 를 사용합니다. `next` 는 optional peer 이므로
 `ButtonLink` 를 쓰지 않으면 설치할 필요가 없습니다.
 
+### Select / MultiSelect 와 `react-select`
+
+`Select` 와 `MultiSelect` 는 내부적으로 `react-select` 을 씁니다. `react-select` 은
+**dependency 이므로 따로 설치할 필요가 없고**, 소비자 프로젝트가 같은 라이브러리를
+쓰더라도 서로 간섭하지 않습니다 — 우리 스타일은 `nui-select__*` 클래스만 겨냥합니다.
+
+값은 옵션 객체가 아니라 **원시값**으로 주고받습니다.
+
+```tsx
+import { Select, MultiSelect } from "@chansikchoi/next-ui";
+
+const OPTIONS = [
+  { label: "서울", value: "seoul" },
+  { label: "부산", value: "busan" },
+];
+
+<Select options={OPTIONS} value={city} onChange={setCity} />;
+<MultiSelect options={OPTIONS} value={cities} onChange={setCities} />;
+```
+
+**스타일을 더 손볼 때 알아둘 것.** `react-select` 은 emotion 으로 스타일을
+주입하는데, 그 클래스는 CSS 레이어 밖에 있어 `@layer nui.components` 안의 규칙보다
+항상 우선합니다. 그래서 이 컴포넌트는 `unstyled` 로 구동하면서 **충돌하는 속성만
+emotion 쪽에서 걷어내** CSS 가 책임지게 합니다.
+
+- 외형은 위 커스터마이징 절의 CSS 변수로 조정합니다
+  (`--nui-select-height` / `-radius` / `-border-color` / `-bg`)
+- `styles` prop 을 직접 넘기면 그 정리된 값 위에 얹히므로 의도대로 덧칠됩니다
+- 다만 **메뉴 최대 높이는 CSS 가 아니라 `maxMenuHeight` prop** 으로 조정합니다.
+  `react-select` 이 메뉴 배치를 계산할 때 이 값을 참조하므로, CSS 로 덮으면
+  실제 높이와 계산이 어긋납니다 (기본값 `240`)
+
+**`value` 는 `options` 안에 존재하는 값이어야 합니다.** 옵션을 비동기로 불러오는
+동안처럼 `options` 에 없는 값을 넣으면 선택이 표시되지 않고 placeholder 가 보입니다
+(원시값 API 의 구조적 특성입니다).
+
+**`components` 는 렌더 밖에서 선언하세요.** `react-select` 공식 권고이기도 합니다 —
+매 렌더 새 컴포넌트 함수를 넘기면 내부 input 이 remount 되어 포커스와 입력 중이던
+검색어가 사라집니다.
+
+```tsx
+// ❌ 렌더 안에서 컴포넌트를 새로 만든다
+<Select components={{ Option: (props) => <CustomOption {...props} /> }} />
+
+// ✅ 모듈 스코프에 한 번만 선언한다
+const SELECT_COMPONENTS = { Option: CustomOption };
+<Select components={SELECT_COMPONENTS} />
+```
+
+`styles` 는 컴포넌트가 아니라 함수 객체라 인라인으로 넘겨도 remount 되지 않습니다.
+
 ## 라이선스
 
 MIT

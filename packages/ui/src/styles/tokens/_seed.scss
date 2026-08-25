@@ -126,6 +126,7 @@
     #{v("control-accent-soft")}: var(#{v("color-primary-bright")});
     #{v("control-accent-error")}: var(#{v("color-error")});
     #{v("control-selection-disabled")}: var(#{v("line-color-2")});
+    #{v("control-selection-text")}: var(#{v("color-primary-dark")});
 
     // ── accessibility
     #{v("focus-color")}: var(#{v("control-accent")});
@@ -165,6 +166,7 @@
     #{v("size-control-lg")}: 2.5rem; // 40px
     #{v("size-control-xl")}: 3rem; // 48px
     #{v("size-field")}: 3.5rem; // 56px
+    #{v("size-control-option")}: 2.75rem; // 44px
 
     // ── radius
     #{v("radius-xs")}: 0.3125rem; // 5px
@@ -250,6 +252,7 @@
     #{v("z-layer")}: 1010;
     #{v("z-overlay-dimmed")}: 1020;
     #{v("z-overlay-layer")}: 1030;
+    #{v("z-portal-menu")}: 1031; // portal 로 body 에 붙는 드롭다운·달력 — 팝업(1030) 안에서도 보여야 한다
     #{v("z-toast")}: 1031; // 팝업보다 위 — 팝업 안에서 띄운 토스트도 보여야 한다
     #{v("z-loader")}: 9999;
   }

@@ -41,6 +41,16 @@ const GROUPS = [
         href: "/components/textfield",
         desc: "한 줄 텍스트 입력",
       },
+      {
+        name: "Select",
+        href: "/components/select",
+        desc: "단일 선택 드롭다운 (react-select 래핑)",
+      },
+      {
+        name: "MultiSelect",
+        href: "/components/select",
+        desc: "다중 선택 드롭다운. 선택값을 칩으로 표시",
+      },
     ],
   },
 ];

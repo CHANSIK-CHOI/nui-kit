@@ -21,6 +21,12 @@ export type { RHFRadioProps } from "./components/Radio/RHFRadio.js";
 export { default as RHFSwitch } from "./components/Switch/RHFSwitch.js";
 export type { RHFSwitchProps } from "./components/Switch/RHFSwitch.js";
 
+export { default as RHFSelect } from "./components/Select/RHFSelect.js";
+export type { RHFSelectProps } from "./components/Select/RHFSelect.js";
+
+export { default as RHFMultiSelect } from "./components/Select/RHFMultiSelect.js";
+export type { RHFMultiSelectProps } from "./components/Select/RHFMultiSelect.js";
+
 export type {
   RHFComponentProps,
   RHFCheckedInputManagedProps,
