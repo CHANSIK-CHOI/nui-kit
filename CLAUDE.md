@@ -131,8 +131,94 @@ npm run refs:check     # Context7 캐시 신선도
 | 1 | 스타일 시스템 재정비 (프리픽스 / @layer / 토큰) | ✅ |
 | 2 | 파일럿 3종 이식 + 서브패스 패키징 | ✅ |
 | 3 | `.claude` 자동화 | ✅ |
-| 4 | 문서 사이트 (Foundations + Components + props/토큰 자동생성) | ✅ |
-| 5 | 나머지 컴포넌트 이전 → npm 배포 | ⬜ |
+| 4 | 문서 사이트 (props/토큰 자동생성) | ✅ |
+| 5 | 컴포넌트 계열별 이전 | 🔄 진행 중 |
+| 6 | npm 최초 배포 | ⬜ |
 
-**파일럿 3종(Button / Field / Textfield)에는 spec 이 없다** — 원본 이식이라 건너뛰었다.
-`/component-audit` 으로 역추출하는 것이 남은 과제다.
+### 5단계 — 계열별 이전 현황
+
+| 계열 | 컴포넌트 | 상태 |
+| --- | --- | --- |
+| Button | Button / IconButton / ButtonGroup / ButtonLink | ✅ |
+| Form 입력 | Field / Textfield / Textarea / Search / Password | ✅ |
+| Form 선택 | Checkbox / Radio / Switch (+Group) | ✅ |
+| Popup | PopupBase / Alert / Confirm / LayerPopup / BottomSheet / FullPopup / PopupHost | ✅ |
+| Feedback | Toast / ToastHost / Tooltip | ✅ |
+| Disclosure | Accordion | ✅ |
+| **Select** | **Select / MultiSelect (+RHF 2종)** | ⬜ **다음 작업** |
+| **Datepicker** | **Datepicker / DateRangePicker / DateMultiplePicker (+RHF 3종)** | ⬜ |
+
+RHF 래퍼는 이식된 컴포넌트 전부에 대해 `/rhf` 서브패스로 제공 중이다.
+
+---
+
+## 다음 작업 — Select · Datepicker (서드파티 래핑)
+
+앞선 계열들과 성격이 다르다. **처음으로 서드파티 라이브러리의 스타일을 덮어야 한다.**
+
+### 원본 위치
+
+```
+../next-ui-components-guide/src/components/Select/      Select, MultiSelect, RHF*
+../next-ui-components-guide/src/components/Datepicker/  Datepicker, DateRangePicker,
+                                                        DateMultiplePicker, DatepickerBase,
+                                                        Datepicker.utils, RHF*
+../next-ui-components-guide/src/styles/components/_select.scss
+../next-ui-components-guide/src/styles/components/_datepicker.scss
+```
+
+### 핵심 과제 — `rules/styles.md` §8 의 첫 시험대
+
+원본은 `.rdp-day` 같은 **react-day-picker 클래스를 전역에서 덮고 있다.**
+그대로 배포하면 소비자가 같은 라이브러리를 쓸 때 그쪽까지 깨진다.
+
+```scss
+#{cls("datepicker")} .rdp-day { }   // ✅ 우리 스코프 안에서만
+.rdp-day { }                        // ❌ 전역 침범
+```
+
+`react-select` 는 emotion 기반이라 클래스 오버라이드가 통하지 않을 수 있다.
+`classNames` prop 또는 `styles` prop 으로 우리 토큰을 주입하는 방식을 먼저 검토할 것.
+**Context7 캐시 규칙을 따른다** (`rules/references.md`) — 두 라이브러리 문서를
+`.claude/references/` 에 받아두고 7일간 재사용한다.
+
+### 반복 절차 (앞 계열에서 확립된 순서)
+
+```
+1. 원본 소스·SCSS 읽기 → 부족한 토큰 파악
+2. 토큰 추가 (tokens/_seed.scss)
+3. 스타일 이식 — 프리픽스 / @layer / 공개훅·내부배선 분리 / camelCase→kebab
+4. entries/<name>.scss 추가 + entries/index.scss 등록
+5. 컴포넌트 이식 — "use client" / px()·pv() / .js 확장자 / 합성이면 named export 동반
+6. 배럴 4곳 갱신: components/<N>/index.ts, src/<n>.ts, tsup.config.ts entry,
+   package.json exports, src/index.ts (RHF 는 src/rhf.ts)
+7. apps/docs/scripts/extract-props.mjs TARGETS 등록
+8. 문서 페이지 + 데모(Client Component) 작성, nav.ts / components/page.tsx 등록
+9. 게이트: typecheck → build:ui → verify:pkg → build:docs → verify:console
+10. 브라우저로 실제 조작 검증 (playwright 스크립트)
+11. changeset 작성 → 커밋
+```
+
+### 이전 계열에서 반복해서 나온 함정
+
+| 함정 | 증상 | 대응 |
+| --- | --- | --- |
+| 전역 reset 의존 | input/button 에 UA 기본 스타일 잔존, box-sizing 없음 | 컴포넌트 자체 정규화 |
+| 상태 우선순위 | error 가 readonly 에 덮임 | `:not()` 으로 명시 (disabled > error > readonly) |
+| RSC dot notation | 런타임에만 `undefined` | named export 동반 |
+| portal 컨테이너 | 없으면 조용히 렌더 안 됨 | Host 가 직접 생성 |
+| controlled 경고 | `checked` + `disabled` 만으로는 React 경고 | `readOnly` 를 DOM 에 전달 |
+| Prettier 재포맷 | 문자열 치환이 **조용히** 실패 | 포맷된 파일은 부분 치환 대신 전체 재작성 |
+
+**정적 검사를 전부 통과하고 브라우저에서만 드러난 결함이 계열마다 나왔다.**
+`verify:console` 과 playwright 조작 검증을 생략하지 말 것.
+
+---
+
+## 배포 전 남은 일 (6단계)
+
+- 파일럿 3종(Button/Field/Textfield)에 spec 이 없다 → `/component-audit` 역추출
+- `packages/ui/README.md` 를 전 컴포넌트 기준으로 갱신
+- npm 계정 준비 + Trusted Publishing(OIDC) 설정
+- `.changeset/` 에 쌓인 큐를 `/docs-sync` → `/release` 로 소비
+- 최초 배포는 반드시 `--tag next` 프리릴리즈 → 빈 프로젝트 설치 스모크 테스트 후 latest
