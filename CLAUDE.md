@@ -20,6 +20,7 @@
 | tsup 의 `dts` 가 TypeScript 7 에서 크래시 | `dts: false` + `tsc --emitDeclarationOnly` |
 | rollup treeshake 패스가 `"use client"` 를 제거 | `treeshake: false` |
 | 한글 경로가 `import.meta.url` 에서 percent-encoding | Node 스크립트는 `fileURLToPath` 사용 |
+| `react-docgen-typescript` 도 TypeScript 7 에서 크래시 | props 추출기를 직접 작성 + `apps/docs` 에 typescript 5.9 격리 설치 |
 
 ## 응답 방식
 
@@ -79,8 +80,13 @@ RSC dot notation)은 모두 `구현 → 빌드 → 브라우저 확인 → 수�
 npm run typecheck      # 전 워크스페이스
 npm run verify:pkg     # verify:css + publint + attw
 npm run build:ui       # tsup + tsc + sass
-npm run build:docs
+npm run build:docs     # generate(props/토큰 추출) + next build
+npm run refs:check     # Context7 캐시 신선도
 ```
+
+**문서는 손으로 쓰지 않는 부분이 있다.** `apps/docs/scripts/extract-props.mjs` 가 컴포넌트
+타입에서 props 표를, `extract-tokens.mjs` 가 `_seed.scss` 에서 토큰 표를 생성한다.
+두 스크립트는 `npm run dev`/`build` 앞단에서 자동 실행되므로 문서가 코드를 따라간다.
 
 `verify:css` 는 빌드된 CSS 가 격리 원칙을 지키는지 기계 검사한다
 (`packages/ui/scripts/check-css-isolation.mjs`) — 프리픽스 누락, 전역 셀렉터 유입,
@@ -99,8 +105,9 @@ npm run build:docs
 
 ## MCP
 
-- **Context7** — 외부 라이브러리의 props/이벤트 정확도가 중요할 때 반드시 확인한다.
-  React 19 / Next 16 자체 문법처럼 학습 데이터로 충분한 것은 호출하지 않는다
+- **Context7** — ⚠️ **매번 호출하지 않는다.** 받은 문서를 `.claude/references/` 에 저장하고
+  **7일간 로컬 파일로 팩트체크**한다. 만료되면 다시 받는다. 상태 확인은 `npm run refs:check`,
+  절차는 `.claude/rules/references.md`. React 19 / Next 16 자체 문법은 애초에 호출하지 않는다
 - **Playwright** — `component-qa` 의 실동작 검증 전용.
   dev server 는 사용자가 `npm run dev` 로 띄운다. 에이전트가 직접 기동하지 않는다
 - **Chrome DevTools** — 성능·네트워크·콘솔 심층 조사가 필요할 때
@@ -114,6 +121,7 @@ npm run build:docs
 | `.claude/rules/styles.md` | 프리픽스, `@layer`, 공개/내부 변수 분리, 자체 정규화, rem 기준 |
 | `.claude/rules/packaging.md` | ESM 계약, dep/peer 판정, 갱신 목록, changeset, 배포 |
 | `.claude/rules/a11y.md` | id 연결, `aria-describedby`, 에러 표현, 포커스, 모션 |
+| `.claude/rules/references.md` | **Context7 로컬 캐시(TTL 7일)** — 매번 MCP 호출하지 않는다 |
 
 ## 진행 상황
 
@@ -123,7 +131,7 @@ npm run build:docs
 | 1 | 스타일 시스템 재정비 (프리픽스 / @layer / 토큰) | ✅ |
 | 2 | 파일럿 3종 이식 + 서브패스 패키징 | ✅ |
 | 3 | `.claude` 자동화 | ✅ |
-| 4 | 문서 사이트 (Foundations=MDX, Components=TSX + props 자동생성) | ⬜ |
+| 4 | 문서 사이트 (Foundations + Components + props/토큰 자동생성) | ✅ |
 | 5 | 나머지 컴포넌트 이전 → npm 배포 | ⬜ |
 
 **파일럿 3종(Button / Field / Textfield)에는 spec 이 없다** — 원본 이식이라 건너뛰었다.

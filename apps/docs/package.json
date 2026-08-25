@@ -4,13 +4,18 @@
   "private": true,
   "description": "@chansikchoi/next-ui API 문서 사이트 (Next.js App Router)",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "npm run generate && next dev",
+    "build": "npm run generate && next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate": "node scripts/extract-props.mjs && node scripts/extract-tokens.mjs"
   },
   "dependencies": {
     "@chansikchoi/next-ui": "*",
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^16.3.2",
+    "@types/mdx": "^2.0.14",
     "next": "16.3.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -21,6 +26,6 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "sass": "1.103.1",
-    "typescript": "7.0.2"
+    "typescript": "^5.9.3"
   }
 }

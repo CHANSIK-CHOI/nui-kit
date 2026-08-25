@@ -32,23 +32,28 @@ next-ui-system/
 | `npm run build:docs` | 문서 사이트 빌드 |
 | `npm run typecheck` | 전 워크스페이스 타입 검사 |
 | `npm run format` | Prettier 포맷 |
-| `npm run verify:pkg` | 배포 정합성 검증 (publint + attw) |
+| `npm run verify:pkg` | 배포 정합성 검증 (CSS 격리 + publint + attw) |
+| `npm run refs:check` | Context7 로컬 문서 캐시 신선도 (TTL 7일) |
 | `npm run changeset` | 변경 큐 적재 |
 | `npm run release` | 빌드 → 검증 → npm 배포 |
 
 > 라이브러리 소스를 고치면서 문서를 보려면 터미널 두 개가 필요하다.
 > `npm run build:ui -- --watch` 는 아직 미설정 — 현재는 `npm run build:ui` 후 `npm run dev`.
 
+문서 사이트의 **props 표와 토큰 표는 손으로 쓰지 않는다.** `npm run dev`/`build` 가
+`apps/docs/scripts/extract-props.mjs`(컴포넌트 타입 → props)와
+`extract-tokens.mjs`(`_seed.scss` → 토큰)를 먼저 실행해 문서가 코드를 따라가게 한다.
+
 ## 로드맵
 
 | 단계 | 내용 | 상태 |
 | --- | --- | --- |
 | 0 | 모노레포 스캐폴딩 + 툴체인 + MCP | ✅ 완료 |
-| 1 | 스타일 시스템 재정비 (프리픽스 / @layer / 토큰 확정) | ⬜ |
-| 2 | 컴포넌트 이전 + 패키징 (파일럿: Button / Field / Textfield) | ⬜ |
-| 3 | `.claude/` 자동화 (rules / commands / agents / hooks) | ⬜ |
-| 4 | 문서 사이트 (Foundations=MDX, Components=TSX + props 자동생성) | ⬜ |
-| 5 | npm 최초 배포 → 컴포넌트 증설 | ⬜ |
+| 1 | 스타일 시스템 재정비 (프리픽스 / @layer / 토큰 확정) | ✅ 완료 |
+| 2 | 컴포넌트 이전 + 패키징 (파일럿: Button / Field / Textfield) | ✅ 완료 |
+| 3 | `.claude/` 자동화 (rules / commands / agents / hooks) | ✅ 완료 |
+| 4 | 문서 사이트 (Foundations + Components + props/토큰 자동생성) | ✅ 완료 |
+| 5 | 나머지 컴포넌트 이전 → npm 최초 배포 | ⬜ |
 
 원본 컴포넌트는 형제 폴더 `next-ui-components-guide` (Pages Router) 에 있으며,
 **읽기 전용 참조**로만 사용한다.

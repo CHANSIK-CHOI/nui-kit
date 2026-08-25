@@ -21,7 +21,8 @@
     "verify:pkg": "npm run verify -w @chansikchoi/next-ui",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "npm run build:ui && npm run verify:pkg && changeset publish"
+    "release": "npm run build:ui && npm run verify:pkg && changeset publish",
+    "refs:check": "node scripts/check-refs.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.1",

@@ -1,0 +1,105 @@
+export const metadata = { title: "설치와 사용" };
+
+# 설치와 사용
+
+`react` / `react-dom` 외에 **추가로 설치할 것은 없다.**
+`react-hook-form` 은 RHF 래퍼를 쓸 때만, `next` 는 `ButtonLink` 를 쓸 때만 필요하다.
+
+```bash
+npm install @chansikchoi/next-ui
+```
+
+## 스타일 불러오기
+
+### 전체
+
+```ts
+import "@chansikchoi/next-ui/styles/index.css";
+```
+
+### 온디맨드
+
+컴포넌트별로 나눠 가져올 수 있다. `tokens.css` 는 한 번만 불러오면 된다.
+
+```ts
+import "@chansikchoi/next-ui/styles/tokens.css";
+import "@chansikchoi/next-ui/styles/button.css";
+```
+
+### reset (선택)
+
+기본 배포 CSS 에는 reset 이 **포함되어 있지 않다.** 자체 reset 이 없는 프로젝트만
+명시적으로 불러온다.
+
+```ts
+import "@chansikchoi/next-ui/styles/preflight.css";
+```
+
+## 컴포넌트 가져오기
+
+```tsx
+// 배럴
+import { Button, Field, Textfield } from "@chansikchoi/next-ui";
+
+// 서브패스 (번들 최소화)
+import { Button } from "@chansikchoi/next-ui/button";
+
+// react-hook-form 래퍼
+import { RHFTextfield } from "@chansikchoi/next-ui/rhf";
+```
+
+배럴로 가져오든 서브패스로 가져오든 **같은 React Context 를 공유**한다.
+`Field` 와 `Textfield` 를 서로 다른 경로에서 가져와도 정상 동작한다.
+
+## Server Component 에서 쓸 때
+
+모든 컴포넌트는 `"use client"` 로 배포된다. Server Component 가 이를 가져오면
+React 는 client reference 프록시로 치환하는데, **정적 프로퍼티(dot notation)는
+`undefined` 가 된다.** 그래서 서브 컴포넌트를 named export 로도 함께 제공한다.
+
+```tsx
+// ❌ Server Component — 런타임 에러
+<Field.Label>이름</Field.Label>
+
+// ✅ Server Component — named export
+import { FieldLabel } from "@chansikchoi/next-ui";
+<FieldLabel>이름</FieldLabel>
+
+// ✅ Client Component ("use client") — dot notation 사용 가능
+<Field.Label>이름</Field.Label>
+```
+
+| dot notation        | named export       |
+| ------------------- | ------------------ |
+| `Field.Item`        | `FieldItem`        |
+| `Field.Grid`        | `FieldGrid`        |
+| `Field.Label`       | `FieldLabel`       |
+| `Field.Description` | `FieldDescription` |
+| `Field.Message`     | `FieldMessage`     |
+| `ButtonGroup.Item`  | `ButtonGroupItem`  |
+
+## 커스터마이징
+
+CSS 변수 2계층 구조다. 모든 CSS 가 `@layer nui.*` 안에 있으므로
+여러분의 레이어 없는 CSS 가 항상 우선한다 — `!important` 가 필요 없다.
+
+```css
+/* 전체 테마 — seed 토큰 */
+:root {
+  --nui-color-primary: #ff6b00;
+  --nui-radius-sm: 4px;
+}
+
+/* 특정 컴포넌트만 — 컴포넌트 토큰 */
+:root {
+  --nui-button-radius: 0;
+}
+
+/* 부분 테마 — 상속으로 하위에만 적용 */
+.dark-section {
+  --nui-color-surface: #111;
+  --nui-text-primary: #fff;
+}
+```
+
+`--nui-_` 로 시작하는 변수는 **내부 배선**이다. 덮어쓰면 variant 가 깨지므로 건드리지 않는다.

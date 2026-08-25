@@ -1,7 +1,15 @@
 // 문서 사이트 전용 전역 스타일.
 // ⚠️ 이 파일은 패키지에 배포되지 않는다 — 라이브러리 CSS 와 철저히 분리한다.
+// 문서 사이트의 클래스는 `doc-` 프리픽스를 쓴다 (라이브러리의 `nui-` 와 구분).
+
 :root {
   color-scheme: light;
+  --doc-sidebar-w: 260px;
+  --doc-content-max: 860px;
+  --doc-border: #e5e7eb;
+  --doc-bg-subtle: #f9fafb;
+  --doc-code-bg: #0f172a;
+  --doc-code-fg: #e2e8f0;
 }
 
 *,
@@ -17,10 +25,273 @@ body {
 }
 
 body {
-  font-family: var(--nui-font-family-base);
-  font-size: var(--nui-font-size-md);
-  line-height: var(--nui-line-height-base);
-  color: var(--nui-color-text);
-  background: var(--nui-color-surface);
+  font-family:
+    "Pretendard",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  font-size: var(--nui-font-size-body);
+  line-height: var(--nui-line-height-body);
+  color: var(--nui-text-primary);
+  background: #fff;
   -webkit-font-smoothing: antialiased;
+}
+
+// ─── 레이아웃
+.doc-shell {
+  display: grid;
+  grid-template-columns: var(--doc-sidebar-w) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.doc-sidebar {
+  border-right: 1px solid var(--doc-border);
+  padding: 24px 16px 64px;
+  background: var(--doc-bg-subtle);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.doc-brand {
+  display: block;
+  font-weight: var(--nui-font-weight-bold);
+  font-size: var(--nui-font-size-body);
+  color: var(--nui-text-primary);
+  text-decoration: none;
+  margin-bottom: 24px;
+}
+
+.doc-brand small {
+  display: block;
+  font-weight: var(--nui-font-weight-regular);
+  font-size: var(--nui-font-size-label);
+  color: var(--nui-text-tertiary);
+  letter-spacing: 0;
+}
+
+.doc-nav-section + .doc-nav-section {
+  margin-top: 20px;
+}
+
+.doc-nav-title {
+  font-size: var(--nui-font-size-label);
+  font-weight: var(--nui-font-weight-semi-bold);
+  color: var(--nui-text-tertiary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+  padding-left: 8px;
+}
+
+.doc-nav-link {
+  display: block;
+  padding: 5px 8px;
+  border-radius: var(--nui-radius-sm);
+  color: var(--nui-text-secondary);
+  text-decoration: none;
+  font-size: var(--nui-font-size-body-sm);
+}
+
+.doc-nav-link:hover {
+  background: rgb(17 24 39 / 5%);
+  color: var(--nui-text-primary);
+}
+
+.doc-nav-link[aria-current="page"] {
+  background: var(--nui-color-primary-bright);
+  color: var(--nui-color-primary-dark);
+  font-weight: var(--nui-font-weight-medium);
+}
+
+.doc-main {
+  padding: 48px 40px 96px;
+  max-width: calc(var(--doc-content-max) + 80px);
+}
+
+// ─── 타이포
+.doc-main h1 {
+  font-size: var(--nui-font-size-title);
+  letter-spacing: var(--nui-letter-spacing-title);
+  margin: 0 0 8px;
+}
+
+.doc-main h2 {
+  font-size: var(--nui-font-size-lg, 1.125rem);
+  margin: 40px 0 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--doc-border);
+}
+
+.doc-main h3 {
+  font-size: var(--nui-font-size-body);
+  margin: 24px 0 8px;
+}
+
+.doc-lead {
+  color: var(--nui-text-secondary);
+  margin: 0 0 32px;
+}
+
+.doc-main p {
+  margin: 0 0 12px;
+}
+
+.doc-main :is(ul, ol) {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.doc-main li {
+  margin-bottom: 4px;
+}
+
+.doc-main code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.86em;
+  background: rgb(17 24 39 / 6%);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+// ─── 표
+.doc-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--doc-border);
+  border-radius: var(--nui-radius-sm);
+  margin-bottom: 16px;
+}
+
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--nui-font-size-body-sm);
+}
+
+.doc-table th,
+.doc-table td {
+  text-align: left;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--doc-border);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.doc-table td.doc-wrap {
+  white-space: normal;
+}
+
+.doc-table tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+
+.doc-table thead th {
+  background: var(--doc-bg-subtle);
+  font-weight: var(--nui-font-weight-semi-bold);
+  font-size: var(--nui-font-size-label);
+  color: var(--nui-text-secondary);
+}
+
+.doc-req {
+  color: var(--nui-color-secondary);
+  font-weight: var(--nui-font-weight-bold);
+}
+
+.doc-type {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82em;
+  color: var(--nui-color-primary-dark);
+}
+
+// ─── 예제
+.doc-example {
+  border: 1px solid var(--doc-border);
+  border-radius: var(--nui-radius-sm);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.doc-example__preview {
+  padding: 24px;
+}
+
+.doc-example__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.doc-example__caption {
+  padding: 8px 12px;
+  border-top: 1px solid var(--doc-border);
+  background: var(--doc-bg-subtle);
+  font-size: var(--nui-font-size-label);
+  color: var(--nui-text-secondary);
+}
+
+// ─── 코드
+.doc-code {
+  background: var(--doc-code-bg);
+  color: var(--doc-code-fg);
+  padding: 14px 16px;
+  border-radius: var(--nui-radius-sm);
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.doc-code code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+// ─── 토큰
+.doc-swatch {
+  width: 44px;
+  height: 26px;
+  border-radius: 4px;
+  border: 1px solid rgb(17 24 39 / 12%);
+  display: block;
+}
+
+.doc-token-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+}
+
+.doc-note {
+  border-left: 3px solid var(--nui-color-info);
+  background: var(--nui-color-info-soft);
+  padding: 10px 14px;
+  border-radius: 0 var(--nui-radius-sm) var(--nui-radius-sm) 0;
+  margin: 0 0 16px;
+  font-size: var(--nui-font-size-body-sm);
+}
+
+.doc-note--warn {
+  border-left-color: var(--nui-color-warning);
+  background: var(--nui-color-warning-soft);
+}
+
+@media (max-width: 860px) {
+  .doc-shell {
+    grid-template-columns: 1fr;
+  }
+  .doc-sidebar {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--doc-border);
+  }
+  .doc-main {
+    padding: 32px 20px 64px;
+  }
 }
