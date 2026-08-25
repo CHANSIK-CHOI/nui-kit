@@ -1,0 +1,290 @@
+@use "../abstracts" as *;
+
+// ─────────────────────────────────────────────────────────────
+// Popup — PopupBase / Alert / Confirm / LayerPopup / BottomSheet / FullPopup
+//
+// 구조: .nui-popup > (.nui-popup__dim + .nui-popup__positioner > .nui-popup__panel)
+// variant: --dialog(기본) / --bottom-sheet / --full
+// size:    --small / (regular=기본) / --large
+//
+// 공개 훅: --nui-popup-width / -radius / -bg / -dim
+//
+// ⏸️ 원본은 데스크톱에서 내부 여백을 card → section 으로 키웠으나
+//    브레이크포인트 대응이 보류 상태라 card 값으로 통일했다.
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("popup")} {
+    position: fixed;
+    inset: 0;
+    z-index: var(#{v("z-overlay-layer")});
+
+    &__dim {
+      position: absolute;
+      inset: 0;
+      background: #{hook("popup-dim", var(#{v("surface-overlay-dim")}))};
+      pointer-events: auto;
+      will-change: opacity;
+    }
+
+    &__positioner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100%;
+      max-height: 100%;
+      padding: var(#{v("surface-space-card")});
+    }
+
+    &__panel {
+      display: flex;
+      flex-direction: column;
+      width: #{hook("popup-width", min(100%, 30rem))};
+      max-height: min(calc(100dvh - 2.5rem), 45rem);
+      overflow: hidden;
+      background: #{hook("popup-bg", var(#{v("surface-panel-strong")}))};
+      border: var(#{v("border-width")}) solid var(#{v("border-default")});
+      border-radius: #{hook("popup-radius", var(#{v("radius-xl")}))};
+      box-shadow: var(#{v("shadow-overlay")});
+      pointer-events: auto;
+      transform-origin: center;
+      will-change: transform, opacity;
+    }
+
+    &__head {
+      display: flex;
+      flex-shrink: 0;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(#{v("space-md")});
+      padding: var(#{v("surface-space-card")}) var(#{v("surface-space-card")}) 0;
+    }
+
+    &__head--no-title {
+      justify-content: flex-end;
+    }
+
+    &__header-content {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    &__title {
+      color: var(#{v("text-primary")});
+
+      @include typo("title", "bold", 1.15);
+    }
+
+    &__close {
+      // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
+      appearance: none;
+      margin: 0;
+      padding: 0;
+      font-family: var(#{v("font-family-base")});
+      cursor: pointer;
+
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: var(#{v("size-control-lg")});
+      height: var(#{v("size-control-lg")});
+      color: var(#{v("text-secondary")});
+      background: transparent;
+      border: var(#{v("border-width")}) solid transparent;
+      border-radius: var(#{v("radius-pill")});
+
+      @include motion((background-color, border-color, color, transform));
+
+      &:focus-visible {
+        outline: var(#{v("focus-ring-width")}) solid var(#{v("focus-color")});
+        outline-offset: 0.125rem;
+      }
+
+      &:hover {
+        color: var(#{v("text-primary")});
+        background: var(#{v("control-bg-subtle")});
+        border-color: var(#{v("border-subtle")});
+      }
+
+      &:active {
+        transform: scale(0.96);
+      }
+    }
+
+    &__body {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      gap: var(#{v("space-sm")});
+      overflow-y: auto;
+      padding: var(#{v("surface-space-compact")})
+        var(#{v("surface-space-card")}) var(#{v("surface-space-card")});
+    }
+
+    &__icon {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-self: center;
+      align-items: center;
+      justify-content: center;
+      width: var(#{v("size-field")});
+      height: var(#{v("size-field")});
+      color: var(#{v("color-info")});
+      background: var(#{v("gradient-panel-soft")});
+      border: var(#{v("border-width")}) solid var(#{v("border-subtle")});
+      border-radius: var(#{v("radius-pill")});
+      box-shadow: var(#{v("shadow-inset-soft")});
+    }
+
+    &__description {
+      color: var(#{v("text-secondary")});
+
+      @include typo("body-sm", "regular", 1.7);
+    }
+
+    &__foot {
+      flex-shrink: 0;
+      padding: 0 var(#{v("surface-space-card")}) var(#{v("surface-space-card")});
+    }
+
+    // ── 정렬
+    &--align-center &__body {
+      align-items: center;
+      text-align: center;
+    }
+
+    // ── 크기
+    &--small &__panel {
+      width: #{hook("popup-width", min(100%, 22.5rem))};
+    }
+
+    &--large &__panel {
+      width: #{hook("popup-width", min(100%, 40rem))};
+    }
+
+    // ── variant: bottom sheet
+    &--bottom-sheet &__positioner {
+      align-items: flex-end;
+      padding: 0;
+    }
+
+    &--bottom-sheet &__panel {
+      width: 100%;
+      max-height: min(88dvh, 45rem);
+      border-radius: var(#{v("radius-xl")}) var(#{v("radius-xl")}) 0 0;
+    }
+
+    // ── variant: full
+    &--full &__positioner {
+      padding: 0;
+    }
+
+    &--full &__panel {
+      width: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
+      border: none;
+      border-radius: 0;
+    }
+
+    // 전체 팝업은 노치·홈 인디케이터 영역을 피한다
+    &--full &__head {
+      padding: calc(var(#{v("surface-space-card")}) + env(safe-area-inset-top))
+        calc(var(#{v("surface-space-card")}) + env(safe-area-inset-right)) 0
+        calc(var(#{v("surface-space-card")}) + env(safe-area-inset-left));
+    }
+
+    &--full &__body {
+      padding: var(#{v("space-md")})
+        calc(var(#{v("surface-space-card")}) + env(safe-area-inset-right))
+        calc(var(#{v("surface-space-card")}) + env(safe-area-inset-bottom))
+        calc(var(#{v("surface-space-card")}) + env(safe-area-inset-left));
+    }
+
+    &--full &__foot {
+      padding: 0
+        calc(var(#{v("surface-space-card")}) + env(safe-area-inset-right))
+        calc(var(#{v("surface-space-card")}) + env(safe-area-inset-bottom))
+        calc(var(#{v("surface-space-card")}) + env(safe-area-inset-left));
+    }
+
+    // ── 헤더/푸터 없을 때 여백 보정
+    &--no-header &__body {
+      padding-top: var(#{v("surface-space-card")});
+    }
+
+    &--full#{cls("popup")}--no-header &__body {
+      padding-top: calc(
+        var(#{v("surface-space-card")}) + env(safe-area-inset-top)
+      );
+    }
+
+    &--no-footer &__body {
+      padding-bottom: var(#{v("surface-space-card")});
+    }
+
+    &--full#{cls("popup")}--no-footer &__body {
+      padding-bottom: calc(
+        var(#{v("surface-space-card")}) + env(safe-area-inset-bottom)
+      );
+    }
+  }
+
+  // ── Alert / Confirm 공통 (가운데 정렬 메시지형)
+  #{cls("popup-alert")},
+  #{cls("popup-confirm")} {
+    #{cls("popup")}__header-content {
+      text-align: center;
+    }
+
+    #{cls("popup")}__title {
+      @include typo("title", "bold", 1.12);
+    }
+
+    #{cls("popup")}__description {
+      max-width: 22.5rem;
+      color: var(#{v("text-secondary")});
+    }
+
+    &#{cls("popup")}--no-header {
+      #{cls("popup")}__body {
+        justify-content: center;
+        min-height: 11.25rem;
+        gap: var(#{v("space-md")});
+      }
+
+      #{cls("popup")}__description {
+        max-width: 20rem;
+        margin: 0 auto;
+      }
+    }
+
+    &__actions {
+      #{cls("button-group")}__wrap {
+        width: 100%;
+      }
+
+      #{cls("button-group")}__item {
+        display: flex;
+      }
+    }
+  }
+
+  // ── Alert 는 버튼 하나라 가운데 정렬 + 폭 제한
+  #{cls("popup-alert")} {
+    &__actions {
+      #{cls("button-group")}__wrap {
+        justify-content: center;
+      }
+
+      #{cls("button-group")}__item {
+        justify-content: center;
+      }
+
+      #{cls("button")} {
+        max-width: 12.5rem;
+      }
+    }
+  }
+}

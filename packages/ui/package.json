@@ -59,6 +59,10 @@
       "types": "./dist/switch.d.ts",
       "default": "./dist/switch.js"
     },
+    "./popup": {
+      "types": "./dist/popup.d.ts",
+      "default": "./dist/popup.js"
+    },
     "./icon": {
       "types": "./dist/icon.d.ts",
       "default": "./dist/icon.js"

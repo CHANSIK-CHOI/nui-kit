@@ -6,4 +6,5 @@ export {
   SearchIcon,
   ShowPwIcon,
   HidePwIcon,
+  CloseIcon,
 } from "./icons.js";

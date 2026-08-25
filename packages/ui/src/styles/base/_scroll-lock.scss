@@ -1,0 +1,21 @@
+@use "../abstracts/prefix" as *;
+
+// ═══════════════════════════════════════════════════════════════════
+// 스크롤 잠금
+//
+// 팝업이 열려 있는 동안 배경 스크롤을 막는다.
+// `body` 를 대상으로 하지만 **우리 클래스가 붙었을 때만** 적용되므로
+// 소비자 프로젝트의 body 에는 아무 영향이 없다.
+//
+// 스크롤 위치는 PopupHost 가 --nui-scroll-lock-top 에 기록하고,
+// 잠금 해제 시 그 위치로 복원한다.
+// ═══════════════════════════════════════════════════════════════════
+@layer nui.base {
+  body#{state("prevent-scroll")} {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: 100%;
+    top: calc(var(#{v("scroll-lock-top")}, 0px) * -1);
+    overflow: hidden;
+  }
+}

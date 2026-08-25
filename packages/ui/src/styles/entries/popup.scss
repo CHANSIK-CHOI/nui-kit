@@ -1,0 +1,8 @@
+// → styles/popup.css  (온디맨드: tokens.css 와 함께 import)
+// 팝업은 Button / ButtonGroup(Alert·Confirm 푸터)과 Icon 을 함께 렌더한다.
+@use "abstracts/layer";
+@use "base/normalize";
+@use "base/scroll-lock";
+@use "components/icon";
+@use "components/button";
+@use "components/popup";

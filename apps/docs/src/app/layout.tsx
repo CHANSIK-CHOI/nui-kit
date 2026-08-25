@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Sidebar } from "@/components/Sidebar";
+import { PopupProvider } from "@/components/PopupProvider";
 
 // 라이브러리 전체 스타일 (토큰 포함). reset 은 포함되지 않는다.
 import "@chansikchoi/next-ui/styles/index.css";
@@ -23,10 +24,12 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <div className="doc-shell">
-          <Sidebar />
-          <main className="doc-main">{children}</main>
-        </div>
+        <PopupProvider>
+          <div className="doc-shell">
+            <Sidebar />
+            <main className="doc-main">{children}</main>
+          </div>
+        </PopupProvider>
       </body>
     </html>
   );

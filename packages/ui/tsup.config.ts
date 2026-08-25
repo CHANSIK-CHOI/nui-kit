@@ -12,6 +12,7 @@ export default defineConfig({
     checkbox: "src/checkbox.ts",
     radio: "src/radio.ts",
     switch: "src/switch.ts",
+    popup: "src/popup.ts",
     icon: "src/icon.ts",
   },
   // App Router 전용 라이브러리 — ESM 단일 포맷.

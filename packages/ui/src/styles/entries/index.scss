@@ -4,6 +4,7 @@
 @use "abstracts/layer";
 @use "tokens/seed";
 @use "base/normalize";
+@use "base/scroll-lock";
 
 // components — 파일럿 3개
 @use "components/icon";
@@ -12,6 +13,7 @@
 @use "components/textfield";
 @use "components/textarea";
 @use "components/choice";
+@use "components/popup";
 
 // utilities
 @use "utilities/a11y";

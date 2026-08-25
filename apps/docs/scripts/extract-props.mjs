@@ -124,6 +124,26 @@ const TARGETS = [
     type: "RadioGroupProps",
   },
   { name: "Switch", file: "components/Switch/Switch.tsx", type: "SwitchProps" },
+  {
+    name: "PopupBase",
+    file: "components/Popup/Popup.types.ts",
+    type: "PopupBaseProps",
+  },
+  {
+    name: "Alert",
+    file: "components/Popup/Popup.types.ts",
+    type: "AlertProps",
+  },
+  {
+    name: "Confirm",
+    file: "components/Popup/Popup.types.ts",
+    type: "ConfirmProps",
+  },
+  {
+    name: "LayerPopup",
+    file: "components/Popup/Popup.types.ts",
+    type: "LayerPopupProps",
+  },
   { name: "Icon", file: "components/Icon/Icon.tsx", type: "IconProps" },
 ];
 

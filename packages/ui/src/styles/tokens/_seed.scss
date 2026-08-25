@@ -87,6 +87,17 @@
     // ── semantic / surface
     #{v("surface-neutral-soft")}: rgb(17 24 39 / 4%);
     #{v("surface-neutral-subtle")}: rgb(17 24 39 / 6%);
+    #{v("surface-panel-strong")}: rgb(255 255 255 / 96%);
+    #{v("surface-overlay-dim")}: rgb(17 24 39 / 54%);
+    #{v("gradient-panel-soft")}: linear-gradient(
+      180deg,
+      rgb(255 255 255 / 98%) 0%,
+      rgb(249 250 251 / 92%) 100%
+    );
+
+    // ── semantic / border
+    #{v("border-subtle")}: rgb(17 24 39 / 6%);
+    #{v("border-default")}: rgb(17 24 39 / 8%);
 
     // ── control state (입력 컨트롤 공통 배선)
     #{v("control-text")}: var(#{v("text-primary")});
@@ -110,6 +121,11 @@
 
     // ── accessibility
     #{v("focus-color")}: var(#{v("control-accent")});
+
+    // ── surface spacing (패널·카드 내부 여백)
+    #{v("surface-space-compact")}: 1rem; // 16px
+    #{v("surface-space-card")}: 1.5rem; // 24px
+    #{v("surface-space-section")}: 2rem; // 32px
 
     // ── spacing (원본 10px 루트 기준 → 16px 루트 환산, 실제 px 동일)
     #{v("space-2xs")}: 0.25rem; // 4px
@@ -161,6 +177,7 @@
     #{v("shadow-dropdown")}: 0 1rem 2rem rgb(15 23 42 / 12%);
     #{v("shadow-toast")}: 0 0.875rem 2rem rgb(17 24 39 / 22%);
     #{v("shadow-thumb")}: 0 0.125rem 0.375rem rgb(15 23 42 / 18%);
+    #{v("shadow-inset-soft")}: inset 0 1px 0 rgb(255 255 255 / 76%);
     #{v("shadow-focus")}: 0 0 0 0.25rem rgb(28 166 115 / 14%);
     #{v("shadow-focus-strong")}: 0 0 0 0.25rem rgb(28 166 115 / 16%);
     #{v("shadow-focus-error")}: 0 0 0 0.25rem rgb(220 38 38 / 12%);
