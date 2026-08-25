@@ -154,6 +154,31 @@ const TARGETS = [
     file: "components/Tooltip/Tooltip.tsx",
     type: "TooltipProps",
   },
+  {
+    name: "Accordion",
+    file: "components/Accordion/Accordion.tsx",
+    type: "AccordionProps",
+  },
+  {
+    name: "Accordion.Item",
+    file: "components/Accordion/AccordionItem.tsx",
+    type: "AccordionItemProps",
+  },
+  {
+    name: "Accordion.Head",
+    file: "components/Accordion/AccordionHead.tsx",
+    type: "AccordionHeadProps",
+  },
+  {
+    name: "Accordion.Button",
+    file: "components/Accordion/AccordionButton.tsx",
+    type: "AccordionButtonProps",
+  },
+  {
+    name: "Accordion.Panel",
+    file: "components/Accordion/AccordionPanel.tsx",
+    type: "AccordionPanelProps",
+  },
   { name: "Icon", file: "components/Icon/Icon.tsx", type: "IconProps" },
 ];
 

@@ -71,6 +71,10 @@
       "types": "./dist/tooltip.d.ts",
       "default": "./dist/tooltip.js"
     },
+    "./accordion": {
+      "types": "./dist/accordion.d.ts",
+      "default": "./dist/accordion.js"
+    },
     "./icon": {
       "types": "./dist/icon.d.ts",
       "default": "./dist/icon.js"

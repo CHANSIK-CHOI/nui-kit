@@ -85,9 +85,11 @@
     #{v("text-inverse-strong")}: var(#{v("color-white")});
 
     // ── semantic / surface
+    #{v("surface-neutral-softest")}: rgb(17 24 39 / 2%);
     #{v("surface-neutral-soft")}: rgb(17 24 39 / 4%);
     #{v("surface-neutral-subtle")}: rgb(17 24 39 / 6%);
     #{v("surface-panel-strong")}: rgb(255 255 255 / 96%);
+    #{v("surface-panel-muted")}: rgb(249 250 251 / 94%);
     #{v("surface-inverse")}: rgb(17 24 39 / 96%);
     #{v("surface-toast-error")}: rgb(127 29 29 / 96%);
     #{v("surface-overlay-dim")}: rgb(17 24 39 / 54%);
@@ -100,6 +102,9 @@
     // ── semantic / border
     #{v("border-subtle")}: rgb(17 24 39 / 6%);
     #{v("border-default")}: rgb(17 24 39 / 8%);
+    #{v("border-brand-active")}: rgb(28 166 115 / 22%);
+    #{v("border-brand-divider")}: rgb(28 166 115 / 14%);
+    #{v("border-brand-line")}: rgb(28 166 115 / 30%);
 
     // ── control state (입력 컨트롤 공통 배선)
     #{v("control-text")}: var(#{v("text-primary")});
@@ -176,6 +181,7 @@
     #{v("shadow-base")}: 0 1.125rem 2.5rem rgb(17 24 39 / 8%);
     #{v("shadow-strong")}: 0 1.5rem 3.125rem rgb(17 24 39 / 8%);
     #{v("shadow-press")}: 0 0.5rem 1rem rgb(17 24 39 / 12%);
+    #{v("shadow-brand")}: 0 1.125rem 2.5rem rgb(1 64 41 / 8%);
     #{v("shadow-overlay")}: 0 1.125rem 3rem rgb(17 24 39 / 14%);
     #{v("shadow-dropdown")}: 0 1rem 2rem rgb(15 23 42 / 12%);
     #{v("shadow-toast")}: 0 0.875rem 2rem rgb(17 24 39 / 22%);

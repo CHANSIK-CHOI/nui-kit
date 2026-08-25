@@ -61,6 +61,15 @@ export const motionTransition = {
     duration: motionDuration.fast,
     ease: motionEase.exit,
   } satisfies Transition,
+  // 레이아웃 전환(아코디언 펼침 등)
+  panel: {
+    duration: motionDuration.slow,
+    ease: motionEase.emphasized,
+  } satisfies Transition,
+  panelExit: {
+    duration: motionDuration.fast,
+    ease: motionEase.exit,
+  } satisfies Transition,
   // tooltip / popover — 가볍고 빠르게
   popover: {
     duration: motionDuration.fast,

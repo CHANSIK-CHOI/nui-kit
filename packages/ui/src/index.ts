@@ -19,3 +19,4 @@ export * from "./components/Switch/index.js";
 export * from "./components/Popup/index.js";
 export * from "./components/Toast/index.js";
 export * from "./components/Tooltip/index.js";
+export * from "./components/Accordion/index.js";

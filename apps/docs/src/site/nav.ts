@@ -37,6 +37,7 @@ export const NAV: NavSection[] = [
       { title: "Popup", href: "/components/popup" },
       { title: "Toast", href: "/components/toast" },
       { title: "Tooltip", href: "/components/tooltip" },
+      { title: "Accordion", href: "/components/accordion" },
     ],
   },
 ];
