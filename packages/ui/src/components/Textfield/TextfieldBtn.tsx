@@ -3,16 +3,22 @@
 import cn from "classnames";
 import type { ButtonHTMLAttributes } from "react";
 import { px } from "../../internal/prefix.js";
-import { DelIcon, SearchIcon, ShowPwIcon, HidePwIcon } from "../Icon/index.js";
+import {
+  DelIcon,
+  SearchIcon,
+  ShowPwIcon,
+  HidePwIcon,
+  CalendarIcon,
+} from "../Icon/index.js";
 
 const block = px("textfield");
 
-// date 는 Datepicker 이식 시 추가한다.
 const ICON_MAP = {
   clear: <DelIcon />,
   search: <SearchIcon />,
   showPw: <ShowPwIcon />,
   hidePw: <HidePwIcon />,
+  date: <CalendarIcon />,
 } as const;
 
 export type TextfieldBtnIcon = keyof typeof ICON_MAP;

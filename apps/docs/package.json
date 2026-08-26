@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "generate": "node scripts/extract-props.mjs && node scripts/extract-tokens.mjs",
     "verify:console": "node scripts/check-console.mjs",
-    "verify:select-rhf": "node scripts/check-select-rhf.mjs"
+    "verify:select-rhf": "node scripts/check-select-rhf.mjs",
+    "verify:datepicker": "node scripts/check-datepicker.mjs"
   },
   "dependencies": {
     "@chansikchoi/next-ui": "*",

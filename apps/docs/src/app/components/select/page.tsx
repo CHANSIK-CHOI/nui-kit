@@ -28,11 +28,11 @@ const OPTIONS = [
 
       <div className="doc-note">
         <strong>controlled 전용이다.</strong> <code>value</code> 와{" "}
-        <code>onChange</code> 를 소비자가 소유한다.{" "}
-        <code>onChange</code> 의 첫 인자가 원시값이고, 두 번째·세 번째로
-        react-select 의 옵션 객체와 <code>actionMeta</code> 가 함께 온다.
-        react-hook-form 을 쓴다면 <code>@chansikchoi/next-ui/rhf</code> 의{" "}
-        <code>RHFSelect</code> · <code>RHFMultiSelect</code> 를 쓴다.
+        <code>onChange</code> 를 소비자가 소유한다. <code>onChange</code> 의 첫
+        인자가 원시값이고, 두 번째·세 번째로 react-select 의 옵션 객체와{" "}
+        <code>actionMeta</code> 가 함께 온다. react-hook-form 을 쓴다면{" "}
+        <code>@chansikchoi/next-ui/rhf</code> 의 <code>RHFSelect</code> ·{" "}
+        <code>RHFMultiSelect</code> 를 쓴다.
       </div>
 
       <SelectDemo />
@@ -41,9 +41,8 @@ const OPTIONS = [
 
       <h2>스타일 커스터마이징</h2>
       <p>
-        컨트롤 외형은 공개 CSS 변수로 조정한다. 이 변수들은 라이브러리
-        레이어(<code>@layer nui.components</code>) 밖에서 선언하면 언제나
-        우선한다.
+        컨트롤 외형은 공개 CSS 변수로 조정한다. 이 변수들은 라이브러리 레이어(
+        <code>@layer nui.components</code>) 밖에서 선언하면 언제나 우선한다.
       </p>
       <div className="doc-table-wrap">
         <table className="doc-table">
@@ -99,9 +98,9 @@ const OPTIONS = [
         <strong>
           react-select 의 <code>styles</code> prop 은 우리 CSS 를 이긴다.
         </strong>{" "}
-        react-select 은 emotion 으로 스타일을 주입하는데, 그 클래스는 CSS
-        레이어 밖에 있어 <code>@layer nui.components</code> 안의 우리 규칙보다
-        항상 우선한다. 그래서 이 컴포넌트는 <code>unstyled</code> 로 구동하면서{" "}
+        react-select 은 emotion 으로 스타일을 주입하는데, 그 클래스는 CSS 레이어
+        밖에 있어 <code>@layer nui.components</code> 안의 우리 규칙보다 항상
+        우선한다. 그래서 이 컴포넌트는 <code>unstyled</code> 로 구동하면서{" "}
         <strong>충돌하는 속성만 emotion 쪽에서 걷어내</strong> CSS 가 책임지게
         한다. <code>styles</code> prop 을 직접 넘기면 그 정리된 값 위에 얹히므로
         의도한 대로 덧칠할 수 있다. 반대로 메뉴 최대 높이처럼 react-select 이
@@ -113,8 +112,8 @@ const OPTIONS = [
         <strong>
           <code>components</code> 는 렌더 밖에서 선언한다.
         </strong>{" "}
-        매 렌더 새 컴포넌트 함수를 넘기면 react-select 이 내부 input 을 remount 해{" "}
-        <strong>포커스와 입력 중이던 검색어가 사라진다.</strong> react-select
+        매 렌더 새 컴포넌트 함수를 넘기면 react-select 이 내부 input 을 remount
+        해 <strong>포커스와 입력 중이던 검색어가 사라진다.</strong> react-select
         공식 문서도 같은 것을 권고한다.
         <pre className="doc-code" style={{ marginTop: 10, marginBottom: 0 }}>
           <code>{`// ❌ 렌더 안에서 컴포넌트를 새로 만든다
@@ -132,8 +131,9 @@ const SELECT_COMPONENTS = { Option: CustomOption };
 
       <div className="doc-note">
         <code>value</code> 는 <code>options</code> 안에 존재하는 값이어야 한다.
-        옵션을 비동기로 불러오는 동안처럼 <code>options</code> 에 없는 값을 넣으면
-        선택이 표시되지 않고 placeholder 가 보인다 — 원시값 API 의 구조적 특성이다.
+        옵션을 비동기로 불러오는 동안처럼 <code>options</code> 에 없는 값을
+        넣으면 선택이 표시되지 않고 placeholder 가 보인다 — 원시값 API 의 구조적
+        특성이다.
       </div>
 
       <h2>접근성</h2>

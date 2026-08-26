@@ -179,6 +179,45 @@ const SELECT_COMPONENTS = { Option: CustomOption };
 
 `styles` 는 컴포넌트가 아니라 함수 객체라 인라인으로 넘겨도 remount 되지 않습니다.
 
+### Datepicker 계열과 `react-day-picker`
+
+`Datepicker` · `DateRangePicker` · `DateMultiplePicker` 는 내부적으로
+`react-day-picker` 를 씁니다. **dependency 이므로 따로 설치할 필요가 없고,
+기본 CSS(`react-day-picker/style.css`)도 불러올 필요가 없습니다.**
+
+```tsx
+import { Datepicker, DateRangePicker } from "@chansikchoi/next-ui";
+
+<Datepicker selected={date} onSelectedChange={setDate} />;
+<DateRangePicker selected={range} onSelectedChange={setRange} />;
+```
+
+- 입력창은 직접 타이핑할 수 없습니다. 달력으로만 값을 바꿉니다
+- `DateRangePicker` 는 시작·종료가 모두 정해지기 전까지 `undefined` 를 넘깁니다
+- `dayPickerProps` 로 `react-day-picker` 설정을 그대로 전달합니다
+
+**클래스 이름이 겹치지 않는 이유.** 라이브러리의 `classNames` 를 통째로
+`nui-daypicker__*` 로 갈아끼운 뒤 우리 CSS 로 그립니다. 소비자 프로젝트가 같은
+라이브러리를 따로 쓰더라도 서로 간섭하지 않습니다. 달력 세부 스타일을 손보려면
+`nui-daypicker__day` 처럼 우리 클래스를 대상으로 하면 됩니다.
+
+블록이 둘입니다 — `nui-datepicker`(입력 필드와 캘린더 팝업),
+`nui-daypicker`(달력 내부).
+
+`DateRange` 같은 타입과 기본 포맷터는 배럴에서 함께 내보냅니다.
+
+```tsx
+import { DateRangePicker, type DateRange } from "@chansikchoi/next-ui";
+```
+
+**알려진 제약**
+- 기간(`DateRangePicker`)은 최소 2일입니다 — 하루짜리 기간은 만들 수 없습니다
+- 캘린더 팝업은 portal 을 쓰지 않으므로 `overflow: hidden` 인 조상 안에서 잘릴 수
+  있습니다 (`Select` 의 메뉴도 같습니다)
+- 월 전환 애니메이션(`animate`)은 지원하지 않습니다
+- 달력 컨트롤의 접근 이름은 한국어가 기본입니다. 다른 언어를 쓰려면
+  `dayPickerProps.labels` 와 `calendarLabel` 을 함께 넘깁니다
+
 ## 라이선스
 
 MIT

@@ -1,0 +1,342 @@
+@use "../abstracts" as *;
+@use "textfield";
+
+// ─────────────────────────────────────────────────────────────
+// Datepicker (react-day-picker 래핑)
+//
+// 블록이 둘이다.
+//   nui-datepicker  — 입력 필드 + 캘린더 팝업 컨테이너 (우리 컴포넌트)
+//   nui-daypicker   — 달력 내부 (react-day-picker 가 그리는 부분)
+//
+// 왜 나누는가 — react-day-picker 의 `dropdown` 키는 "년/월 셀렉트" 인데
+// 우리 `__dropdown` 은 "캘린더 팝업" 이라 한 블록에 두면 이름이 충돌한다.
+// 달력은 그 자체로 독립된 블록이므로 분리하는 편이 BEM 상으로도 맞다.
+//
+// ⚠️ 서드파티 클래스를 덮지 않는다 (rules/styles.md §8)
+//   react-day-picker 의 기본 CSS(`react-day-picker/style.css`)를 배포하지 않고,
+//   `classNames` prop 으로 `.rdp-*` 를 통째로 `nui-daypicker__*` 로 갈아끼운다
+//   (`Datepicker.utils.ts` 의 `DAYPICKER_CLASS_NAMES`).
+//   따라서 이 파일에는 `.rdp-*` 셀렉터도 `--rdp-*` 변수도 없다.
+//   두 파일은 함께 움직인다 — 매핑을 바꾸면 여기 셀렉터도 바뀐다.
+//
+// 공개 훅: --nui-datepicker-dropdown-bg / -dropdown-radius
+//          --nui-datepicker-day-size / -day-button-size / -day-radius
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("datepicker")} {
+    position: relative;
+    width: 100%;
+
+    // 캘린더 팝업
+    &__dropdown {
+      position: absolute;
+      top: calc(100% + var(#{v("space-xs")}));
+      left: 0;
+      z-index: var(#{v("z-tooltip")});
+      min-width: 19.5rem;
+      padding: var(#{v("space-md")});
+      border: var(#{v("border-width")}) solid
+        var(#{v("control-border-disabled")});
+      border-radius: #{hook(
+          "datepicker-dropdown-radius",
+          var(#{v("radius-md")})
+        )};
+      background-color: #{hook(
+          "datepicker-dropdown-bg",
+          var(#{v("surface-panel-strong")})
+        )};
+      box-shadow: var(#{v("shadow-dropdown-strong")});
+    }
+  }
+
+  // ── 달력 본체
+  #{cls("daypicker")} {
+    #{iv("daypicker-day-size")}: #{hook(
+        "datepicker-day-size",
+        var(#{v("size-control-lg")})
+      )};
+    #{iv("daypicker-day-button-size")}: #{hook(
+        "datepicker-day-button-size",
+        var(#{v("size-control-md")})
+      )};
+    #{iv("daypicker-day-radius")}: #{hook(
+        "datepicker-day-radius",
+        var(#{v("radius-sm")})
+      )};
+
+    color: var(#{v("control-text")});
+
+    // 달력 내부에는 클래스 없는 표 요소(tbody/tr 등)가 섞이므로
+    // 스코프 안에서만 box-sizing 을 정규화한다 (전역 reset 미배포 대응).
+    &__root,
+    &__root * {
+      box-sizing: border-box;
+    }
+
+    &__months {
+      display: flex;
+    }
+
+    &__month {
+      position: relative;
+      width: 100%;
+    }
+
+    &__month-caption {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: var(#{v("size-control-lg")});
+      margin-bottom: var(#{v("space-xs")});
+      // 우측 네비게이션 버튼 영역을 비워둔다
+      padding-right: 4.75rem;
+    }
+
+    &__caption-label {
+      @include typo("body", "semi-bold", 1.4);
+    }
+
+    &__dropdowns {
+      display: inline-flex;
+      align-items: center;
+      gap: var(#{v("space-xs")});
+    }
+
+    // 실제 <select> 는 투명하게 덮어두고, 아래 caption-label 이 보이는 UI 가 된다.
+    &__dropdown {
+      // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
+      appearance: none;
+      margin: 0;
+      border: none;
+      background: transparent;
+      font-family: var(#{v("font-family-base")});
+
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      width: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    &__dropdown-root {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-width: 5.5rem;
+      min-height: var(#{v("size-control-md")});
+      padding: 0 var(#{v("space-sm")});
+      border: var(#{v("border-width")}) solid var(#{v("control-border")});
+      border-radius: var(#{v("radius-sm")});
+      background-color: var(#{v("control-bg")});
+      color: var(#{v("control-text")});
+
+      @include motion((border-color, background-color), "fast");
+
+      &[data-disabled="true"] {
+        opacity: 0.45;
+      }
+    }
+
+    &__dropdown-root:hover {
+      border-color: var(#{v("control-border-hover")});
+      background-color: var(#{v("control-bg-subtle")});
+    }
+
+    &__dropdown:focus-visible + &__caption-label {
+      outline: none;
+      border-radius: var(#{v("radius-sm")});
+      box-shadow: var(#{v("shadow-focus-sm")});
+    }
+
+    &__dropdown-root &__caption-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(#{v("space-xs")});
+      width: 100%;
+
+      @include typo("body-sm", "semi-bold", 1.35, -0.01em);
+    }
+
+    // ── 이전/다음 달 네비게이션
+    &__nav {
+      position: absolute;
+      top: var(#{v("space-2xs")});
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: var(#{v("space-2xs")});
+      // 캡션 위에 겹쳐 있으므로 버튼 자신만 이벤트를 받는다
+      pointer-events: none;
+    }
+
+    &__button-previous,
+    &__button-next {
+      // UA 기본 스타일 무력화
+      appearance: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      font-family: var(#{v("font-family-base")});
+      cursor: pointer;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(#{v("size-control-sm")});
+      height: var(#{v("size-control-sm")});
+      border-radius: var(#{v("radius-round")});
+      color: var(#{v("control-icon")});
+      pointer-events: auto;
+
+      @include motion((background-color, color, opacity), "fast");
+    }
+
+    &__button-previous:hover,
+    &__button-next:hover {
+      background-color: var(#{v("control-bg-subtle")});
+      color: var(#{v("control-icon-strong")});
+    }
+
+    // ⚠️ react-day-picker v9 는 월 경계에서 `disabled` 속성이 아니라
+    //    `aria-disabled="true"` 를 붙인다. `:disabled` 만 쓰면 절대 매치되지 않아
+    //    경계에서도 버튼이 멀쩡히 hover 하이라이트된다.
+    &__button-previous[aria-disabled="true"],
+    &__button-next[aria-disabled="true"],
+    &__button-previous:disabled,
+    &__button-next:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    // 비활성 버튼은 hover 피드백도 주지 않는다.
+    &__button-previous[aria-disabled="true"]:hover,
+    &__button-next[aria-disabled="true"]:hover {
+      background-color: transparent;
+      color: var(#{v("control-icon")});
+    }
+
+    &__chevron {
+      width: var(#{v("size-icon-lg")});
+      height: var(#{v("size-icon-lg")});
+      fill: currentColor;
+    }
+
+    // ── 날짜 그리드
+    &__month-grid {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    &__weekday {
+      width: var(#{iv("daypicker-day-size")});
+      height: var(#{v("size-control-sm")});
+      color: var(#{v("text-tertiary")});
+      text-align: center;
+
+      @include typo("label", "semi-bold", 1.35, 0.04em);
+    }
+
+    &__day {
+      width: var(#{iv("daypicker-day-size")});
+      height: var(#{iv("daypicker-day-size")});
+      text-align: center;
+    }
+
+    &__day-button {
+      // UA 기본 스타일 무력화
+      appearance: none;
+      padding: 0;
+      font-family: var(#{v("font-family-base")});
+      cursor: pointer;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(#{iv("daypicker-day-button-size")});
+      height: var(#{iv("daypicker-day-button-size")});
+      margin: 0 auto;
+      border: var(#{v("border-width")}) solid transparent;
+      border-radius: var(#{iv("daypicker-day-radius")});
+      background: transparent;
+      color: inherit;
+
+      @include motion((background-color, border-color, color), "fast");
+      @include typo("body-sm", "medium", 1.4, -0.01em);
+    }
+
+    &__day:not(#{cls("daypicker")}__selected)
+      &__day-button:hover:not(:disabled) {
+      background-color: var(#{v("control-bg-subtle")});
+    }
+
+    &__day-button:focus-visible {
+      outline: none;
+      border-color: var(#{v("focus-color")});
+      box-shadow: var(#{v("shadow-focus-sm")});
+    }
+
+    // ── 주말 (modifiersClassNames 로 붙는다)
+    //    선택·비활성 상태가 아닐 때만 주말 색을 쓴다.
+    &__day--saturday:not(#{cls("daypicker")}__disabled):not(
+        #{cls("daypicker")}__selected
+      ):not(#{cls("daypicker")}__range-start):not(
+        #{cls("daypicker")}__range-end
+      ):not(#{cls("daypicker")}__outside)
+      &__day-button {
+      color: var(#{v("text-info")});
+    }
+
+    &__day--sunday:not(#{cls("daypicker")}__disabled):not(
+        #{cls("daypicker")}__selected
+      ):not(#{cls("daypicker")}__range-start):not(
+        #{cls("daypicker")}__range-end
+      ):not(#{cls("daypicker")}__outside)
+      &__day-button {
+      color: var(#{v("text-danger")});
+    }
+
+    // ── 상태
+    &__outside {
+      color: var(#{v("text-quaternary")});
+    }
+
+    &__disabled &__day-button {
+      color: var(#{v("text-quaternary")});
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    // 오늘 표시는 선택 상태가 아닐 때만.
+    // 원본은 `!important` 로 눌렀지만, 우리는 react-day-picker 의 기본 CSS 를
+    // 배포하지 않으므로 이길 상대가 없다 — 상세도만으로 충분하다.
+    &__today:not(#{cls("daypicker")}__selected) &__day-button {
+      border-color: var(#{v("control-accent")});
+      color: var(#{v("control-accent")});
+    }
+
+    // range 중간 날짜에는 `selected` 와 `range-middle` 이 **함께** 붙는다.
+    // 두 규칙은 상세도가 같아 소스 순서로 승부가 갈리므로 `:not()` 으로 명시한다
+    // (rules/styles.md §7 — 순서를 바꾸면 기간 중간이 통째로 진해진다).
+    &__selected:not(#{cls("daypicker")}__range-middle) &__day-button,
+    &__range-start &__day-button,
+    &__range-end &__day-button {
+      background-color: var(#{v("control-accent")});
+      border-color: var(#{v("control-accent")});
+      color: var(#{v("text-inverse-strong")});
+    }
+
+    &__range-middle {
+      background-color: var(#{v("control-accent-soft")});
+    }
+
+    &__range-middle &__day-button {
+      background-color: transparent;
+      border-color: transparent;
+      color: var(#{v("text-primary")});
+    }
+  }
+}

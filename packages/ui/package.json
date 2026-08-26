@@ -79,6 +79,10 @@
       "types": "./dist/select.d.ts",
       "default": "./dist/select.js"
     },
+    "./datepicker": {
+      "types": "./dist/datepicker.d.ts",
+      "default": "./dist/datepicker.js"
+    },
     "./icon": {
       "types": "./dist/icon.d.ts",
       "default": "./dist/icon.js"

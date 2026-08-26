@@ -81,6 +81,7 @@
     #{v("text-quaternary")}: var(#{v("text-color-4")});
     #{v("text-brand")}: var(#{v("color-primary-dark")});
     #{v("text-danger")}: var(#{v("color-error")});
+    #{v("text-info")}: var(#{v("color-info")});
     #{v("text-inverse")}: rgb(255 255 255 / 92%);
     #{v("text-inverse-strong")}: var(#{v("color-white")});
 
@@ -186,6 +187,7 @@
     #{v("shadow-brand")}: 0 1.125rem 2.5rem rgb(1 64 41 / 8%);
     #{v("shadow-overlay")}: 0 1.125rem 3rem rgb(17 24 39 / 14%);
     #{v("shadow-dropdown")}: 0 1rem 2rem rgb(15 23 42 / 12%);
+    #{v("shadow-dropdown-strong")}: 0 1rem 2.5rem rgb(17 24 39 / 12%);
     #{v("shadow-toast")}: 0 0.875rem 2rem rgb(17 24 39 / 22%);
     #{v("shadow-thumb")}: 0 0.125rem 0.375rem rgb(15 23 42 / 18%);
     #{v("shadow-inset-soft")}: inset 0 1px 0 rgb(255 255 255 / 76%);
@@ -194,6 +196,7 @@
     #{v("shadow-ring-error")}: 0 0 0 0.25rem rgb(254 226 226 / 18%);
     #{v("shadow-focus")}: 0 0 0 0.25rem rgb(28 166 115 / 14%);
     #{v("shadow-focus-strong")}: 0 0 0 0.25rem rgb(28 166 115 / 16%);
+    #{v("shadow-focus-sm")}: 0 0 0 0.1875rem rgb(28 166 115 / 16%);
     #{v("shadow-focus-error")}: 0 0 0 0.25rem rgb(220 38 38 / 12%);
 
     // ── border

@@ -51,6 +51,21 @@ const GROUPS = [
         href: "/components/select",
         desc: "다중 선택 드롭다운. 선택값을 칩으로 표시",
       },
+      {
+        name: "Datepicker",
+        href: "/components/datepicker",
+        desc: "날짜 하나를 고르는 캘린더 입력 (react-day-picker 래핑)",
+      },
+      {
+        name: "DateRangePicker",
+        href: "/components/datepicker",
+        desc: "시작·종료 기간 선택",
+      },
+      {
+        name: "DateMultiplePicker",
+        href: "/components/datepicker",
+        desc: "여러 날짜를 개별 선택",
+      },
     ],
   },
 ];

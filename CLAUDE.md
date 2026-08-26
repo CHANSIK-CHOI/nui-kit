@@ -86,6 +86,7 @@ npm run refs:check     # Context7 캐시 신선도
 # dev server 가 떠 있어야 하는 것 (npm run dev)
 npm run verify:console     # 전 페이지 콘솔 에러·경고
 npm run verify:select-rhf  # RHF 연동 Select 의 remount 회귀
+npm run verify:datepicker  # Datepicker 개폐·포커스·팝업 클리핑·RHF 회귀
 ```
 
 **문서는 손으로 쓰지 않는 부분이 있다.** `apps/docs/scripts/extract-props.mjs` 가 컴포넌트
@@ -150,79 +151,38 @@ npm run verify:select-rhf  # RHF 연동 Select 의 remount 회귀
 | Feedback | Toast / ToastHost / Tooltip | ✅ |
 | Disclosure | Accordion | ✅ |
 | Select | Select / MultiSelect (+RHF 2종) | ✅ |
-| **Datepicker** | **Datepicker / DateRangePicker / DateMultiplePicker (+RHF 3종)** | ⬜ **다음 작업** |
+| Datepicker | Datepicker / DateRangePicker / DateMultiplePicker (+RHF 3종) | ✅ |
 
 RHF 래퍼는 이식된 컴포넌트 전부에 대해 `/rhf` 서브패스로 제공 중이다.
 
 ---
 
-## 다음 작업 — Datepicker (서드파티 래핑)
+## 다음 작업 — 5단계 완료, 6단계(배포) 준비
 
-### 원본 위치
-
-```
-../next-ui-components-guide/src/components/Datepicker/  Datepicker, DateRangePicker,
-                                                        DateMultiplePicker, DatepickerBase,
-                                                        Datepicker.utils, RHF*
-../next-ui-components-guide/src/styles/components/_datepicker.scss
-```
-
-### 핵심 과제 — `rules/styles.md` §8 의 진짜 시험대
-
-Select 은 원본이 이미 `unstyled` + `classNamePrefix` 를 쓰고 있어서 전역 침범이
-애초에 없었다. **Datepicker 는 다르다.** 원본이 `.rdp-day` 같은
-react-day-picker 클래스를 **전역에서 덮고 있다.** 그대로 배포하면 소비자가 같은
-라이브러리를 쓸 때 그쪽까지 깨진다.
-
-```scss
-#{cls("datepicker")} .rdp-day { }   // ✅ 우리 스코프 안에서만
-.rdp-day { }                        // ❌ 전역 침범
-```
-
-react-day-picker v9 는 `classNames` prop 을 지원한다 — 클래스를 통째로 우리
-`nui-datepicker__*` 로 바꿔 끼우면 Select 과 같은 구조가 된다. **그 방식을 먼저
-검토할 것.** `.rdp-*` 를 자손 셀렉터로 덮는 건 차선이다.
-
-**Context7 캐시 규칙을 따른다** (`rules/references.md`) — react-day-picker 문서를
-`.claude/references/` 에 받아두고 7일간 재사용한다.
-`.claude/references/websites-react-select/` 에 Select 작업 때 받은 2건이 있다.
-
-### 반복 절차 (앞 계열에서 확립된 순서)
-
-```
-1. 원본 소스·SCSS 읽기 → 부족한 토큰 파악
-2. 토큰 추가 (tokens/_seed.scss)
-3. 스타일 이식 — 프리픽스 / @layer / 공개훅·내부배선 분리 / camelCase→kebab
-4. entries/<name>.scss 추가 + entries/index.scss 등록
-5. 컴포넌트 이식 — "use client" / px()·pv() / .js 확장자 / 합성이면 named export 동반
-6. 배럴 5곳 갱신: components/<N>/index.ts, src/<n>.ts, tsup.config.ts entry,
-   package.json exports, src/index.ts (RHF 는 src/rhf.ts)
-7. apps/docs/scripts/extract-props.mjs TARGETS 등록
-8. 문서 페이지 + 데모(Client Component) 작성, nav.ts / components/page.tsx 등록
-9. 게이트: typecheck → build:ui → verify:pkg → build:docs → verify:console
-10. 브라우저로 실제 조작 검증 (playwright 스크립트)
-11. changeset 작성 → 커밋
-```
+계열별 이전이 **전부 끝났다.** 남은 일은 아래 "배포 전 남은 일" 이다.
 
 ### 이전 계열에서 반복해서 나온 함정
 
 | 함정 | 증상 | 대응 |
 | --- | --- | --- |
 | 전역 reset 의존 | input/button 에 UA 기본 스타일 잔존, box-sizing 없음 | 컴포넌트 자체 정규화 |
-| 상태 우선순위 | error 가 readonly 에 덮임 | `:not()` 으로 명시 (disabled > error > readonly) |
+| 상태 우선순위 | error 가 readonly 에 덮임 / hover 가 focus 를 이김 | `:not()` 으로 명시 |
 | RSC dot notation | 런타임에만 `undefined` | named export 동반 |
 | portal 컨테이너 | 없으면 조용히 렌더 안 됨 | Host 가 직접 생성 |
 | controlled 경고 | `checked` + `disabled` 만으로는 React 경고 | `readOnly` 를 DOM 에 전달 |
 | Prettier 재포맷 | 문자열 치환이 **조용히** 실패 | 포맷된 파일은 부분 치환 대신 전체 재작성 |
-| **서드파티 CSS-in-JS** | **emotion 클래스가 우리 `@layer` 를 항상 이긴다** | **충돌 속성만 라이브러리 쪽에서 제거 → CSS 로 넘긴다** |
-| **중첩 min-height** | **자식에도 같은 min-height 를 주면 border 만큼 밀린다** | **높이는 한 요소만 소유** |
-| **서드파티 aria 덮어쓰기** | **라이브러리가 `aria-describedby` 를 자체 계산** | **컨테이너 컴포넌트에서 자식 aria 를 병합** |
-| **`forwardRef` 타입 추론** | **`--emitDeclarationOnly` 만 TS2883 으로 실패** | **`ForwardRefExoticComponent` 명시** |
+| 서드파티 CSS-in-JS | emotion 클래스가 우리 `@layer` 를 항상 이긴다 | 충돌 속성만 라이브러리 쪽에서 제거 → CSS 로 넘긴다 |
+| 중첩 min-height | 자식에도 같은 min-height 를 주면 border 만큼 밀린다 | 높이는 한 요소만 소유 |
+| 서드파티 aria 덮어쓰기 | 라이브러리가 `aria-describedby` 를 자체 계산 | 컨테이너 컴포넌트에서 자식 aria 를 병합 |
+| `forwardRef` 타입 추론 | `--emitDeclarationOnly` 만 TS2883 으로 실패 | `ForwardRefExoticComponent` 명시 |
+| **서드파티 상태 속성** | **`:disabled` 셀렉터가 절대 매치되지 않음** | **라이브러리가 `aria-disabled` 를 쓰는지 확인** |
+| **포커스 복귀 ↔ 자동 열기** | **닫으면서 `focus()` 하면 focus 핸들러가 다시 연다** | **복귀 중임을 ref 로 표시해 순환을 끊는다** |
+| **문서 사이트의 `overflow: hidden`** | **팝업이 잘려 데모를 조작할 수 없다** | **팝업 예제는 `overflow` 를 연다** |
 
 **정적 검사를 전부 통과하고 브라우저에서만 드러난 결함이 계열마다 나왔다.**
 `verify:console` 과 playwright 조작 검증을 생략하지 말 것.
 
-#### Select 계열에서 배운 것 — 서드파티 CSS-in-JS 를 감쌀 때
+#### 서드파티 CSS-in-JS 를 감쌀 때 (Select)
 
 `@layer nui.components` 는 소비자가 우리를 쉽게 덮게 해주는 장치인데,
 **같은 성질 때문에 서드파티 emotion/styled-components 도 우리를 덮는다.**
@@ -233,14 +193,25 @@ react-day-picker v9 는 `classNames` prop 을 지원한다 — 클래스를 통�
 → **라이브러리의 `styles` API 로 충돌 속성만 걷어내고 CSS 가 책임진다.**
    (`Select.utils.ts` 의 `CSS_OWNED_PROPERTIES` 참조)
 
-단, **기능 스타일은 걷어내면 안 된다** — 메뉴 배치(`position`/`top`/`width`),
-`maxMenuHeight`, `valueContainer` 의 `display` 전환 등. 이런 값은 CSS 로 덮지 말고
-라이브러리의 prop 으로 조정한다.
+단, **기능 스타일은 걷어내면 안 된다** — 메뉴 배치, `maxMenuHeight`,
+`valueContainer` 의 `display` 전환 등. 이런 값은 CSS 로 덮지 말고 prop 으로 조정한다.
 
-`Select.utils.ts` 와 `styles/components/_select.scss` 는 **짝을 이룬다.**
-한쪽만 고치면 조용히 깨진다.
+#### 서드파티 클래스를 통째로 갈아끼울 때 (Datepicker)
 
----
+react-day-picker 는 emotion 이 아니라 **일반 CSS 클래스**라 접근이 다르다.
+기본 CSS 를 배포하지 않고 `classNames` prop 으로 `.rdp-*` 를 통째로
+`nui-daypicker__*` 로 치환했다 (`Datepicker.utils.ts` 의 `DAYPICKER_CLASS_NAMES`).
+
+- 키를 하나씩 적지 않고 **enum 에서 자동 생성**한다 — 빠뜨린 키가 있으면 그 요소만
+  클래스 없이 렌더되어 스타일이 조용히 빠진다
+- 그래도 **라이브러리가 키를 바꾸면 조용히 깨진다** (타입 검사에 안 걸린다).
+  DOM 에 `.rdp-*` 가 0건인지 브라우저로 확인할 것
+- `labels` 는 `locale` 을 따라가지 않는다 — 한국어 기본값을 우리가 채워야 한다
+- 애니메이션(`animate`)은 정리를 `animationend` 에 의존하므로, keyframes 를
+  배포하지 않으면 **DOM 이 누수된다.** 타입에서 막아뒀다
+
+**공개 API 를 닫는 것과 여는 것은 비용이 다르다.** 막았다 나중에 여는 건 non-breaking,
+열었다 닫는 건 breaking 이다. 애매하면 **닫고 시작한다.**
 
 ## 배포 전 남은 일 (6단계)
 

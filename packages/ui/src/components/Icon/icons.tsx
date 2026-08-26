@@ -123,3 +123,56 @@ export function CloseIcon(props: IconBaseProps) {
     </Icon>
   );
 }
+
+/** 캘린더 — Datepicker 의 달력 열기 버튼 */
+export function CalendarIcon(props: IconBaseProps) {
+  return (
+    <Icon viewBox="0 0 20 20" fill="none" {...props}>
+      <rect
+        x="3"
+        y="4.5"
+        width="14"
+        height="12.5"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+      <path
+        d="M6.5 3V6"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M13.5 3V6"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M3 8H17"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6.5 11H8.5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M11.5 11H13.5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6.5 14H8.5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </Icon>
+  );
+}

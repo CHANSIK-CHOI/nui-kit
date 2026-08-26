@@ -27,8 +27,18 @@ export type { RHFSelectProps } from "./components/Select/RHFSelect.js";
 export { default as RHFMultiSelect } from "./components/Select/RHFMultiSelect.js";
 export type { RHFMultiSelectProps } from "./components/Select/RHFMultiSelect.js";
 
+export { default as RHFDatepicker } from "./components/Datepicker/RHFDatepicker.js";
+export type { RHFDatepickerProps } from "./components/Datepicker/RHFDatepicker.js";
+
+export { default as RHFDateRangePicker } from "./components/Datepicker/RHFDateRangePicker.js";
+export type { RHFDateRangePickerProps } from "./components/Datepicker/RHFDateRangePicker.js";
+
+export { default as RHFDateMultiplePicker } from "./components/Datepicker/RHFDateMultiplePicker.js";
+export type { RHFDateMultiplePickerProps } from "./components/Datepicker/RHFDateMultiplePicker.js";
+
 export type {
   RHFComponentProps,
   RHFCheckedInputManagedProps,
+  RHFSelectedInputManagedProps,
   RHFValueInputManagedProps,
 } from "./types/rhf.js";

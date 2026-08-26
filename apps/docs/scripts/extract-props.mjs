@@ -185,6 +185,21 @@ const TARGETS = [
     file: "components/Select/MultiSelect.tsx",
     type: "MultiSelectProps",
   },
+  {
+    name: "Datepicker",
+    file: "components/Datepicker/Datepicker.tsx",
+    type: "DatepickerProps",
+  },
+  {
+    name: "DateRangePicker",
+    file: "components/Datepicker/DateRangePicker.tsx",
+    type: "DateRangePickerProps",
+  },
+  {
+    name: "DateMultiplePicker",
+    file: "components/Datepicker/DateMultiplePicker.tsx",
+    type: "DateMultiplePickerProps",
+  },
   { name: "Icon", file: "components/Icon/Icon.tsx", type: "IconProps" },
 ];
 

@@ -7,4 +7,5 @@ export {
   ShowPwIcon,
   HidePwIcon,
   CloseIcon,
+  CalendarIcon,
 } from "./icons.js";

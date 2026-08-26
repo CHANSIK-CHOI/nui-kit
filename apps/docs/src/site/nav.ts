@@ -38,6 +38,7 @@ export const NAV: NavSection[] = [
       { title: "Toast", href: "/components/toast" },
       { title: "Tooltip", href: "/components/tooltip" },
       { title: "Select", href: "/components/select" },
+      { title: "Datepicker", href: "/components/datepicker" },
       { title: "Accordion", href: "/components/accordion" },
     ],
   },
