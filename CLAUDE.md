@@ -127,7 +127,8 @@ npm run verify:a11y        # prefers-reduced-motion 대응 + 명도 대비(AA)
 | `.claude/rules/styles.md` | 프리픽스, `@layer`, 공개/내부 변수 분리, 자체 정규화, rem 기준 |
 | `.claude/rules/packaging.md` | ESM 계약, dep/peer 판정, 갱신 목록, changeset, 배포 |
 | `.claude/rules/a11y.md` | id 연결, `aria-describedby`, 에러 표현, 포커스, 모션 |
-| `.claude/rules/design-system.md` | **컴포넌트 공통 스타일 계약** — 토큰 3계층, 상태×속성 매트릭스, 너비 원칙 |
+| `.claude/rules/tokens.md` | **토큰 체계의 정본** — 3계층, 숫자 스케일 네이밍, 스케일 값, deprecated 대응표 |
+| `.claude/rules/design-system.md` | **무엇을 고르는가** — 상태×속성 매트릭스, 상태 조합, 포커스, 타이포 매트릭스, 모션 |
 | `.claude/rules/spec-scope.md` | spec 규율 — What/How 경계, 현행만 남기기, Open Questions 라이프사이클 |
 | `.claude/rules/references.md` | **Context7 로컬 캐시(TTL 7일)** — 매번 MCP 호출하지 않는다 |
 

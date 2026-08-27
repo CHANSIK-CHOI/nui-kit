@@ -19,9 +19,9 @@
   body {
     margin: 0;
     font-family: var(#{v("font-family-base")});
-    font-size: var(#{v("font-size-md")});
-    line-height: var(#{v("line-height-base")});
-    color: var(#{v("color-text")});
+    font-size: var(#{v("font-size-4")});
+    line-height: var(#{v("line-height-4")});
+    color: var(#{v("text-primary")});
   }
 
   button,

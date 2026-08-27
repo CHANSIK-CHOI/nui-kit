@@ -18,11 +18,11 @@
       background-color: #{hook("textfield-bg", var(#{v("control-bg")}))};
       border: var(#{v("border-width")}) solid
         #{hook("textfield-border-color", var(#{v("control-border")}))};
-      border-radius: #{hook("textfield-radius", var(#{v("radius-sm")}))};
+      border-radius: #{hook("textfield-radius", var(#{v("radius-2")}))};
 
       @include motion(
         (border-color, background-color, box-shadow, border-width),
-        "fast"
+        "3"
       );
     }
 
@@ -37,7 +37,7 @@
       flex-shrink: 0;
       align-items: center;
       height: 100%;
-      padding: 0 var(#{v("space-md")});
+      padding: 0 var(#{v("space-4")});
     }
 
     &__btn {
@@ -55,16 +55,16 @@
       justify-content: center;
       width: var(#{v("size-icon-3xl")});
       height: var(#{v("size-icon-3xl")});
-      margin-left: var(#{v("space-xs")});
+      margin-left: var(#{v("space-2")});
       color: var(#{v("control-icon")});
-      border-radius: var(#{v("radius-round")});
+      border-radius: var(#{v("radius-circle")});
 
-      @include motion((color, background-color, opacity), "fast");
+      @include motion((color, background-color, opacity), "3");
       transition:
-        color var(#{v("duration-fast")}) var(#{v("easing-standard")}),
-        background-color var(#{v("duration-fast")}) var(#{v("easing-standard")}),
-        transform var(#{v("duration-quick")}) var(#{v("easing-standard")}),
-        opacity var(#{v("duration-fast")}) var(#{v("easing-standard")});
+        color var(#{v("duration-3")}) var(#{v("easing-standard")}),
+        background-color var(#{v("duration-3")}) var(#{v("easing-standard")}),
+        transform var(#{v("duration-2")}) var(#{v("easing-standard")}),
+        opacity var(#{v("duration-3")}) var(#{v("easing-standard")});
     }
 
     &__btn:first-child {
@@ -88,11 +88,11 @@
 
       width: 100%;
       height: 100%;
-      padding: 0 var(#{v("space-2xs")}) 0 var(#{v("space-md")});
+      padding: 0 var(#{v("space-1")}) 0 var(#{v("space-4")});
       color: var(#{v("control-text")});
       caret-color: var(#{v("control-text")});
 
-      @include typo("body", "regular", 1.5);
+      @include typo(4, "regular", 1.5);
     }
 
     &__input:focus,
@@ -103,15 +103,15 @@
     &__input::placeholder {
       color: var(#{v("control-text-placeholder")});
 
-      @include typo("body", "regular", 1.5);
+      @include typo(4, "regular", 1.5);
     }
 
     &__unit {
-      margin-left: var(#{v("space-xs")});
+      margin-left: var(#{v("space-2")});
       color: var(#{v("control-text")});
 
-      @include motion(color, "fast");
-      @include typo("body", "regular", 1.5);
+      @include motion(color, "3");
+      @include typo(4, "regular", 1.5);
     }
 
     &__clear {
@@ -125,8 +125,8 @@
 
     &:not(#{state("disabled")}):not(#{state("readonly")}):focus-within &__wrap {
       border-color: var(#{v("focus-color")});
-      border-width: var(#{v("border-width-focus")});
-      box-shadow: var(#{v("shadow-focus")});
+      border-width: var(#{v("focus-width")});
+      box-shadow: var(#{v("focus-ring")});
     }
 
     &:not(#{state("disabled")}):not(#{state("readonly")}) &__btn:hover {
@@ -201,7 +201,7 @@
       ):focus-within
       &__wrap {
       border-color: var(#{v("control-border-error")});
-      box-shadow: var(#{v("shadow-focus-error")});
+      box-shadow: var(#{v("focus-ring-error")});
     }
 
     // ── modifier

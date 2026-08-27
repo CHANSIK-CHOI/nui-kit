@@ -20,7 +20,15 @@ const SEED = resolve(
 );
 const OUT = join(DOCS_ROOT, "src", "generated", "tokens.json");
 
-const scss = readFileSync(SEED, "utf8");
+const raw = readFileSync(SEED, "utf8");
+
+/**
+ * 다크 테마(`@mixin dark-scheme`)는 **같은 이름의 토큰을 다시 선언**한다.
+ * 그대로 파싱하면 문서 표에 모든 색이 두 번씩 나오므로 라이트 선언만 남긴다.
+ * 다크 값은 "이름은 그대로, 값만 교체"라는 설계라 표에 따로 실을 것이 없다.
+ */
+const DARK_MIXIN = /@mixin dark-scheme \{[\s\S]*?\n\}\n/;
+const scss = raw.replace(DARK_MIXIN, "");
 
 /**
  * `#{v("color-primary")}: #1ca673; // 주석` 형태를 뽑는다.
@@ -35,7 +43,10 @@ const TOKEN_RE =
 /** 토큰 이름 → 문서 그룹 */
 function groupOf(name) {
   if (name.startsWith("color-")) return "color";
-  if (/^(text|surface)-/.test(name)) return "semantic";
+  if (/^(layer|surface)-|^gradient-/.test(name)) return "layer";
+  if (name.startsWith("text-")) return "text";
+  if (name.startsWith("action-")) return "action";
+  if (name.startsWith("status-")) return "status";
   if (name.startsWith("control-") || name === "focus-color") return "control";
   if (name.startsWith("space-")) return "space";
   if (name.startsWith("size-")) return "size";
@@ -44,7 +55,8 @@ function groupOf(name) {
   if (/^(font-|line-height|letter-spacing)/.test(name)) return "typography";
   if (/^(duration-|easing-)/.test(name)) return "motion";
   if (name.startsWith("z-")) return "z-index";
-  if (/^(border-|focus-ring)/.test(name)) return "border";
+  if (name.startsWith("focus-")) return "focus";
+  if (name.startsWith("border-")) return "border";
   return "etc";
 }
 

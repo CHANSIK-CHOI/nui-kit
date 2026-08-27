@@ -34,12 +34,12 @@
       background-color: #{hook("select-bg", var(#{v("control-bg")}))};
       border: var(#{v("border-width")}) solid
         #{hook("select-border-color", var(#{v("control-border")}))};
-      border-radius: #{hook("select-radius", var(#{v("radius-sm")}))};
+      border-radius: #{hook("select-radius", var(#{v("radius-2")}))};
       cursor: pointer;
 
       @include motion(
         (border-color, background-color, box-shadow, border-width),
-        "fast"
+        "3"
       );
     }
 
@@ -50,9 +50,9 @@
       // 높이는 control 의 min-height 가 소유한다.
       // 여기에도 같은 min-height 를 주면 border-box 기준으로 컨트롤이
       // `min-height + border*2` 로 밀린다 (56px → 58px).
-      padding: var(#{v("space-xs")}) var(#{v("space-2xs")}) var(#{v("space-xs")})
-        var(#{v("space-md")});
-      gap: var(#{v("space-xs")});
+      padding: var(#{v("space-2")}) var(#{v("space-1")}) var(#{v("space-2")})
+        var(#{v("space-4")});
+      gap: var(#{v("space-2")});
       min-width: 0;
     }
 
@@ -61,7 +61,7 @@
       padding: 0;
       color: var(#{v("control-text")});
 
-      @include typo("body", "regular", 1.5);
+      @include typo(4, "regular", 1.5);
     }
 
     &__input-container input {
@@ -83,13 +83,13 @@
     &__single-value {
       color: var(#{v("control-text")});
 
-      @include typo("body", "regular", 1.5);
+      @include typo(4, "regular", 1.5);
     }
 
     &__placeholder {
       color: var(#{v("control-text-placeholder")});
 
-      @include typo("body", "regular", 1.5);
+      @include typo(4, "regular", 1.5);
     }
 
     // ── indicators
@@ -98,7 +98,7 @@
     //   (같은 파일에서 `__indicators` 를 두 번 선언해 뒤엣것이 이긴 결과다).
     //   Textfield 와 높이를 맞추기 위해 고정 높이를 두지 않는다.
     &__indicators {
-      padding: 0 var(#{v("space-md")});
+      padding: 0 var(#{v("space-4")});
     }
 
     &__clear-indicator {
@@ -112,16 +112,16 @@
       justify-content: center;
       width: var(#{v("size-icon-3xl")});
       height: var(#{v("size-icon-3xl")});
-      margin-left: var(#{v("space-xs")});
-      padding: var(#{v("space-2xs")});
-      border-radius: var(#{v("radius-round")});
+      margin-left: var(#{v("space-2")});
+      padding: var(#{v("space-1")});
+      border-radius: var(#{v("radius-circle")});
       color: var(#{v("control-icon")});
       cursor: pointer;
       transition:
-        color var(#{v("duration-fast")}) var(#{v("easing-standard")}),
-        background-color var(#{v("duration-fast")}) var(#{v("easing-standard")}),
-        transform var(#{v("duration-quick")}) var(#{v("easing-standard")}),
-        opacity var(#{v("duration-fast")}) var(#{v("easing-standard")});
+        color var(#{v("duration-3")}) var(#{v("easing-standard")}),
+        background-color var(#{v("duration-3")}) var(#{v("easing-standard")}),
+        transform var(#{v("duration-2")}) var(#{v("easing-standard")}),
+        opacity var(#{v("duration-3")}) var(#{v("easing-standard")});
     }
 
     &__clear-indicator:first-child,
@@ -144,34 +144,34 @@
     //   max-height 도 react-select 이 `maxMenuHeight` prop 으로 소유한다 —
     //   여기서 덮으면 메뉴 위치 계산과 어긋난다.
     &__menu {
-      margin-top: var(#{v("space-xs")});
-      padding: var(#{v("space-xs")});
+      margin-top: var(#{v("space-2")});
+      padding: var(#{v("space-2")});
       border: var(#{v("border-width")}) solid
         var(#{v("control-border-disabled")});
-      border-radius: var(#{v("radius-md")});
+      border-radius: var(#{v("radius-3")});
       background-color: var(#{v("control-bg")});
-      box-shadow: var(#{v("shadow-dropdown")});
+      box-shadow: var(#{v("shadow-2")});
       z-index: var(#{v("z-tooltip")});
     }
 
     &__menu-list {
       display: flex;
       flex-direction: column;
-      gap: var(#{v("space-2xs")});
+      gap: var(#{v("space-1")});
     }
 
     &__group {
       display: flex;
       flex-direction: column;
-      gap: var(#{v("space-2xs")});
+      gap: var(#{v("space-1")});
     }
 
     &__group-heading {
-      padding: var(#{v("space-xs")}) var(#{v("space-sm")}) var(#{v("space-2xs")});
-      color: var(#{v("text-tertiary")});
+      padding: var(#{v("space-2")}) var(#{v("space-3")}) var(#{v("space-1")});
+      color: var(#{v("text-secondary")});
       text-transform: none;
 
-      @include typo("label", "medium", 1.5, 0);
+      @include typo(1, "medium", 1.5, 0);
     }
 
     // ── option (emotion 이 display / cursor 를 넘겨준 자리)
@@ -179,13 +179,13 @@
       display: flex;
       align-items: center;
       min-height: var(#{v("size-control-option")});
-      padding: 0 var(#{v("space-sm")});
-      border-radius: var(#{v("radius-sm")});
+      padding: 0 var(#{v("space-3")});
+      border-radius: var(#{v("radius-2")});
       color: var(#{v("text-primary")});
       cursor: pointer;
 
-      @include motion((background-color, color), "fast");
-      @include typo("body", "regular", 1.5);
+      @include motion((background-color, color), "3");
+      @include typo(4, "regular", 1.5);
     }
 
     &__option--is-focused {
@@ -208,7 +208,7 @@
     }
 
     &__option--is-disabled {
-      color: var(#{v("text-quaternary")});
+      color: var(#{v("text-disabled")});
       cursor: not-allowed;
     }
 
@@ -216,28 +216,28 @@
     &__multi-value {
       display: inline-flex;
       align-items: center;
-      border-radius: var(#{v("radius-pill-fluid")});
+      border-radius: var(#{v("radius-full")});
       background-color: var(#{v("control-bg-subtle")});
       color: var(#{v("text-primary")});
     }
 
     &__multi-value__label {
-      padding: var(#{v("space-xs")}) var(#{v("space-2xs")}) var(#{v("space-xs")})
-        var(#{v("space-sm")});
+      padding: var(#{v("space-2")}) var(#{v("space-1")}) var(#{v("space-2")})
+        var(#{v("space-3")});
 
-      @include typo("body-sm", "medium", 1.35, -0.01em);
+      @include typo(3, "medium", 1.35, -0.01em);
     }
 
     &__multi-value__remove {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: var(#{v("space-xs")}) var(#{v("space-xs")}) var(#{v("space-xs")})
-        var(#{v("space-2xs")});
+      padding: var(#{v("space-2")}) var(#{v("space-2")}) var(#{v("space-2")})
+        var(#{v("space-1")});
       color: var(#{v("text-secondary")});
       cursor: pointer;
 
-      @include motion((color, background-color), "fast");
+      @include motion((color, background-color), "3");
     }
 
     &__multi-value__remove svg {
@@ -246,13 +246,13 @@
     }
 
     &__menu-notice {
-      padding: var(#{v("space-md")}) var(#{v("space-sm")});
-      color: var(#{v("text-tertiary")});
+      padding: var(#{v("space-4")}) var(#{v("space-3")});
+      color: var(#{v("text-secondary")});
       // emotion 이 unstyled 에서도 남기는 유일한 속성이지만, 우리가 명시해
       // 라이브러리 기본값에 기대지 않는다.
       text-align: center;
 
-      @include typo("body-sm", "regular", 1.6);
+      @include typo(3, "regular", 1.6);
     }
 
     // ── interaction
@@ -271,8 +271,8 @@
     &:not(#{state("disabled")}):not(#{state("readonly")})
       &__control--is-focused {
       border-color: var(#{v("focus-color")});
-      border-width: var(#{v("border-width-focus")});
-      box-shadow: var(#{v("shadow-focus")});
+      border-width: var(#{v("focus-width")});
+      box-shadow: var(#{v("focus-ring")});
     }
 
     &:not(#{state("disabled")}):not(#{state("readonly")})
@@ -331,7 +331,7 @@
     &#{state("error")}:not(#{state("disabled")}):not(#{state("readonly")})
       &__control--is-focused {
       border-color: var(#{v("control-border-error")});
-      box-shadow: var(#{v("shadow-focus-error")});
+      box-shadow: var(#{v("focus-ring-error")});
     }
 
     // ── readonly

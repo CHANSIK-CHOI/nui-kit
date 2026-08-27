@@ -6,173 +6,458 @@
 // 값을 "선언"만 하고 어떤 셀렉터에도 스타일을 "적용"하지 않는다.
 // 따라서 :root 에 두어도 소비자 프로젝트 렌더링에 영향이 없다.
 //
-// ⚠️ rem 기준 변경 (원본 대비)
-//   원본 프로젝트는 `html { font-size: 8px→10px }` 를 깔고 1.6rem = 16px 로 썼다.
+// 체계의 정본은 `.claude/rules/tokens.md` 다.
+//   계층      Primitive → Semantic → Component(공개 훅/내부 배선)
+//   이름      등간격 스케일은 숫자(space-4), 불규칙 실측값은 역할(size-control-md)
+//   고르는 법 `.claude/rules/design-system.md` 의 매트릭스
+//
+// ⚠️ rem 기준 (원본 대비)
+//   원본 프로젝트는 `html { font-size: 10px }` 를 깔고 1.6rem = 16px 로 썼다.
 //   배포 라이브러리는 reset 을 내보내지 않으므로 그 전제가 성립하지 않는다.
-//   (소비자의 기본 16px 루트에서 1.6rem 은 25.6px 이 되어 전부 깨진다)
 //   → 모든 치수를 16px 루트 기준으로 환산했다. 실제 픽셀값은 원본과 동일하다.
-//   → px 하드코딩 대신 rem 을 유지하므로 사용자 글꼴 확대 접근성도 보존된다.
 //
 // 커스터마이징
 //   전체 테마 → 여기 seed 값을 덮어쓴다
 //   부분 테마 → 임의 조상 요소에서 재선언하면 상속으로 하위에만 적용된다
 // ═══════════════════════════════════════════════════════════════════
-@layer nui.tokens {
-  :root {
-    // ── typography / family
-    // 라이브러리는 폰트를 배포하지 않는다. 기본은 소비자 앱의 폰트를 상속한다.
-    #{v("font-family-base")}: inherit;
+// ═══════════════════════════════════════════════════════════════════
+// 다크 테마 — primitive 만 갈아끼운다
+//
+// semantic 이름은 그대로 두고 참조하는 primitive 값만 바꾼다.
+// 그래서 컴포넌트 SCSS 는 한 줄도 수정하지 않아도 다크가 적용된다.
+// 유일한 예외가 layer-* 다 (아래 주석 참조).
+//
+// 적용 순서
+//   1) 소비자가 [data-theme="dark"] 를 지정하면 그것이 이긴다
+//   2) 지정하지 않으면 OS 설정(prefers-color-scheme)을 따른다
+//   3) [data-theme="light"] 를 지정하면 OS 가 다크여도 라이트를 유지한다
+// ═══════════════════════════════════════════════════════════════════
+@mixin dark-scheme {
+  // ── brand
+  #{v("color-brand-1")}: #0b1312;
+  #{v("color-brand-2")}: #101c1a;
+  #{v("color-brand-3")}: #0b2d2a;
+  #{v("color-brand-4")}: #003b36;
+  #{v("color-brand-5")}: #024842;
+  #{v("color-brand-6")}: #0d5750;
+  #{v("color-brand-7")}: #146a61;
+  #{v("color-brand-8")}: #127f75;
+  #{v("color-brand-9")}: #01796f;
+  #{v("color-brand-10")}: #126960;
+  #{v("color-brand-11")}: #70cdc2;
+  #{v("color-brand-12")}: #a5f1e6;
+  #{v("color-brand-a4")}: #00ffe32d;
+  #{v("color-brand-a5")}: #00ffe53b;
+  #{v("color-brand-a6")}: #04ffe84b;
+  #{v("color-brand-a7")}: #19fde560;
 
-    // ── color / absolute
-    #{v("color-black")}: #000;
+  // ── gray
+  #{v("color-gray-1")}: #101210;
+  #{v("color-gray-2")}: #181919;
+  #{v("color-gray-3")}: #212322;
+  #{v("color-gray-4")}: #262b27;
+  #{v("color-gray-5")}: #2d332f;
+  #{v("color-gray-6")}: #373c38;
+  #{v("color-gray-7")}: #444a46;
+  #{v("color-gray-8")}: #5c615d;
+  #{v("color-gray-9")}: #6a706b;
+  #{v("color-gray-10")}: #797d7a;
+  #{v("color-gray-11")}: #b0b6b1;
+  #{v("color-gray-12")}: #e9f0eb;
+  #{v("color-gray-a3")}: #ddf7ea14;
+  #{v("color-gray-a4")}: #d1feda1c;
+  #{v("color-gray-a5")}: #d2fbdf25;
+  #{v("color-gray-a6")}: #e0fbe52f;
+  #{v("color-gray-a7")}: #e3fceb3e;
+
+  // ── danger
+  #{v("color-danger-1")}: #180e0d;
+  #{v("color-danger-2")}: #221110;
+  #{v("color-danger-3")}: #42090a;
+  #{v("color-danger-4")}: #5b0002;
+  #{v("color-danger-5")}: #6d0006;
+  #{v("color-danger-6")}: #800713;
+  #{v("color-danger-7")}: #9c1c21;
+  #{v("color-danger-8")}: #c9262d;
+  #{v("color-danger-9")}: #ce2c31;
+  #{v("color-danger-10")}: #be1523;
+  #{v("color-danger-11")}: #ff8f87;
+  #{v("color-danger-12")}: #ffcdc7;
+  #{v("color-danger-a4")}: #fd000050;
+  #{v("color-danger-a5")}: #fe000063;
+  #{v("color-danger-a6")}: #ff001677;
+  #{v("color-danger-a7")}: #ff242d95;
+
+  // ── warning
+  #{v("color-warning-1")}: #13110c;
+  #{v("color-warning-2")}: #1c1810;
+  #{v("color-warning-3")}: #2c220c;
+  #{v("color-warning-4")}: #3b2900;
+  #{v("color-warning-5")}: #483300;
+  #{v("color-warning-6")}: #554112;
+  #{v("color-warning-7")}: #695323;
+  #{v("color-warning-8")}: #84692e;
+  #{v("color-warning-9")}: #ffc53d;
+  #{v("color-warning-10")}: #f4bb2e;
+  #{v("color-warning-11")}: #ffcc4c;
+  #{v("color-warning-12")}: #fee7ba;
+  #{v("color-warning-a5")}: #ffa4003b;
+  #{v("color-warning-a6")}: #ffb91549;
+  #{v("color-warning-a7")}: #fdc2415f;
+
+  // ── success
+  #{v("color-success-1")}: #0b130f;
+  #{v("color-success-2")}: #111b15;
+  #{v("color-success-3")}: #102d1f;
+  #{v("color-success-4")}: #083c26;
+  #{v("color-success-5")}: #0c4a30;
+  #{v("color-success-6")}: #13593a;
+  #{v("color-success-7")}: #196a46;
+  #{v("color-success-8")}: #1a7e54;
+  #{v("color-success-9")}: #218358;
+  #{v("color-success-10")}: #24734e;
+  #{v("color-success-11")}: #73cd9e;
+  #{v("color-success-12")}: #a7f4c9;
+  #{v("color-success-a5")}: #00fc913e;
+  #{v("color-success-a6")}: #18fd984e;
+  #{v("color-success-a7")}: #26fd9e60;
+
+  // ── info
+  #{v("color-info-1")}: #07121e;
+  #{v("color-info-2")}: #0c1928;
+  #{v("color-info-3")}: #02274c;
+  #{v("color-info-4")}: #00316a;
+  #{v("color-info-5")}: #003d7d;
+  #{v("color-info-6")}: #004b8f;
+  #{v("color-info-7")}: #025ca7;
+  #{v("color-info-8")}: #006ec7;
+  #{v("color-info-9")}: #0d74ce;
+  #{v("color-info-10")}: #0066bf;
+  #{v("color-info-11")}: #6bb8ff;
+  #{v("color-info-12")}: #c6e4ff;
+  #{v("color-info-a5")}: #0072ff74;
+  #{v("color-info-a6")}: #007fff87;
+  #{v("color-info-a7")}: #0088ffa1;
+
+  // layer 는 테마별로 참조가 달라지는 유일한 semantic 이다.
+  // 고도가 높을수록 밝아져야 하므로 basement 와 default 가 자리를 바꾼다.
+  #{v("layer-basement")}: var(#{v("color-gray-1")});
+  #{v("layer-default")}: var(#{v("color-gray-2")});
+  #{v("layer-floating")}: var(#{v("color-gray-3")});
+  #{v("layer-floating-muted")}: var(#{v("color-gray-2")});
+  #{v("surface-toast-error")}: var(#{v("color-danger-3")});
+}
+
+@layer nui.tokens {
+
+  :root {
+    // ═════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════
+    // PRIMITIVE — Radix 12단계 스케일
+    //
+    //   1~2   배경        3~5  컴포넌트 배경(기본·hover·pressed)
+    //   6~8   테두리(6 비상호작용 · 7 상호작용 · 8 강한 테두리+포커스)
+    //   9~10  solid 배경  11~12 텍스트(11 저대비 · 12 고대비)
+    //
+    // 단계 번호가 곧 역할이다. 컴포넌트는 색을 직접 참조하지 않고
+    // 아래 SEMANTIC 을 거친다 (tokens.md §1).
+    // ═════════════════════════════════════════════════════════════
+
     #{v("color-white")}: #fff;
 
-    // ── color / gray scale
-    // 이 라이브러리의 **유일한 무채색 원본**이다. semantic 이 여기서만 색을 가져온다.
-    #{v("color-gray-50")}: #f9fafb;
-    #{v("color-gray-100")}: #f3f4f6;
-    #{v("color-gray-200")}: #e5e7eb;
-    #{v("color-gray-300")}: #d1d5db;
-    #{v("color-gray-400")}: #9ca3af;
-    #{v("color-gray-500")}: #6b7280;
-    #{v("color-gray-600")}: #4b5563;
-    #{v("color-gray-700")}: #374151;
-    #{v("color-gray-800")}: #1f2937;
-    #{v("color-gray-900")}: #111827;
+    // ── brand
+    #{v("color-brand-1")}: #f9fefd;
+    #{v("color-brand-2")}: #f2fbfa;
+    #{v("color-brand-3")}: #def8f4;
+    #{v("color-brand-4")}: #c9f3ed;
+    #{v("color-brand-5")}: #b3ebe3;
+    #{v("color-brand-6")}: #9cdfd5;
+    #{v("color-brand-7")}: #7ecec4;
+    #{v("color-brand-8")}: #4dbaad;
+    #{v("color-brand-9")}: #01796f;
+    #{v("color-brand-10")}: #006b61;
+    #{v("color-brand-11")}: #00776d;
+    #{v("color-brand-12")}: #18423d;
+    #{v("color-brand-a4")}: #00c7aa36;
+    #{v("color-brand-a5")}: #00bca24c;
+    #{v("color-brand-a6")}: #00ad9363;
+    #{v("color-brand-a7")}: #009f8b81;
 
-    // ── color / brand
-    #{v("color-primary-bright")}: #dcfce7;
-    // #1ca673 → #16815a. 흰 글자 대비가 3.11:1 로 WCAG AA(4.5:1)에 미달했다.
-    // 4.86:1 로 올린 값이다 (2026-08-27 사용자 결정).
-    #{v("color-primary")}: #16815a;
-    #{v("color-primary-dark")}: #014029;
-    #{v("color-secondary-bright")}: #ffe4e6;
-    #{v("color-secondary")}: #d92b2b;
-    #{v("color-point-bright")}: #fef9c3;
-    #{v("color-point")}: #f29b30;
+    // ── gray
+    #{v("color-gray-1")}: #fcfdfc;
+    #{v("color-gray-2")}: #f8f9f8;
+    #{v("color-gray-3")}: #eff1ef;
+    #{v("color-gray-4")}: #e7e9e7;
+    #{v("color-gray-5")}: #e0e1e0;
+    #{v("color-gray-6")}: #d8dad8;
+    #{v("color-gray-7")}: #cdcfcd;
+    #{v("color-gray-8")}: #b9bcba;
+    #{v("color-gray-9")}: #898d8a;
+    #{v("color-gray-10")}: #7f8380;
+    #{v("color-gray-11")}: #616462;
+    #{v("color-gray-12")}: #1c201d;
+    #{v("color-gray-a3")}: #00200010;
+    #{v("color-gray-a4")}: #00160018;
+    #{v("color-gray-a5")}: #0009001f;
+    #{v("color-gray-a6")}: #000e0027;
+    #{v("color-gray-a7")}: #000b0032;
 
-    // ── color / status
-    #{v("color-error")}: #dc2626;
-    #{v("color-error-soft")}: #fee2e2;
-    #{v("color-success")}: #16a34a;
-    #{v("color-success-soft")}: #dcfce7;
-    #{v("color-warning")}: #d97706;
-    #{v("color-warning-soft")}: #fef3c7;
-    #{v("color-info")}: #0284c7;
-    #{v("color-info-soft")}: #e0f2fe;
+    // ── danger
+    #{v("color-danger-1")}: #fffcfc;
+    #{v("color-danger-2")}: #fff7f7;
+    #{v("color-danger-3")}: #feebe9;
+    #{v("color-danger-4")}: #ffdcd7;
+    #{v("color-danger-5")}: #ffcec8;
+    #{v("color-danger-6")}: #fdbeb7;
+    #{v("color-danger-7")}: #f5aaa3;
+    #{v("color-danger-8")}: #eb8f88;
+    #{v("color-danger-9")}: #ce2c31;
+    #{v("color-danger-10")}: #be1523;
+    #{v("color-danger-11")}: #ce2c31;
+    #{v("color-danger-12")}: #641818;
+    #{v("color-danger-a4")}: #ff200028;
+    #{v("color-danger-a5")}: #ff1c0037;
+    #{v("color-danger-a6")}: #f8190048;
+    #{v("color-danger-a7")}: #e414005c;
+
+    // ── warning
+    #{v("color-warning-1")}: #fefdfb;
+    #{v("color-warning-2")}: #fffaea;
+    #{v("color-warning-3")}: #fff2c3;
+    #{v("color-warning-4")}: #ffe9a0;
+    #{v("color-warning-5")}: #ffde7f;
+    #{v("color-warning-6")}: #fcd27a;
+    #{v("color-warning-7")}: #e9c16e;
+    #{v("color-warning-8")}: #d7a944;
+    #{v("color-warning-9")}: #ffca2f;
+    #{v("color-warning-10")}: #fac137;
+    #{v("color-warning-11")}: #9b6f00;
+    #{v("color-warning-12")}: #463a20;
+    #{v("color-warning-a5")}: #ffbe0080;
+    #{v("color-warning-a6")}: #faa90085;
+    #{v("color-warning-a7")}: #d9920091;
+
+    // ── success
+    #{v("color-success-1")}: #fbfefc;
+    #{v("color-success-2")}: #f5fbf7;
+    #{v("color-success-3")}: #e7f6ed;
+    #{v("color-success-4")}: #d9f0e2;
+    #{v("color-success-5")}: #c8e7d5;
+    #{v("color-success-6")}: #b3dcc4;
+    #{v("color-success-7")}: #97ccae;
+    #{v("color-success-8")}: #6eb68f;
+    #{v("color-success-9")}: #218358;
+    #{v("color-success-10")}: #06754b;
+    #{v("color-success-11")}: #1a7f54;
+    #{v("color-success-12")}: #223a2d;
+    #{v("color-success-a5")}: #00903d37;
+    #{v("color-success-a6")}: #008a3a4c;
+    #{v("color-success-a7")}: #00823968;
+
+    // ── info
+    #{v("color-info-1")}: #fbfdff;
+    #{v("color-info-2")}: #f5f9fe;
+    #{v("color-info-3")}: #eaf3fd;
+    #{v("color-info-4")}: #dcecff;
+    #{v("color-info-5")}: #cbe3fe;
+    #{v("color-info-6")}: #b7d5f9;
+    #{v("color-info-7")}: #9dc4f1;
+    #{v("color-info-8")}: #78ade9;
+    #{v("color-info-9")}: #0d74ce;
+    #{v("color-info-10")}: #0066bf;
+    #{v("color-info-11")}: #0e75cf;
+    #{v("color-info-12")}: #0d355c;
+    #{v("color-info-a5")}: #0076fb34;
+    #{v("color-info-a6")}: #006bea48;
+    #{v("color-info-a7")}: #0066db62;
+
+    // 9단계 배경 위에서 AA(4.5:1)를 넘는 글자색. 스케일마다 다르다 —
+    // 노랑은 어둡게 하면 갈색이 되어 "주의"의 의미를 잃으므로 밝게 두고 글자를 어둡게 한다.
+    #{v("color-brand-contrast")}: #ffffff;
+    #{v("color-danger-contrast")}: #ffffff;
+    #{v("color-warning-contrast")}: #2b2009;
+    #{v("color-success-contrast")}: #ffffff;
+    #{v("color-info-contrast")}: #ffffff;
+
+    // ═════════════════════════════════════════════════════════════
+    // SEMANTIC — 역할 이름. 컴포넌트는 여기서만 색을 가져온다
+    // ═════════════════════════════════════════════════════════════
 
     // ── semantic / text
-    #{v("text-primary")}: var(#{v("color-gray-900")});
-    #{v("text-secondary")}: var(#{v("color-gray-600")});
-    #{v("text-tertiary")}: var(#{v("color-gray-500")});
-    #{v("text-quaternary")}: var(#{v("color-gray-400")});
-    #{v("text-brand")}: var(#{v("color-primary-dark")});
-    #{v("text-danger")}: var(#{v("color-error")});
-    #{v("text-info")}: var(#{v("color-info")});
-    #{v("text-inverse")}: rgb(255 255 255 / 92%);
+    #{v("text-primary")}: var(#{v("color-gray-12")});
+    #{v("text-secondary")}: var(#{v("color-gray-11")});
+    // Radix 에서 글자로 쓸 수 있는 단계는 11(저대비)·12(고대비) 뿐이다.
+    // 그래서 위계를 셋으로 줄이고 이름이 역할을 말하게 했다 —
+    // tertiary 는 secondary 와 값·역할이 겹쳐 없앴고, quaternary 는
+    // 실제 용도가 "비활성"이었으므로 그렇게 이름을 바꿨다.
+    // 비활성 텍스트는 WCAG 대비 요구에서 제외되므로 9단계를 쓴다.
+    #{v("text-disabled")}: var(#{v("color-gray-9")});
+    #{v("text-danger")}: var(#{v("color-danger-11")});
+    #{v("text-info")}: var(#{v("color-info-11")});
     #{v("text-inverse-strong")}: var(#{v("color-white")});
 
-    // ── semantic / surface
-    #{v("surface-neutral-softest")}: rgb(17 24 39 / 2%);
-    #{v("surface-neutral-soft")}: rgb(17 24 39 / 4%);
-    #{v("surface-neutral-subtle")}: rgb(17 24 39 / 6%);
-    #{v("surface-panel-strong")}: rgb(255 255 255 / 96%);
-    #{v("surface-panel-muted")}: rgb(249 250 251 / 94%);
-    #{v("surface-inverse")}: rgb(17 24 39 / 96%);
-    #{v("surface-toast-error")}: rgb(127 29 29 / 96%);
-    #{v("surface-overlay-dim")}: rgb(17 24 39 / 54%);
+    // ── semantic / layer (컨테이너 표면) ★
+    // 다크 테마에서 basement 와 default 가 자리를 바꾼다 —
+    // "고도가 높을수록 밝아진다"는 규칙은 색을 반전시켜서는 만들어지지 않는다.
+    // semantic 중 테마별로 참조가 달라지는 것은 layer 뿐이다 (tokens.md §4-1).
+    #{v("layer-basement")}: var(#{v("color-gray-2")});
+    #{v("layer-default")}: var(#{v("color-gray-1")});
+    #{v("layer-floating")}: var(#{v("color-gray-1")});
+    #{v("layer-floating-muted")}: var(#{v("color-gray-2")});
+    #{v("layer-inverse")}: var(#{v("color-gray-12")});
+    #{v("layer-overlay")}: rgb(0 0 0 / 50%);
+
+    // ── semantic / surface — layer 가 아니라 콘텐츠 위에 얹는 톤
+    #{v("surface-neutral-soft")}: var(#{v("color-gray-a3")});
+    #{v("surface-neutral-subtle")}: var(#{v("color-gray-a4")});
+    #{v("surface-toast-error")}: var(#{v("color-danger-12")});
+
     #{v("gradient-panel-soft")}: linear-gradient(
       180deg,
-      rgb(255 255 255 / 98%) 0%,
-      rgb(249 250 251 / 92%) 100%
+      var(#{v("color-gray-1")}) 0%,
+      var(#{v("color-gray-2")}) 100%
     );
 
     // ── semantic / border
-    #{v("border-subtle")}: rgb(17 24 39 / 6%);
-    #{v("border-default")}: rgb(17 24 39 / 8%);
-    #{v("border-brand-active")}: rgb(28 166 115 / 22%);
-    #{v("border-brand-divider")}: rgb(28 166 115 / 14%);
-    #{v("border-brand-line")}: rgb(28 166 115 / 30%);
+    #{v("border-subtle")}: var(#{v("color-gray-5")});
+    #{v("border-default")}: var(#{v("color-gray-6")});
+    #{v("border-brand")}: var(#{v("color-brand-7")});
+    #{v("border-brand-subtle")}: var(#{v("color-brand-6")});
 
     // ── control state (입력 컨트롤 공통 배선)
-    #{v("control-text")}: var(#{v("text-primary")});
-    #{v("control-text-muted")}: var(#{v("text-secondary")});
-    #{v("control-text-placeholder")}: var(#{v("text-tertiary")});
-    #{v("control-text-disabled")}: var(#{v("text-tertiary")});
-    #{v("control-text-error")}: var(#{v("text-danger")});
-    #{v("control-icon")}: var(#{v("text-tertiary")});
-    #{v("control-icon-strong")}: var(#{v("text-primary")});
-    #{v("control-bg")}: var(#{v("color-white")});
-    #{v("control-bg-disabled")}: var(#{v("color-gray-50")});
-    #{v("control-bg-readonly")}: var(#{v("color-gray-50")});
-    #{v("control-bg-subtle")}: var(#{v("color-gray-100")});
-    // 목록 행·패널 헤더·아이콘 버튼처럼 **면 전체가 반응**하는 hover 배경.
-    // `control-bg-subtle`(칩·정적 강조면)과 값은 같지만 역할이 다르므로 이름을 나눈다.
-    #{v("control-bg-hover")}: var(#{v("color-gray-100")});
-    #{v("control-border")}: var(#{v("color-gray-300")});
-    #{v("control-border-hover")}: var(#{v("text-tertiary")});
-    #{v("control-border-disabled")}: var(#{v("color-gray-200")});
-    #{v("control-border-error")}: var(#{v("color-error")});
-    #{v("control-accent")}: var(#{v("color-primary")});
-    #{v("control-accent-soft")}: var(#{v("color-primary-bright")});
-    #{v("control-accent-error")}: var(#{v("color-error")});
-    #{v("control-selection-disabled")}: var(#{v("color-gray-300")});
-    // 스위치 트랙(꺼짐)과 썸. 이전에는 테두리색·글자색 토큰을 배경에 돌려썼다.
-    #{v("control-track")}: var(#{v("color-gray-200")});
+    #{v("control-text")}: var(#{v("color-gray-12")});
+    #{v("control-text-muted")}: var(#{v("color-gray-11")});
+    #{v("control-text-placeholder")}: var(#{v("color-gray-10")});
+    #{v("control-text-disabled")}: var(#{v("text-disabled")});
+    #{v("control-text-error")}: var(#{v("color-danger-11")});
+    #{v("control-icon")}: var(#{v("color-gray-10")});
+    #{v("control-icon-strong")}: var(#{v("color-gray-12")});
+    #{v("control-bg")}: var(#{v("layer-default")});
+    #{v("control-bg-disabled")}: var(#{v("color-gray-3")});
+    #{v("control-bg-readonly")}: var(#{v("color-gray-2")});
+    #{v("control-bg-subtle")}: var(#{v("color-gray-3")});
+    // 목록 행·패널 헤더·아이콘 버튼처럼 면 전체가 반응하는 hover 배경.
+    // Radix 4단계가 hover, 3단계가 정적 강조면이다. 값이 다르므로 이제 진짜로 구분된다.
+    #{v("control-bg-hover")}: var(#{v("color-gray-4")});
+    #{v("control-border")}: var(#{v("color-gray-7")});
+    #{v("control-border-hover")}: var(#{v("color-gray-8")});
+    #{v("control-border-disabled")}: var(#{v("color-gray-6")});
+    // 에러 테두리는 8단계(강한 테두리) — 6·7 은 눈에 띄지 않는다.
+    #{v("control-border-error")}: var(#{v("color-danger-8")});
+    #{v("control-accent")}: var(#{v("color-brand-9")});
+    #{v("control-accent-soft")}: var(#{v("color-brand-3")});
+    #{v("control-accent-error")}: var(#{v("color-danger-9")});
+    #{v("control-selection-disabled")}: var(#{v("color-gray-7")});
+    #{v("control-track")}: var(#{v("color-gray-6")});
     #{v("control-thumb")}: var(#{v("color-white")});
-    #{v("control-selection-text")}: var(#{v("color-primary-dark")});
+    #{v("control-selection-text")}: var(#{v("color-brand-11")});
 
-    // ── status (알림·배지의 은은한 면색)
-    #{v("status-error-soft")}: var(#{v("color-error-soft")});
-    #{v("status-success-soft")}: var(#{v("color-success-soft")});
-    #{v("status-warning-soft")}: var(#{v("color-warning-soft")});
-    #{v("status-info-soft")}: var(#{v("color-info-soft")});
+    // ── semantic / status — 알림·배지의 은은한 면색
+    #{v("status-error-soft")}: var(#{v("color-danger-3")});
+    #{v("status-success-soft")}: var(#{v("color-success-3")});
+    #{v("status-warning-soft")}: var(#{v("color-warning-3")});
+    #{v("status-info-soft")}: var(#{v("color-info-3")});
 
-    // ── action (버튼 계열 의미색)
-    // Button 이 primitive(color-primary 등)를 직접 참조하던 것을 역할 이름으로 승격했다.
-    // 나중에 Badge·Chip 같은 것을 만들 때 같은 토큰을 쓰면 자동으로 색이 맞아떨어진다.
-    #{v("action-bg")}: var(#{v("text-primary")});
-    #{v("action-fg")}: var(#{v("text-inverse-strong")});
-    #{v("action-primary")}: var(#{v("color-primary")});
-    #{v("action-secondary")}: var(#{v("color-secondary")});
-    #{v("action-point")}: var(#{v("color-point")});
-    // 주황 배경에 흰 글자는 2.21:1 로 AA 에 크게 미달한다. 검정 글자가 8.03:1 이고
-    // 경고·주의 색의 관습에도 맞는다 (2026-08-27 사용자 결정).
-    #{v("action-fg-on-point")}: var(#{v("text-primary")});
-    #{v("action-bg-hover")}: var(#{v("surface-neutral-soft")});
-    #{v("action-bg-active")}: var(#{v("surface-neutral-subtle")});
-    #{v("action-bg-disabled")}: var(#{v("control-bg-disabled")});
-    #{v("action-fg-disabled")}: var(#{v("control-text-muted")});
-    #{v("action-border-disabled")}: var(#{v("control-border-disabled")});
-    #{v("action-fg-line-disabled")}: var(#{v("control-text-placeholder")});
+    // ── semantic / action (버튼 계열) ★
+    // 색이 아니라 역할이 이름이다 — "이 버튼은 삭제인가"만 물으면 된다.
+    #{v("action-neutral")}: var(#{v("color-gray-12")});
+    #{v("action-primary")}: var(#{v("color-brand-9")});
+    #{v("action-danger")}: var(#{v("color-danger-9")});
+    #{v("action-warning")}: var(#{v("color-warning-9")});
+    #{v("action-success")}: var(#{v("color-success-9")});
+    #{v("action-info")}: var(#{v("color-info-9")});
+    #{v("action-neutral-fg")}: var(#{v("color-gray-1")});
+    #{v("action-primary-fg")}: var(#{v("color-brand-contrast")});
+    #{v("action-danger-fg")}: var(#{v("color-danger-contrast")});
+    #{v("action-warning-fg")}: var(#{v("color-warning-contrast")});
+    #{v("action-success-fg")}: var(#{v("color-success-contrast")});
+    #{v("action-info-fg")}: var(#{v("color-info-contrast")});
+    #{v("action-bg-hover")}: var(#{v("color-gray-a3")});
+    #{v("action-bg-active")}: var(#{v("color-gray-a4")});
+    #{v("action-bg-disabled")}: var(#{v("color-gray-3")});
+    #{v("action-fg-disabled")}: var(#{v("color-gray-9")});
+    #{v("action-border-disabled")}: var(#{v("color-gray-6")});
+    #{v("action-fg-line-disabled")}: var(#{v("color-gray-9")});
 
-    // ── accessibility
-    #{v("focus-color")}: var(#{v("control-accent")});
+    // ── semantic / focus — Radix 8단계가 포커스 링 자리다
+    #{v("focus-color")}: var(#{v("color-brand-8")});
 
-    // ── panel spacing (패널·카드 내부 여백)
-    // ⚠️ 색이 아니라 여백값이다. `surface-*`(배경색) 와 헷갈리지 않도록 이름을 나눴다.
-    #{v("space-panel-compact")}: 1rem; // 16px
-    #{v("space-panel-card")}: 1.5rem; // 24px
-    #{v("space-panel-section")}: 2rem; // 32px
+    // ═════════════════════════════════════════════════════════════
+    // SCALE — 등간격은 숫자, 불규칙 실측값은 역할 이름
+    // ═════════════════════════════════════════════════════════════
 
-    // ── spacing (원본 10px 루트 기준 → 16px 루트 환산, 실제 px 동일)
-    #{v("space-2xs")}: 0.25rem; // 4px
-    #{v("space-xs")}: 0.5rem; // 8px
-    #{v("space-sm")}: 0.75rem; // 12px
-    #{v("space-md")}: 1rem; // 16px
-    #{v("space-lg")}: 1.5rem; // 24px
-    #{v("space-xl")}: 2rem; // 32px
-    #{v("space-2xl")}: 3rem; // 48px
+    // ── space (4px 기준)
+    // 7·9 가 없는 것은 쓰이지 않아서다. 스케일은 기계적으로 채우지 않는다.
+    #{v("space-1")}: 0.25rem; // 4px
+    #{v("space-2")}: 0.5rem; // 8px
+    #{v("space-3")}: 0.75rem; // 12px
+    #{v("space-4")}: 1rem; // 16px
+    #{v("space-5")}: 1.25rem; // 20px
+    #{v("space-6")}: 1.5rem; // 24px
+    #{v("space-8")}: 2rem; // 32px
 
-    // ── size / icon
+    // 의미 간격 — "규칙이 따로 없으면 이것" ★
+    // 모든 조합에 간격을 정의하려다 실패하는 대신 fallback 을 명시적 토큰으로 만든다.
+    // 그러면 임의의 값이 코드에 들어가는 경로가 막힌다.
+    #{v("space-component-gap")}: var(#{v("space-3")});
+    #{v("space-panel-compact")}: var(#{v("space-4")});
+    #{v("space-panel-card")}: var(#{v("space-6")});
+
+    // ── radius (4px 기준)
+    #{v("radius-1")}: 0.25rem; // 4px
+    #{v("radius-2")}: 0.5rem; // 8px
+    #{v("radius-3")}: 0.75rem; // 12px
+    #{v("radius-4")}: 1rem; // 16px
+    #{v("radius-6")}: 1.5rem; // 24px
+    // pill — 양끝이 완전한 반원. 비정사각 요소는 반드시 이것을 쓴다.
+    #{v("radius-full")}: 9999px;
+    // ⚠️ **정사각 전용.** 가로세로가 다른 요소에 쓰면 타원이 된다.
+    #{v("radius-circle")}: 50%;
+
+    // ── font
+    // 시맨틱 타이포 토큰(font-size-label 등)을 두지 않는다 — 어느 컴포넌트가
+    // 어느 스케일을 쓰는지는 design-system.md 의 타이포 매트릭스가 정한다.
+    // 토큰으로 한 겹 더 감싸면 출처가 둘이 되어 어긋난다.
+    #{v("font-family-base")}: inherit; // 라이브러리는 폰트를 배포하지 않는다
+
+    #{v("font-size-1")}: 0.75rem; // 12px
+    #{v("font-size-2")}: 0.8125rem; // 13px
+    #{v("font-size-3")}: 0.875rem; // 14px
+    #{v("font-size-4")}: 1rem; // 16px
+    #{v("font-size-5")}: 1.125rem; // 18px
+    #{v("font-size-6")}: 1.25rem; // 20px
+    #{v("font-size-8")}: 2rem; // 32px
+
+    // 같은 번호끼리 짝지어 쓴다. 배수가 일정하지 않은 것은 **광학 보정**이다 —
+    // 큰 글자일수록 줄 높이 배수를 줄인다. 단일 배수면 큰 제목이 헐거워진다.
+    // 배수(unitless)로 둔 것은 소비자가 font-size 를 덮어도 비율이 유지되게 하기 위함이다.
+    #{v("line-height-1")}: 1.5; // 12 → 18px
+    #{v("line-height-2")}: 1.46; // 13 → 19px
+    #{v("line-height-3")}: 1.5; // 14 → 21px
+    #{v("line-height-4")}: 1.5; // 16 → 24px
+    #{v("line-height-5")}: 1.44; // 18 → 26px
+    #{v("line-height-6")}: 1.4; // 20 → 28px
+    #{v("line-height-8")}: 1.19; // 32 → 38px
+
+    // 큰 글자일수록 자간을 좁히는 광학 보정. 같은 번호끼리 짝지어 쓴다.
+    #{v("letter-spacing-1")}: 0.08em; // 12px — 작은 라벨은 오히려 넓힌다
+    #{v("letter-spacing-3")}: -0.01em; // 14px
+    #{v("letter-spacing-4")}: -0.02em; // 16px
+    #{v("letter-spacing-6")}: -0.04em; // 20px
+    #{v("letter-spacing-8")}: -0.06em; // 32px
+
+    #{v("font-weight-regular")}: 400;
+    #{v("font-weight-medium")}: 500;
+    #{v("font-weight-semi-bold")}: 600;
+    #{v("font-weight-bold")}: 700;
+
+    // ── size (불규칙 실측값 — 역할 이름을 유지한다)
     #{v("size-icon-sm")}: 0.625rem; // 10px
     #{v("size-icon-md")}: 0.875rem; // 14px
     #{v("size-icon-lg")}: 1rem; // 16px
-    #{v("size-icon-xl")}: 1.125rem; // 18px
     #{v("size-icon-2xl")}: 1.25rem; // 20px
     #{v("size-icon-3xl")}: 1.5rem; // 24px
 
-    // ── size / control height
     // 선택 컨트롤 (Checkbox / Radio / Switch)
     #{v("size-dot-xs")}: 0.375rem; // 6px
     #{v("size-dot-sm")}: 0.5rem; // 8px
@@ -185,97 +470,74 @@
     #{v("size-control-lg")}: 2.5rem; // 40px
     #{v("size-control-xl")}: 3rem; // 48px
     #{v("size-field")}: 3.5rem; // 56px
+    // ⚠️ 터치 영역의 **하한**이다. 단독으로 누를 수 있는 것은 이보다 작지 않다.
     #{v("size-control-option")}: 2.75rem; // 44px
 
-    // ── radius
-    #{v("radius-xs")}: 0.3125rem; // 5px
-    #{v("radius-sm")}: 0.5rem; // 8px
-    #{v("radius-md")}: 0.75rem; // 12px
-    #{v("radius-lg")}: 1rem; // 16px
-    #{v("radius-xl")}: 1.5rem; // 24px
-    #{v("radius-pill")}: 999px;
-    #{v("radius-pill-fluid")}: 999rem;
-    #{v("radius-round")}: 50%;
+    // ── border width
+    #{v("border-width")}: 1px;
+    // 포커스 시 두께. outline 방식과 border 방식이 같은 값을 쓴다.
+    #{v("focus-width")}: 2px;
+    #{v("focus-offset")}: 0.25rem;
 
-    // ── elevation
-    #{v("shadow-soft")}: 0 0.75rem 1.75rem rgb(17 24 39 / 6%);
-    #{v("shadow-base")}: 0 1.125rem 2.5rem rgb(17 24 39 / 8%);
-    #{v("shadow-strong")}: 0 1.5rem 3.125rem rgb(17 24 39 / 8%);
+    // ── focus ring ★
+    // **elevation 이 아니다.** 그래서 `shadow-*` 가 아니라 `focus-*` 다.
+    // 크기로 고른다 — design-system.md §4.
+    #{v("focus-ring")}: 0 0 0 0.25rem var(#{v("color-brand-a5")});
+    #{v("focus-ring-sm")}: 0 0 0 0.1875rem var(#{v("color-brand-a5")});
+    #{v("focus-ring-strong")}: 0 0 0 0.25rem var(#{v("color-brand-a6")});
+    #{v("focus-ring-error")}: 0 0 0 0.25rem var(#{v("color-danger-a5")});
+
+    // ── shadow (고도 — 3단계)
+    #{v("shadow-1")}: 0 0.75rem 1.75rem rgb(17 24 39 / 6%); // 카드·인라인 드롭다운
+    #{v("shadow-2")}: 0 1.125rem 2.5rem rgb(17 24 39 / 8%); // 팝오버·메뉴·달력
+    #{v("shadow-3")}: 0 1.125rem 3rem rgb(17 24 39 / 14%); // 모달·토스트
+    // 토스트 표시점 둘레의 은은한 후광. 고도(elevation)도 포커스도 아니므로
+    // shadow-1~3 · focus-ring-* 어느 쪽도 아니다.
+    #{v("shadow-ring-brand")}: 0 0 0 0.25rem var(#{v("color-brand-a4")});
+    #{v("shadow-ring-error")}: 0 0 0 0.25rem var(#{v("color-danger-a4")});
     #{v("shadow-press")}: 0 0.5rem 1rem rgb(17 24 39 / 12%);
-    #{v("shadow-brand")}: 0 1.125rem 2.5rem rgb(1 64 41 / 8%);
-    #{v("shadow-overlay")}: 0 1.125rem 3rem rgb(17 24 39 / 14%);
-    #{v("shadow-dropdown")}: 0 1rem 2rem rgb(15 23 42 / 12%);
-    #{v("shadow-dropdown-strong")}: 0 1rem 2.5rem rgb(17 24 39 / 12%);
-    #{v("shadow-toast")}: 0 0.875rem 2rem rgb(17 24 39 / 22%);
+
+    // 컴포넌트 내부 전용 — 공개 훅으로 문서화하지 않는다
     #{v("shadow-thumb")}: 0 0.125rem 0.375rem rgb(15 23 42 / 18%);
     #{v("shadow-inset-soft")}: inset 0 1px 0 rgb(255 255 255 / 76%);
     #{v("shadow-inset-inverse")}: inset 0 1px 0 rgb(255 255 255 / 8%);
-    #{v("shadow-ring-brand")}: 0 0 0 0.25rem rgb(220 252 231 / 18%);
-    #{v("shadow-ring-error")}: 0 0 0 0.25rem rgb(254 226 226 / 18%);
-    #{v("shadow-focus")}: 0 0 0 0.25rem rgb(28 166 115 / 14%);
-    #{v("shadow-focus-strong")}: 0 0 0 0.25rem rgb(28 166 115 / 16%);
-    #{v("shadow-focus-sm")}: 0 0 0 0.1875rem rgb(28 166 115 / 16%);
-    #{v("shadow-focus-error")}: 0 0 0 0.25rem rgb(220 38 38 / 12%);
 
-    // ── border
-    #{v("border-width")}: 1px;
-    #{v("border-width-focus")}: 2px;
-    #{v("focus-ring-width")}: 2px;
-    #{v("focus-ring-offset")}: 0.25rem;
+    // ── duration — 0.2초가 마이크로/매크로 경계 ★
+    // 마이크로(버튼 눌림·포커스·색 전환)는 duration-4 이하,
+    // 매크로(팝업 개폐·시트 슬라이드)는 duration-4 초과.
+    #{v("duration-1")}: 50ms;
+    #{v("duration-2")}: 100ms;
+    #{v("duration-3")}: 150ms;
+    #{v("duration-4")}: 200ms;
+    #{v("duration-5")}: 250ms;
+    #{v("duration-6")}: 300ms;
 
-    // ── typography scale (모바일 기준값 — desktop 은 아래 미디어쿼리에서 재선언)
-    #{v("font-size-label")}: 0.75rem; // 12px
-    #{v("font-size-body-sm")}: 0.875rem; // 14px
-    #{v("font-size-body")}: 1rem; // 16px
-    #{v("font-size-title")}: 1.25rem; // 20px
-    #{v("font-size-display")}: 2rem; // 32px
-
-    #{v("font-weight-regular")}: 400;
-    #{v("font-weight-medium")}: 500;
-    #{v("font-weight-semi-bold")}: 600;
-    #{v("font-weight-bold")}: 700;
-    #{v("font-weight-extra-bold")}: 800;
-
-    #{v("font-weight-label")}: var(#{v("font-weight-semi-bold")});
-    #{v("font-weight-body-sm")}: var(#{v("font-weight-regular")});
-    #{v("font-weight-body")}: var(#{v("font-weight-regular")});
-    #{v("font-weight-title")}: var(#{v("font-weight-bold")});
-    #{v("font-weight-display")}: var(#{v("font-weight-extra-bold")});
-
-    #{v("line-height-label")}: 1.45;
-    #{v("line-height-body-sm")}: 1.65;
-    #{v("line-height-body")}: 1.6;
-    #{v("line-height-title")}: 1.18;
-    #{v("line-height-display")}: 1.02;
-
-    #{v("letter-spacing-label")}: 0.08em;
-    #{v("letter-spacing-body-sm")}: -0.01em;
-    #{v("letter-spacing-body")}: -0.02em;
-    #{v("letter-spacing-title")}: -0.04em;
-    #{v("letter-spacing-display")}: -0.06em;
-
-    // ── motion
-    #{v("duration-quick")}: 0.12s;
-    #{v("duration-fast")}: 0.18s;
-    #{v("duration-base")}: 0.2s;
-    #{v("duration-slow")}: 0.24s;
-    #{v("duration-deliberate")}: 0.32s;
-
+    // ── easing — enter 와 exit 은 대칭이 아니다 ★
+    // 나타날 때는 결과를 인지할 시간을 주고(느리게 끝남),
+    // 사라질 때는 이미 끝난 것에 시간을 쓰지 않는다(빠르게 끝남).
+    // 하나의 곡선으로 개폐 양방향을 처리하면 이 차이가 사라진다.
     #{v("easing-linear")}: linear;
-    #{v("easing-standard")}: cubic-bezier(0.2, 0, 0, 1);
-    #{v("easing-emphasized")}: cubic-bezier(0.16, 1, 0.3, 1);
-    #{v("easing-exit")}: cubic-bezier(0.4, 0, 1, 1);
+    #{v("easing-standard")}: cubic-bezier(0.2, 0, 0, 1); // 기능적 마이크로
+    #{v("easing-enter")}: cubic-bezier(0, 0, 0.15, 1); // ease-out 계열
+    #{v("easing-exit")}: cubic-bezier(0.35, 0, 1, 1); // ease-in 계열
+    #{v("easing-enter-emphasized")}: cubic-bezier(0.03, 0.4, 0.1, 1);
+    #{v("easing-exit-emphasized")}: cubic-bezier(0.35, 0, 0.95, 0.55);
 
     // ── z-index (오버레이 계층 단일 출처)
-    #{v("z-sticky")}: 10;
     #{v("z-tooltip")}: 20;
-    #{v("z-dimmed")}: 200;
-    #{v("z-layer")}: 1010;
-    #{v("z-overlay-dimmed")}: 1020;
     #{v("z-overlay-layer")}: 1030;
     #{v("z-portal-menu")}: 1031; // portal 로 body 에 붙는 드롭다운·달력 — 팝업(1030) 안에서도 보여야 한다
     #{v("z-toast")}: 1031; // 팝업보다 위 — 팝업 안에서 띄운 토스트도 보여야 한다
-    #{v("z-loader")}: 9999;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      @include dark-scheme;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    @include dark-scheme;
   }
 
   // ⏸️ 반응형 타이포(데스크톱 스케일 재선언)는 보류.
@@ -283,13 +545,15 @@
   //    현재는 모바일 기준 단일값이며, $breakpoints / respond-to 인프라는 남겨두었다.
 
   // 모션 최소화 환경 — duration 무력화
+  // 컴포넌트가 duration 을 하드코딩하면 이 장치를 우회한다.
   @media (prefers-reduced-motion: reduce) {
     :root {
-      #{v("duration-quick")}: 1ms;
-      #{v("duration-fast")}: 1ms;
-      #{v("duration-base")}: 1ms;
-      #{v("duration-slow")}: 1ms;
-      #{v("duration-deliberate")}: 1ms;
+      #{v("duration-1")}: 1ms;
+      #{v("duration-2")}: 1ms;
+      #{v("duration-3")}: 1ms;
+      #{v("duration-4")}: 1ms;
+      #{v("duration-5")}: 1ms;
+      #{v("duration-6")}: 1ms;
     }
   }
 }

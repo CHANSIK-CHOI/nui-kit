@@ -13,14 +13,14 @@
 @layer nui.components {
   #{cls("radio")} {
     &__control {
-      border-radius: var(#{v("radius-round")});
+      border-radius: var(#{v("radius-circle")});
     }
 
     &__indicator {
       width: var(#{v("size-dot-sm")});
       height: var(#{v("size-dot-sm")});
       background-color: currentColor;
-      border-radius: var(#{v("radius-round")});
+      border-radius: var(#{v("radius-circle")});
       transform: scale(0.4);
     }
 

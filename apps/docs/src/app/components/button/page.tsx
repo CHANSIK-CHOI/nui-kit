@@ -40,14 +40,16 @@ import "@chansikchoi/next-ui/styles/button.css"; // 온디맨드일 때`}</code>
 
       <h2>색상</h2>
       <p>
-        기본은 <code>black</code> 이다. 브랜드 강조에는 <code>primary</code>,
-        파괴적 동작에는 <code>secondary</code> 를 쓴다.
+        색이 아니라 <strong>역할</strong>이 이름이다. 기본은{" "}
+        <code>neutral</code>, 가장 중요한 액션에는 <code>primary</code>,
+        되돌릴 수 없는 액션(삭제·탈퇴)에는 <code>danger</code>, 확인이 필요한
+        액션에는 <code>warning</code> 을 쓴다.
       </p>
-      <Example caption="color: black | primary | secondary | point">
-        <Button>black</Button>
+      <Example caption="color: neutral | primary | danger | warning">
+        <Button>neutral</Button>
         <Button color="primary">primary</Button>
-        <Button color="secondary">secondary</Button>
-        <Button color="point">point</Button>
+        <Button color="danger">danger</Button>
+        <Button color="warning">warning</Button>
       </Example>
 
       <h2>변형</h2>
@@ -91,7 +93,7 @@ import "@chansikchoi/next-ui/styles/button.css"; // 온디맨드일 때`}</code>
 
       <h2>커스터마이징</h2>
       <p>
-        <code>--nui-button-bg</code> 는 <strong>기본(black) 버튼만</strong>{" "}
+        <code>--nui-button-bg</code> 는 <strong>기본(neutral) 버튼만</strong>{" "}
         바꾼다. variant 는 각자의 훅을 갖는다 — 훅 하나로 모든 variant 가 덮이는
         것을 막기 위해서다.
       </p>
@@ -119,10 +121,10 @@ import "@chansikchoi/next-ui/styles/button.css"; // 온디맨드일 때`}</code>
           </thead>
           <tbody>
             {[
-              ["--nui-button-bg", "기본(black) 버튼 배경"],
+              ["--nui-button-bg", 'color="neutral" 배경'],
               ["--nui-button-primary-bg", 'color="primary" 배경'],
-              ["--nui-button-secondary-bg", 'color="secondary" 배경'],
-              ["--nui-button-point-bg", 'color="point" 배경'],
+              ["--nui-button-danger-bg", 'color="danger" 배경'],
+              ["--nui-button-warning-bg", 'color="warning" 배경'],
               ["--nui-button-color", "라벨 색"],
               ["--nui-button-radius", "모서리 반경"],
               ["--nui-button-min-height", "최소 높이"],

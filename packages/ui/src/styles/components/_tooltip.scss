@@ -32,10 +32,10 @@
 
     &__bubble {
       position: relative;
-      padding: var(#{v("space-xs")}) var(#{v("space-sm")});
-      background-color: #{hook("tooltip-bg", var(#{v("surface-inverse")}))};
-      border-radius: #{hook("tooltip-radius", var(#{v("radius-md")}))};
-      box-shadow: var(#{v("shadow-dropdown")});
+      padding: var(#{v("space-2")}) var(#{v("space-3")});
+      background-color: #{hook("tooltip-bg", var(#{v("layer-inverse")}))};
+      border-radius: #{hook("tooltip-radius", var(#{v("radius-3")}))};
+      box-shadow: var(#{v("shadow-2")});
     }
 
     &__content {
@@ -44,47 +44,47 @@
       white-space: normal;
       word-break: keep-all;
 
-      @include typo("body-sm", "regular", 1.6, 0);
+      @include typo(3, "regular", 1.6, 0);
     }
 
     &__arrow {
       position: absolute;
       width: var(#{v("size-icon-sm")});
       height: var(#{v("size-icon-sm")});
-      background-color: #{hook("tooltip-bg", var(#{v("surface-inverse")}))};
+      background-color: #{hook("tooltip-bg", var(#{v("layer-inverse")}))};
       transform: rotate(45deg);
     }
 
     // ── 패널 위치
     &--top-center &__panel {
-      bottom: calc(100% + var(#{v("space-sm")}));
+      bottom: calc(100% + var(#{v("space-3")}));
       left: 50%;
       translate: -50% 0;
     }
 
     &--top-left &__panel {
-      bottom: calc(100% + var(#{v("space-sm")}));
+      bottom: calc(100% + var(#{v("space-3")}));
       left: 0;
     }
 
     &--top-right &__panel {
       right: 0;
-      bottom: calc(100% + var(#{v("space-sm")}));
+      bottom: calc(100% + var(#{v("space-3")}));
     }
 
     &--bottom-center &__panel {
-      top: calc(100% + var(#{v("space-sm")}));
+      top: calc(100% + var(#{v("space-3")}));
       left: 50%;
       translate: -50% 0;
     }
 
     &--bottom-left &__panel {
-      top: calc(100% + var(#{v("space-sm")}));
+      top: calc(100% + var(#{v("space-3")}));
       left: 0;
     }
 
     &--bottom-right &__panel {
-      top: calc(100% + var(#{v("space-sm")}));
+      top: calc(100% + var(#{v("space-3")}));
       right: 0;
     }
 
@@ -109,12 +109,12 @@
 
     &--top-left &__arrow,
     &--bottom-left &__arrow {
-      left: var(#{v("space-md")});
+      left: var(#{v("space-4")});
     }
 
     &--top-right &__arrow,
     &--bottom-right &__arrow {
-      right: var(#{v("space-md")});
+      right: var(#{v("space-4")});
     }
   }
 }

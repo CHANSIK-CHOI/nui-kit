@@ -55,7 +55,7 @@ export default function FoundationsPage() {
       </p>
       <ul>
         <li>
-          <code>--nui-color-primary</code> 같은 seed 토큰을 바꾸면 이를 참조하는
+          <code>--nui-color-brand-9</code> 같은 seed 토큰을 바꾸면 이를 참조하는
           모든 컴포넌트가 함께 바뀐다
         </li>
         <li>

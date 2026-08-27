@@ -15,7 +15,7 @@
     &--box {
       display: flex;
       flex-direction: column;
-      gap: #{hook("accordion-gap", var(#{v("space-sm")}))};
+      gap: #{hook("accordion-gap", var(#{v("space-3")}))};
     }
 
     &--line {
@@ -26,19 +26,19 @@
       position: relative;
       overflow: hidden;
 
-      @include motion((border-color, box-shadow, background-color), "fast");
+      @include motion((border-color, box-shadow, background-color), "3");
     }
 
     &--box &__item {
       background: var(#{v("gradient-panel-soft")});
       border: var(#{v("border-width")}) solid var(#{v("border-default")});
-      border-radius: #{hook("accordion-radius", var(#{v("radius-lg")}))};
-      box-shadow: var(#{v("shadow-soft")});
+      border-radius: #{hook("accordion-radius", var(#{v("radius-4")}))};
+      box-shadow: var(#{v("shadow-1")});
     }
 
     &--box &__item#{state("active")} {
-      border-color: var(#{v("border-brand-active")});
-      box-shadow: var(#{v("shadow-brand")});
+      border-color: var(#{v("border-brand")});
+      box-shadow: var(#{v("shadow-2")});
     }
 
     &--line &__item {
@@ -47,7 +47,7 @@
     }
 
     &--line &__item#{state("active")} {
-      border-bottom-color: var(#{v("border-brand-line")});
+      border-bottom-color: var(#{v("border-brand")});
     }
 
     &__button {
@@ -69,7 +69,7 @@
       @include motion((background-color, color));
 
       &:focus-visible {
-        outline: var(#{v("focus-ring-width")}) solid var(#{v("focus-color")});
+        outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
         outline-offset: -2px;
       }
 
@@ -90,18 +90,18 @@
       justify-content: center;
       width: 100%;
       height: 100%;
-      border-radius: var(#{v("radius-pill")});
+      border-radius: var(#{v("radius-full")});
     }
 
     &__head {
       display: flex;
       align-items: center;
-      gap: var(#{v("space-md")});
+      gap: var(#{v("space-4")});
       width: 100%;
       padding: var(#{v("space-panel-compact")})
         var(#{v("space-panel-card")});
 
-      @include motion(background-color, "fast");
+      @include motion(background-color, "3");
     }
 
     &__title-box {
@@ -112,7 +112,7 @@
     &__title {
       color: var(#{v("text-primary")});
 
-      @include typo("body", "semi-bold", 1.45, -0.02em);
+      @include typo(4, "semi-bold", 1.45, -0.02em);
     }
 
     // 헤더에 폼 컨트롤을 넣는 경우가 있어 폭을 채워준다
@@ -130,8 +130,8 @@
       height: var(#{v("size-control-md")});
       margin-top: 0.0625rem;
       color: var(#{v("text-secondary")});
-      background: var(#{v("surface-panel-muted")});
-      border-radius: var(#{v("radius-pill")});
+      background: var(#{v("layer-floating-muted")});
+      border-radius: var(#{v("radius-full")});
     }
 
     &__button--icon:not(:disabled):hover,
@@ -146,7 +146,7 @@
       width: var(#{v("size-icon-lg")});
       height: var(#{v("size-icon-lg")});
 
-      @include motion(transform, "fast");
+      @include motion(transform, "3");
     }
 
     // 아이콘은 SVG 없이 테두리 두 변을 회전시켜 만든다 (자산 의존 제거)
@@ -170,14 +170,14 @@
     &__panel-box {
       display: flex;
       flex-direction: column;
-      gap: var(#{v("space-sm")});
+      gap: var(#{v("space-3")});
       padding: var(#{v("space-panel-compact")})
         var(#{v("space-panel-card")}) var(#{v("space-panel-card")});
       color: var(#{v("text-secondary")});
       border-top: var(#{v("border-width")}) solid
         var(#{v("control-border-disabled")});
 
-      @include typo("body-sm", "regular", 1.7);
+      @include typo(3, "regular", 1.7);
 
       > * {
         margin: 0;
@@ -190,7 +190,7 @@
     }
 
     &__item#{state("active")} &__panel-box {
-      border-top-color: var(#{v("border-brand-divider")});
+      border-top-color: var(#{v("border-brand-subtle")});
     }
 
     &__item#{state("active")} &__arrow-icon {

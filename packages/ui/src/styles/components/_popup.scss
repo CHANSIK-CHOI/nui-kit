@@ -21,7 +21,7 @@
     &__dim {
       position: absolute;
       inset: 0;
-      background: #{hook("popup-dim", var(#{v("surface-overlay-dim")}))};
+      background: #{hook("popup-dim", var(#{v("layer-overlay")}))};
       pointer-events: auto;
       will-change: opacity;
     }
@@ -42,10 +42,10 @@
       width: #{hook("popup-width", min(100%, 30rem))};
       max-height: min(calc(100dvh - 2.5rem), 45rem);
       overflow: hidden;
-      background: #{hook("popup-bg", var(#{v("surface-panel-strong")}))};
+      background: #{hook("popup-bg", var(#{v("layer-floating")}))};
       border: var(#{v("border-width")}) solid var(#{v("border-default")});
-      border-radius: #{hook("popup-radius", var(#{v("radius-xl")}))};
-      box-shadow: var(#{v("shadow-overlay")});
+      border-radius: #{hook("popup-radius", var(#{v("radius-6")}))};
+      box-shadow: var(#{v("shadow-3")});
       pointer-events: auto;
       transform-origin: center;
       will-change: transform, opacity;
@@ -56,7 +56,7 @@
       flex-shrink: 0;
       align-items: flex-start;
       justify-content: space-between;
-      gap: var(#{v("space-md")});
+      gap: var(#{v("space-4")});
       padding: var(#{v("space-panel-card")}) var(#{v("space-panel-card")}) 0;
     }
 
@@ -72,7 +72,7 @@
     &__title {
       color: var(#{v("text-primary")});
 
-      @include typo("title", "bold", 1.15);
+      @include typo(6, "bold", 1.15);
     }
 
     &__close {
@@ -92,12 +92,12 @@
       color: var(#{v("text-secondary")});
       background: transparent;
       border: var(#{v("border-width")}) solid transparent;
-      border-radius: var(#{v("radius-pill")});
+      border-radius: var(#{v("radius-full")});
 
       @include motion((background-color, border-color, color, transform));
 
       &:focus-visible {
-        outline: var(#{v("focus-ring-width")}) solid var(#{v("focus-color")});
+        outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
         outline-offset: 0.125rem;
       }
 
@@ -116,7 +116,7 @@
       display: flex;
       flex: 1 1 auto;
       flex-direction: column;
-      gap: var(#{v("space-sm")});
+      gap: var(#{v("space-3")});
       overflow-y: auto;
       padding: var(#{v("space-panel-compact")})
         var(#{v("space-panel-card")}) var(#{v("space-panel-card")});
@@ -133,14 +133,14 @@
       color: var(#{v("text-info")});
       background: var(#{v("gradient-panel-soft")});
       border: var(#{v("border-width")}) solid var(#{v("border-subtle")});
-      border-radius: var(#{v("radius-pill")});
+      border-radius: var(#{v("radius-full")});
       box-shadow: var(#{v("shadow-inset-soft")});
     }
 
     &__description {
       color: var(#{v("text-secondary")});
 
-      @include typo("body-sm", "regular", 1.7);
+      @include typo(3, "regular", 1.7);
     }
 
     &__foot {
@@ -172,7 +172,7 @@
     &--bottom-sheet &__panel {
       width: 100%;
       max-height: min(88dvh, 45rem);
-      border-radius: var(#{v("radius-xl")}) var(#{v("radius-xl")}) 0 0;
+      border-radius: var(#{v("radius-6")}) var(#{v("radius-6")}) 0 0;
     }
 
     // ── variant: full
@@ -196,7 +196,7 @@
     }
 
     &--full &__body {
-      padding: var(#{v("space-md")})
+      padding: var(#{v("space-4")})
         calc(var(#{v("space-panel-card")}) + env(safe-area-inset-right))
         calc(var(#{v("space-panel-card")}) + env(safe-area-inset-bottom))
         calc(var(#{v("space-panel-card")}) + env(safe-area-inset-left));
@@ -239,7 +239,7 @@
     }
 
     #{cls("popup")}__title {
-      @include typo("title", "bold", 1.12);
+      @include typo(6, "bold", 1.12);
     }
 
     #{cls("popup")}__description {
@@ -251,7 +251,7 @@
       #{cls("popup")}__body {
         justify-content: center;
         min-height: 11.25rem;
-        gap: var(#{v("space-md")});
+        gap: var(#{v("space-4")});
       }
 
       #{cls("popup")}__description {

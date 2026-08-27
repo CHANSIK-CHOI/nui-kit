@@ -40,7 +40,7 @@ export default function SpacingPage() {
                   display: "block",
                   height: 14,
                   width: `var(${token.name})`,
-                  background: "var(--nui-color-primary)",
+                  background: "var(--nui-color-brand-9)",
                   borderRadius: 2,
                 }}
               />
@@ -67,11 +67,11 @@ export default function SpacingPage() {
                   width: 96,
                   background: "var(--nui-bg-color-3)",
                   border: "1px solid var(--nui-control-border)",
-                  borderRadius: "var(--nui-radius-sm)",
+                  borderRadius: "var(--nui-radius-2)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "var(--nui-font-size-label)",
+                  fontSize: "var(--nui-font-size-1)",
                 }}
               >
                 {token.value}

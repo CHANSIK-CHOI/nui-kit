@@ -30,22 +30,22 @@
     // 캘린더 팝업
     &__dropdown {
       position: absolute;
-      top: calc(100% + var(#{v("space-xs")}));
+      top: calc(100% + var(#{v("space-2")}));
       left: 0;
       z-index: var(#{v("z-tooltip")});
       min-width: 19.5rem;
-      padding: var(#{v("space-md")});
+      padding: var(#{v("space-4")});
       border: var(#{v("border-width")}) solid
         var(#{v("control-border-disabled")});
       border-radius: #{hook(
           "datepicker-dropdown-radius",
-          var(#{v("radius-md")})
+          var(#{v("radius-3")})
         )};
       background-color: #{hook(
           "datepicker-dropdown-bg",
-          var(#{v("surface-panel-strong")})
+          var(#{v("layer-floating")})
         )};
-      box-shadow: var(#{v("shadow-dropdown-strong")});
+      box-shadow: var(#{v("shadow-2")});
     }
   }
 
@@ -61,7 +61,7 @@
       )};
     #{iv("daypicker-day-radius")}: #{hook(
         "datepicker-day-radius",
-        var(#{v("radius-sm")})
+        var(#{v("radius-2")})
       )};
 
     color: var(#{v("control-text")});
@@ -88,19 +88,19 @@
       align-items: center;
       justify-content: flex-start;
       min-height: var(#{v("size-control-lg")});
-      margin-bottom: var(#{v("space-xs")});
+      margin-bottom: var(#{v("space-2")});
       // 우측 네비게이션 버튼 영역을 비워둔다
       padding-right: 4.75rem;
     }
 
     &__caption-label {
-      @include typo("body", "semi-bold", 1.4);
+      @include typo(4, "semi-bold", 1.4);
     }
 
     &__dropdowns {
       display: inline-flex;
       align-items: center;
-      gap: var(#{v("space-xs")});
+      gap: var(#{v("space-2")});
     }
 
     // 실제 <select> 는 투명하게 덮어두고, 아래 caption-label 이 보이는 UI 가 된다.
@@ -126,13 +126,13 @@
       align-items: center;
       min-width: 5.5rem;
       min-height: var(#{v("size-control-md")});
-      padding: 0 var(#{v("space-sm")});
+      padding: 0 var(#{v("space-3")});
       border: var(#{v("border-width")}) solid var(#{v("control-border")});
-      border-radius: var(#{v("radius-sm")});
+      border-radius: var(#{v("radius-2")});
       background-color: var(#{v("control-bg")});
       color: var(#{v("control-text")});
 
-      @include motion((border-color, background-color), "fast");
+      @include motion((border-color, background-color), "3");
 
       &[data-disabled="true"] {
         opacity: 0.45;
@@ -146,28 +146,28 @@
 
     &__dropdown:focus-visible + &__caption-label {
       outline: none;
-      border-radius: var(#{v("radius-sm")});
-      box-shadow: var(#{v("shadow-focus-sm")});
+      border-radius: var(#{v("radius-2")});
+      box-shadow: var(#{v("focus-ring-sm")});
     }
 
     &__dropdown-root &__caption-label {
       display: inline-flex;
       align-items: center;
       justify-content: space-between;
-      gap: var(#{v("space-xs")});
+      gap: var(#{v("space-2")});
       width: 100%;
 
-      @include typo("body-sm", "semi-bold", 1.35, -0.01em);
+      @include typo(3, "semi-bold", 1.35, -0.01em);
     }
 
     // ── 이전/다음 달 네비게이션
     &__nav {
       position: absolute;
-      top: var(#{v("space-2xs")});
+      top: var(#{v("space-1")});
       right: 0;
       display: flex;
       align-items: center;
-      gap: var(#{v("space-2xs")});
+      gap: var(#{v("space-1")});
       // 캡션 위에 겹쳐 있으므로 버튼 자신만 이벤트를 받는다
       pointer-events: none;
     }
@@ -188,11 +188,11 @@
       justify-content: center;
       width: var(#{v("size-control-sm")});
       height: var(#{v("size-control-sm")});
-      border-radius: var(#{v("radius-round")});
+      border-radius: var(#{v("radius-circle")});
       color: var(#{v("control-icon")});
       pointer-events: auto;
 
-      @include motion((background-color, color, opacity), "fast");
+      @include motion((background-color, color, opacity), "3");
     }
 
     &__button-previous:hover,
@@ -234,10 +234,10 @@
     &__weekday {
       width: var(#{iv("daypicker-day-size")});
       height: var(#{v("size-control-sm")});
-      color: var(#{v("text-tertiary")});
+      color: var(#{v("text-secondary")});
       text-align: center;
 
-      @include typo("label", "semi-bold", 1.35, 0.04em);
+      @include typo(1, "semi-bold", 1.35, 0.04em);
     }
 
     &__day {
@@ -264,8 +264,8 @@
       background: transparent;
       color: inherit;
 
-      @include motion((background-color, border-color, color), "fast");
-      @include typo("body-sm", "medium", 1.4, -0.01em);
+      @include motion((background-color, border-color, color), "3");
+      @include typo(3, "medium", 1.4, -0.01em);
     }
 
     &__day:not(#{cls("daypicker")}__selected)
@@ -276,7 +276,7 @@
     &__day-button:focus-visible {
       outline: none;
       border-color: var(#{v("focus-color")});
-      box-shadow: var(#{v("shadow-focus-sm")});
+      box-shadow: var(#{v("focus-ring-sm")});
     }
 
     // ── 주말 (modifiersClassNames 로 붙는다)
@@ -301,11 +301,11 @@
 
     // ── 상태
     &__outside {
-      color: var(#{v("text-quaternary")});
+      color: var(#{v("text-disabled")});
     }
 
     &__disabled &__day-button {
-      color: var(#{v("text-quaternary")});
+      color: var(#{v("text-disabled")});
       opacity: 0.45;
       cursor: not-allowed;
     }

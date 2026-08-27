@@ -23,7 +23,7 @@ export default function MotionPage() {
       <pre className="doc-code">
         <code>{`@media (prefers-reduced-motion: reduce) {
   :root {
-    --nui-duration-fast: 1ms;
+    --nui-duration-3: 1ms;
     --nui-duration-base: 1ms;
     /* … */
   }

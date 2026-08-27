@@ -15,11 +15,11 @@
       background-color: #{hook("textarea-bg", var(#{v("control-bg")}))};
       border: var(#{v("border-width")}) solid
         #{hook("textarea-border-color", var(#{v("control-border")}))};
-      border-radius: #{hook("textarea-radius", var(#{v("radius-sm")}))};
+      border-radius: #{hook("textarea-radius", var(#{v("radius-2")}))};
 
       @include motion(
         (border-color, background-color, box-shadow, border-width),
-        "fast"
+        "3"
       );
     }
 
@@ -38,12 +38,12 @@
           calc(var(#{v("size-field")}) * 2)
         )};
       // 우측 여백은 clear 버튼 자리 (3.125rem = 50px)
-      padding: var(#{v("space-md")}) 3.125rem var(#{v("space-md")})
-        var(#{v("space-md")});
+      padding: var(#{v("space-4")}) 3.125rem var(#{v("space-4")})
+        var(#{v("space-4")});
       color: var(#{v("control-text")});
       caret-color: var(#{v("control-text")});
 
-      @include typo("body", "regular", 1.6);
+      @include typo(4, "regular", 1.6);
     }
 
     &__input:focus,
@@ -54,13 +54,13 @@
     &__input::placeholder {
       color: var(#{v("control-text-placeholder")});
 
-      @include typo("body", "regular", 1.6);
+      @include typo(4, "regular", 1.6);
     }
 
     &__actions {
       position: absolute;
-      top: var(#{v("space-sm")});
-      right: var(#{v("space-sm")});
+      top: var(#{v("space-3")});
+      right: var(#{v("space-3")});
       display: inline-flex;
       align-items: center;
     }
@@ -76,8 +76,8 @@
 
     &:not(#{state("disabled")}):not(#{state("readonly")}):focus-within &__wrap {
       border-color: var(#{v("focus-color")});
-      border-width: var(#{v("border-width-focus")});
-      box-shadow: var(#{v("shadow-focus")});
+      border-width: var(#{v("focus-width")});
+      box-shadow: var(#{v("focus-ring")});
     }
 
     &:not(#{state("disabled")}):not(#{state("readonly")}) &__clear:hover {
@@ -126,7 +126,7 @@
       ):focus-within
       &__wrap {
       border-color: var(#{v("control-border-error")});
-      box-shadow: var(#{v("shadow-focus-error")});
+      box-shadow: var(#{v("focus-ring-error")});
     }
 
     // ── resize

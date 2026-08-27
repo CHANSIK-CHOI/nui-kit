@@ -16,10 +16,10 @@
 
     &__control {
       justify-content: flex-start;
-      padding: var(#{v("space-2xs")});
+      padding: var(#{v("space-1")});
       background-color: var(#{v("control-track")});
       border-color: var(#{v("control-track")});
-      border-radius: var(#{v("radius-pill-fluid")});
+      border-radius: var(#{v("radius-full")});
     }
 
     &__thumb {
@@ -27,7 +27,7 @@
       width: var(#{v("size-icon-2xl")});
       height: var(#{v("size-icon-2xl")});
       background-color: var(#{v("control-thumb")});
-      border-radius: var(#{v("radius-round")});
+      border-radius: var(#{v("radius-circle")});
       box-shadow: var(#{v("shadow-thumb")});
 
       @include motion((transform, background-color));

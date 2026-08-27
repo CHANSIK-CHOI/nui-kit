@@ -13,7 +13,7 @@
 @layer nui.components {
   #{cls("checkbox")} {
     &__control {
-      border-radius: var(#{v("radius-sm")});
+      border-radius: var(#{v("radius-2")});
     }
 
     // 체크 표시는 두 변(border)만 그린 뒤 45도로 돌려 만든다.

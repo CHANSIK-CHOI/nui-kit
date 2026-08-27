@@ -7,7 +7,12 @@ import { px } from "../../internal/prefix.js";
 const block = px("button");
 
 export type ButtonSize = "large" | "medium" | "small";
-export type ButtonColor = "black" | "primary" | "secondary" | "point";
+// 색이 아니라 역할이 이름이다 — "이 버튼은 삭제인가"만 물으면 된다.
+export type ButtonColor =
+  | "neutral"
+  | "primary"
+  | "danger"
+  | "warning";
 export type ButtonVariant = "solid" | "line" | "text";
 export type ButtonShape = "round" | "square";
 
@@ -45,13 +50,13 @@ export type ButtonClassNameParams = {
 export function getButtonClassName({
   className,
   size = "large",
-  color = "black",
+  color = "neutral",
   variant = "solid",
   shape = "square",
 }: ButtonClassNameParams) {
   return cn(
     block,
-    color !== "black" && `${block}--${color}`,
+    color !== "neutral" && `${block}--${color}`,
     variant !== "solid" && `${block}--${variant}`,
     variant !== "text" && shape !== "square" && `${block}--${shape}`,
     size !== "large" && `${block}--${size}`,
@@ -76,7 +81,7 @@ export default function Button({
   icon,
   className,
   size = "large",
-  color = "black",
+  color = "neutral",
   variant = "solid",
   shape = "square",
   ...rest

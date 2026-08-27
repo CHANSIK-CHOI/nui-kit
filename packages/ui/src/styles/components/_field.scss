@@ -9,7 +9,7 @@
   #{cls("field")} {
     display: flex;
     width: 100%;
-    gap: var(#{v("space-sm")});
+    gap: var(#{v("space-3")});
 
     &--row {
       flex-direction: row;
@@ -30,7 +30,7 @@
     &__label {
       color: var(#{v("text-primary")});
 
-      @include typo("body-sm", "medium", 1.5, -0.01em);
+      @include typo(3, "medium", 1.5, -0.01em);
     }
 
     label#{cls("field")}__label {
@@ -47,7 +47,7 @@
       margin: -0.125rem 0 0; // -2px
       color: var(#{v("text-secondary")});
 
-      @include typo("label", "regular", 1.55, 0);
+      @include typo(1, "regular", 1.55, 0);
     }
 
     &__message {
@@ -60,7 +60,7 @@
 
     &__grid {
       display: grid;
-      gap: var(#{v("space-md")});
+      gap: var(#{v("space-4")});
       width: 100%;
 
       // ⏸️ 모바일 1열 붕괴(브레이크포인트)는 보류 — 별도 단계에서 일괄 적용.
@@ -81,7 +81,7 @@
       display: flex;
       flex-wrap: wrap;
       width: 100%;
-      gap: var(#{v("space-sm")});
+      gap: var(#{v("space-3")});
 
       &--row {
         flex-direction: row;

@@ -24,8 +24,8 @@ export default function ShapePage() {
                 style={{
                   width: 72,
                   height: 56,
-                  background: "var(--nui-color-primary-bright)",
-                  border: "1px solid var(--nui-color-primary)",
+                  background: "var(--nui-color-brand-3)",
+                  border: "1px solid var(--nui-color-brand-9)",
                   borderRadius: `var(${token.name})`,
                 }}
               />
@@ -51,7 +51,7 @@ export default function ShapePage() {
                   width: 92,
                   height: 56,
                   background: "#fff",
-                  borderRadius: "var(--nui-radius-sm)",
+                  borderRadius: "var(--nui-radius-2)",
                   boxShadow: `var(${token.name})`,
                 }}
               />
@@ -64,8 +64,24 @@ export default function ShapePage() {
       </div>
       <TokenTable group="shadow" />
 
-      <h2>테두리와 포커스</h2>
-      <TokenTable group="border" />
+      <h2>포커스 링</h2>
+      <p>
+        키보드로 이동할 때 &quot;지금 여기&quot;를 알리는 표시다. 마우스로 눌렀을
+        때는 나타나지 않는다(<code>:focus-visible</code>). 그림자와 생김새가
+        비슷하지만 다른 토큰인데, 그림자는 <em>높이</em>를 나타내고 링은{" "}
+        <em>상태</em>를 나타내기 때문이다.
+      </p>
+      <p>
+        크기를 둘로 나눈 것은 컨트롤이 작을수록 같은 굵기의 링이 더 두껍게 보이기
+        때문이다. 컨트롤 높이 <strong>36px</strong> 이 경계다 — 달력 날짜 칸처럼
+        작은 것에는 <code>focus-ring-sm</code> 을 쓴다.
+      </p>
+      <TokenTable group="focus" />
+
+      <p className="doc-note">
+        테두리 <strong>색</strong>은 색상 문서에 있다 — 값이 색이므로 테마에 따라
+        바뀌고, 여기 있는 치수는 테마와 무관하다.
+      </p>
     </>
   );
 }

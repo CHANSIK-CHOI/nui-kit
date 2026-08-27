@@ -88,6 +88,12 @@ reset 은 배포하지 않는다(`preflight.css` opt-in). 따라서 `box-sizing`
 SCSS map/변수로 두면 소비자가 덮어쓸 수 없다. 색·간격·치수·반경·그림자·모션·타이포·
 z-index 는 전부 `tokens/_seed.scss` 의 CSS 변수다.
 
+토큰의 **계층·이름·스케일 값**은 [tokens.md](./tokens.md) 가 정본이다.
+요약하면 — 등간격 스케일은 **숫자**(`space-4` `radius-2` `font-size-3`),
+불규칙 실측값은 **역할 이름**(`size-control-md` `size-field`).
+t-shirt 사이즈(`md` `lg`)를 쓰지 않는 이유는 **중간값을 넣을 때마다 이름 논쟁이
+벌어지기 때문**이다.
+
 **유일한 예외는 브레이크포인트** — media query 가 `var()` 를 읽지 못하므로
 `abstracts/_breakpoints.scss` 에 컴파일 타임 값으로 남는다.
 

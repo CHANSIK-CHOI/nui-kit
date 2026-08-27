@@ -23,7 +23,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(#{v("space-sm")});
+    gap: var(#{v("space-3")});
     padding: 0 var(#{v("space-panel-card")})
       calc(var(#{v("space-panel-card")}) + env(safe-area-inset-bottom))
       var(#{v("space-panel-card")});
@@ -32,13 +32,13 @@
   #{cls("toast")} {
     display: flex;
     align-items: flex-start;
-    gap: var(#{v("space-sm")});
+    gap: var(#{v("space-3")});
     width: #{hook("toast-width", min(100%, 26.25rem))};
-    padding: var(#{v("space-sm")}) var(#{v("space-panel-compact")});
+    padding: var(#{v("space-3")}) var(#{v("space-panel-compact")});
     color: var(#{v("text-inverse-strong")});
-    background: #{hook("toast-bg", var(#{v("surface-inverse")}))};
-    border-radius: #{hook("toast-radius", var(#{v("radius-lg")}))};
-    box-shadow: var(#{v("shadow-toast")}), var(#{v("shadow-inset-inverse")});
+    background: #{hook("toast-bg", var(#{v("layer-inverse")}))};
+    border-radius: #{hook("toast-radius", var(#{v("radius-4")}))};
+    box-shadow: var(#{v("shadow-3")}), var(#{v("shadow-inset-inverse")});
     pointer-events: auto;
 
     &__indicator {
@@ -47,7 +47,7 @@
       height: var(#{v("size-icon-sm")});
       margin-top: 0.3125rem;
       background: var(#{v("control-accent-soft")});
-      border-radius: var(#{v("radius-pill")});
+      border-radius: var(#{v("radius-full")});
       box-shadow: var(#{v("shadow-ring-brand")});
     }
 
@@ -65,7 +65,7 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
 
-      @include typo("body-sm", "medium", 1.5);
+      @include typo(3, "medium", 1.5);
     }
 
     &--error {

@@ -19,13 +19,13 @@
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("button")} {
-    #{iv("button-main")}: #{hook("button-bg", var(#{v("action-bg")}))};
+    #{iv("button-main")}: #{hook("button-bg", var(#{v("action-neutral")}))};
     #{iv("button-fg")}: #{hook(
         "button-color",
-        var(#{v("action-fg")})
+        var(#{v("action-neutral-fg")})
       )};
-    #{iv("button-shadow")}: var(#{v("shadow-soft")});
-    #{iv("button-shadow-hover")}: var(#{v("shadow-base")});
+    #{iv("button-shadow")}: var(#{v("shadow-1")});
+    #{iv("button-shadow-hover")}: var(#{v("shadow-2")});
     #{iv("button-shadow-active")}: var(#{v("shadow-press")});
 
     // UA 기본 스타일 무력화 (전역 reset 미배포 대응 — 이 셀렉터 안에서만 적용)
@@ -40,11 +40,11 @@
     width: 100%;
     min-width: #{hook("button-min-width", 7.5rem)}; // 120px
     min-height: #{hook("button-min-height", var(#{v("size-field")}))};
-    padding: 0 #{hook("button-padding-x", var(#{v("space-lg")}))};
+    padding: 0 #{hook("button-padding-x", var(#{v("space-6")}))};
     overflow-wrap: initial;
     background: var(#{iv("button-main")});
     border: var(#{v("border-width")}) solid var(#{iv("button-main")});
-    border-radius: #{hook("button-radius", var(#{v("radius-xs")}))};
+    border-radius: #{hook("button-radius", var(#{v("radius-1")}))};
     box-shadow: var(#{iv("button-shadow")});
 
     @include motion(
@@ -52,9 +52,9 @@
     );
 
     &:focus-visible {
-      outline: var(#{v("focus-ring-width")}) solid var(#{v("focus-color")});
-      outline-offset: var(#{v("focus-ring-offset")});
-      box-shadow: var(#{v("shadow-focus")}), var(#{iv("button-shadow-hover")});
+      outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
+      outline-offset: var(#{v("focus-offset")});
+      box-shadow: var(#{v("focus-ring")}), var(#{iv("button-shadow-hover")});
     }
 
     &:not([disabled]):hover {
@@ -71,13 +71,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: var(#{v("space-2xs")});
+      gap: var(#{v("space-1")});
       width: 100%;
       height: 100%;
       color: var(#{iv("button-fg")});
       text-align: center;
 
-      @include typo("body", "semi-bold", 1.2, -0.01em);
+      @include typo(4, "semi-bold", 1.2, -0.01em);
     }
 
     &__icon {
@@ -94,7 +94,7 @@
 
     &--small {
       min-height: #{hook("button-min-height", var(#{v("size-control-md")}))};
-      padding: 0 #{hook("button-padding-x", var(#{v("space-md")}))};
+      padding: 0 #{hook("button-padding-x", var(#{v("space-4")}))};
     }
 
     &--small &__icon {
@@ -103,12 +103,12 @@
     }
 
     &--small &__wrap {
-      @include typo("body-sm", "semi-bold", 1.2, -0.01em);
+      @include typo(3, "semi-bold", 1.2, -0.01em);
     }
 
     // ── shape
     &--round {
-      border-radius: #{hook("button-radius", var(#{v("radius-pill")}))};
+      border-radius: #{hook("button-radius", var(#{v("radius-full")}))};
     }
 
     // ── color (variant 별 전용 훅)
@@ -117,22 +117,35 @@
           "button-primary-bg",
           var(#{v("action-primary")})
         )};
-    }
-
-    &--secondary {
-      #{iv("button-main")}: #{hook(
-          "button-secondary-bg",
-          var(#{v("action-secondary")})
+      #{iv("button-fg")}: #{hook(
+          "button-primary-color",
+          var(#{v("action-primary-fg")})
         )};
     }
 
-    &--point {
-      #{iv("button-main")}: #{hook("button-point-bg", var(#{v("action-point")}))};
-      // 주황 배경에 흰 글자는 2.21:1 로 AA 에 크게 미달한다.
-      // 검정 글자가 8.03:1 이고 경고·주의 색의 관습에도 맞는다.
+    // 되돌릴 수 없는 액션 — 삭제 · 탈퇴 · 결제 취소
+    &--danger {
+      #{iv("button-main")}: #{hook(
+          "button-danger-bg",
+          var(#{v("action-danger")})
+        )};
       #{iv("button-fg")}: #{hook(
-          "button-point-color",
-          var(#{v("action-fg-on-point")})
+          "button-danger-color",
+          var(#{v("action-danger-fg")})
+        )};
+    }
+
+    // 주의가 필요한 액션 — 확인 후 진행
+    &--warning {
+      #{iv("button-main")}: #{hook(
+          "button-warning-bg",
+          var(#{v("action-warning")})
+        )};
+      // 노랑 배경에 흰 글자는 AA 에 크게 미달한다. 노랑을 어둡게 하면
+      // 갈색이 되어 "주의"의 의미를 잃으므로, 배경을 밝게 두고 글자를 어둡게 한다.
+      #{iv("button-fg")}: #{hook(
+          "button-warning-color",
+          var(#{v("action-warning-fg")})
         )};
     }
 
@@ -156,7 +169,7 @@
       display: flex;
       width: 100%;
       min-height: auto;
-      padding: var(#{v("space-2xs")}) var(#{v("space-sm")});
+      padding: var(#{v("space-1")}) var(#{v("space-3")});
       background-color: transparent;
       border: none;
 
@@ -226,12 +239,12 @@
 
     &__wrap {
       display: flex;
-      gap: var(#{v("space-xs")});
+      gap: var(#{v("space-2")});
     }
 
     &__item {
       flex-grow: 1;
-      flex-basis: calc(50% - var(#{v("space-xs")}));
+      flex-basis: calc(50% - var(#{v("space-2")}));
     }
 
     &__item > #{cls("button")} {

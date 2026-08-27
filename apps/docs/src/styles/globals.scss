@@ -6,8 +6,10 @@
   color-scheme: light;
   --doc-sidebar-w: 260px;
   --doc-content-max: 860px;
-  --doc-border: #e5e7eb;
-  --doc-bg-subtle: #f9fafb;
+  --doc-border: var(--nui-border-default);
+  --doc-bg-subtle: var(--nui-layer-basement);
+  // 코드 블록은 테마를 따라가지 않는다 — 라이트에서도 다크에서도 어두운 표면이다.
+  // layer-* 를 쓰면 다크에서 배경이 밝아져 글자가 묻힌다.
   --doc-code-bg: #0f172a;
   --doc-code-fg: #e2e8f0;
 }
@@ -32,10 +34,10 @@ body {
     "Segoe UI",
     Roboto,
     sans-serif;
-  font-size: var(--nui-font-size-body);
-  line-height: var(--nui-line-height-body);
+  font-size: var(--nui-font-size-4);
+  line-height: var(--nui-line-height-4);
   color: var(--nui-text-primary);
-  background: #fff;
+  background: var(--nui-layer-default);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -59,7 +61,7 @@ body {
 .doc-brand {
   display: block;
   font-weight: var(--nui-font-weight-bold);
-  font-size: var(--nui-font-size-body);
+  font-size: var(--nui-font-size-4);
   color: var(--nui-text-primary);
   text-decoration: none;
   margin-bottom: 24px;
@@ -68,8 +70,8 @@ body {
 .doc-brand small {
   display: block;
   font-weight: var(--nui-font-weight-regular);
-  font-size: var(--nui-font-size-label);
-  color: var(--nui-text-tertiary);
+  font-size: var(--nui-font-size-1);
+  color: var(--nui-text-secondary);
   letter-spacing: 0;
 }
 
@@ -78,9 +80,9 @@ body {
 }
 
 .doc-nav-title {
-  font-size: var(--nui-font-size-label);
+  font-size: var(--nui-font-size-1);
   font-weight: var(--nui-font-weight-semi-bold);
-  color: var(--nui-text-tertiary);
+  color: var(--nui-text-secondary);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 0 0 6px;
@@ -90,20 +92,20 @@ body {
 .doc-nav-link {
   display: block;
   padding: 5px 8px;
-  border-radius: var(--nui-radius-sm);
+  border-radius: var(--nui-radius-2);
   color: var(--nui-text-secondary);
   text-decoration: none;
-  font-size: var(--nui-font-size-body-sm);
+  font-size: var(--nui-font-size-3);
 }
 
 .doc-nav-link:hover {
-  background: rgb(17 24 39 / 5%);
+  background: var(--nui-control-bg-hover);
   color: var(--nui-text-primary);
 }
 
 .doc-nav-link[aria-current="page"] {
-  background: var(--nui-color-primary-bright);
-  color: var(--nui-color-primary-dark);
+  background: var(--nui-color-brand-3);
+  color: var(--nui-color-brand-11);
   font-weight: var(--nui-font-weight-medium);
 }
 
@@ -114,8 +116,8 @@ body {
 
 // ─── 타이포
 .doc-main h1 {
-  font-size: var(--nui-font-size-title);
-  letter-spacing: var(--nui-letter-spacing-title);
+  font-size: var(--nui-font-size-6);
+  letter-spacing: var(--nui-letter-spacing-6);
   margin: 0 0 8px;
 }
 
@@ -127,7 +129,7 @@ body {
 }
 
 .doc-main h3 {
-  font-size: var(--nui-font-size-body);
+  font-size: var(--nui-font-size-4);
   margin: 24px 0 8px;
 }
 
@@ -152,7 +154,7 @@ body {
 .doc-main code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.86em;
-  background: rgb(17 24 39 / 6%);
+  background: var(--nui-surface-neutral-subtle);
   padding: 1px 5px;
   border-radius: 4px;
 }
@@ -161,14 +163,14 @@ body {
 .doc-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--doc-border);
-  border-radius: var(--nui-radius-sm);
+  border-radius: var(--nui-radius-2);
   margin-bottom: 16px;
 }
 
 .doc-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--nui-font-size-body-sm);
+  font-size: var(--nui-font-size-3);
 }
 
 .doc-table th,
@@ -191,25 +193,25 @@ body {
 .doc-table thead th {
   background: var(--doc-bg-subtle);
   font-weight: var(--nui-font-weight-semi-bold);
-  font-size: var(--nui-font-size-label);
+  font-size: var(--nui-font-size-1);
   color: var(--nui-text-secondary);
 }
 
 .doc-req {
-  color: var(--nui-color-secondary);
+  color: var(--nui-text-danger);
   font-weight: var(--nui-font-weight-bold);
 }
 
 .doc-type {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.82em;
-  color: var(--nui-color-primary-dark);
+  color: var(--nui-color-brand-11);
 }
 
 // ─── 예제
 .doc-example {
   border: 1px solid var(--doc-border);
-  border-radius: var(--nui-radius-sm);
+  border-radius: var(--nui-radius-2);
   margin-bottom: 20px;
   overflow: hidden;
 }
@@ -235,7 +237,7 @@ body {
   padding: 8px 12px;
   border-top: 1px solid var(--doc-border);
   background: var(--doc-bg-subtle);
-  font-size: var(--nui-font-size-label);
+  font-size: var(--nui-font-size-1);
   color: var(--nui-text-secondary);
 }
 
@@ -244,7 +246,7 @@ body {
   background: var(--doc-code-bg);
   color: var(--doc-code-fg);
   padding: 14px 16px;
-  border-radius: var(--nui-radius-sm);
+  border-radius: var(--nui-radius-2);
   overflow-x: auto;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.8rem;
@@ -264,7 +266,7 @@ body {
   width: 44px;
   height: 26px;
   border-radius: 4px;
-  border: 1px solid rgb(17 24 39 / 12%);
+  border: 1px solid var(--nui-border-default);
   display: block;
 }
 
@@ -274,17 +276,17 @@ body {
 }
 
 .doc-note {
-  border-left: 3px solid var(--nui-color-info);
-  background: var(--nui-color-info-soft);
+  border-left: 3px solid var(--nui-color-info-9);
+  background: var(--nui-status-info-soft);
   padding: 10px 14px;
-  border-radius: 0 var(--nui-radius-sm) var(--nui-radius-sm) 0;
+  border-radius: 0 var(--nui-radius-2) var(--nui-radius-2) 0;
   margin: 0 0 16px;
-  font-size: var(--nui-font-size-body-sm);
+  font-size: var(--nui-font-size-3);
 }
 
 .doc-note--warn {
-  border-left-color: var(--nui-color-warning);
-  background: var(--nui-color-warning-soft);
+  border-left-color: var(--nui-color-warning-9);
+  background: var(--nui-status-warning-soft);
 }
 
 @media (max-width: 860px) {
@@ -300,4 +302,73 @@ body {
   .doc-main {
     padding: 32px 20px 64px;
   }
+}
+
+// ─── 테마 전환
+// 우측 상단 고정. 스크롤과 무관하게 항상 같은 자리에 있어야
+// "지금 무슨 테마인지"를 확인하러 위로 올라갈 필요가 없다.
+.doc-theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  border: 1px solid var(--doc-border);
+  border-radius: var(--nui-radius-full);
+  background: var(--nui-layer-floating);
+  box-shadow: var(--nui-shadow-1);
+  backdrop-filter: blur(8px);
+}
+
+.doc-theme-toggle__label {
+  font-size: var(--nui-font-size-1);
+  font-weight: var(--nui-font-weight-medium);
+  color: var(--nui-text-secondary);
+  letter-spacing: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+// ─── 색 스케일 (Foundations · 색상)
+.doc-scale {
+  margin: 20px 0 24px;
+}
+
+.doc-scale__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.doc-scale__head strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--nui-font-size-3);
+  color: var(--nui-text-primary);
+}
+
+.doc-scale__head span {
+  font-size: var(--nui-font-size-1);
+  color: var(--nui-text-secondary);
+  letter-spacing: 0;
+}
+
+.doc-scale__row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  border-radius: var(--nui-radius-2);
+  overflow: hidden;
+  border: 1px solid var(--doc-border);
+}
+
+.doc-scale__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
 }

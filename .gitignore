@@ -28,3 +28,6 @@ coverage/
 
 # claude local overrides
 .claude/settings.local.json
+
+# 외부 디자인 시스템 조사 자료 (로컬 참고용)
+research/

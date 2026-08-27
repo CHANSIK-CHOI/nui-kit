@@ -16,7 +16,7 @@ export default function IconButton({
   children,
   className,
   size = "large",
-  color = "black",
+  color = "neutral",
   variant = "solid",
   shape,
   ...rest

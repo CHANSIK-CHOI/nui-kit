@@ -48,7 +48,7 @@
       &:focus-visible + #{cls("radio")}__control,
       &:focus-visible + #{cls("switch")}__control {
         border-color: var(#{v("focus-color")});
-        box-shadow: var(#{v("shadow-focus-strong")});
+        box-shadow: var(#{v("focus-ring-strong")});
       }
     }
 

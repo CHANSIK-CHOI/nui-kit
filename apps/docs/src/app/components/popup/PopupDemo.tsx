@@ -102,7 +102,7 @@ export function PopupDemo() {
         >
           <Button
             size="medium"
-            color="secondary"
+            color="danger"
             onClick={async () => {
               const isConfirmed = await confirm.openAsync({
                 title: "정말 진행할까요?",
