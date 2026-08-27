@@ -140,7 +140,8 @@ npm run verify:a11y        # prefers-reduced-motion 대응 + 명도 대비(AA)
 | 2 | 파일럿 3종 이식 + 서브패스 패키징 | ✅ |
 | 3 | `.claude` 자동화 | ✅ |
 | 4 | 문서 사이트 (props/토큰 자동생성) | ✅ |
-| 5 | 컴포넌트 계열별 이전 | 🔄 진행 중 |
+| 5 | 컴포넌트 계열별 이전 | ✅ |
+| 5.5 | 디자인 시스템 계약 + spec 체계 + 접근성 | 🔄 **재정비 예정** |
 | 6 | npm 최초 배포 | ⬜ |
 
 ### 5단계 — 계열별 이전 현황
@@ -160,9 +161,61 @@ RHF 래퍼는 이식된 컴포넌트 전부에 대해 `/rhf` 서브패스로 제
 
 ---
 
-## 다음 작업 — 5단계 완료, 6단계(배포) 준비
+## 다음 작업 — 디자인 시스템 재정비 (사용자 요청)
 
-계열별 이전이 **전부 끝났다.** 남은 일은 아래 "배포 전 남은 일" 이다.
+계열 이전(5단계)은 끝났다. 다음 세션의 주제는 **디자인 시스템 재정비**다.
+
+### 지금까지 한 것 — 어디까지 정리됐나
+
+2026-08-27 에 토큰 3계층을 재편하고 공통 스타일 계약을 세웠다
+(`rules/design-system.md`). 요지는 **"컴포넌트를 만들 때 무슨 색을 쓸지 고민하지
+않게 한다"** — 상태와 역할이 정해지면 쓸 토큰이 하나로 결정된다.
+
+| 한 것 | 결과 |
+| --- | --- |
+| Primitive → Semantic → Component 3계층 | 컴포넌트의 primitive 색 직접 참조 **0건** |
+| 원본 유산 alias(`text-color-1~4` 등) 12개 제거 | semantic 이 gray scale 을 직접 참조 |
+| gray scale 50~900 재정의 | 이전 8단계는 **전부 죽은 토큰**이었다(사용처 0) |
+| 상태×속성 매트릭스 | hover 배경 3종 → 1종, 포커스 링 선택 기준 규칙화 |
+| `action-*` / `status-*` / `control-track`·`thumb` 신설 | 다른 역할 토큰을 돌려쓰던 자리를 메움 |
+| `verify:tokens` 기계 검사 | 문서만으로는 다시 어긋나므로 `verify` 체인에 편입 |
+| 대비 AA | primary `#1ca673`→`#16815a`(4.86:1), point 글자 검정(8.03:1) |
+
+### 재정비에서 다룰 만한 것 (사용자와 범위를 먼저 맞출 것)
+
+**이번에 한 것은 "기존 토큰에 규칙을 부여하고 최소 재편"이다.** 더 근본적으로
+손볼 여지가 남아 있고, 무엇을 재정비할지는 **사용자에게 확인하고 시작한다.**
+
+1. **variant 훅 이름 공유** — `--nui-popup-width` 를 small/regular/large 세 규칙이
+   같은 이름으로 읽는다. 소비자가 한 번 설정하면 **size variant 가 전부 무력화**된다.
+   `--nui-button-min-height` / `-padding-x` / `-radius` 도 같은 구조.
+   `styles.md` §3 이 경고하는 형태이고, 고치면 **breaking**
+2. **스케일 체계** — t-shirt 사이즈(`space-2xs`~`2xl`, `size-control-sm`~`xl`)를
+   숫자 스케일로 갈지. 원본 유산이다
+3. **색 팔레트** — secondary(#d92b2b, 4.85:1)가 AA 경계에 가깝다. brand 3색을
+   대비 관점에서 함께 재설계할지
+4. **다크 테마** — 현재 없다. 토큰이 `:root` 단일 선언이라 `[data-theme]` 축을
+   추가하려면 지금이 싸다
+5. **반응형** — `respond-to` 인프라만 있고 사용처가 없다(의도적 보류).
+   재정비와 함께 풀지, 계속 미룰지
+6. **타이포 스케일** — `font-size-label/body-sm/body/title/display` 5단계.
+   컴포넌트가 실제로 쓰는 조합과 맞는지 검증 안 됨
+
+### 배포 전에 결정해야 하는 breaking 3건
+
+spec §13 에 쌓여 있다. **닫는 것은 breaking, 여는 것은 non-breaking** 이므로
+배포 전이 유일하게 싼 시점이다.
+
+1. `IconButton` 의 `aria-label` 을 타입으로 강제할지 (현재 누락이 조용히 통과)
+2. `--nui-popup-width` 가 size variant 를 무력화하는 문제 (위 1번과 같은 뿌리)
+3. `--nui-button-min-height` / `-padding-x` / `-radius` 도 동일
+
+### 그 외 남은 작업
+
+- **spec 나머지 12계열** — `_TEMPLATE.md` 형식이 확정됐으므로 이제 찍어낼 수 있다.
+  Button / LayerPopup 두 개가 참고 샘플이다. **한 번에 다 만들지 말 것** (사용자 지시)
+- 배포 준비는 "배포 전 남은 일" 참조. **배포 자체는 사용자가 로컬에서 완성도를
+  확인한 뒤 직접 지시한다** — 먼저 진행하지 않는다
 
 ### 이전 계열에서 반복해서 나온 함정
 
@@ -218,8 +271,16 @@ react-day-picker 는 emotion 이 아니라 **일반 CSS 클래스**라 접근이
 
 ## 배포 전 남은 일 (6단계)
 
-- 파일럿 3종(Button/Field/Textfield)에 spec 이 없다 → `/component-audit` 역추출
-- `packages/ui/README.md` 를 전 컴포넌트 기준으로 갱신
-- npm 계정 준비 + Trusted Publishing(OIDC) 설정
-- `.changeset/` 에 쌓인 큐를 `/docs-sync` → `/release` 로 소비
+**끝난 것** — LICENSE 파일, `engines`, README 전 컴포넌트 갱신, 문서 사이트
+Components 목록, 서브패스↔CSS 이름 1:1 일치(`choice.css` 분리)
+
+**남은 것**
+
+- `repository` / `homepage` / `bugs` 가 비어 있다. **git remote 가 없어 URL 을 모른다** —
+  사용자에게 GitHub 저장소 주소를 받아야 한다. `publishConfig.provenance: true` 라
+  provenance 서명에도 필요하다
+- npm 계정 준비 + Trusted Publishing(OIDC) 설정 — **사용자만 할 수 있다**
+- `.changeset/` 큐 8건을 `/docs-sync` → `/release` 로 소비
+  (`changeset version` 이 0.0.0 → **0.1.0**)
 - 최초 배포는 반드시 `--tag next` 프리릴리즈 → 빈 프로젝트 설치 스모크 테스트 후 latest
+- 파일럿 3종 중 Field / Textfield spec 미작성 (Button 은 완료)
