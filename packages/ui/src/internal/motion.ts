@@ -88,3 +88,37 @@ export const motionTransition = {
     ease: motionEase.linear,
   } satisfies Transition,
 } as const;
+
+/**
+ * `prefers-reduced-motion: reduce` 에서 **위치·크기 변화를 없애고 페이드만 남긴다.**
+ *
+ * ⚠️ framer-motion 은 CSS 의 `--nui-duration-*` 무력화(1ms)를 읽지 않는다.
+ *    `MotionConfig.reducedMotion` 기본값도 `"never"` 다. 그래서 `motion.*` 에
+ *    `y`·`scale` 을 직접 주는 컴포넌트는 이 헬퍼로 걸러야 한다
+ *    (rules/design-system.md §6 · rules/a11y.md §6).
+ *
+ * ```tsx
+ * const shouldReduceMotion = useReducedMotion();
+ * <motion.div
+ *   initial={reduceMotion({ opacity: 0, y: 24 }, shouldReduceMotion)}
+ *   transition={reduceMotionTransition(motionTransition.toast, shouldReduceMotion)}
+ * />
+ * ```
+ */
+export function reduceMotion<T extends Record<string, unknown>>(
+  variant: T,
+  shouldReduce: boolean | null,
+): T | Pick<T, "opacity"> {
+  if (!shouldReduce) return variant;
+
+  // 페이드는 남긴다 — 완전히 없애면 요소가 갑자기 나타나 오히려 인지 부담이 크다.
+  return "opacity" in variant ? ({ opacity: variant.opacity } as Pick<T, "opacity">) : variant;
+}
+
+/** 모션 감소 시 전환을 즉시 끝낸다. */
+export function reduceMotionTransition<T>(
+  transition: T,
+  shouldReduce: boolean | null,
+): T | { duration: 0 } {
+  return shouldReduce ? { duration: 0 } : transition;
+}

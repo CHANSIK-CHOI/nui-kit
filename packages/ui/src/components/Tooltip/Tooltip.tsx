@@ -1,7 +1,7 @@
 "use client";
 
 import cn from "classnames";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   cloneElement,
   isValidElement,
@@ -14,7 +14,11 @@ import {
   type ReactNode,
 } from "react";
 import { px } from "../../internal/prefix.js";
-import { motionTransition } from "../../internal/motion.js";
+import {
+  motionTransition,
+  reduceMotion,
+  reduceMotionTransition,
+} from "../../internal/motion.js";
 
 const block = px("tooltip");
 
@@ -85,6 +89,9 @@ export default function Tooltip({
   onOpenChange,
   disabled = false,
 }: TooltipProps) {
+  // framer-motion 은 CSS duration 토큰의 1ms 무력화를 읽지 않는다 (design-system.md §6).
+  const shouldReduceMotion = useReducedMotion();
+
   const tooltipId = useId();
   const [isTooltipOpen, setIsTooltipOpen] = useState(defaultOpen);
   const prevDisabledRef = useRef(disabled);
@@ -167,15 +174,28 @@ export default function Tooltip({
           <motion.div
             key="tooltip-panel"
             className={`${block}__panel`}
-            initial={{ opacity: 0, y: animationOffset, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            initial={reduceMotion(
+              { opacity: 0, y: animationOffset, scale: 0.98 },
+              shouldReduceMotion,
+            )}
+            animate={reduceMotion(
+              { opacity: 1, y: 0, scale: 1 },
+              shouldReduceMotion,
+            )}
             exit={{
-              opacity: 0,
-              y: animationOffset,
-              scale: 0.98,
-              transition: motionTransition.popoverExit,
+              ...reduceMotion(
+                { opacity: 0, y: animationOffset, scale: 0.98 },
+                shouldReduceMotion,
+              ),
+              transition: reduceMotionTransition(
+                motionTransition.popoverExit,
+                shouldReduceMotion,
+              ),
             }}
-            transition={motionTransition.popover}
+            transition={reduceMotionTransition(
+              motionTransition.popover,
+              shouldReduceMotion,
+            )}
           >
             <div id={tooltipId} role="tooltip" className={`${block}__bubble`}>
               <div className={`${block}__content`}>{content}</div>

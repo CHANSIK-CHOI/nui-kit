@@ -78,7 +78,7 @@ RSC dot notation)은 모두 `구현 → 빌드 → 브라우저 확인 → 수�
 
 ```bash
 npm run typecheck      # 전 워크스페이스
-npm run verify:pkg     # verify:css + publint + attw
+npm run verify:pkg     # verify:css + verify:tokens + publint + attw
 npm run build:ui       # tsup + tsc + sass
 npm run build:docs     # generate(props/토큰 추출) + next build
 npm run refs:check     # Context7 캐시 신선도
@@ -87,6 +87,7 @@ npm run refs:check     # Context7 캐시 신선도
 npm run verify:console     # 전 페이지 콘솔 에러·경고
 npm run verify:select-rhf  # RHF 연동 Select 의 remount 회귀
 npm run verify:datepicker  # Datepicker 개폐·포커스·팝업 클리핑·RHF 회귀
+npm run verify:a11y        # prefers-reduced-motion 대응 + 명도 대비(AA)
 ```
 
 **문서는 손으로 쓰지 않는 부분이 있다.** `apps/docs/scripts/extract-props.mjs` 가 컴포넌트
@@ -126,6 +127,8 @@ npm run verify:datepicker  # Datepicker 개폐·포커스·팝업 클리핑·RHF
 | `.claude/rules/styles.md` | 프리픽스, `@layer`, 공개/내부 변수 분리, 자체 정규화, rem 기준 |
 | `.claude/rules/packaging.md` | ESM 계약, dep/peer 판정, 갱신 목록, changeset, 배포 |
 | `.claude/rules/a11y.md` | id 연결, `aria-describedby`, 에러 표현, 포커스, 모션 |
+| `.claude/rules/design-system.md` | **컴포넌트 공통 스타일 계약** — 토큰 3계층, 상태×속성 매트릭스, 너비 원칙 |
+| `.claude/rules/spec-scope.md` | spec 규율 — What/How 경계, 현행만 남기기, Open Questions 라이프사이클 |
 | `.claude/rules/references.md` | **Context7 로컬 캐시(TTL 7일)** — 매번 MCP 호출하지 않는다 |
 
 ## 진행 상황

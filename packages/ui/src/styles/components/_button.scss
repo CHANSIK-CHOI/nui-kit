@@ -128,6 +128,12 @@
 
     &--point {
       #{iv("button-main")}: #{hook("button-point-bg", var(#{v("action-point")}))};
+      // 주황 배경에 흰 글자는 2.21:1 로 AA 에 크게 미달한다.
+      // 검정 글자가 8.03:1 이고 경고·주의 색의 관습에도 맞는다.
+      #{iv("button-fg")}: #{hook(
+          "button-point-color",
+          var(#{v("action-fg-on-point")})
+        )};
     }
 
     // ── variant

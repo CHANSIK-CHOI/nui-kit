@@ -25,7 +25,8 @@
     "refs:check": "node scripts/check-refs.mjs",
     "verify:console": "npm run verify:console -w docs",
     "verify:select-rhf": "npm run verify:select-rhf -w docs",
-    "verify:datepicker": "npm run verify:datepicker -w docs"
+    "verify:datepicker": "npm run verify:datepicker -w docs",
+    "verify:a11y": "npm run verify:a11y -w docs"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.1",

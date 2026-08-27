@@ -42,7 +42,9 @@
 
     // ── color / brand
     #{v("color-primary-bright")}: #dcfce7;
-    #{v("color-primary")}: #1ca673;
+    // #1ca673 → #16815a. 흰 글자 대비가 3.11:1 로 WCAG AA(4.5:1)에 미달했다.
+    // 4.86:1 로 올린 값이다 (2026-08-27 사용자 결정).
+    #{v("color-primary")}: #16815a;
     #{v("color-primary-dark")}: #014029;
     #{v("color-secondary-bright")}: #ffe4e6;
     #{v("color-secondary")}: #d92b2b;
@@ -134,6 +136,9 @@
     #{v("action-primary")}: var(#{v("color-primary")});
     #{v("action-secondary")}: var(#{v("color-secondary")});
     #{v("action-point")}: var(#{v("color-point")});
+    // 주황 배경에 흰 글자는 2.21:1 로 AA 에 크게 미달한다. 검정 글자가 8.03:1 이고
+    // 경고·주의 색의 관습에도 맞는다 (2026-08-27 사용자 결정).
+    #{v("action-fg-on-point")}: var(#{v("text-primary")});
     #{v("action-bg-hover")}: var(#{v("surface-neutral-soft")});
     #{v("action-bg-active")}: var(#{v("surface-neutral-subtle")});
     #{v("action-bg-disabled")}: var(#{v("control-bg-disabled")});

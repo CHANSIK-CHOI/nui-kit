@@ -1,10 +1,14 @@
 "use client";
 
 import cn from "classnames";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useId } from "react";
 import { px } from "../../internal/prefix.js";
-import { motionTransition } from "../../internal/motion.js";
+import {
+  motionTransition,
+  reduceMotion,
+  reduceMotionTransition,
+} from "../../internal/motion.js";
 import { CloseIcon } from "../Icon/index.js";
 import type { PopupBaseProps, PopupVariant } from "./Popup.types.js";
 import usePopupPanelA11y from "./usePopupPanelA11y.js";
@@ -77,6 +81,9 @@ export default function PopupBase({
   onExited,
   isTopmost = false,
 }: PopupBaseProps) {
+  // framer-motion 은 CSS duration 토큰의 1ms 무력화를 읽지 않는다 (design-system.md §6).
+  const shouldReduceMotion = useReducedMotion();
+
   const generatedTitleId = useId();
   const generatedDescriptionId = useId();
   const panelMotion = getPanelMotion(variant);
@@ -150,9 +157,15 @@ export default function PopupBase({
             animate={{ opacity: 1 }}
             exit={{
               opacity: 0,
-              transition: motionTransition.overlayDialogExit,
+              transition: reduceMotionTransition(
+                motionTransition.overlayDialogExit,
+                shouldReduceMotion,
+              ),
             }}
-            transition={motionTransition.overlayDialog}
+            transition={reduceMotionTransition(
+              motionTransition.overlayDialog,
+              shouldReduceMotion,
+            )}
             onClick={handleBackdropClick}
           />
 
@@ -166,13 +179,19 @@ export default function PopupBase({
               aria-describedby={descriptionId}
               className={cn(`${block}__panel`, panelClassName)}
               tabIndex={-1}
-              initial={panelMotion.initial}
-              animate={panelMotion.animate}
+              initial={reduceMotion(panelMotion.initial, shouldReduceMotion)}
+              animate={reduceMotion(panelMotion.animate, shouldReduceMotion)}
               exit={{
-                ...panelMotion.exit,
-                transition: panelMotion.exitTransition,
+                ...reduceMotion(panelMotion.exit, shouldReduceMotion),
+                transition: reduceMotionTransition(
+                  panelMotion.exitTransition,
+                  shouldReduceMotion,
+                ),
               }}
-              transition={panelMotion.enter}
+              transition={reduceMotionTransition(
+                panelMotion.enter,
+                shouldReduceMotion,
+              )}
             >
               {headerContent}
 

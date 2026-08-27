@@ -1,10 +1,14 @@
 "use client";
 
 import cn from "classnames";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { px } from "../../internal/prefix.js";
-import { motionTransition } from "../../internal/motion.js";
+import {
+  motionTransition,
+  reduceMotion,
+  reduceMotionTransition,
+} from "../../internal/motion.js";
 import type { ToastProps } from "./Toast.types.js";
 
 const block = px("toast");
@@ -26,6 +30,9 @@ export default function Toast({
   onExited,
   onOpenComplete,
 }: ToastProps) {
+  // framer-motion 은 CSS duration 토큰의 1ms 무력화를 읽지 않는다 (design-system.md §6).
+  const shouldReduceMotion = useReducedMotion();
+
   const hasOpenedRef = useRef(false);
 
   useEffect(() => {
@@ -63,10 +70,22 @@ export default function Toast({
             tone !== "default" && `${block}--${tone}`,
             className,
           )}
-          initial={{ opacity: 0, y: 32, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 24, scale: 0.98 }}
-          transition={motionTransition.toast}
+          initial={reduceMotion(
+            { opacity: 0, y: 32, scale: 0.98 },
+            shouldReduceMotion,
+          )}
+          animate={reduceMotion(
+            { opacity: 1, y: 0, scale: 1 },
+            shouldReduceMotion,
+          )}
+          exit={reduceMotion(
+            { opacity: 0, y: 24, scale: 0.98 },
+            shouldReduceMotion,
+          )}
+          transition={reduceMotionTransition(
+            motionTransition.toast,
+            shouldReduceMotion,
+          )}
           onAnimationComplete={handleAnimationComplete}
           layout="position"
         >

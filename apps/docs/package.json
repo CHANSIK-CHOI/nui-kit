@@ -11,7 +11,8 @@
     "generate": "node scripts/extract-props.mjs && node scripts/extract-tokens.mjs",
     "verify:console": "node scripts/check-console.mjs",
     "verify:select-rhf": "node scripts/check-select-rhf.mjs",
-    "verify:datepicker": "node scripts/check-datepicker.mjs"
+    "verify:datepicker": "node scripts/check-datepicker.mjs",
+    "verify:a11y": "node scripts/check-a11y.mjs"
   },
   "dependencies": {
     "@chansikchoi/next-ui": "*",
