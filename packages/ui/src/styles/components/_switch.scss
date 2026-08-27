@@ -1,0 +1,75 @@
+@use "../abstracts" as *;
+@use "choice-base";
+
+// ─────────────────────────────────────────────────────────────
+// Switch
+//
+// 공통 골격은 `_choice-base.scss` 가 담당한다.
+// Checkbox / Radio 와 달리 그룹 컴포넌트가 없어 `_choice-group.scss` 는 쓰지 않는다.
+//
+// 공개 훅: --nui-switch-width / --nui-switch-height
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("switch")} {
+    width: #{hook("switch-width", var(#{v("size-switch-track-w")}))};
+    height: #{hook("switch-height", var(#{v("size-switch-track-h")}))};
+
+    &__control {
+      justify-content: flex-start;
+      padding: var(#{v("space-2xs")});
+      background-color: var(#{v("control-track")});
+      border-color: var(#{v("control-track")});
+      border-radius: var(#{v("radius-pill-fluid")});
+    }
+
+    &__thumb {
+      display: inline-block;
+      width: var(#{v("size-icon-2xl")});
+      height: var(#{v("size-icon-2xl")});
+      background-color: var(#{v("control-thumb")});
+      border-radius: var(#{v("radius-round")});
+      box-shadow: var(#{v("shadow-thumb")});
+
+      @include motion((transform, background-color));
+    }
+
+    &__input:checked + #{cls("switch")}__control {
+      background-color: var(#{v("control-accent")});
+      border-color: var(#{v("control-accent")});
+    }
+
+    &__input:checked + #{cls("switch")}__control #{cls("switch")}__thumb {
+      transform: translateX(var(#{v("size-icon-2xl")}));
+    }
+
+    &#{state("error")}:not(#{state("disabled")})
+      #{cls("switch")}__input:checked
+      + #{cls("switch")}__control {
+      background-color: var(#{v("control-accent-error")});
+      border-color: var(#{v("control-accent-error")});
+    }
+
+    &#{state("disabled")} #{cls("switch")}__control {
+      background-color: var(#{v("control-track")});
+      border-color: var(#{v("control-border-disabled")});
+    }
+
+    &#{state("disabled")}
+      #{cls("switch")}__input:checked
+      + #{cls("switch")}__control {
+      background-color: var(#{v("control-selection-disabled")});
+      border-color: var(#{v("control-selection-disabled")});
+    }
+
+    // ⚠️ error / disabled 와 상세도가 같아 소스 순서만으로는 readonly 가 이겨버린다.
+    //    상태 우선순위는 disabled > error > readonly 이므로 명시적으로 제외한다.
+    //    (readonly 는 "바꿀 수 없다"일 뿐이라 색은 평상시와 같아야 하지만,
+    //     에러·비활성 표시를 덮어서는 안 된다)
+    &#{state("readonly")}:not(#{state("error")}):not(#{state("disabled")})
+      #{cls("switch")}__input:checked
+      + #{cls("switch")}__control {
+      background-color: var(#{v("control-accent")});
+      border-color: var(#{v("control-accent")});
+    }
+  }
+}

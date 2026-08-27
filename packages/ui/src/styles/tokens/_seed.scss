@@ -28,7 +28,9 @@
     #{v("color-white")}: #fff;
 
     // ── color / gray scale
-    #{v("color-gray-100")}: #f5f7fa;
+    // 이 라이브러리의 **유일한 무채색 원본**이다. semantic 이 여기서만 색을 가져온다.
+    #{v("color-gray-50")}: #f9fafb;
+    #{v("color-gray-100")}: #f3f4f6;
     #{v("color-gray-200")}: #e5e7eb;
     #{v("color-gray-300")}: #d1d5db;
     #{v("color-gray-400")}: #9ca3af;
@@ -36,6 +38,7 @@
     #{v("color-gray-600")}: #4b5563;
     #{v("color-gray-700")}: #374151;
     #{v("color-gray-800")}: #1f2937;
+    #{v("color-gray-900")}: #111827;
 
     // ── color / brand
     #{v("color-primary-bright")}: #dcfce7;
@@ -56,29 +59,11 @@
     #{v("color-info")}: #0284c7;
     #{v("color-info-soft")}: #e0f2fe;
 
-    // ── color / text ramp
-    #{v("text-color-1")}: #111827;
-    #{v("text-color-2")}: #4b5563;
-    #{v("text-color-3")}: #6b7280;
-    #{v("text-color-4")}: #9ca3af;
-
-    // ── color / line ramp
-    #{v("line-color-1")}: #1f2937;
-    #{v("line-color-2")}: #d1d5db;
-    #{v("line-color-3")}: #e5e7eb;
-    #{v("line-color-4")}: #f3f4f6;
-
-    // ── color / background ramp
-    #{v("bg-color-1")}: #ffffff;
-    #{v("bg-color-2")}: #f9fafb;
-    #{v("bg-color-3")}: #f3f4f6;
-    #{v("bg-color-4")}: #e5e7eb;
-
     // ── semantic / text
-    #{v("text-primary")}: var(#{v("text-color-1")});
-    #{v("text-secondary")}: var(#{v("text-color-2")});
-    #{v("text-tertiary")}: var(#{v("text-color-3")});
-    #{v("text-quaternary")}: var(#{v("text-color-4")});
+    #{v("text-primary")}: var(#{v("color-gray-900")});
+    #{v("text-secondary")}: var(#{v("color-gray-600")});
+    #{v("text-tertiary")}: var(#{v("color-gray-500")});
+    #{v("text-quaternary")}: var(#{v("color-gray-400")});
     #{v("text-brand")}: var(#{v("color-primary-dark")});
     #{v("text-danger")}: var(#{v("color-error")});
     #{v("text-info")}: var(#{v("color-info")});
@@ -115,27 +100,55 @@
     #{v("control-text-error")}: var(#{v("text-danger")});
     #{v("control-icon")}: var(#{v("text-tertiary")});
     #{v("control-icon-strong")}: var(#{v("text-primary")});
-    #{v("control-bg")}: var(#{v("bg-color-1")});
-    #{v("control-bg-disabled")}: var(#{v("bg-color-2")});
-    #{v("control-bg-readonly")}: var(#{v("bg-color-2")});
-    #{v("control-bg-subtle")}: var(#{v("bg-color-3")});
-    #{v("control-border")}: var(#{v("line-color-2")});
+    #{v("control-bg")}: var(#{v("color-white")});
+    #{v("control-bg-disabled")}: var(#{v("color-gray-50")});
+    #{v("control-bg-readonly")}: var(#{v("color-gray-50")});
+    #{v("control-bg-subtle")}: var(#{v("color-gray-100")});
+    // 목록 행·패널 헤더·아이콘 버튼처럼 **면 전체가 반응**하는 hover 배경.
+    // `control-bg-subtle`(칩·정적 강조면)과 값은 같지만 역할이 다르므로 이름을 나눈다.
+    #{v("control-bg-hover")}: var(#{v("color-gray-100")});
+    #{v("control-border")}: var(#{v("color-gray-300")});
     #{v("control-border-hover")}: var(#{v("text-tertiary")});
-    #{v("control-border-disabled")}: var(#{v("line-color-3")});
+    #{v("control-border-disabled")}: var(#{v("color-gray-200")});
     #{v("control-border-error")}: var(#{v("color-error")});
     #{v("control-accent")}: var(#{v("color-primary")});
     #{v("control-accent-soft")}: var(#{v("color-primary-bright")});
     #{v("control-accent-error")}: var(#{v("color-error")});
-    #{v("control-selection-disabled")}: var(#{v("line-color-2")});
+    #{v("control-selection-disabled")}: var(#{v("color-gray-300")});
+    // 스위치 트랙(꺼짐)과 썸. 이전에는 테두리색·글자색 토큰을 배경에 돌려썼다.
+    #{v("control-track")}: var(#{v("color-gray-200")});
+    #{v("control-thumb")}: var(#{v("color-white")});
     #{v("control-selection-text")}: var(#{v("color-primary-dark")});
+
+    // ── status (알림·배지의 은은한 면색)
+    #{v("status-error-soft")}: var(#{v("color-error-soft")});
+    #{v("status-success-soft")}: var(#{v("color-success-soft")});
+    #{v("status-warning-soft")}: var(#{v("color-warning-soft")});
+    #{v("status-info-soft")}: var(#{v("color-info-soft")});
+
+    // ── action (버튼 계열 의미색)
+    // Button 이 primitive(color-primary 등)를 직접 참조하던 것을 역할 이름으로 승격했다.
+    // 나중에 Badge·Chip 같은 것을 만들 때 같은 토큰을 쓰면 자동으로 색이 맞아떨어진다.
+    #{v("action-bg")}: var(#{v("text-primary")});
+    #{v("action-fg")}: var(#{v("text-inverse-strong")});
+    #{v("action-primary")}: var(#{v("color-primary")});
+    #{v("action-secondary")}: var(#{v("color-secondary")});
+    #{v("action-point")}: var(#{v("color-point")});
+    #{v("action-bg-hover")}: var(#{v("surface-neutral-soft")});
+    #{v("action-bg-active")}: var(#{v("surface-neutral-subtle")});
+    #{v("action-bg-disabled")}: var(#{v("control-bg-disabled")});
+    #{v("action-fg-disabled")}: var(#{v("control-text-muted")});
+    #{v("action-border-disabled")}: var(#{v("control-border-disabled")});
+    #{v("action-fg-line-disabled")}: var(#{v("control-text-placeholder")});
 
     // ── accessibility
     #{v("focus-color")}: var(#{v("control-accent")});
 
-    // ── surface spacing (패널·카드 내부 여백)
-    #{v("surface-space-compact")}: 1rem; // 16px
-    #{v("surface-space-card")}: 1.5rem; // 24px
-    #{v("surface-space-section")}: 2rem; // 32px
+    // ── panel spacing (패널·카드 내부 여백)
+    // ⚠️ 색이 아니라 여백값이다. `surface-*`(배경색) 와 헷갈리지 않도록 이름을 나눴다.
+    #{v("space-panel-compact")}: 1rem; // 16px
+    #{v("space-panel-card")}: 1.5rem; // 24px
+    #{v("space-panel-section")}: 2rem; // 32px
 
     // ── spacing (원본 10px 루트 기준 → 16px 루트 환산, 실제 px 동일)
     #{v("space-2xs")}: 0.25rem; // 4px

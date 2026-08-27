@@ -1,0 +1,55 @@
+@use "../abstracts" as *;
+@use "choice-base";
+@use "choice-group";
+
+// ─────────────────────────────────────────────────────────────
+// Checkbox / CheckboxGroup
+//
+// 공통 골격은 `_choice-base.scss`, 그룹 배치는 `_choice-group.scss` 가 담당한다.
+// 여기에는 체크박스 고유의 표시부만 둔다.
+//
+// 공개 훅: --nui-selector-size (Radio 와 공유)
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("checkbox")} {
+    &__control {
+      border-radius: var(#{v("radius-sm")});
+    }
+
+    // 체크 표시는 두 변(border)만 그린 뒤 45도로 돌려 만든다.
+    &__indicator {
+      width: var(#{v("size-dot-xs")});
+      height: var(#{v("size-icon-sm")});
+      border-right: 0.125rem solid currentColor;
+      border-bottom: 0.125rem solid currentColor;
+      transform: rotate(45deg) scale(0.6);
+      transform-origin: center;
+    }
+
+    &__input:checked + #{cls("checkbox")}__control {
+      background-color: var(#{v("control-accent")});
+      border-color: var(#{v("control-accent")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")})
+      #{cls("checkbox")}__input:checked
+      + #{cls("checkbox")}__control {
+      background-color: var(#{v("control-accent-error")});
+      border-color: var(#{v("control-accent-error")});
+    }
+
+    &#{state("disabled")}
+      #{cls("checkbox")}__input:checked
+      + #{cls("checkbox")}__control {
+      background-color: var(#{v("control-selection-disabled")});
+      border-color: var(#{v("control-selection-disabled")});
+    }
+
+    &__input:checked
+      + #{cls("checkbox")}__control
+      #{cls("checkbox")}__indicator {
+      opacity: 1;
+      transform: rotate(45deg) scale(1);
+    }
+  }
+}

@@ -13,6 +13,9 @@
     "components"
   ],
   "type": "module",
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "sideEffects": [
     "**/*.css",
     "**/*.scss"
@@ -20,7 +23,8 @@
   "files": [
     "dist",
     "styles",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "exports": {
     ".": {
@@ -97,12 +101,13 @@
   "scripts": {
     "build": "npm run build:js && npm run build:styles",
     "build:js": "tsup && tsc -p tsconfig.build.json",
-    "build:styles": "sass --no-source-map --style=compressed --load-path=src/styles src/styles/entries:styles",
+    "build:styles": "node -e \"require('node:fs').rmSync('styles',{recursive:true,force:true})\" && sass --no-source-map --style=compressed --load-path=src/styles src/styles/entries:styles",
     "dev:styles": "sass --watch --no-source-map --load-path=src/styles src/styles/entries:styles",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run verify:css && publint --strict && attw --pack . --profile esm-only",
+    "verify": "npm run verify:css && npm run verify:tokens && publint --strict && attw --pack . --profile esm-only",
     "prepublishOnly": "npm run build",
-    "verify:css": "node scripts/check-css-isolation.mjs"
+    "verify:css": "node scripts/check-css-isolation.mjs",
+    "verify:tokens": "node scripts/check-token-layers.mjs"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

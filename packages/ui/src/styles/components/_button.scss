@@ -19,10 +19,10 @@
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("button")} {
-    #{iv("button-main")}: #{hook("button-bg", var(#{v("text-primary")}))};
+    #{iv("button-main")}: #{hook("button-bg", var(#{v("action-bg")}))};
     #{iv("button-fg")}: #{hook(
         "button-color",
-        var(#{v("text-inverse-strong")})
+        var(#{v("action-fg")})
       )};
     #{iv("button-shadow")}: var(#{v("shadow-soft")});
     #{iv("button-shadow-hover")}: var(#{v("shadow-base")});
@@ -115,19 +115,19 @@
     &--primary {
       #{iv("button-main")}: #{hook(
           "button-primary-bg",
-          var(#{v("color-primary")})
+          var(#{v("action-primary")})
         )};
     }
 
     &--secondary {
       #{iv("button-main")}: #{hook(
           "button-secondary-bg",
-          var(#{v("color-secondary")})
+          var(#{v("action-secondary")})
         )};
     }
 
     &--point {
-      #{iv("button-main")}: #{hook("button-point-bg", var(#{v("color-point")}))};
+      #{iv("button-main")}: #{hook("button-point-bg", var(#{v("action-point")}))};
     }
 
     // ── variant
@@ -162,25 +162,25 @@
 
     // ── disabled
     &[disabled] {
-      #{iv("button-main")}: var(#{v("control-bg-disabled")});
-      #{iv("button-fg")}: var(#{v("control-text-muted")});
+      #{iv("button-main")}: var(#{v("action-bg-disabled")});
+      #{iv("button-fg")}: var(#{v("action-fg-disabled")});
 
       box-shadow: none;
       opacity: 0.72;
       cursor: not-allowed;
 
       &#{cls("button")}--line {
-        #{iv("button-main")}: var(#{v("control-border-disabled")});
-        #{iv("button-fg")}: var(#{v("control-text-placeholder")});
+        #{iv("button-main")}: var(#{v("action-border-disabled")});
+        #{iv("button-fg")}: var(#{v("action-fg-line-disabled")});
       }
     }
 
     &--line:not([disabled]):hover {
-      background-color: var(#{v("surface-neutral-soft")});
+      background-color: var(#{v("action-bg-hover")});
     }
 
     &--line:not([disabled]):active {
-      background-color: var(#{v("surface-neutral-subtle")});
+      background-color: var(#{v("action-bg-active")});
     }
 
     &--text:not([disabled]):hover {

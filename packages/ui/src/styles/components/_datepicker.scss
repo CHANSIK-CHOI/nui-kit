@@ -197,7 +197,7 @@
 
     &__button-previous:hover,
     &__button-next:hover {
-      background-color: var(#{v("control-bg-subtle")});
+      background-color: var(#{v("control-bg-hover")});
       color: var(#{v("control-icon-strong")});
     }
 
@@ -270,7 +270,7 @@
 
     &__day:not(#{cls("daypicker")}__selected)
       &__day-button:hover:not(:disabled) {
-      background-color: var(#{v("control-bg-subtle")});
+      background-color: var(#{v("control-bg-hover")});
     }
 
     &__day-button:focus-visible {

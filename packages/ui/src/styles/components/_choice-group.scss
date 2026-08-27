@@ -1,0 +1,31 @@
+@use "../abstracts" as *;
+
+// ─────────────────────────────────────────────────────────────
+// CheckboxGroup / RadioGroup 의 배치
+//
+// ⚠️ 이 파일은 단독으로 쓰지 않는다 — `_checkbox.scss` / `_radio.scss` 가 `@use` 한다.
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("checkbox-group")},
+  #{cls("radio-group")} {
+    display: flex;
+    gap: var(#{v("space-sm")});
+
+    &--row {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+
+      // Field 는 기본이 width:100% 라 그대로 두면 가로 배치가 무의미해진다
+      // (각 항목이 한 줄을 차지해 세로로 쌓인다).
+      > #{cls("field")} {
+        width: auto;
+      }
+    }
+
+    &--column {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}

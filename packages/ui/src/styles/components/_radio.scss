@@ -1,0 +1,53 @@
+@use "../abstracts" as *;
+@use "choice-base";
+@use "choice-group";
+
+// ─────────────────────────────────────────────────────────────
+// Radio / RadioGroup
+//
+// 공통 골격은 `_choice-base.scss`, 그룹 배치는 `_choice-group.scss` 가 담당한다.
+// 여기에는 라디오 고유의 표시부만 둔다.
+//
+// 공개 훅: --nui-selector-size (Checkbox 와 공유)
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("radio")} {
+    &__control {
+      border-radius: var(#{v("radius-round")});
+    }
+
+    &__indicator {
+      width: var(#{v("size-dot-sm")});
+      height: var(#{v("size-dot-sm")});
+      background-color: currentColor;
+      border-radius: var(#{v("radius-round")});
+      transform: scale(0.4);
+    }
+
+    // 체크박스와 달리 배경을 채우지 않고 테두리·점만 강조한다.
+    &__input:checked + #{cls("radio")}__control {
+      color: var(#{v("control-accent")});
+      background-color: var(#{v("control-bg")});
+      border-color: var(#{v("control-accent")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")})
+      #{cls("radio")}__input:checked
+      + #{cls("radio")}__control {
+      color: var(#{v("control-accent-error")});
+      border-color: var(#{v("control-accent-error")});
+    }
+
+    &#{state("disabled")}
+      #{cls("radio")}__input:checked
+      + #{cls("radio")}__control {
+      color: var(#{v("control-selection-disabled")});
+      border-color: var(#{v("control-selection-disabled")});
+    }
+
+    &__input:checked + #{cls("radio")}__control #{cls("radio")}__indicator {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}

@@ -24,9 +24,9 @@
     flex-direction: column;
     align-items: center;
     gap: var(#{v("space-sm")});
-    padding: 0 var(#{v("surface-space-card")})
-      calc(var(#{v("surface-space-card")}) + env(safe-area-inset-bottom))
-      var(#{v("surface-space-card")});
+    padding: 0 var(#{v("space-panel-card")})
+      calc(var(#{v("space-panel-card")}) + env(safe-area-inset-bottom))
+      var(#{v("space-panel-card")});
   }
 
   #{cls("toast")} {
@@ -34,7 +34,7 @@
     align-items: flex-start;
     gap: var(#{v("space-sm")});
     width: #{hook("toast-width", min(100%, 26.25rem))};
-    padding: var(#{v("space-sm")}) var(#{v("surface-space-compact")});
+    padding: var(#{v("space-sm")}) var(#{v("space-panel-compact")});
     color: var(#{v("text-inverse-strong")});
     background: #{hook("toast-bg", var(#{v("surface-inverse")}))};
     border-radius: #{hook("toast-radius", var(#{v("radius-lg")}))};
@@ -72,7 +72,7 @@
       background: #{hook("toast-bg", var(#{v("surface-toast-error")}))};
 
       #{cls("toast")}__indicator {
-        background: var(#{v("color-error-soft")});
+        background: var(#{v("status-error-soft")});
         box-shadow: var(#{v("shadow-ring-error")});
       }
     }

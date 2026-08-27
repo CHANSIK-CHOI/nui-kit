@@ -75,7 +75,7 @@
 
       &:not(#{cls("accordion")}__button--icon):not(:disabled):hover
         #{cls("accordion")}__head {
-        background-color: var(#{v("surface-neutral-softest")});
+        background-color: var(#{v("control-bg-hover")});
       }
     }
 
@@ -98,8 +98,8 @@
       align-items: center;
       gap: var(#{v("space-md")});
       width: 100%;
-      padding: var(#{v("surface-space-compact")})
-        var(#{v("surface-space-card")});
+      padding: var(#{v("space-panel-compact")})
+        var(#{v("space-panel-card")});
 
       @include motion(background-color, "fast");
     }
@@ -137,7 +137,7 @@
     &__button--icon:not(:disabled):hover,
     &__button--icon:not(:disabled):focus-visible {
       color: var(#{v("text-primary")});
-      background: var(#{v("control-bg-subtle")});
+      background: var(#{v("control-bg-hover")});
     }
 
     &__arrow-icon {
@@ -171,8 +171,8 @@
       display: flex;
       flex-direction: column;
       gap: var(#{v("space-sm")});
-      padding: var(#{v("surface-space-compact")})
-        var(#{v("surface-space-card")}) var(#{v("surface-space-card")});
+      padding: var(#{v("space-panel-compact")})
+        var(#{v("space-panel-card")}) var(#{v("space-panel-card")});
       color: var(#{v("text-secondary")});
       border-top: var(#{v("border-width")}) solid
         var(#{v("control-border-disabled")});

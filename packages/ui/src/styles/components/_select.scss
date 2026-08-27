@@ -189,7 +189,7 @@
     }
 
     &__option--is-focused {
-      background-color: var(#{v("control-bg-subtle")});
+      background-color: var(#{v("control-bg-hover")});
     }
 
     &__option--is-selected {

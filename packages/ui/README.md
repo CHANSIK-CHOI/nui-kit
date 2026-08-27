@@ -79,6 +79,80 @@ CSS 변수 2계층 구조. `!important` 없이 덮어쓸 수 있습니다.
 }
 ```
 
+## 컴포넌트
+
+| 컴포넌트 | 서브패스 | 온디맨드 CSS |
+| --- | --- | --- |
+| `Button` · `IconButton` · `ButtonGroup`(`.Item`) · `ButtonLink` | `/button` | `button.css` |
+| `Field`(`.Item` `.Grid` `.Label` `.Description` `.Message`) | `/field` | `field.css` |
+| `Textfield` · `Search` · `Password` · `TextfieldBtn` · `Message` | `/textfield` | `textfield.css` |
+| `Textarea` | `/textarea` | `textarea.css` |
+| `Checkbox` · `CheckboxGroup` | `/checkbox` | `checkbox.css` |
+| `Radio` · `RadioGroup` | `/radio` | `radio.css` |
+| `Switch` | `/switch` | `switch.css` |
+| `Select` · `MultiSelect` | `/select` | `select.css` |
+| `Datepicker` · `DateRangePicker` · `DateMultiplePicker` | `/datepicker` | `datepicker.css` |
+| `Accordion`(`.Item` `.Head` `.Button` `.Panel`) | `/accordion` | `accordion.css` |
+| `PopupBase` · `Alert` · `Confirm` · `LayerPopup` · `BottomSheet` · `FullPopup` · `PopupHost` | `/popup` | `popup.css` |
+| `Toast` · `ToastHost` | `/toast` | `toast.css` |
+| `Tooltip` | `/tooltip` | `tooltip.css` |
+| `Icon` | `/icon` | `icon.css` |
+
+**서브패스 이름과 CSS 이름은 항상 같습니다.** 온디맨드로 쓸 때 헷갈릴 일이 없습니다.
+
+`Toast` 와 팝업 계열을 **명령형으로**(`useToast()` · `useAlert()` · `useConfirm()` ·
+`useLayerPopup()`) 쓰려면 Host 로 앱을 **감싸야** 합니다. 앱 루트에서 한 번만 합니다.
+
+```tsx
+// app/layout.tsx
+import { PopupHost, ToastHost } from "@chansikchoi/next-ui";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="ko">
+      <body>
+        <PopupHost>
+          <ToastHost>{children}</ToastHost>
+        </PopupHost>
+      </body>
+    </html>
+  );
+}
+```
+
+두 Host 모두 `children` 을 **필수**로 받는 래퍼입니다. portal 컨테이너는 없으면
+직접 만들므로 따로 심을 필요가 없습니다.
+
+**Host 가 없으면 명령형 팝업·토스트는 조용히 렌더되지 않습니다** — 에러도 경고도
+나지 않습니다. `<LayerPopup open={...} />` 처럼 선언형으로 직접 렌더할 때는 Host 가
+필요 없지만, 그 경우 배경 스크롤 잠금과 배경 `inert` 도 걸리지 않습니다.
+
+### react-hook-form 래퍼
+
+`@chansikchoi/next-ui/rhf` 에서 가져옵니다. `control` 만 넘기면 값과 에러를
+스스로 소유합니다.
+
+`RHFTextfield` · `RHFSearch` · `RHFPassword` · `RHFTextarea` ·
+`RHFCheckbox` · `RHFRadio` · `RHFSwitch` ·
+`RHFSelect` · `RHFMultiSelect` ·
+`RHFDatepicker` · `RHFDateRangePicker` · `RHFDateMultiplePicker`
+
+```tsx
+import { useForm } from "react-hook-form";
+import { RHFTextfield } from "@chansikchoi/next-ui/rhf";
+
+const { control } = useForm<{ name: string }>();
+
+<RHFTextfield control={control} name="name" rules={{ required: "필수입니다" }} />;
+```
+
+값과 변경 콜백은 RHF 가 소유하므로 `value` · `onChange` · `name` · `onBlur` 는
+받지 않습니다 (날짜 계열은 `selected` · `onSelectedChange`).
+
 ## 사용
 
 ```tsx
@@ -122,6 +196,10 @@ import { Field, FieldLabel } from "@chansikchoi/next-ui";
 | `Field.Description` | `FieldDescription` |
 | `Field.Message` | `FieldMessage` |
 | `ButtonGroup.Item` | `ButtonGroupItem` |
+| `Accordion.Item` | `AccordionItem` |
+| `Accordion.Head` | `AccordionHead` |
+| `Accordion.Button` | `AccordionButton` |
+| `Accordion.Panel` | `AccordionPanel` |
 
 ### ButtonLink 와 `next`
 

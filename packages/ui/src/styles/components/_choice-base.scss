@@ -1,0 +1,102 @@
+@use "../abstracts" as *;
+
+// ─────────────────────────────────────────────────────────────
+// Checkbox / Radio / Switch 의 공통 골격
+//
+// 구조: <span.block> <input.block__input(투명)> <span.block__control> </span>
+//   실제 input 을 투명하게 덮어 접근성·키보드 조작을 유지하고,
+//   시각 표현은 형제 요소가 담당한다 (`appearance: none` 대신 이 방식을 쓰는 이유는
+//   OS 별 렌더 차이를 완전히 배제하기 위함).
+//
+// ⚠️ 이 파일은 단독으로 쓰지 않는다. `_checkbox.scss` / `_radio.scss` /
+//    `_switch.scss` 가 각각 `@use` 한다. sass 는 같은 모듈을 한 번만 로드하므로
+//    셋을 함께 번들해도(index.css) 공통 규칙이 중복되지 않는다.
+//
+// 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("checkbox")},
+  #{cls("radio")},
+  #{cls("switch")} {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    cursor: pointer;
+
+    &#{state("disabled")} {
+      cursor: not-allowed;
+    }
+
+    &#{state("readonly")} {
+      cursor: default;
+    }
+
+    &__input {
+      // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
+      appearance: none;
+
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: inherit;
+
+      &:focus-visible + #{cls("checkbox")}__control,
+      &:focus-visible + #{cls("radio")}__control,
+      &:focus-visible + #{cls("switch")}__control {
+        border-color: var(#{v("focus-color")});
+        box-shadow: var(#{v("shadow-focus-strong")});
+      }
+    }
+
+    &__control {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: var(#{v("text-inverse-strong")});
+      background-color: var(#{v("control-bg")});
+      border: var(#{v("border-width")}) solid var(#{v("control-border")});
+
+      @include motion((border-color, background-color, box-shadow, color));
+    }
+
+    &__indicator {
+      display: inline-block;
+      opacity: 0;
+
+      @include motion((opacity, transform, background-color));
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")}):not(
+        #{state("error")}
+      ):hover
+      &__control {
+      border-color: var(#{v("control-accent")});
+    }
+
+    &#{state("error")} &__control {
+      border-color: var(#{v("control-border-error")});
+    }
+
+    &#{state("disabled")} &__control {
+      background-color: var(#{v("control-bg-subtle")});
+      border-color: var(#{v("control-border-disabled")});
+    }
+
+    &#{state("readonly")} &__control {
+      background-color: var(#{v("control-bg-readonly")});
+    }
+  }
+
+  // 사각/원형 선택자는 같은 치수를 쓴다 (Switch 는 자체 치수).
+  #{cls("checkbox")},
+  #{cls("radio")} {
+    width: #{hook("selector-size", var(#{v("size-selector")}))};
+    height: #{hook("selector-size", var(#{v("size-selector")}))};
+  }
+}
