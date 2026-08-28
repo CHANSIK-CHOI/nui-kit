@@ -1,0 +1,2247 @@
+<!doctype html>
+<html lang="ko" data-theme="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시스템 재정비 계획 — next-ui-system</title>
+<style>
+:root {
+  --bg: #ffffff; --bg-sub: #f7f8f9; --bg-code: #f1f3f4;
+  --fg: #16191d; --fg-muted: #545c68; --fg-subtle: #868d97;
+  --line: #dcdee3; --line-soft: #eceef0;
+  --accent: #01796f; --accent-weak: #e9f6f3;
+  --ok: #218358; --ok-weak: #e6f6ed;
+  --warn: #8a6a13; --warn-weak: #fdf5da;
+  --crit: #ce2c31; --crit-weak: #fdeceb;
+  --hold: #6b6f76; --hold-weak: #f0f1f2;
+  --radius: 10px; --maxw: 74rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101210; --bg-sub: #181919; --bg-code: #212322;
+    --fg: #e9f0eb; --fg-muted: #b0b6b1; --fg-subtle: #797d7a;
+    --line: #373c38; --line-soft: #262b27;
+    --accent: #70cdc2; --accent-weak: #0b2d2a;
+    --ok: #73cd9e; --ok-weak: #102d1f;
+    --warn: #ffcc4c; --warn-weak: #2c220c;
+    --crit: #ff8f87; --crit-weak: #2a1110;
+    --hold: #999e9a; --hold-weak: #212322;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101210; --bg-sub: #181919; --bg-code: #212322;
+  --fg: #e9f0eb; --fg-muted: #b0b6b1; --fg-subtle: #797d7a;
+  --line: #373c38; --line-soft: #262b27;
+  --accent: #70cdc2; --accent-weak: #0b2d2a;
+  --ok: #73cd9e; --ok-weak: #102d1f;
+  --warn: #ffcc4c; --warn-weak: #2c220c;
+  --crit: #ff8f87; --crit-weak: #2a1110;
+  --hold: #999e9a; --hold-weak: #212322;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans KR", sans-serif;
+  font-size: 16px; line-height: 1.78;
+}
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 3rem 1.25rem 7rem; }
+
+header.doc { border-bottom: 1px solid var(--line); padding-bottom: 1.75rem; margin-bottom: 1rem; }
+.eyebrow {
+  font-size: 0.75rem; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 0.75rem; font-weight: 700;
+}
+h1 { font-size: 2.125rem; line-height: 1.3; margin: 0 0 0.75rem; letter-spacing: -0.025em; }
+.lede { color: var(--fg-muted); margin: 0; font-size: 1.0625rem; max-width: 52rem; }
+.meta { font-size: 0.8125rem; color: var(--fg-subtle); margin-top: 1rem; }
+
+.theme-btn {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 10;
+  background: var(--bg-sub); color: var(--fg-muted);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.5rem 0.9rem; font: inherit; font-size: 0.8125rem; cursor: pointer;
+}
+.theme-btn:hover { color: var(--fg); }
+
+h2 {
+  font-size: 1.4375rem; margin: 3.5rem 0 0.75rem; letter-spacing: -0.015em;
+  padding-top: 1.75rem; border-top: 1px solid var(--line-soft); scroll-margin-top: 1rem;
+}
+h2:first-of-type { border-top: 0; }
+h3 { font-size: 1.0625rem; margin: 2.25rem 0 0.5rem; letter-spacing: -0.01em; scroll-margin-top: 1rem; }
+h4 { font-size: 0.9375rem; margin: 1.5rem 0 0.375rem; color: var(--fg-muted); }
+p { margin: 0.8rem 0; }
+ul, ol { margin: 0.8rem 0; padding-left: 1.35rem; }
+li { margin: 0.35rem 0; }
+li > ul, li > ol { margin: 0.35rem 0; }
+strong { font-weight: 650; }
+a { color: var(--accent); }
+code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.86em; background: var(--bg-code); padding: 0.1em 0.38em;
+  border-radius: 4px; word-break: break-all;
+}
+pre {
+  background: var(--bg-code); padding: 1rem 1.125rem; border-radius: var(--radius);
+  overflow-x: auto; font-size: 0.8125rem; line-height: 1.7; margin: 1.125rem 0;
+  border: 1px solid var(--line-soft);
+}
+pre code { background: none; padding: 0; font-size: inherit; word-break: normal; }
+
+.tw { overflow-x: auto; margin: 1.125rem 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+th { color: var(--fg-muted); font-weight: 650; font-size: 0.8125rem; white-space: nowrap; border-bottom-color: var(--line); }
+tbody tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.note {
+  border-left: 3px solid var(--accent); background: var(--accent-weak);
+  padding: 0.875rem 1.125rem; border-radius: 0 var(--radius) var(--radius) 0; margin: 1.25rem 0;
+}
+.note.warn { border-left-color: var(--warn); background: var(--warn-weak); }
+.note.crit { border-left-color: var(--crit); background: var(--crit-weak); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-weak); }
+.note.plain { border-left-color: var(--line); background: var(--bg-sub); }
+.note > :first-child { margin-top: 0; }
+.note > :last-child { margin-bottom: 0; }
+
+.badge {
+  display: inline-block; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em;
+  padding: 0.15em 0.55em; border-radius: 999px; vertical-align: 0.12em; white-space: nowrap;
+}
+.b-done { background: var(--ok-weak); color: var(--ok); }
+.b-now { background: var(--accent-weak); color: var(--accent); }
+.b-wait { background: var(--warn-weak); color: var(--warn); }
+.b-hold { background: var(--hold-weak); color: var(--hold); }
+.b-crit { background: var(--crit-weak); color: var(--crit); }
+
+.road { display: grid; gap: 0.625rem; margin: 1.5rem 0; }
+.step {
+  display: grid; grid-template-columns: 2.25rem 1fr auto; gap: 1rem; align-items: start;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 0.875rem 1.125rem; background: var(--bg-sub);
+}
+.step.on { border-color: var(--accent); background: var(--accent-weak); }
+.step-n { font-weight: 700; color: var(--fg-subtle); font-variant-numeric: tabular-nums; }
+.step.on .step-n { color: var(--accent); }
+.step-t { font-weight: 650; margin: 0; }
+.step-d { margin: 0.2rem 0 0; color: var(--fg-muted); font-size: 0.875rem; }
+
+.card {
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1.25rem 1.375rem; margin: 1.5rem 0; background: var(--bg-sub);
+}
+.card.decided { border-color: var(--ok); }
+.card.asking { border-color: var(--warn); }
+.card > :first-child { margin-top: 0; }
+.card > :last-child { margin-bottom: 0; }
+.card-h { display: flex; align-items: center; gap: 0.625rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.card-id {
+  font-family: ui-monospace, monospace; font-size: 0.75rem; font-weight: 700;
+  color: var(--fg-subtle); letter-spacing: 0.03em;
+}
+.card-t { font-size: 1.0625rem; font-weight: 650; margin: 0; }
+
+.answer {
+  border-left: 3px solid var(--ok); background: var(--ok-weak);
+  padding: 0.75rem 1rem; border-radius: 0 8px 8px 0; margin: 0 0 1rem;
+}
+.answer.q { border-left-color: var(--warn); background: var(--warn-weak); }
+.answer > :first-child { margin-top: 0; }
+.answer > :last-child { margin-bottom: 0; }
+.answer-k {
+  font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ok); display: block; margin-bottom: 0.15rem;
+}
+.answer.q .answer-k { color: var(--warn); }
+
+.opts { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.625rem; }
+.opts li {
+  border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem 0.9rem;
+  background: var(--bg); margin: 0;
+}
+.opts li.rec { border-color: var(--ok); background: var(--ok-weak); }
+.opt-k { font-weight: 700; margin-right: 0.35rem; }
+.opts li.rec .opt-k { color: var(--ok); }
+
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 0.875rem; margin: 1.125rem 0; }
+@media (max-width: 40rem) { .ba { grid-template-columns: 1fr; } }
+.ba > div { border: 1px solid var(--line); border-radius: var(--radius); padding: 0.875rem 1rem; background: var(--bg); }
+.ba h4 { margin: 0 0 0.5rem; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.ba .old h4 { color: var(--crit); }
+.ba .new h4 { color: var(--ok); }
+.layer { font-family: ui-monospace, monospace; font-size: 0.8125rem; line-height: 2; margin: 0; }
+.layer .gone { text-decoration: line-through; color: var(--fg-subtle); }
+
+.sw-row { display: flex; flex-wrap: wrap; gap: 0.375rem; margin: 0.875rem 0; }
+.sw { width: 2.25rem; height: 2.25rem; border-radius: 6px; border: 1px solid var(--line-soft); }
+.scale { display: flex; gap: 2px; margin: 0.75rem 0; flex-wrap: wrap; }
+.scale span {
+  flex: 1 1 3.5rem; min-width: 2.5rem; height: 2.75rem; border-radius: 4px;
+  display: flex; align-items: flex-end; justify-content: center;
+  font-size: 0.625rem; font-weight: 700; padding-bottom: 0.2rem;
+}
+
+/* 두 축 다이어그램 */
+.axes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.875rem; margin: 1.25rem 0; }
+@media (max-width: 44rem) { .axes { grid-template-columns: 1fr; } }
+.axis { border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.125rem; background: var(--bg); }
+.axis h4 { margin: 0 0 0.25rem; color: var(--accent); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.axis .q { font-weight: 650; margin: 0 0 0.5rem; }
+
+footer.doc {
+  margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--line);
+  font-size: 0.8125rem; color: var(--fg-subtle);
+}
+</style>
+</head>
+<body>
+<button class="theme-btn" id="themeBtn" type="button">테마 전환</button>
+
+<div class="wrap">
+
+<header class="doc">
+  <p class="eyebrow">next-ui-system · 살아 있는 계획서</p>
+  <h1>디자인 시스템 재정비 계획</h1>
+  <p class="lede">
+    당근 SEED를 <strong>따라 하는 것이 아니라 기반으로 삼아</strong>, 우리 방식의 디자인 기반을 먼저 세운다.
+    그 다음에 토큰을 재정비하고, 가이드 페이지를 고치고, 마지막에 컴포넌트를 손댄다.
+  </p>
+  <p class="meta">
+    최초 작성 2026-08-28 · 최종 갱신 <strong>2026-08-28 (4차 — 전체 점검)</strong> ·
+    <strong>승인 없이는 코드를 수정하지 않는다.</strong>
+  </p>
+</header>
+
+<div class="note plain">
+  <p><strong>지금 상태 — 답이 필요한 질문은 없다</strong></p>
+  <p>
+    <code>Q-01</code>~<code>Q-07</code> 이 전부 결정(<code>D-01</code>~<code>D-12</code>)으로 바뀌었다.
+    <strong>남은 것은 이 문서를 승인하고 2단계 실행 계약을 쓰는 것</strong>뿐이다.
+  </p>
+  <p style="margin-bottom:0"><strong>읽는 순서</strong> —
+    <a href="#s3">1장</a>에서 "훅"이 뭔지 알고 →
+    <a href="#s2">2장</a>에서 원칙을 보고 →
+    <a href="#s1">3장</a> 결정 로그로 전체를 훑은 뒤 →
+    <a href="#s4">4장</a>에서 결정별 before/after를 확인한다.
+    <strong>2장이 나머지 전부의 근거</strong>이므로 거기가 가장 중요하다.
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<h2 id="s0">0. 왜 이 순서로 가는가</h2>
+
+<p>
+  토큰을 먼저 고치고 원칙을 나중에 쓰면, <strong>토큰이 곧 원칙이 되어버린다.</strong>
+  "이미 이렇게 되어 있으니까"가 근거가 되고, 나중에 원칙을 바꾸려면 토큰을 또 갈아야 한다.
+</p>
+
+<h3>0-1. 이미 한 번 겪은 일</h3>
+
+<p>
+  13계열 컴포넌트를 다 이식하고 나서 <strong>hover 배경색이 몇 종류나 쓰이는지</strong> 세어봤다.
+  세 종류였다.
+</p>
+
+<pre><code>/* Accordion 헤더 */   background: var(--nui-control-bg-hover);
+/* Select 옵션 */      background: var(--nui-surface-neutral-soft);
+/* Datepicker 날짜 */  background: var(--nui-surface-neutral-subtle);</code></pre>
+
+<p>
+  셋 다 "마우스를 올렸을 때 면이 반응한다"는 <strong>똑같은 상황</strong>인데 다른 토큰을 썼다.
+  <strong>토큰이 부족해서가 아니었다.</strong> 문제는
+  <strong>"이럴 때는 이걸 쓴다"는 규칙이 없어서</strong> 그때그때 그럴듯한 걸 골랐다는 것이다.
+</p>
+
+<div class="road">
+  <div class="step on">
+    <span class="step-n">01</span>
+    <div>
+      <p class="step-t">디자인 기반 정의</p>
+      <p class="step-d">계층·원칙·매트릭스를 <strong>문서로</strong> 확정한다. 코드는 건드리지 않는다 — 지금 여기</p>
+    </div>
+    <span class="badge b-now">진행</span>
+  </div>
+  <div class="step">
+    <span class="step-n">02</span>
+    <div>
+      <p class="step-t">토큰 재정비</p>
+      <p class="step-d"><code>_seed.scss</code> 와 검사 스크립트를 1단계 결론에 맞춘다</p>
+    </div>
+    <span class="badge b-hold">대기</span>
+  </div>
+  <div class="step">
+    <span class="step-n">03</span>
+    <div>
+      <p class="step-t">Foundations 페이지</p>
+      <p class="step-d"><code>apps/docs</code> — <strong>이번 작업 범위의 끝</strong></p>
+    </div>
+    <span class="badge b-hold">대기</span>
+  </div>
+  <div class="step">
+    <span class="step-n">04</span>
+    <div>
+      <p class="step-t">컴포넌트 반영</p>
+      <p class="step-d">이번 범위 밖. 별도 세션에서 계열별로 진행한다</p>
+    </div>
+    <span class="badge b-hold">범위 밖</span>
+  </div>
+</div>
+
+<h3>0-2. 이 프로젝트가 만드는 것</h3>
+<p>
+  퍼블리싱 규약은 이미 <code>.claude/rules/</code> 에 있다. <strong>부족한 쪽은 디자인 체계</strong>이고,
+  그래서 외부 시스템(당근 SEED · Radix · Figma)의 결론을 근거로 빌려온다.
+  최종 목표는 <strong>디자인과 퍼블 규약이 둘 다 정해진 컴포넌트 라이브러리</strong>다.
+  <strong>기존 규칙 문서(<code>rules/</code>)도 여기서 정하는 대로 새로 쓴다.</strong>
+</p>
+
+<!-- ══════════════════════════════════════════════════ -->
+<h2 id="s3">1. "훅"이 뭐고 왜 문제인가</h2>
+
+<p>
+  이 문서에 <strong>"훅"이라는 말이 계속 나온다.</strong> 나머지를 읽으려면 이것부터 알아야 하므로
+  먼저 설명한다. 결론만 말하면 <strong>훅은 CSS <code>var()</code> 한 줄</strong>이고,
+  <strong>지금 31개 있고, 그중 일부가 고장 나 있다.</strong>
+</p>
+
+<h3>1-1. 먼저 — 왜 소비자를 못 이기나</h3>
+
+<p>이 문서 전체를 관통하는 전제다. CSS는 어느 규칙이 이길지 이 순서로 결정한다.</p>
+
+<pre><code>origin  →  importance  →  @layer  →  specificity(상세도)
+                            ↑
+                    상세도보다 먼저 본다</code></pre>
+
+<p>
+  우리 스타일은 전부 <code>@layer nui.components</code> <strong>안</strong>에 있고,
+  소비자가 그냥 쓴 CSS는 레이어 밖(unlayered)이다.
+  <strong>레이어 밖이 레이어 안을 항상 이긴다.</strong> 상세도는 그 다음에야 본다.
+</p>
+
+<pre><code>/* 소비자 — 레이어 밖. 상세도 0-1-0 */
+:root { --nui-button-min-height: 50px; }
+
+/* 우리 — 레이어 안. 상세도를 아무리 올려도 진다 */
+@layer nui.components {
+  html body .nui-button.nui-button--small { min-height: 2.25rem; }
+}</code></pre>
+
+<div class="note">
+  <p style="margin-bottom:0">
+    <strong>이건 버그가 아니라 우리가 원해서 만든 구조다.</strong>
+    <code>@layer</code> 를 쓴 이유가 <strong>"소비자가 우리 스타일을 쉽게 덮게 하려고"</strong>였다.
+    다만 그 성질 때문에 <strong>우리가 뚫어둔 구멍도 우리가 못 막는다.</strong>
+  </p>
+</div>
+
+<h3>1-2. "훅"이 대체 뭔가</h3>
+
+<pre><code>/* 우리가 쓰는 SCSS */
+min-width: #{hook("button-min-width", 7.5rem)};
+
+/* 빌드된 CSS — 이게 전부다 */
+min-width: var(--nui-button-min-width, 7.5rem);</code></pre>
+
+<p>
+  <code>var(이름, 기본값)</code> = <strong>"손님이 이 이름으로 값을 적어뒀으면 그걸 쓰고,
+  안 적었으면 원래 값"</strong>. 즉 훅은 <strong>우리가 미리 뚫어둔 구멍</strong>이다.
+  지금 <strong>31개</strong> 있다.
+</p>
+
+<h3>1-3. 진짜 문제 — 구멍 하나가 여러 자리에 뚫려 있다 ★</h3>
+
+<pre><code>/* _button.scss — 이름이 세 곳 모두 같다 */
+.nui-button         { min-height: var(--nui-button-min-height, 3.5rem);  }  /* 56px */
+.nui-button--medium { min-height: var(--nui-button-min-height, 3rem);    }  /* 48px */
+.nui-button--small  { min-height: var(--nui-button-min-height, 2.25rem); }  /* 36px */</code></pre>
+
+<pre><code>/* 소비자 — 딱 한 줄 */
+:root { --nui-button-min-height: 50px; }</code></pre>
+
+<div class="note crit">
+  <p style="margin-bottom:0">
+    <strong>세 자리가 전부 50px이 된다.</strong> 버튼의 크기 variant가 통째로 죽는다.
+    손잡이 하나가 <strong>S·M·L 세 개에 동시에 연결</strong>돼 있는 셈이고,
+    <strong>우리가 잘못 뚫은 것</strong>이다.
+  </p>
+</div>
+
+<h3>1-4. 31개의 내역</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th>분류</th><th class="num">개수</th><th>토큰</th><th>결정</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>색</strong></td><td class="num">11</td>
+      <td><code>button-bg</code> <code>popup-bg</code> <code>popup-dim</code> <code>select-bg</code>
+        <code>select-border-color</code> <code>textarea-bg</code> <code>textarea-border-color</code>
+        <code>textfield-bg</code> <code>textfield-border-color</code> <code>toast-bg</code> <code>tooltip-bg</code></td>
+      <td><span class="badge b-crit">삭제</span><br>
+        <span class="meta">짝이 있다</span></td>
+    </tr>
+    <tr>
+      <td><strong>모양 (radius)</strong></td><td class="num">8</td>
+      <td><code>accordion-radius</code> <code>button-radius</code> <code>popup-radius</code>
+        <code>select-radius</code> <code>textarea-radius</code> <code>textfield-radius</code>
+        <code>toast-radius</code> <code>tooltip-radius</code></td>
+      <td rowspan="3"><span class="badge b-done">쪼개고 확장</span><br>
+        <span class="meta">20개 → 26개 + 신규</span></td>
+    </tr>
+    <tr>
+      <td><strong>간격</strong></td><td class="num">2</td>
+      <td><code>accordion-gap</code> <code>button-padding-x</code></td>
+    </tr>
+    <tr>
+      <td><strong>크기</strong></td><td class="num">10</td>
+      <td><code>button-min-height</code> <code>button-min-width</code> <code>popup-width</code>
+        <code>select-height</code> <code>selector-size</code> <code>switch-height</code>
+        <code>switch-width</code> <code>textfield-height</code> <code>toast-width</code>
+        <code>tooltip-max-width</code></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note warn">
+  <p><strong><code>--nui-_*</code> 내부 배선 9개는 이것과 별개다.</strong></p>
+  <p style="margin-bottom:0">
+    밑줄 변수는 <em>창구</em>가 아니라 <strong>variant를 구현하는 수단</strong>이다.
+    <code>.nui-button--primary</code> 가 <code>--nui-_button-main</code> 하나만 갈아끼워
+    배경·테두리를 한꺼번에 바꾼다. 없애면 variant 자체가 불가능해진다.
+    <strong>공개 API가 아니므로 문서화하지 않고, 코드에는 그대로 남는다.</strong>
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<h2 id="s2">2. 토큰 체계의 두 축 — 계층 ≠ 창구 ★</h2>
+
+<div class="answer q">
+  <span class="answer-k">당신이 짚은 것</span>
+  <p style="margin:0">
+    "뭔가 우리가 SEED처럼 토큰 체계를 정리하려고 하는 것에서 <strong>조금씩 무너지는 것 같은데</strong>
+    컴포넌트도 그렇고 이 선도 그렇고 한번 검토해줘"
+  </p>
+</div>
+
+<p>
+  <strong>정확한 지적이고, 검토 결과는 "무너지는 게 아니라 두 가지를 섞어 봤다"</strong>이다.
+  지금까지 나는 <strong>"계층"과 "창구"를 한 덩어리로 말했는데, 이 둘은 다른 축이다.</strong>
+  나눠 놓으면 색·치수·선이 전부 한 규칙으로 설명된다.
+</p>
+
+<div class="axes">
+  <div class="axis">
+    <h4>축 1 — 계층</h4>
+    <p class="q">값이 <strong>어디서 오는가</strong></p>
+    <p style="margin:0;font-size:0.9rem;color:var(--fg-muted)">
+      우리 내부의 문제다. 소비자는 알 필요가 없다.<br>
+      <code>action-primary</code> 가 <code>color-brand-9</code> 에서 온다는 것.
+    </p>
+  </div>
+  <div class="axis">
+    <h4>축 2 — 창구</h4>
+    <p class="q">소비자가 <strong>어디를 만지는가</strong></p>
+    <p style="margin:0;font-size:0.9rem;color:var(--fg-muted)">
+      공개 API의 문제다. 한 번 열면 <strong>약속</strong>이 된다.<br>
+      <code>--nui-button-height-sm</code> 을 덮어쓸 수 있다는 것.
+    </p>
+  </div>
+</div>
+
+<p>
+  <strong>SEED가 2계층인 것은 축 1의 이야기</strong>다. 그리고 SEED에는 축 2가 아예 없다 —
+  사내 시스템이라 <strong>소비자가 덮어쓰는 시나리오를 상정하지 않기 때문</strong>이다.
+  우리는 npm 배포 라이브러리라 축 2가 반드시 필요하다.
+  <strong>그러니 "SEED처럼 2계층"과 "컴포넌트별 변수를 연다"는 충돌하지 않는다.</strong> 다른 축이다.
+</p>
+
+<h3 id="chain">2-1. 그럼 창구는 어디에 뚫나 — 한 문장 규칙</h3>
+
+<div class="note ok">
+  <p style="margin:0;font-size:1.0625rem">
+    <strong>값이 다른 값의 근거가 되면 위에서만 연다. 독립적이면 개별로 연다.</strong>
+  </p>
+</div>
+
+<p>이걸 <strong>연쇄</strong>라고 부르자. 색과 치수는 연쇄하는 정도가 완전히 다르다.</p>
+
+<h4>색은 연쇄한다 — 실측했다</h4>
+<p>
+  primitive 색 하나가 semantic 몇 개로 퍼지는지 세어봤다.
+</p>
+
+<pre><code>--nui-color-gray-12  →  5개로 퍼진다
+                        text-primary · layer-inverse · control-text
+                        control-icon-strong · action-neutral
+
+--nui-color-gray-6   →  4개
+                        border-default · control-border-disabled
+                        control-track · action-border-disabled
+
+--nui-color-brand-9  →  2개
+                        control-accent · action-primary</code></pre>
+
+<p>
+  그리고 이 semantic들이 <strong>다시 컴포넌트 수십 곳으로</strong> 퍼진다.
+  즉 <strong>색은 하나를 건드리면 화면 전체가 흔들린다.</strong>
+</p>
+<p>
+  그래서 색을 <strong>컴포넌트별로 열면 연쇄가 끊긴다.</strong>
+  버튼 배경만 연한 색으로 바꾸면 <strong>글자색은 따라오지 않아 대비가 깨진다.</strong>
+  <strong>색의 창구는 위쪽 하나여야 한다.</strong>
+</p>
+
+<h4>치수는 연쇄하지 않는다</h4>
+<p>
+  Button 높이를 40px로 바꾸면 무엇이 따라 바뀌나? <strong>아무것도 안 바뀐다.</strong>
+  Popup 너비도, Tooltip 여백도 그대로다. 그리고 <strong>아무것도 깨지지 않는다.</strong>
+</p>
+<p>
+  <code>space-4</code>(16px)는 <code>space-4</code>일 뿐이고,
+  테마를 바꿔도 16px이다. 그래서 <strong>치수에는 역할 계층 자체가 없다</strong> — 이름이 곧 역할이다.
+  연쇄가 없으니 <strong>개별로 열어도 안전하다.</strong>
+</p>
+
+<h3 id="shape-vs-size">2-2. 그럼 무엇을 막고 무엇을 여나 ★</h3>
+
+<div class="answer">
+  <span class="answer-k">당신의 결정</span>
+  <p style="margin:0">
+    "선 컬러·두께는 브랜드 컬러와 같이 <strong>컴포넌트에서 변경하지 못하도록</strong>.
+    <strong><code>radius</code> 는 막지 말고 열자</strong> — 어떻게 보면 모양에 관한 거니까
+    <strong>컴포넌트 수정하는 것에 포함</strong>하는 게 맞을 것 같다"
+  </p>
+</div>
+
+<p>훅 31개를 성격별로 세어보면 이렇게 갈린다.</p>
+
+<div class="tw">
+<table>
+  <thead><tr><th>성격</th><th class="num">개수</th><th>예</th><th>처분</th></tr></thead>
+  <tbody>
+    <tr><td><strong>색</strong></td><td class="num">11</td>
+      <td><code>button-bg</code> <code>tooltip-bg</code> <code>textfield-border-color</code></td>
+      <td><span class="badge b-crit">막는다</span></td></tr>
+    <tr><td><strong>모양 (radius)</strong></td><td class="num">8</td>
+      <td><code>button-radius</code> <code>popup-radius</code> <code>tooltip-radius</code></td>
+      <td><span class="badge b-done">연다</span></td></tr>
+    <tr><td><strong>간격</strong></td><td class="num">2</td>
+      <td><code>accordion-gap</code> <code>button-padding-x</code></td>
+      <td><span class="badge b-done">연다</span></td></tr>
+    <tr><td><strong>크기</strong></td><td class="num">10</td>
+      <td><code>button-min-height</code> <code>popup-width</code> <code>switch-width</code></td>
+      <td><span class="badge b-done">연다</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>색 11개만 막고 나머지 20개는 연다.</strong> 그 경계의 근거가 이것이다.</p>
+
+<div class="note ok">
+  <p style="margin:0;font-size:1.0625rem">
+    <strong>소비자가 잘못 바꿨을 때 자기 눈으로 알아챌 수 있으면 연다.<br>
+    알아챌 수 없으면 막는다.</strong>
+  </p>
+</div>
+
+<p>
+  <strong>"짝이 있느냐"보다 이게 정확하다.</strong> 색을 막는 진짜 이유는 짝이 있어서가 아니라,
+  <strong>짝이 깨진 걸 소비자가 모르기 때문</strong>이다.
+</p>
+
+<h4>색만 "짝"이 있다 — 그리고 깨진 게 안 보인다</h4>
+
+<p>
+  색은 <strong>배경과 글자가 한 쌍</strong>이다. 둘의 <strong>관계</strong>가 읽을 수 있는지를 결정한다.
+  그런데 우리 훅은 <strong>배경만 열어놨다.</strong>
+</p>
+
+<pre><code>/* 소비자가 버튼 배경만 연하게 바꾼다 */
+:root { --nui-button-primary-bg: #a7e0d8; }
+
+/* 글자색은 우리 것이 그대로 남는다 */
+.nui-button--primary { color: var(--nui-action-primary-fg); }  /* 흰색 */
+
+/*  결과 → 연한 배경 + 흰 글자 = 대비 1.3:1
+    읽을 수 없다. 그런데 소비자는 모른다.               */</code></pre>
+
+<p>
+  <strong>이게 "보이지 않게 깨지는" 경우다.</strong>
+  디자이너가 아니면 대비가 부족한지 눈으로 알기 어렵고,
+  <strong>저시력 사용자만 못 읽게 된다.</strong>
+  게다가 우리가 만든 글자색이 그대로 남아 있으니 <strong>절반은 우리 책임</strong>이다.
+</p>
+
+<h4>radius · 간격 · 크기는 짝이 없다</h4>
+
+<pre><code>/* 소비자가 버튼을 둥글게 바꾼다 */
+:root { --nui-button-radius: 20px; }
+
+/*  결과 → 버튼이 둥글어진다. 끝.
+    같이 바꿔야 할 다른 값이 없다.
+    마음에 안 들면 바로 보인다.                        */</code></pre>
+
+<p>
+  <strong>바꾸면 바로 눈에 보이고, 그게 전부다.</strong>
+  "버튼만 알약 모양"이 마음에 들면 그게 정답이고, 이상하면 바로 알아채고 되돌린다.
+  <strong>소비자가 스스로 판단할 수 있는 값</strong>은 막을 이유가 없다.
+</p>
+
+<h3 id="line-width">2-3. 선 두께는? — 열되, 포커스 링만 뺀다 ★</h3>
+
+<div class="answer q">
+  <span class="answer-k">당신의 질문</span>
+  <p style="margin:0">"그렇게 치면 <strong>선 두께도 열어야 하나?</strong> 선 색상은 닫되?"</p>
+</div>
+
+<p>
+  <strong>기준을 대면 열어야 한다.</strong> 선 두께를 2px로 바꾸면 <strong>바로 눈에 보인다.</strong>
+  같이 바꿔야 할 짝도 없다. <strong>다만 딱 하나 예외가 있다.</strong>
+</p>
+
+<h4>먼저 — 지금 두께가 어떻게 쓰이는지 재봤다</h4>
+
+<div class="tw">
+<table>
+  <thead><tr><th>토큰</th><th>값</th><th class="num">자리</th><th>쓰이는 곳</th></tr></thead>
+  <tbody>
+    <tr><td><code>border-width</code></td><td><code>1px</code></td><td class="num">17</td>
+      <td>Accordion 4 · Popup 3 · Datepicker 3 · Select 3 · Button · Choice · Textfield · Textarea</td></tr>
+    <tr><td><code>focus-width</code></td><td><code>2px</code></td><td class="num">3</td>
+      <td><strong>포커스 시</strong> Textfield · Textarea · Select 의 테두리가 두꺼워진다</td></tr>
+  </tbody>
+</table>
+</div>
+
+<pre><code>/* _textfield.scss — 포커스가 들어오면 테두리가 굵어진다 */
+.nui-textfield:focus-within .nui-textfield__wrap {
+  border-width: var(--nui-focus-width);   /* 1px → 2px */
+}</code></pre>
+
+<h4>그래서 두께는 두 종류다 — 성격이 다르다</h4>
+
+<div class="tw">
+<table>
+  <thead><tr><th></th><th>일반 테두리 <code>border-width</code></th><th>포커스 링 <code>focus-width</code></th></tr></thead>
+  <tbody>
+    <tr><td><strong>역할</strong></td><td>요소의 외곽을 그린다</td>
+      <td><strong>"지금 여기에 커서가 있다"</strong>를 알린다</td></tr>
+    <tr><td><strong>잘못 바꾸면</strong></td>
+      <td>테두리가 굵거나 얇아 보인다.<br><strong>바로 눈에 띈다</strong></td>
+      <td><strong>키보드 사용자만</strong> 포커스를 놓친다.<br>
+        마우스로 쓰는 소비자는 <strong>알아채지 못한다</strong></td></tr>
+    <tr><td><strong>기준 적용</strong></td>
+      <td><span class="badge b-done">연다</span></td>
+      <td><span class="badge b-crit">막는다</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  <strong>포커스 링이 색과 같은 성격이다.</strong> 대비가 부족한 것도, 포커스 링이 안 보이는 것도
+  <strong>일부 사용자만 겪고 소비자는 모른다.</strong>
+  WCAG 2.4.11(Focus Appearance)이 포커스 표시의 최소 크기를 요구하는 이유이기도 하다.
+</p>
+
+<h4>그래서 이렇게 정리된다</h4>
+
+<pre><code>/* PRIMITIVE — 전역 두께 스케일. 여기는 소비자가 덮을 수 있다 */
+--nui-border-width-1: 1px;
+--nui-border-width-2: 2px;
+
+/* 컴포넌트 훅 — 새로 연다. border 를 쓰는 8개 컴포넌트 */
+--nui-button-border-width      --nui-popup-border-width
+--nui-textfield-border-width   --nui-textarea-border-width
+--nui-select-border-width      --nui-accordion-border-width
+--nui-datepicker-border-width  --nui-checkbox-border-width
+
+/* 포커스 링 — 훅 없음. 접근성 요소다 */
+--nui-focus-width: 2px;        /* 전역에서만 조정 가능 */</code></pre>
+
+<div class="note">
+  <p style="margin-bottom:0">
+    <strong>훅은 "그 컴포넌트가 실제로 쓰는 속성"에만 만든다.</strong>
+    Toast나 Tooltip은 <code>border</code> 를 쓰지 않으므로 두께 훅도 만들지 않는다.
+    <strong>안 쓰는 훅은 죽은 토큰이 된다.</strong>
+  </p>
+</div>
+
+<div class="note warn">
+  <p style="margin-bottom:0">
+    <strong>덤으로 찾은 것 — Accordion에 <code>2px</code> 하드코딩이 있다.</strong>
+    <code>_accordion.scss:160</code> 인데, 확인해보니 <strong>테두리가 아니라 화살표 아이콘</strong>이었다
+    (<code>border-right</code> + <code>border-bottom</code> + <code>rotate(45deg)</code> 로 V자를 그린다).
+    선이 아니라 <strong>도형을 그리는 수단</strong>이므로 두께 토큰 대상이 아니다.
+    <strong>다만 이런 자리가 더 있는지는 2단계에서 훑는다.</strong>
+  </p>
+</div>
+
+<h3 id="naming">2-4. 이름 규칙 — 속성이 먼저, variant가 뒤 ★</h3>
+
+<div class="answer q">
+  <span class="answer-k">당신의 제안</span>
+  <p style="margin:0">
+    "여는 것은 컴포넌트처럼 <code>button-lg-line-size</code>, <code>button-lg-radius</code> 이렇게"
+  </p>
+</div>
+
+<p>
+  방향은 같은데 <strong>순서를 뒤집는 쪽</strong>을 권한다. 이유가 하나 있다 —
+  <strong>variant 축이 속성마다 다르기 때문</strong>이다.
+</p>
+
+<div class="tw">
+<table>
+  <thead><tr><th>속성</th><th>이 속성의 variant 축</th></tr></thead>
+  <tbody>
+    <tr><td><code>height</code> · <code>padding-x</code></td><td><code>lg</code> / <code>md</code> / <code>sm</code> — 크기</td></tr>
+    <tr><td><code>radius</code></td><td>기본 / <code>round</code> — <strong>모양</strong></td></tr>
+    <tr><td><code>border-width</code></td><td><strong>없다</strong> — 하나뿐</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  variant를 앞에 두면 <strong>존재하지 않는 조합이 만들어진다.</strong>
+</p>
+
+<pre><code>/* variant 먼저 — button-lg-radius 는 무엇인가? */
+--nui-button-lg-height         ✓
+--nui-button-lg-radius         ✗ radius 는 lg/md/sm 축이 아니다
+--nui-button-lg-border-width   ✗ border-width 는 variant 가 없다
+
+/* 속성 먼저 — 속성이 정해지면 그 다음에 올 variant 가 결정된다 */
+--nui-button-height-lg    --nui-button-height-md    --nui-button-height-sm
+--nui-button-radius       --nui-button-radius-round
+--nui-button-border-width</code></pre>
+
+<div class="note ok">
+  <p style="margin:0"><strong>규칙</strong></p>
+<pre style="margin:0.5rem 0 0"><code>--nui-{컴포넌트}-{요소?}-{속성}-{variant?}
+
+--nui-button-height-lg          버튼 · 높이 · large
+--nui-button-radius-round       버튼 · 둥글기 · round
+--nui-textfield-padding-x       텍스트필드 · 좌우 여백        (variant 없음)
+--nui-accordion-header-gap      아코디언 · 헤더 · 간격        (요소 있음)</code></pre>
+</div>
+
+<p>
+  <strong>속성 이름은 CSS 속성명을 그대로 쓴다.</strong>
+  <code>line-size</code> 보다 <code>border-width</code> 가 낫다 —
+  소비자가 <strong>CSS를 보고 바로 어떤 토큰을 찾을지 알 수 있고</strong>,
+  우리 전역 토큰(<code>--nui-border-width-1</code>)과도 이름이 이어진다.
+</p>
+
+<div class="note">
+  <p><strong>radius를 열 때 문서에 적어둘 것</strong></p>
+  <p style="margin-bottom:0">
+    지금 컴포넌트마다 radius 값이 다르고 <strong>그건 의도된 것</strong>이다 —
+    요소가 클수록 더 둥글어야 같은 정도로 둥글어 보인다.
+  </p>
+<pre style="margin:0.75rem 0"><code>Button    radius-1  (4px)   ← 작고 각지다
+Tooltip   radius-3  (12px)
+Popup     radius-6  (24px)  ← 크고 둥글다</code></pre>
+  <p style="margin-bottom:0">
+    <strong>전체를 둥글게 하고 싶으면 전역 스케일을 덮는 쪽이 낫다</strong> — 비율이 유지된다.
+    컴포넌트별 훅은 <strong>"이것만 다르게"</strong>일 때 쓴다.
+    <strong>둘 다 열어두고 문서에서 안내한다.</strong>
+  </p>
+<pre style="margin:0.75rem 0 0"><code>/* 권장 — 전체가 비율을 유지한 채 둥글어진다 */
+:root { --nui-radius-1: 8px; --nui-radius-3: 16px; --nui-radius-6: 32px; }
+
+/* 이것만 다르게 */
+:root { --nui-button-radius: 999px; }</code></pre>
+</div>
+
+<h3 id="important">2-5. <code>!important</code> 는 필요 없다 — 실측했다 ★</h3>
+
+<div class="answer q">
+  <span class="answer-k">당신의 제안</span>
+  <p style="margin:0">
+    "속성 중에 radius를 없애는 건 CSS에서 <code>0 !important</code> 로 못박고"
+  </p>
+</div>
+
+<p>
+  <strong><code>!important</code> 없이도 소비자가 이긴다.</strong>
+  <a href="#s3">1-1</a>에서 설명한 <code>@layer</code> 때문인데,
+  말로만 하면 믿기 어려우니 <strong>실제 문서 사이트에서 재봤다.</strong>
+</p>
+
+<pre><code>// 브라우저에서 실행한 코드
+const btn = document.querySelector('.nui-button');
+getComputedStyle(btn).borderRadius;        // → "4px"   우리 값
+
+// 소비자가 레이어 밖에 쓴 CSS를 흉내낸다. !important 없음
+const style = document.createElement('style');
+style.textContent = '.nui-button { border-radius: 0px; }';
+document.head.appendChild(style);
+
+getComputedStyle(btn).borderRadius;        // → "0px"   소비자가 이겼다</code></pre>
+
+<div class="note ok">
+  <p style="margin-bottom:0">
+    <strong><code>4px</code> → <code>0px</code>.</strong>
+    상세도도 같고 <code>!important</code> 도 없는데 소비자 규칙이 이겼다.
+    <strong>우리 규칙이 <code>@layer nui.components</code> 안에 있고 소비자 규칙은 밖에 있기 때문</strong>이다.
+    캐스케이드가 상세도보다 레이어를 <strong>먼저</strong> 보기 때문에 생기는 결과다.
+  </p>
+</div>
+
+<h4>오히려 <code>!important</code> 를 쓰면 손해다</h4>
+
+<pre><code>/* 소비자가 이렇게 쓰면 */
+.my-button { border-radius: 0 !important; }
+
+/* 자기 자신의 다음 규칙도 못 덮는다 */
+.my-button:hover { border-radius: 4px; }        /* ← 안 먹는다 */
+.my-button.is-featured { border-radius: 12px; } /* ← 안 먹는다 */</code></pre>
+
+<p>
+  <code>!important</code> 는 <strong>자기 발등을 찍는다.</strong>
+  나중에 그 컴포넌트를 조건부로 다르게 하고 싶어지면
+  <strong>또 <code>!important</code> 를 붙여야 하고</strong>, 그렇게 계단이 쌓인다.
+</p>
+
+<div class="note">
+  <p style="margin-bottom:0">
+    <strong>이건 문서에 적어둘 가치가 있다.</strong>
+    보통의 라이브러리는 <code>!important</code> 없이 못 덮는 경우가 많아서
+    <strong>소비자가 습관적으로 붙인다.</strong>
+    "우리 라이브러리는 <code>!important</code> 없이 덮인다"를 README와 Foundations에 명시하면
+    소비자가 불필요한 <code>!important</code> 를 쌓지 않는다.
+  </p>
+</div>
+
+<h3>2-6. 정리 — 이 표가 나머지 전부의 근거다</h3>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr><th></th><th>색</th><th>radius · 간격 · 크기 · 모션</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>축 1 · 계층</strong></td>
+      <td>Primitive → Semantic <strong>(2계층)</strong></td>
+      <td>Primitive <strong>(1계층)</strong> — 이름이 곧 역할</td>
+    </tr>
+    <tr>
+      <td><strong>축 2 · 창구</strong></td>
+      <td><strong>전역에서 한 번</strong><br>
+        브랜드 색 1개(빌드) + semantic 덮어쓰기</td>
+      <td><strong>전역 스케일 + 컴포넌트별 변수</strong><br>
+        <code>radius-1~6</code> 과 <code>--nui-button-radius</code> 둘 다</td>
+    </tr>
+    <tr>
+      <td><strong>짝이 있나</strong></td>
+      <td><strong>있다.</strong> 배경↔글자.<br>
+        하나만 바꾸면 <strong>보이지 않게 대비가 깨진다</strong></td>
+      <td><strong>없다.</strong> 바꾸면 그게 전부고<br>
+        <strong>결과가 바로 눈에 보인다</strong></td>
+    </tr>
+    <tr>
+      <td><strong>연쇄</strong></td>
+      <td><code>gray-12</code> 하나가 <strong>5개 semantic</strong>으로</td>
+      <td>Button 높이는 <strong>아무 데도 안 퍼진다</strong></td>
+    </tr>
+    <tr>
+      <td><strong>컴포넌트 훅</strong></td>
+      <td><span class="badge b-crit">없앤다</span> 11개</td>
+      <td><span class="badge b-done">쪼개고 늘린다</span> 20개 → 26개 + 신규</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="stroke">2-7. 선(stroke)에 적용해보면 ★</h3>
+
+<p>
+  선은 다른 것과 다르다. <strong>색과 두께를 둘 다 갖기 때문</strong>이다.
+  그래서 "Primitive에 넣나 Semantic에 넣나"가 헷갈렸던 것인데,
+  <strong>두 개를 따로 떼어 놓고 규칙을 대면 깨끗하게 갈린다.</strong>
+</p>
+
+<div class="tw">
+<table>
+  <thead><tr><th></th><th>선 <strong>색</strong></th><th>선 <strong>두께</strong></th></tr></thead>
+  <tbody>
+    <tr><td><strong>연쇄하나</strong></td>
+      <td><strong>한다.</strong> <code>border-default</code> 는 <code>gray-6</code> 에서 오는데,
+        그 <code>gray-6</code> 은 <strong>다른 3개와 함께 쓴다</strong></td>
+      <td><strong>안 한다.</strong> 1px은 그냥 1px이다</td></tr>
+    <tr><td><strong>계층</strong></td>
+      <td>Primitive(gray 스케일) → Semantic(역할)</td>
+      <td>Primitive만</td></tr>
+    <tr><td><strong>창구</strong></td>
+      <td>브랜드 색 생성 + semantic 덮어쓰기</td>
+      <td>컴포넌트별 변수 <strong>가능</strong></td></tr>
+    <tr><td><strong>SEED의 3분할</strong></td>
+      <td><strong>여기에 해당한다.</strong> 전부 <em>색</em> 토큰이다</td>
+      <td>해당 없음</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>그래서 당신의 제안이 맞다.</strong> 다만 짚어둘 게 하나 있다.</p>
+
+<div class="note">
+  <p style="margin-bottom:0">
+    <strong>SEED의 3분할은 "두께"가 아니라 "색"이다.</strong>
+    <code>stroke.neutral-weak</code> · <code>-subtle</code> · <code>-muted</code> 세 개는
+    전부 색 토큰이고, 나누는 기준은 굵기가 아니라
+    <strong>"한 화면에 몇 번 등장하는가"</strong>다. 그러니 말씀하신 대로
+    <strong>두께는 Primitive, 색은 Semantic</strong> 으로 두 축을 다 만들면 된다.
+  </p>
+</div>
+
+<h3>2-8. 그런데 재보니 — 선에도 같은 문제가 있었다 ★</h3>
+
+<p>
+  0장에서 본 <strong>"hover 배경 3종이 기준 없이 섞였다"</strong>와
+  <strong>똑같은 일이 선에서도 벌어지고 있다.</strong> 실측한 결과다.
+</p>
+
+<h4>먼저 — 지금 선 토큰 전량</h4>
+
+<div class="tw">
+<table>
+  <thead><tr><th>토큰</th><th>값</th><th>어디에 쓰이나</th></tr></thead>
+  <tbody>
+    <tr><td colspan="3" style="background:var(--bg-code);font-weight:650">두께 — 1개</td></tr>
+    <tr><td><code>border-width</code></td><td><code>1px</code></td><td>전부</td></tr>
+
+    <tr><td colspan="3" style="background:var(--bg-code);font-weight:650">색 · 일반 — 4개</td></tr>
+    <tr><td><code>border-default</code></td><td><code>gray-6</code></td><td>Accordion 박스 외곽 · Popup 카드 외곽</td></tr>
+    <tr><td><code>border-subtle</code></td><td><code>gray-5</code></td><td>Popup 내부 구분 2건</td></tr>
+    <tr><td><code>border-brand</code></td><td><code>brand-7</code></td><td>Accordion 활성 상태</td></tr>
+    <tr><td><code>border-brand-subtle</code></td><td><code>brand-6</code></td><td>Accordion 패널 상단</td></tr>
+
+    <tr><td colspan="3" style="background:var(--bg-code);font-weight:650">색 · 입력 컨트롤 전용 — 4개</td></tr>
+    <tr><td><code>control-border</code></td><td><code>gray-7</code></td><td>Textfield · Textarea · Select · Datepicker · Checkbox</td></tr>
+    <tr><td><code>control-border-hover</code></td><td><code>gray-8</code></td><td>↑ 의 hover</td></tr>
+    <tr><td><code>control-border-disabled</code></td><td><code>gray-6</code></td><td>↑ 의 비활성</td></tr>
+    <tr><td><code>control-border-error</code></td><td><code>danger-8</code></td><td>↑ 의 에러</td></tr>
+
+    <tr><td colspan="3" style="background:var(--bg-code);font-weight:650">색 · 액션 — 1개</td></tr>
+    <tr><td><code>action-border-disabled</code></td><td><code>gray-6</code></td><td>비활성 아웃라인 버튼</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="meta" style="margin-top:0">
+  선 관련 토큰 <strong>10개</strong>. 이 중 두께가 1개, 색이 9개다
+</p>
+
+<h4>문제 ① 같은 "형태선"인데 값이 두 개다</h4>
+
+<p>
+  <strong>형태선</strong>은 요소의 외곽을 그리는 선이다 — 카드, 인풋, 아웃라인 버튼의 테두리.
+  그런데 우리는 <strong>두 가지 다른 값</strong>을 쓰고 있다.
+</p>
+
+<pre><code>/* Popup 카드의 외곽 */
+border: 1px solid var(--nui-border-default);    /* gray-6 */
+
+/* Textfield 의 외곽 */
+border: 1px solid var(--nui-control-border);    /* gray-7  ← 더 진하다 */</code></pre>
+
+<div class="note ok">
+  <p style="margin-bottom:0">
+    <strong>다행히 이건 문제가 아닐 수도 있다.</strong>
+    Radix 12단계에서 <strong>6은 "비상호작용 테두리", 7은 "상호작용 테두리"</strong>다.
+    즉 <em>누를 수 있는 것</em>과 <em>가만히 있는 것</em>을 색 진하기로 구분하는 것이고,
+    <strong>이미 그 규칙대로 되어 있다.</strong> 다만 <strong>이름이 그걸 말해주지 않는다</strong> —
+    <code>border-default</code> 와 <code>control-border</code> 라는 이름만 보고
+    "왜 값이 다르지?"를 알 수 없다.
+  </p>
+</div>
+
+<h4>문제 ② 반복항목 구분선이 입력 컨트롤 토큰을 빌려 쓰고 있다 ⚠️</h4>
+
+<p>
+  Accordion의 <code>line</code> 스타일은 항목들이 세로로 쌓이고 <strong>그 사이를 선이 나눈다.</strong>
+  전형적인 <strong>반복항목 구분선</strong>이다. 그런데 코드를 보면 —
+</p>
+
+<pre><code>/* _accordion.scss:46 — Accordion line variant 의 항목 구분선 */
+.nui-accordion--line .nui-accordion__item {
+  border-bottom: 1px solid var(--nui-control-border);
+                                  ↑
+                     입력 컨트롤(Textfield·Select) 전용 토큰이다</code></pre>
+
+<p>
+  <strong>Accordion 항목은 입력 컨트롤이 아니다.</strong>
+  그런데 "구분선용 토큰"이 없으니 <strong>가장 그럴듯한 걸 빌려 쓴 것</strong>이다.
+  이게 정확히 hover 배경 3종과 같은 형태의 문제다 —
+  <strong>토큰이 없어서가 아니라 "이럴 때 뭘 쓴다"가 없어서</strong> 벌어진다.
+</p>
+
+<div class="note crit">
+  <p style="margin-bottom:0">
+    <strong>왜 이게 나중에 터지나</strong> — 언젠가 <code>control-border</code> 의 값을
+    바꿔야 할 일이 생긴다(입력 테두리가 너무 연하다 같은 이유로).
+    그러면 <strong>아무 상관 없는 Accordion 구분선이 같이 바뀐다.</strong>
+    그때는 왜 바뀌는지 찾기도 어렵다.
+  </p>
+</div>
+
+<h4>정리 — 지금 선은 이렇게 배정되어 있다</h4>
+
+<div class="tw">
+<table>
+  <thead><tr><th>실제 역할</th><th>지금 쓰는 토큰</th><th>값</th><th>판정</th></tr></thead>
+  <tbody>
+    <tr><td><strong>형태선</strong> — 정적 요소 외곽<br><span class="meta">Popup 카드 · Accordion 박스</span></td>
+      <td><code>border-default</code></td><td><code>gray-6</code></td>
+      <td><span class="badge b-done">적절</span> 이름만 애매</td></tr>
+    <tr><td><strong>형태선</strong> — 상호작용 요소 외곽<br><span class="meta">Textfield · Select</span></td>
+      <td><code>control-border</code></td><td><code>gray-7</code></td>
+      <td><span class="badge b-done">적절</span> Radix 6/7 규칙과 맞음</td></tr>
+    <tr><td><strong>반복항목 구분선</strong><br><span class="meta">Accordion line 항목 사이</span></td>
+      <td><code>control-border</code></td><td><code>gray-7</code></td>
+      <td><span class="badge b-crit">빌려 씀</span> 전용 토큰 없음</td></tr>
+    <tr><td><strong>의미경계선</strong><br><span class="meta">Popup 내부 영역 구분</span></td>
+      <td><code>border-subtle</code></td><td><code>gray-5</code></td>
+      <td><span class="badge b-wait">역전</span> 구분선보다 <strong>연하다</strong></td></tr>
+    <tr><td>강조 (활성)</td>
+      <td><code>border-brand</code></td><td><code>brand-7</code></td>
+      <td><span class="badge b-done">적절</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note warn">
+  <p style="margin-bottom:0">
+    <strong>네 번째 줄이 이상하다.</strong> SEED 기준으로는
+    <strong>의미경계선(한 화면에 한두 번)이 반복항목 구분선(여러 번)보다 진해야</strong> 한다 —
+    적게 나오는 선일수록 강한 의미를 갖기 때문이다.
+    그런데 우리는 <strong>의미경계선이 <code>gray-5</code>, 구분선이 <code>gray-7</code></strong> 로
+    <strong>반대</strong>다. 이것도 규칙 없이 골라서 생긴 결과로 보인다.
+  </p>
+</div>
+
+<h4>재편안 — <code>D-06</code></h4>
+
+<pre><code>/* ── PRIMITIVE — 두께 (연쇄 안 함) ─────────────── */
+--nui-border-width-1: 1px;
+--nui-border-width-2: 2px;
+
+/* ── SEMANTIC — 색 (연쇄함) ────────────────────── */
+/* 기준: 한 화면에 몇 번 등장하는가 */
+
+--nui-border-form      /* 형태선 — 카드·패널의 외곽.        gray-6 */
+--nui-border-divider   /* 반복항목 구분선 — 리스트 row.     gray-a3 */
+--nui-border-section   /* 의미경계선 — 섹션·헤더 경계.      gray-a4 */
+
+/* 입력 컨트롤은 상태를 갖는 별도 세트로 유지 */
+--nui-control-border          /* gray-7 — 상호작용 요소의 형태선 */
+--nui-control-border-hover    /* gray-8 */
+--nui-control-border-disabled /* gray-6 */
+--nui-control-border-error    /* danger-8 */</code></pre>
+
+<p>
+  <strong>구분선·경계선에 alpha(<code>gray-a3</code> <code>a4</code>)를 제안하는 이유</strong> —
+  SEED도 이 둘만 alpha를 쓴다. 구분선은 <strong>어떤 배경 위에 놓일지 모르기 때문</strong>이다.
+  흰 카드 위일 수도, 회색 패널 위일 수도 있다. 불투명 회색이면 배경에 따라 튀지만
+  <strong>반투명이면 아래 색과 섞여 어디서든 자연스럽다.</strong>
+  우리에겐 이미 <code>gray-a3</code> ~ <code>a7</code> 이 있다.
+</p>
+
+<div class="note warn">
+  <p style="margin-bottom:0">
+    <strong>다만 <code>border-divider</code> 는 지금 쓸 자리가 하나뿐이다</strong> —
+    Accordion의 <code>line</code> variant. <strong>리스트·테이블 컴포넌트가 없어서</strong>
+    "반복항목"이 거의 없다. "안 쓰는 토큰은 남기지 않는다"가 현행 규칙이지만
+    <strong>대칭이 규칙인 세트는 예외</strong>다(하나만 빼면 다음 사람이 이유를 모른다).
+    <strong>셋을 함께 두고 주석에 근거를 적는다.</strong>
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<h2 id="s1">3. 결정 로그</h2>
+
+<p>합의된 것만 남긴다. 각 결정이 <strong>코드를 어떻게 바꾸는지</strong>는 <a href="#s4">4장</a>에 있다.</p>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>ID</th><th>결정</th><th>상태</th><th>현행이 어떻게 바뀌나</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="num"><code>D-01</code></td>
+      <td><strong>색은 2계층</strong> — Primitive → Semantic</td>
+      <td><span class="badge b-done">확정</span></td>
+      <td>색의 Component 계층이 사라진다</td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-02</code></td>
+      <td><strong>브랜드 색 1개 → 빌드 타임 생성기</strong></td>
+      <td><span class="badge b-done">확정</span></td>
+      <td>커스터마이징의 정식 창구. 기본값은 현행 유지 · <a href="#d02">4-2</a></td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-03</code></td>
+      <td><code>DESIGN.md</code> 를 배포물로 생성</td>
+      <td><span class="badge b-done">확정</span></td>
+      <td>2단계 이후 · <a href="#s7">7장</a></td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-04</code></td>
+      <td><strong>색 훅 11개만 삭제</strong> — 색은 짝이 있어 혼자 못 바꾼다</td>
+      <td><span class="badge b-done">확정</span></td>
+      <td><code>var(--nui-tooltip-bg, X)</code> → <code>var(X)</code>.
+        창구는 브랜드 색 1개로 · <a href="#d04">4-1</a></td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-05</code></td>
+      <td><strong>나머지 20개는 이름을 쪼개고 전 컴포넌트로 확장</strong>
+        — radius · 선 두께 포함</td>
+      <td><span class="badge b-done">확정</span></td>
+      <td>20개 → <strong>26개</strong> + 두께 훅 8개 신설.
+        <strong>레이아웃 · 포커스 링은 제외</strong> · <a href="#d05">4-3</a></td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-10</code></td>
+      <td><strong>훅 이름은 <code>{컴포넌트}-{속성}-{variant}</code></strong></td>
+      <td><span class="badge b-done">확정</span></td>
+      <td>속성명은 CSS 그대로. variant 축이 속성마다 달라서 순서가 이렇다 · <a href="#naming">2-4</a></td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-11</code></td>
+      <td><strong><code>!important</code> 불필요를 문서에 명시</strong></td>
+      <td><span class="badge b-done">확정</span></td>
+      <td>토큰 변경 없음. README · Foundations에 한 줄 · <a href="#important">1-5</a></td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-06</code></td>
+      <td>선 — Primitive는 두께, Semantic은 역할</td>
+      <td><span class="badge b-done">확정</span></td>
+      <td>두께 스케일 신설 / 선 색 semantic 3개 · <a href="#d06">4-5</a></td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-07</code></td>
+      <td>pressed 배율을 토큰으로 (SEED 방식)</td>
+      <td><span class="badge b-done">확정</span></td>
+      <td><code>+1px</code> 매직넘버 → <code>scale-*</code> 3개 · <a href="#d07">4-6</a></td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-08</code></td>
+      <td>elevation은 이번 범위에서 제외</td>
+      <td><span class="badge b-done">확정</span></td>
+      <td>토큰 변경 없음. 3단계에서 규칙만 문서화</td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-09</code></td>
+      <td><strong><code>-static</code> 도입</strong> — 글꼴 확대 예외를 이름으로 드러낸다</td>
+      <td><span class="badge b-done">확정</span></td>
+      <td><code>font-size</code> 7개만 두 벌 <strong>(+7개)</strong>.
+        <code>html{font-size:10px}</code> 는 <strong>불가</strong> · <a href="#q07">4-7</a></td>
+    </tr>
+    <tr>
+      <td class="num"><code>D-12</code></td>
+      <td>아이콘 라이브러리 채택</td>
+      <td><span class="badge b-hold">보류</span></td>
+      <td>이번 범위 밖. 나중에 후보를 정리해 결정한다 · <a href="#s8">8장</a></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<h2 id="s4">4. 답변과 그 결과</h2>
+
+<!-- D-04 -->
+<h3 id="d04">4-1. <code>D-04</code> 색 훅 11개 삭제</h3>
+
+<div class="card decided">
+  <h4>현행이 이렇게 바뀐다</h4>
+<pre><code>/* ── before ─────────────────────────────────── */
+background-color: #{hook("tooltip-bg", var(#{v("layer-inverse")}))};
+/* → 빌드: var(--nui-tooltip-bg, var(--nui-layer-inverse)) */
+
+/* ── after ──────────────────────────────────── */
+background-color: var(#{v("layer-inverse")});
+/* → 빌드: var(--nui-layer-inverse) */</code></pre>
+
+  <p>
+    <strong>화면은 한 픽셀도 안 바뀐다.</strong> 값은 그대로고 참조 방식만 바뀐다.
+    <strong>radius는 그대로 둔다</strong> — <a href="#d05">4-3</a>에서 이름만 쪼갠다.
+  </p>
+
+  <h4>소비자는 이제 어떻게 색을 바꾸나</h4>
+  <div class="tw">
+  <table>
+    <thead><tr><th></th><th>방법</th><th>결과</th></tr></thead>
+    <tbody>
+      <tr><td><strong>전체</strong></td>
+        <td><code>D-02</code> 생성기에 브랜드 색 1개</td>
+        <td>버튼 · 포커스 링 · 선택 상태가 <strong>대비를 유지한 채</strong> 따라온다</td></tr>
+      <tr><td><strong>역할 하나</strong></td>
+        <td><code>:root { --nui-layer-inverse: #222 }</code></td>
+        <td>그 역할을 쓰는 모든 곳이 함께 바뀐다. <strong>짝도 같이 관리된다</strong></td></tr>
+      <tr><td><strong>한 컴포넌트만</strong></td>
+        <td><code>.my-tooltip { background:#222; color:#fff }</code></td>
+        <td>레이어 밖이라 <strong>우리를 이긴다.</strong>
+          <strong>배경과 글자를 함께 쓰게 되므로</strong> 대비를 스스로 챙긴다</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <p style="margin-bottom:0">
+      <strong>세 번째 줄이 이 결정의 핵심이다.</strong> 훅으로 열어두면 소비자가
+      <strong>배경만</strong> 바꾸고 끝낼 수 있다. <code>className</code> 으로 바꾸게 하면
+      <strong>배경과 글자를 같은 자리에 쓰게 되므로</strong> 짝을 놓치기 어렵다.
+      <strong>막는 게 아니라 짝을 지키는 경로로 유도하는 것</strong>이다.
+    </p>
+  </div>
+</div>
+
+<!-- D-02 -->
+<h3 id="d02">4-2. <code>D-02</code> 브랜드 1색 생성기 — 텍스트·선까지 정해지나?</h3>
+
+<div class="card decided">
+  <div class="answer">
+    <span class="answer-k">당신의 질문</span>
+    <p style="margin:0">"이렇게 하면 <strong>텍스트나 선 컬러까지 다 정해지는 건가?</strong>"</p>
+  </div>
+
+  <p><strong>아니다. 브랜드 색 하나로는 부족하다.</strong> 실측해보면 이유가 분명하다.</p>
+
+  <h4>semantic 67개가 무엇을 참조하는지 세어봤다</h4>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>참조하는 스케일</th><th class="num">개수</th><th>비율</th><th>예</th></tr></thead>
+    <tbody>
+      <tr><td><strong>gray</strong></td><td class="num">35</td><td class="num">52%</td>
+        <td><code>text-primary</code> <code>border-default</code> <code>layer-default</code></td></tr>
+      <tr><td><strong>brand</strong></td><td class="num">8</td><td class="num">12%</td>
+        <td><code>action-primary</code> <code>focus-color</code> <code>control-accent</code></td></tr>
+      <tr><td>danger</td><td class="num">8</td><td class="num">12%</td><td><code>text-danger</code> <code>action-danger</code></td></tr>
+      <tr><td>info / warning / success</td><td class="num">10</td><td class="num">15%</td><td>상태 표시</td></tr>
+      <tr><td>white · 직접값</td><td class="num">6</td><td class="num">9%</td><td><code>layer-overlay</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>
+    <strong>텍스트와 선은 brand가 아니라 gray에서 온다.</strong>
+    실제로 <code>text-primary</code> 는 <code>gray-12</code>,
+    <code>border-default</code> 는 <code>gray-6</code> 이다.
+  </p>
+
+  <h4>그런데 gray도 브랜드에서 나온다</h4>
+  <p>지금 우리 gray를 보면 <strong>순수한 회색이 아니다.</strong></p>
+
+<pre><code>--nui-color-gray-3:  #eff1ef     R 239 · G 241 · B 239   ← G가 살짝 높다
+--nui-color-gray-12: #1c201d     R  28 · G  32 · B  29   ← 여기도</code></pre>
+
+  <p>
+    <strong>초록빛이 미세하게 섞여 있다.</strong> 브랜드가 초록(<code>#01796f</code>)이기 때문이다.
+    이게 Radix 방식이다 — <strong>gray도 브랜드 색조를 따라간다.</strong>
+    순수 회색을 쓰면 브랜드색 옆에서 <em>탁하게</em> 보인다.
+  </p>
+
+  <h4>그래서 생성기는 이렇게 된다</h4>
+
+<pre><code>입력                  생성되는 것
+────────────────────────────────────────────────────────
+브랜드 색 1개    →    brand 12단계 + alpha 4개
+  #01796f             gray  12단계 + alpha 5개  ← 색조를 물려받는다
+                      ─────────────────────────
+                      = semantic 의 64%가 결정된다
+
+상태색 4종       →    danger · warning · success · info
+(그대로 둔다)         나머지 36%. 브랜드와 무관하다
+                      "위험은 빨강"은 바꿀 이유가 없다</code></pre>
+
+  <div class="note ok">
+    <p style="margin-bottom:0">
+      <strong>답 — 브랜드 색 하나로 텍스트·선까지 정해진다.</strong>
+      단 "brand 스케일이 텍스트를 정한다"가 아니라
+      <strong>"brand 색조를 물려받은 gray 스케일이 정한다"</strong>는 경로다.
+      소비자는 여전히 <strong>색 하나만</strong> 주면 된다.
+    </p>
+  </div>
+
+  <h4>기술적으로 확인한 것</h4>
+  <div class="tw">
+  <table>
+    <thead><tr><th>확인</th><th>결과</th></tr></thead>
+    <tbody>
+      <tr><td><code>@radix-ui/colors</code></td>
+        <td>존재(3.0.0). <strong>미리 만든 스케일만</strong> 있고 커스텀 생성 기능은 없다</td></tr>
+      <tr><td>커스텀 생성 npm 패키지</td><td><strong>없다.</strong> 후보 3개 전부 미등록</td></tr>
+      <tr><td>Radix 웹 생성기</td>
+        <td><code>radix-ui.com/colors/custom</code> 에 있다. <strong>알고리즘을 우리가 옮겨와야 한다</strong></td></tr>
+      <tr><td>런타임 CSS로 가능한가</td>
+        <td><strong>불가능.</strong> 색 공간 계산이 필요하다</td></tr>
+      <tr><td>현재 값의 출처</td>
+        <td><code>_seed.scss</code> 에 "Radix 12단계 스케일" 참조만 있고
+          <strong>어떤 도구로 뽑았는지 기록이 없다.</strong>
+          <code>warning-9</code>(<code>#ffc53d</code>)만 Radix amber-9와 일치</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+<pre><code>npx @chansikchoi/next-ui theme --brand "#01796f" --out ./nui-theme.css
+# 기본값(인자 없음) = 지금 적용된 색 그대로</code></pre>
+
+  <div class="note warn">
+    <p style="margin-bottom:0">
+      <strong>이 기능 자체는 이번 범위(Foundations까지)를 넘어선다.</strong>
+      생성 알고리즘 · CLI · 대비 검증 · 다크 스케일이 붙는 독립 기능이다.
+      <strong>이번에 하는 것은 "창구는 브랜드 색 1개"라는 전제를 세우는 것</strong>까지다.
+      그 전제가 서야 <code>D-04</code>(색 훅 삭제)의 근거가 완성된다.
+    </p>
+  </div>
+</div>
+
+<!-- D-05 -->
+<h3 id="d05">4-3. <code>D-05</code> 치수 훅 — 쪼개고, 전 컴포넌트로 확장</h3>
+
+<div class="card decided">
+  <div class="answer">
+    <span class="answer-k">당신의 답</span>
+    <p style="margin:0">
+      "버튼뿐만 아니라 <strong>모든 컴포넌트의 간격·패딩 등 각 요소별로 변수명으로 쪼개서</strong>
+      커스텀할 수 있도록. 다만 <strong>레이아웃은 변경 못 하게</strong>,
+      각 컴포넌트의 <strong>디테일한 스타일만</strong> 수정하도록"
+    </p>
+  </div>
+
+  <h4>① 겹친 이름을 쪼갠다</h4>
+<pre><code>/* ── before — 세 자리가 한 이름을 공유한다 ──────── */
+.nui-button         { min-height: var(--nui-button-min-height, 3.5rem);  }
+.nui-button--medium { min-height: var(--nui-button-min-height, 3rem);    }
+.nui-button--small  { min-height: var(--nui-button-min-height, 2.25rem); }
+
+/* ── after — 자리마다 이름이 다르다 ────────────── */
+.nui-button         { min-height: var(--nui-button-height-lg, 3.5rem);  }
+.nui-button--medium { min-height: var(--nui-button-height-md, 3rem);    }
+.nui-button--small  { min-height: var(--nui-button-height-sm, 2.25rem); }</code></pre>
+
+<pre><code>/* 소비자 — small 버튼만 키운다. lg · md 는 그대로 */
+:root { --nui-button-height-sm: 40px; }</code></pre>
+
+  <p>
+    <code>D-04</code>로 색 훅 11개가 빠지고 <strong>20개</strong>가 남는다
+    (radius 8 · 간격 2 · 크기 10). 그중 <strong>이름이 겹치는 것은 4개</strong>다. 세어봤다.
+  </p>
+  <div class="tw">
+  <table>
+    <thead><tr><th>훅</th><th class="num">자리</th><th>쪼갠 뒤</th></tr></thead>
+    <tbody>
+      <tr><td><code>button-min-height</code></td><td class="num">3</td>
+        <td><code>button-height-lg</code> <code>-md</code> <code>-sm</code></td></tr>
+      <tr><td><code>popup-width</code></td><td class="num">3</td>
+        <td><code>popup-width-lg</code> <code>-md</code> <code>-sm</code></td></tr>
+      <tr><td><code>button-padding-x</code></td><td class="num">2</td>
+        <td><code>button-padding-x-lg</code> <code>-sm</code></td></tr>
+      <tr><td><code>button-radius</code></td><td class="num">2</td>
+        <td><code>button-radius</code> <code>button-radius-round</code>
+          <br><span class="meta">기본(4px)과 <code>--round</code>(pill)는 다른 자리다</span></td></tr>
+      <tr><td>나머지 16개</td><td class="num">각 1</td><td>그대로</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>20개 → <strong>26개.</strong> 겹치는 이름이 <strong>0개</strong>가 된다.</p>
+
+  <div class="note">
+    <p style="margin-bottom:0">
+      <strong>겹친 이름이 전부 나쁜 건 아니다.</strong>
+      <code>selector-size</code> 도 두 자리에 쓰이는데 <strong>이건 쪼개면 안 된다</strong> —
+      Checkbox·Radio의 <code>width</code> 와 <code>height</code> 를 <strong>같은 값으로 묶어</strong>
+      정사각형을 보장하는 자리이기 때문이다. 쪼개면 소비자가 한쪽만 바꿔 <strong>타원이 될 수 있다.</strong>
+      <strong>"의도해서 묶은 것"과 "실수로 겹친 것"을 구분해야 한다.</strong>
+    </p>
+<pre style="margin:0.75rem 0 0"><code>.nui-checkbox, .nui-radio {
+  width:  var(--nui-selector-size, 1.375rem);
+  height: var(--nui-selector-size, 1.375rem);   /* 같은 이름이어야 정사각형 */
+}</code></pre>
+  </div>
+
+  <h4>② 전 컴포넌트로 확장한다 — 어디까지?</h4>
+  <p>
+    "레이아웃은 안 되고 디테일만"이라는 기준을 <strong>규칙으로 못박아야</strong>
+    나중에 훅을 추가할 때 다시 고민하지 않는다. 이렇게 나눈다.
+  </p>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th></th><th class="num">연다</th><th class="num">닫는다</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>기준</strong></td>
+        <td><strong>컴포넌트 안쪽</strong> — 자기가 소유한 것</td>
+        <td><strong>컴포넌트 바깥</strong> — 부모가 소유한 것</td>
+      </tr>
+      <tr>
+        <td><strong>속성</strong></td>
+        <td><code>padding</code> <code>gap</code> <code>border-radius</code>
+          <code>height</code> <code>min-height</code> <code>min-width</code>
+          <br>자기 치수(<code>width</code> — Switch·Popup 등)</td>
+        <td><code>margin</code> <code>position</code> <code>display</code>
+          <code>flex-direction</code> <code>order</code> <code>z-index</code>
+          <br>블록 요소의 <code>width</code>
+          <br><strong>+ 색 전부</strong> — <code>D-04</code></td>
+      </tr>
+      <tr>
+        <td><strong>왜</strong></td>
+        <td>바꿔도 <strong>그 컴포넌트 안에서 끝난다</strong></td>
+        <td>바꾸면 <strong>주변 배치가 깨진다.</strong>
+          <code>margin</code> 으로 바깥 간격을 만들지 않는다는 현행 원칙과도 맞는다</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <p style="margin-bottom:0">
+      <strong>왜 <code>width</code> 가 양쪽에 있나</strong> —
+      Switch(46×26px)나 Popup처럼 <strong>자기 치수를 갖는</strong> 컴포넌트의 폭은 자기 것이다.
+      반면 Textfield·Button처럼 <strong>부모 폭을 채우는</strong> 블록 요소의 폭은 부모 것이다.
+      전자는 열고 후자는 닫는다.
+    </p>
+  </div>
+
+  <h4>③ 선 두께 훅을 새로 연다</h4>
+  <p>
+    <a href="#line-width">2-3</a>의 결론이다 — <code>border</code> 를 실제로 쓰는
+    <strong>8개 컴포넌트</strong>에만 만든다. <strong>포커스 링 두께는 제외</strong>한다(접근성).
+  </p>
+<pre><code>--nui-button-border-width      --nui-popup-border-width
+--nui-textfield-border-width   --nui-textarea-border-width
+--nui-select-border-width      --nui-accordion-border-width
+--nui-datepicker-border-width  --nui-checkbox-border-width</code></pre>
+
+  <h4>④ 이름 규칙</h4>
+  <p>근거는 <a href="#naming">2-4</a>에 있다. 결과만 다시 적는다.</p>
+<pre><code>--nui-{컴포넌트}-{요소?}-{속성}-{variant?}
+
+--nui-button-height-sm          버튼 · 높이 · small
+--nui-button-radius-round       버튼 · 둥글기 · round
+--nui-textfield-padding-x       텍스트필드 · 좌우 여백      (variant 없음)
+--nui-accordion-header-gap      아코디언 · 헤더 · 간격      (요소 있음)</code></pre>
+
+  <div class="note warn">
+    <p style="margin-bottom:0">
+      <strong>Button 클래스명 문제를 하나 남긴다.</strong> 지금 클래스는
+      <code>.nui-button</code>(기본·56px) / <code>--medium</code>(48px) / <code>--small</code>(36px)이라
+      <strong>가장 큰 것에 이름이 없다.</strong> 토큰만 <code>-lg</code> 로 부르면
+      "<code>lg</code> 인데 클래스는 무명"이 된다.
+      <strong>토큰 이름은 <code>-lg/-md/-sm</code> 으로 가고</strong>,
+      클래스에 <code>--large</code> 를 추가할지는 컴포넌트 단계(4단계)에서 정한다.
+    </p>
+  </div>
+</div>
+
+<!-- Q-06 해소 -->
+<h3 id="q06">4-4. <code>Q-06</code> 해소 — 색과 치수의 비대칭</h3>
+
+<div class="card decided">
+  <p>
+    <strong><a href="#s2">2장</a>이 이 질문의 답이다.</strong>
+    색 훅은 없애고 치수 훅은 늘리는 것이 <strong>비대칭이 아니라 성질의 차이</strong>다.
+  </p>
+  <div class="tw">
+  <table>
+    <thead><tr><th></th><th>색 훅 11개</th><th>나머지 20개 (radius · 간격 · 크기)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>짝이 있나</strong></td>
+        <td><strong>있다.</strong> 배경↔글자.
+          배경만 바꾸면 <strong>보이지 않게 대비가 깨진다</strong></td>
+        <td><strong>없다.</strong> 바꾸면 그게 전부고
+          <strong>결과가 바로 눈에 보인다</strong></td></tr>
+      <tr><td><strong>연쇄</strong></td>
+        <td><code>gray-12</code> 하나가 <strong>5개 semantic</strong>으로 퍼진다</td>
+        <td>Button 높이는 <strong>아무 데도 안 퍼진다</strong></td></tr>
+      <tr><td><strong>처분</strong></td>
+        <td><span class="badge b-crit">삭제</span> — 창구는 브랜드 색 1개</td>
+        <td><span class="badge b-done">확장</span> — 컴포넌트별로 연다</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="margin-bottom:0">
+    <a href="#shape-vs-size">2-2</a>의 결론이다 —
+    <strong>"혼자 바꿀 수 없는 값은 막고, 혼자 바꿔도 되는 값은 연다."</strong>
+    색만 짝이 있고 나머지는 없다.
+  </p>
+</div>
+
+<!-- D-06 -->
+<h3 id="d06">4-5. <code>D-06</code> 선 — 두께와 역할을 나눈다</h3>
+
+<div class="card decided">
+  <div class="answer">
+    <span class="answer-k">당신의 답</span>
+    <p style="margin:0">
+      "Primitive 에는 지금처럼 <strong>선 두께별</strong>,
+      Semantic 에서는 SEED처럼 <strong>각 요소별 정리</strong>로"
+    </p>
+  </div>
+
+  <p>
+    <a href="#s2">2장</a>의 두 축 규칙과 정확히 일치한다.
+    <strong>재편안과 실측 근거는 <a href="#stroke">2-7 · 2-8</a>에 있다.</strong>
+    여기서는 결과만 다시 적는다.
+  </p>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th></th><th>before</th><th>after</th></tr></thead>
+    <tbody>
+      <tr><td><strong>두께</strong></td>
+        <td><code>border-width: 1px</code> 하나</td>
+        <td><code>border-width-1</code> <code>-2</code> — Primitive 스케일</td></tr>
+      <tr><td><strong>형태선</strong></td>
+        <td><code>border-default</code> (gray-6)</td>
+        <td><code>border-form</code> (gray-6) — 이름이 역할을 말한다</td></tr>
+      <tr><td><strong>반복항목 구분선</strong></td>
+        <td><span class="badge b-crit">없음</span> <code>control-border</code> 를 빌려 씀</td>
+        <td><code>border-divider</code> (gray-a3) — 전용 토큰 신설</td></tr>
+      <tr><td><strong>의미경계선</strong></td>
+        <td><code>border-subtle</code> (gray-5) — 구분선보다 <strong>연하다</strong></td>
+        <td><code>border-section</code> (gray-a4) — 구분선보다 <strong>진하게</strong></td></tr>
+      <tr><td><strong>입력 컨트롤</strong></td>
+        <td colspan="2"><code>control-border-*</code> 4종 — <strong>상태를 갖는 별도 세트로 유지</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>
+    실측에서 나온 두 가지가 이 재편의 근거다 —
+    <strong>① Accordion 구분선이 입력 컨트롤 토큰을 빌려 쓰고 있다</strong>,
+    <strong>② 의미경계선이 구분선보다 연해서 위계가 뒤집혀 있다.</strong>
+  </p>
+</div>
+
+<!-- D-07 -->
+<h3 id="d07">4-6. <code>D-07</code> pressed 배율을 토큰으로</h3>
+
+<div class="card decided">
+<pre><code>/* ── before — 매직 넘버 ──────────────────────── */
+.nui-button:active { transform: translateY(1px); }
+
+/* ── after — SEED 방식. 크기별 축소 배율 ──────── */
+--nui-scale-95: 0.95;   /* 작은 요소 — 칩 · 아이콘 버튼 */
+--nui-scale-97: 0.97;   /* 중간 */
+--nui-scale-98: 0.98;   /* 큰 요소 — 전면 버튼 · 카드 */
+
+.nui-button:active { transform: scale(var(--nui-scale-98)); }</code></pre>
+
+  <p>
+    <strong>왜 세 단계인가</strong> — 큰 요소일수록 <strong>덜 줄여야</strong> 같은 정도로 눌린 느낌이 난다.
+    전면 버튼을 0.95로 줄이면 과하게 움츠러들고, 작은 칩을 0.98로 줄이면 티가 안 난다.
+  </p>
+
+  <div class="note">
+    <p style="margin-bottom:0">
+      <strong>이번 범위에서는 토큰만 만든다.</strong>
+      <code>translateY</code> → <code>scale</code> 로 실제 표현을 바꾸는 것은 <strong>시각 변경</strong>이라
+      컴포넌트 단계(4단계)에서 한다. 토큰이 먼저 있어야 그때 일괄로 바꿀 수 있다.
+    </p>
+  </div>
+</div>
+
+<!-- Q-07 -->
+<h3 id="q07">4-7. <code>D-09</code> <code>-static</code> 과 <code>html { font-size: 10px }</code></h3>
+
+<div class="card asking">
+  <div class="answer">
+    <span class="answer-k">당신의 답</span>
+    <p style="margin:0">
+      "SEED처럼 <code>-static</code> 을 도입하고 싶다.
+      <code>html</code> 에 font-size 10px 넣는 건 <strong>빌드 시점에 스크립트로</strong> 넣을 수 있으면 그렇게 하고,
+      이후 브레이크포인트별 <code>html</code> font-size 수정은 <strong>소비자에게 맡기자</strong>"
+    </p>
+  </div>
+
+  <p>세 가지를 나눠서 답한다. <strong>둘은 되고 하나는 안 된다.</strong></p>
+
+  <h4>① <code>-static</code> 도입 — <span class="badge b-done">가능</span></h4>
+  <p>
+    <code>font-size</code> 토큰마다 px 짝을 만든다.
+    <strong>이름에 <code>static</code> 이 박혀 있어 "여기는 의도적으로 고정했다"가 검색된다.</strong>
+  </p>
+<pre><code>--nui-font-size-4:         1rem;    /* 기본 — 사용자 글꼴 설정을 따른다 */
+--nui-font-size-4-static:  16px;    /* 예외 — 고정. Switch 내부 텍스트 등 */</code></pre>
+
+  <div class="note ok">
+    <p style="margin-bottom:0">
+      <strong>우리는 SEED보다 적게 만들면 된다.</strong> SEED는 크기·행간을 <strong>둘 다</strong> 두 벌로 갖는데,
+      우리 <code>line-height</code> 는 <strong>배수(1.5 같은 단위 없는 숫자)</strong>라
+      글꼴이 커져도 <strong>비율이 유지된다.</strong> <code>letter-spacing</code> 도 <code>em</code> 이라 마찬가지다.
+      <strong><code>font-size</code> 7개만 두 벌 = +7개</strong>로 끝난다.
+    </p>
+  </div>
+
+  <h4>② 브레이크포인트별 <code>html</code> font-size 조정 — <span class="badge b-done">이미 가능</span></h4>
+  <p>
+    소비자가 이렇게 쓰면 <strong>우리 컴포넌트가 통째로 스케일된다.</strong>
+    우리가 <strong>이미 rem을 쓰고 있으므로 아무것도 안 해도 된다.</strong>
+  </p>
+<pre><code>/* 소비자 프로젝트 */
+@media (min-width: 1440px) { html { font-size: 112.5%; } }  /* 18px 기준 */
+@media (max-width: 480px)  { html { font-size: 87.5%;  } }  /* 14px 기준 */</code></pre>
+
+  <h4>③ 우리가 <code>html { font-size: 10px }</code> 를 배포 — <span class="badge b-crit">불가</span></h4>
+  <p>세 가지 이유로 막힌다.</p>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th></th><th>문제</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>1원칙 위반</strong></td>
+        <td><code>html</code> 은 전역 셀렉터다. 우리가 이걸 배포하면
+          <strong>소비자 프로젝트의 모든 rem이 함께 바뀐다.</strong>
+          소비자가 <code>2rem</code> 으로 써둔 곳이 32px → <strong>20px로 줄어든다.</strong>
+          "소비자 스타일을 오염시키지 않는다"는 우리 1원칙의 정면 위반이다</td>
+      </tr>
+      <tr>
+        <td><strong>기계 검사에 걸린다</strong></td>
+        <td><code>verify:css</code> 가 <strong>"<code>preflight.css</code> 외 파일의 태그 셀렉터"</strong>를
+          실패로 잡는다. 지금 있는 검사다</td>
+      </tr>
+      <tr>
+        <td><strong>강제 의존이 생긴다</strong></td>
+        <td>우리 값을 10px 기준으로 다시 계산하면(예: 36px = <code>3.6rem</code>),
+          <strong>소비자가 반드시 10px을 넣어야만</strong> 컴포넌트가 정상으로 보인다.
+          안 넣으면 전부 1.6배로 커진다. <strong>"설치하면 그냥 동작한다"가 깨진다</strong></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>그리고 <code>10px</code> 은 접근성에서도 <code>62.5%</code> 보다 나쁘다</h4>
+  <div class="tw">
+  <table>
+    <thead><tr><th></th><th><code>font-size: 10px</code></th><th><code>font-size: 62.5%</code></th></tr></thead>
+    <tbody>
+      <tr><td>사용자가 브라우저 글꼴을 20px로 키우면</td>
+        <td><strong>무시된다.</strong> 10px 고정</td>
+        <td><strong>12.5px로 따라 커진다</strong></td></tr>
+      <tr><td>WCAG 1.4.4 (텍스트 200% 확대)</td>
+        <td><span class="badge b-crit">위반</span></td>
+        <td><span class="badge b-done">통과</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="answer">
+    <span class="answer-k">당신의 결정</span>
+    <p style="margin:0">"<strong><code>-static</code> 사용하도록 할게</strong>"</p>
+  </div>
+
+  <div class="note ok">
+    <p><strong>정리 — 원하시는 것은 ③ 없이도 전부 된다</strong></p>
+    <ul style="margin-bottom:0">
+      <li><strong><code>-static</code> 도입</strong> <span class="badge b-done">확정</span>
+        <code>font-size</code> 7개만 두 벌 = <strong>+7개</strong></li>
+      <li><strong>브레이크포인트별 스케일</strong> → 소비자가 <code>html</code> font-size만 조정하면 된다.
+        <strong>지금도 되고, 문서에 방법을 적으면 끝난다</strong></li>
+      <li><strong>10px 기준</strong> → 하지 않는다. 얻는 것은 <em>계산 편의</em>뿐인데
+        <strong>1원칙 · 기계 검사 · 접근성 셋 다 잃는다</strong></li>
+    </ul>
+  </div>
+
+  <h4>확정된 것 — 토큰 7개</h4>
+<pre><code>--nui-font-size-1-static:  12px      --nui-font-size-5-static:  18px
+--nui-font-size-2-static:  13px      --nui-font-size-6-static:  20px
+--nui-font-size-3-static:  14px      --nui-font-size-8-static:  32px
+--nui-font-size-4-static:  16px</code></pre>
+
+  <div class="note warn">
+    <p style="margin-bottom:0">
+      <strong>어디에 쓸지는 아직 실측하지 않았다.</strong>
+      후보는 Switch(46×26px) · Checkbox(22×22px)처럼 <strong>자기 치수가 고정된</strong> 컨트롤의 내부 텍스트다.
+      글꼴 200%에서 실제로 깨지는지 <strong>브라우저로 확인한 뒤</strong> 대상 목록을 확정한다.
+      <strong>토큰은 이번에 만들고, 적용은 컴포넌트 단계(4단계)</strong>에서 한다.
+      <strong>실측에서 쓸 자리가 하나도 없으면 토큰도 만들지 않는다</strong> — 죽은 토큰이 되므로.
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<h2 id="s5">5. 이번 범위</h2>
+
+<h3 id="tally">5-1. 총 수지 — 토큰이 몇 개 늘고 주나</h3>
+
+<p>결정 전부를 합치면 이렇게 된다. <strong>정확한 목록은 2단계 실행 계약에서 전량 나열한다.</strong></p>
+
+<div class="tw">
+<table>
+  <thead><tr><th></th><th>항목</th><th class="num">변화</th><th>근거</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="2"><strong>공개 훅</strong><br><span class="meta">31개 → 34개</span></td>
+      <td>색 훅 삭제</td><td class="num">−11</td><td><code>D-04</code></td></tr>
+    <tr><td>겹친 이름 쪼개기 (20 → 26) · 선 두께 훅 신설</td>
+      <td class="num">+6 / +8</td><td><code>D-05</code></td></tr>
+
+    <tr><td rowspan="4"><strong>전역 토큰</strong></td>
+      <td><code>-static</code> — <code>font-size</code> 7개의 px 짝</td><td class="num">+7</td><td><code>D-09</code></td></tr>
+    <tr><td><code>scale-95/97/98</code> — pressed 배율</td><td class="num">+3</td><td><code>D-07</code></td></tr>
+    <tr><td><code>border-width-2</code> — 두께 스케일</td><td class="num">+1</td><td><code>D-06</code></td></tr>
+    <tr><td>선 색 재편 — <code>border-form</code> <code>-divider</code> <code>-section</code></td>
+      <td class="num">±0</td><td><code>D-06</code> · 기존 4개를 3개로 갈고 <code>brand</code> 2개 유지</td></tr>
+
+    <tr><td><strong>내부 배선</strong></td>
+      <td><code>--nui-_*</code> 9개</td><td class="num">변화 없음</td>
+      <td>공개 API가 아니다. variant 구현 수단으로 유지</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <p style="margin-bottom:0">
+    <strong>토큰이 늘어나는 것 자체는 목표가 아니다.</strong>
+    늘어난 11개(<code>-static</code> 7 · <code>scale</code> 3 · <code>border-width-2</code> 1)는
+    전부 <strong>지금 코드에 하드코딩되어 있거나 없어서 못 쓰던 값</strong>이다.
+    <code>-static</code> 은 <strong>실측에서 쓸 자리가 없으면 만들지 않는다.</strong>
+  </p>
+</div>
+
+<h3>5-2. 무엇을 하고 무엇을 안 하나</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th>한다</th><th>하지 않는다</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>.claude/rules/</code> 문서 <strong>새로 씀</strong> (두 축 원칙 반영)<br>
+        <code>_seed.scss</code> — 색 계층 · 선 색 3분할 · <code>border-width-1/2</code> ·
+        <code>scale-*</code> · <code>-static</code><br>
+        <code>hook()</code> 정리 — 색 11 삭제 · 이름 분리 6 · <strong>선 두께 훅 8 신설</strong><br>
+        <code>check-token-layers.mjs</code> 검사 규칙 갱신
+        <span class="meta">(색 훅 금지 · 이름 규칙 강제)</span><br>
+        <code>apps/docs</code> Foundations 전 페이지<br>
+        README · Foundations에 <strong><code>!important</code> 불필요</strong> 명시<br>
+        changeset 작성
+      </td>
+      <td>
+        <strong>컴포넌트 <code>.tsx</code> 수정</strong><br>
+        <strong>시각적 변경</strong> (<code>translateY</code>→<code>scale</code>, <code>-static</code> 적용)<br>
+        <strong>브랜드 색 생성기 구현</strong> (<code>D-02</code> — 별도 기능)<br>
+        elevation 토큰 변경 · 반응형 해제 · npm 배포
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note crit">
+  <p><strong>"컴포넌트를 안 건드린다"가 완전히 성립하지 않는다</strong></p>
+  <p>훅을 없애거나 이름을 바꾸면 <strong>SCSS 호출부를 고쳐야 컴파일된다.</strong></p>
+<pre style="margin:0.75rem 0"><code>/* 색 훅 — 삭제 */
+before:  background: #{hook("tooltip-bg", var(#{v("layer-inverse")}))};
+after:   background: var(#{v("layer-inverse")});
+
+/* 치수 훅 — 이름 변경 */
+before:  min-height: #{hook("button-min-height", var(#{v("size-control-md")}))};
+after:   min-height: #{hook("button-height-sm",  var(#{v("size-control-md")}))};</code></pre>
+  <p style="margin-bottom:0">
+    <strong>값은 그대로다. 시각적 결과는 한 픽셀도 바뀌지 않는다.</strong>
+    다만 파일은 열어야 하므로 이 구분을 2단계 착수 전에 다시 확인한다.
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<h2 id="s6">6. 확보한 자료</h2>
+
+<div class="tw">
+<table>
+  <thead><tr><th>자료</th><th>위치</th><th>쓸모</th></tr></thead>
+  <tbody>
+    <tr><td><strong>SEED 분석 14편</strong></td><td><code>research/seed-design/</code></td>
+      <td>당근 파운데이션 15개 항목 전량 + 우리 시사점</td></tr>
+    <tr><td><strong>Figma 100 팔레트</strong></td><td><code>research/figma-palettes/palettes.json</code></td>
+      <td>400색. <strong><code>D-02</code> 생성기의 입력 후보</strong></td></tr>
+    <tr><td>DESIGN.md 사례 73개</td><td><code>voltagent/awesome-design-md</code> (미보관)</td>
+      <td>포맷 조사용 · <a href="#s7">7장</a></td></tr>
+    <tr><td>pen.dev 캔버스</td><td><code>design/design-system.pen</code></td>
+      <td>토큰 계층 · 상태 매트릭스 · 스케일 시각화 4장</td></tr>
+    <tr><td>현행 토큰</td><td><code>apps/docs/src/generated/tokens.json</code></td>
+      <td>261개 / 15개 그룹. <code>_seed.scss</code> 에서 자동 추출</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="sw-row">
+  <span class="sw" style="background:#aebe89"></span>
+  <span class="sw" style="background:#850121"></span>
+  <span class="sw" style="background:#52a7cc"></span>
+  <span class="sw" style="background:#15192f"></span>
+  <span class="sw" style="background:#f57b51"></span>
+  <span class="sw" style="background:#52ada2"></span>
+  <span class="sw" style="background:#872657"></span>
+  <span class="sw" style="background:#f340af"></span>
+  <span class="sw" style="background:#171d4b"></span>
+  <span class="sw" style="background:#13a699"></span>
+  <span class="sw" style="background:#c74375"></span>
+  <span class="sw" style="background:#2c2627"></span>
+</div>
+<p class="meta" style="margin-top:0">
+  Figma 400색 중 12개 표본 · <code>D-02</code> 생성기가 붙으면 <strong>이 중 하나를 골라 테마를 만들 수 있다</strong>
+</p>
+
+<!-- ══════════════════════════════════════════════════ -->
+<h2 id="s7">7. <code>D-03</code> <code>DESIGN.md</code> 도입</h2>
+
+<div class="card decided">
+  <div class="answer">
+    <span class="answer-k">당신의 답</span>
+    <p style="margin:0">"이건 권고안으로 하자" — <strong>도입하되 2단계 이후</strong></p>
+  </div>
+
+  <p>
+    Google Stitch가 만든 <strong>마크다운 한 장짜리 디자인 시스템</strong>이다.
+    프로젝트 루트에 놓으면 <strong>AI 코딩 에이전트가 읽고 그 스타일대로 UI를 만든다.</strong>
+  </p>
+
+  <h4>우리 <code>rules/</code> 와 역할이 갈린다 — 73개 파일에서 세어봤다</h4>
+  <div class="tw">
+  <table>
+    <thead><tr><th>키워드</th><th class="num">등장</th></tr></thead>
+    <tbody>
+      <tr><td><code>contrast</code> / <code>WCAG</code></td><td class="num">55 / 73</td></tr>
+      <tr><td><code>disabled</code></td><td class="num">46 / 73</td></tr>
+      <tr><td><code>readonly</code> · <code>focus-visible</code> · <code>aria-</code> ·
+        <code>prefers-reduced-motion</code></td><td class="num"><strong>0 / 73</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+<pre><code>rules/       퍼블 규약 — 상태 우선순위 · @layer 격리 · aria · 패키징   (이미 있다)
+DESIGN.md    디자인    — 색 · 타이포 · 간격 · 시각 위계               (보강할 쪽)</code></pre>
+
+  <h4>실행 순서</h4>
+  <ol>
+    <li>2단계를 끝내 <strong>토큰 이름을 확정</strong>한다 (지금 넣으면 매핑을 두 번 한다)</li>
+    <li><code>generate-design-md.mjs</code> 로 <code>_seed.scss</code> 에서 생성한다</li>
+    <li><code>design.md lint</code> 를 <code>verify:pkg</code> 체인에 넣는다</li>
+    <li>패키지 <code>files</code> 에 포함해 배포한다</li>
+  </ol>
+
+<pre><code>_seed.scss  →  extract-tokens.mjs  →  tokens.json  →  문서 사이트 표
+                                   ↘  DESIGN.md            ← 여기에 하나 더 붙인다</code></pre>
+
+  <div class="note warn">
+    <p style="margin-bottom:0">
+      <strong>한계 — 우리 체계의 절반만 담긴다.</strong>
+      <code>colors</code> 가 평평한 목록이라 <strong>Primitive/Semantic 구분이 표현되지 않고</strong>,
+      <strong>테마 축도 없어</strong> <code>[data-theme="dark"]</code> 를 담을 자리가 없다.
+      alpha · <code>easing-*</code> · <code>duration-*</code> · <code>z-*</code> · <code>focus-ring-*</code> 도 스키마에 없다.
+      <code>version: alpha</code> 라 스펙도 아직 변한다.
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<h2 id="s8">8. 다음에 할 일</h2>
+
+<p>
+  <strong>질문은 전부 끝났고 실행 계약도 나왔다.</strong>
+  <code>Q-01</code>~<code>Q-07</code> 이 <code>D-01</code>~<code>D-12</code> 로 바뀌었다.
+</p>
+
+<div class="tw">
+<table>
+  <thead><tr><th>순서</th><th>할 일</th><th>상태</th></tr></thead>
+  <tbody>
+    <tr><td class="num">1</td>
+      <td><a href="#s2">2장(두 축 원칙)</a> 승인</td>
+      <td><span class="badge b-done">완료 · 2026-08-28</span></td></tr>
+    <tr><td class="num">2</td>
+      <td><a href="#s9">9장 실행 계약</a> 작성</td>
+      <td><span class="badge b-done">완료</span></td></tr>
+    <tr><td class="num">3</td>
+      <td><strong>실행 계약 승인</strong>
+        <br><span class="meta">특히 <a href="#traps">9-1 함정 4건</a>의 판단을 확인해주셔야 한다</span></td>
+      <td><span class="badge b-wait">여기</span></td></tr>
+    <tr><td class="num">4</td>
+      <td>실측 4건 (8-1) → 코드 수정 → 검증</td>
+      <td><span class="badge b-hold">대기</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>8-1. 2단계에서 먼저 재야 할 것</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th></th><th>실측</th><th>없으면 생기는 일</th></tr></thead>
+  <tbody>
+    <tr><td class="num">①</td>
+      <td><code>-static</code> 이 실제로 필요한 자리 —
+        글꼴 200%에서 <strong>깨지는 컨트롤을 브라우저로 확인</strong></td>
+      <td>쓸 자리가 없으면 <strong>토큰 7개가 통째로 죽는다</strong></td></tr>
+    <tr><td class="num">②</td>
+      <td>전 컴포넌트 훅 확장 —
+        <strong>"안쪽/바깥쪽" 기준으로 속성을 분류</strong>한 목록 작성</td>
+      <td>기준 없이 추가하면 <strong>지금 고치는 문제를 그대로 반복한다</strong></td></tr>
+    <tr><td class="num">③</td>
+      <td>선 색 재편의 실제 값 배정 —
+        <code>border-divider</code> <code>-section</code> 에 어느 alpha 단계를 줄지</td>
+      <td>위계가 또 뒤집힐 수 있다 (<a href="#stroke">2-8</a>의 문제)</td></tr>
+    <tr><td class="num">④</td>
+      <td><code>2px</code> 같은 <strong>하드코딩 잔여물 훑기</strong>
+        <span class="meta">(Accordion 화살표에서 하나 발견됨)</span></td>
+      <td>토큰 체계를 우회하는 자리가 남는다</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="deferred">8-2. 보류 — 이번에 정하지 않은 것</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th>항목</th><th>상태</th><th>내용</th></tr></thead>
+  <tbody>
+    <tr><td><strong>아이콘 라이브러리</strong> <code>D-12</code></td>
+      <td><span class="badge b-hold">보류</span></td>
+      <td>나중에 외부 라이브러리를 쓰기로 했다.
+        <strong>가장 많이 쓰이는 후보를 정리해 비교한 뒤 결정</strong>한다.
+        볼 것 — 번들 크기 · 트리셰이킹 · 라이선스 · React 컴포넌트 제공 여부 ·
+        아이콘 개수 · 우리 <code>size-icon-*</code> 스케일과의 궁합</td></tr>
+    <tr><td><strong>브랜드 색 생성기</strong> <code>D-02</code></td>
+      <td><span class="badge b-hold">별도 기능</span></td>
+      <td>방향은 확정. <strong>구현은 이번 범위 밖.</strong>
+        Radix 커스텀 생성 알고리즘을 옮겨와야 한다 (<a href="#d02">4-2</a>)</td></tr>
+    <tr><td><strong>elevation 체계</strong> <code>D-08</code></td>
+      <td><span class="badge b-hold">보류</span></td>
+      <td>토큰은 안 건드리고 <strong>3단계에서 규칙만 문서화</strong></td></tr>
+    <tr><td><strong>반응형</strong></td>
+      <td><span class="badge b-hold">보류</span></td>
+      <td><code>respond-to</code> 인프라만 있고 사용처 없음. 이번에도 풀지 않는다</td></tr>
+    <tr><td><strong>Button <code>--large</code> 클래스</strong></td>
+      <td><span class="badge b-hold">4단계</span></td>
+      <td>토큰은 <code>-lg/-md/-sm</code> 인데 <strong>클래스는 기본에 이름이 없다.</strong>
+        클래스 추가 여부는 컴포넌트 단계에서 (<a href="#d05">4-3</a>)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<h2 id="s9">9. 2단계 실행 계약</h2>
+
+<div class="note ok">
+  <p style="margin-bottom:0">
+    <strong><a href="#s2">2장(두 축 원칙)</a> 승인 완료 · 2026-08-28.</strong>
+    이 계약을 승인하면 코드를 고치기 시작한다.
+  </p>
+</div>
+
+<h3 id="traps">9-1. 착수 전에 판단해야 하는 것 4가지 ★</h3>
+
+<p>
+  계약을 쓰려고 코드를 전량 훑다가 <strong>기계적으로 처리하면 틀리는 자리 넷</strong>을 찾았다.
+  <strong>이걸 먼저 정하지 않으면 잘못 고친다.</strong>
+</p>
+
+<h4>함정 ① Button과 Popup의 크기 축이 다르다 ⚠️</h4>
+
+<pre><code>/* Button — 기본이 가장 크다 */
+.nui-button           min-height: size-field       56px  ← 기본
+.nui-button--medium   min-height: size-control-xl  48px
+.nui-button--small    min-height: size-control-md  36px
+
+/* Popup — 기본이 가운데다 */
+.nui-popup__panel              width: 30rem    ← 기본
+.nui-popup--small  __panel     width: 22.5rem
+.nui-popup--large  __panel     width: 40rem</code></pre>
+
+<p>
+  <strong>둘 다 3단계인데 기본의 위치가 다르다.</strong>
+  기계적으로 <code>-lg/-md/-sm</code> 을 붙이면 어긋난다.
+</p>
+<div class="tw">
+<table>
+  <thead><tr><th>자리</th><th>Button</th><th>Popup</th></tr></thead>
+  <tbody>
+    <tr><td>기본(클래스 이름 없음)</td><td><code>button-height-lg</code></td><td><code>popup-width-md</code></td></tr>
+    <tr><td><code>--medium</code> / (없음)</td><td><code>button-height-md</code></td><td>—</td></tr>
+    <tr><td><code>--small</code></td><td><code>button-height-sm</code></td><td><code>popup-width-sm</code></td></tr>
+    <tr><td>(없음) / <code>--large</code></td><td>—</td><td><code>popup-width-lg</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p>
+  <strong>결정 — 클래스가 아니라 실제 크기 순서를 따른다.</strong>
+  Button 기본은 가장 크니까 <code>-lg</code>, Popup 기본은 가운데니까 <code>-md</code>.
+  <strong>소비자가 값을 보고 이름을 예측할 수 있어야</strong> 하기 때문이다.
+</p>
+
+<h4>함정 ② 한 컴포넌트에 <code>border-width</code> 가 여러 자리다</h4>
+
+<pre><code>_accordion.scss   4자리 (22 · 34 · 46 · 177행)
+_popup.scss       3자리 (46 · 94 · 135행)
+_datepicker.scss  3자리 (38 · 130 · 262행)
+_select.scss      3자리 (35 · 149 · 206행)
+나머지 4개 파일    각 1자리</code></pre>
+
+<p>
+  <strong>이건 쪼개지 않는다.</strong> <code>selector-size</code> 와 같은 이유다 —
+  <strong>한 컴포넌트 안의 테두리는 같은 두께여야 자연스럽다.</strong>
+  Accordion 헤더는 1px인데 항목 구분선만 2px이면 어긋나 보인다.
+  <strong>"의도해서 묶은 것"이므로 컴포넌트당 훅 하나</strong>다.
+</p>
+
+<h4>함정 ③ <code>transparent</code> 테두리가 있다</h4>
+
+<pre><code>_popup.scss:94        border: var(--nui-border-width) solid transparent;
+_datepicker.scss:262  border: var(--nui-border-width) solid transparent;</code></pre>
+
+<p>
+  <strong>보이지 않는 테두리</strong>다. 왜 있냐면 —
+  선택되거나 포커스되면 색이 생기는데, <strong>그때 요소가 1px 밀리지 않게</strong>
+  미리 자리를 잡아두는 것이다. 흔한 기법이다.
+</p>
+<p>
+  <strong>결정 — 두께 훅을 여기에도 적용한다.</strong>
+  오히려 <strong>적용하지 않으면 위험하다</strong> — 소비자가 두께를 2px로 바꿨을 때
+  보이는 테두리만 2px이 되고 <strong>이 자리는 1px로 남아 선택 시 요소가 밀린다.</strong>
+</p>
+
+<h4>함정 ④ <code>box-shadow</code> 로 그린 테두리가 있다</h4>
+
+<pre><code>_select.scss:206   box-shadow: inset 0 0 0 var(--nui-border-width) …;</code></pre>
+
+<p>
+  <code>border</code> 가 아니라 <strong>안쪽 그림자로 테두리를 흉내낸</strong> 자리다.
+  (레이아웃을 밀지 않으려고 이렇게 쓴다.)
+  <strong>결정 — 여기도 같은 훅을 쓴다.</strong> 소비자 눈에는 똑같은 "테두리"이므로
+  <strong>한 값으로 움직여야 한다.</strong>
+</p>
+
+<h3 id="contract-files">9-2. 바뀌는 파일 전량</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th>파일</th><th>무엇을</th><th class="num">규모</th></tr></thead>
+  <tbody>
+    <tr><td colspan="3" style="background:var(--bg-code);font-weight:650">
+      packages/ui — 라이브러리</td></tr>
+    <tr><td><code>src/styles/tokens/_seed.scss</code></td>
+      <td>선 색 3분할 · <code>border-width-1/2</code> · <code>scale-*</code> 3 · <code>-static</code> 7</td>
+      <td class="num">토큰 +11</td></tr>
+    <tr><td><code>src/styles/components/_button.scss</code></td>
+      <td>색 훅 1 삭제 · 이름 분리 7자리 · 두께 훅 1</td><td class="num">9자리</td></tr>
+    <tr><td><code>src/styles/components/_popup.scss</code></td>
+      <td>색 훅 2 삭제 · 이름 분리 3자리 · 두께 훅 3자리</td><td class="num">8자리</td></tr>
+    <tr><td><code>src/styles/components/_textfield.scss</code></td>
+      <td>색 훅 2 삭제 · 두께 훅 1</td><td class="num">3자리</td></tr>
+    <tr><td><code>src/styles/components/_textarea.scss</code></td>
+      <td>색 훅 2 삭제 · 두께 훅 1</td><td class="num">3자리</td></tr>
+    <tr><td><code>src/styles/components/_select.scss</code></td>
+      <td>색 훅 2 삭제 · 두께 훅 3자리</td><td class="num">5자리</td></tr>
+    <tr><td><code>src/styles/components/_tooltip.scss</code></td>
+      <td>색 훅 1 삭제 (2자리)</td><td class="num">2자리</td></tr>
+    <tr><td><code>src/styles/components/_toast.scss</code></td>
+      <td>색 훅 1 삭제 (2자리)</td><td class="num">2자리</td></tr>
+    <tr><td><code>src/styles/components/_accordion.scss</code></td>
+      <td>선 색 재편 · 두께 훅 4자리</td><td class="num">5자리</td></tr>
+    <tr><td><code>src/styles/components/_datepicker.scss</code></td>
+      <td>두께 훅 3자리</td><td class="num">3자리</td></tr>
+    <tr><td><code>src/styles/components/_choice-base.scss</code></td>
+      <td>두께 훅 1</td><td class="num">1자리</td></tr>
+    <tr><td><code>scripts/check-token-layers.mjs</code></td>
+      <td><strong>검사 규칙 추가</strong> — 색 훅 금지 · 훅 이름 규칙</td><td class="num">—</td></tr>
+    <tr><td><code>README.md</code></td>
+      <td>공개 훅 목록 갱신 · <code>!important</code> 불필요 명시</td><td class="num">—</td></tr>
+
+    <tr><td colspan="3" style="background:var(--bg-code);font-weight:650">
+      .claude/rules — 규약 문서</td></tr>
+    <tr><td><code>tokens.md</code></td><td>두 축 원칙 · 선 토큰 · <code>-static</code> · <code>scale-*</code></td><td class="num">—</td></tr>
+    <tr><td><code>design-system.md</code></td><td>창구 규칙 · 선 선택 기준 · 이름 규칙</td><td class="num">—</td></tr>
+    <tr><td><code>styles.md</code></td><td>§3 공개/내부 분리를 <strong>새 경계로 다시 씀</strong></td><td class="num">—</td></tr>
+
+    <tr><td colspan="3" style="background:var(--bg-code);font-weight:650">
+      apps/docs — 문서 사이트</td></tr>
+    <tr><td>Foundations 5개 페이지</td>
+      <td>깨진 참조 수정 + 신설 페이지 · <span class="meta">별도 목록은 이전 조사에</span></td><td class="num">—</td></tr>
+    <tr><td><code>src/components/ColorScale.tsx</code></td><td>글자색 하드코딩 제거</td><td class="num">—</td></tr>
+    <tr><td><code>src/site/nav.ts</code></td><td>신설 페이지 등록</td><td class="num">—</td></tr>
+
+    <tr><td colspan="3" style="background:var(--bg-code);font-weight:650">그 외</td></tr>
+    <tr><td><code>.changeset/*.md</code></td><td><strong>BREAKING</strong> — 색 훅 11개 제거, 훅 이름 변경 대응표</td><td class="num">—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="contract-hooks">9-3. 훅 before → after 전량</h3>
+
+<h4>삭제 — 색 훅 11개 (13자리)</h4>
+<pre><code>_button.scss:22      hook("button-bg", action-neutral)              → var(action-neutral)
+_popup.scss:24       hook("popup-dim", layer-overlay)               → var(layer-overlay)
+_popup.scss:45       hook("popup-bg", layer-floating)               → var(layer-floating)
+_select.scss:34      hook("select-bg", control-bg)                  → var(control-bg)
+_select.scss:36      hook("select-border-color", control-border)    → var(control-border)
+_textarea.scss:15    hook("textarea-bg", control-bg)                → var(control-bg)
+_textarea.scss:17    hook("textarea-border-color", control-border)  → var(control-border)
+_textfield.scss:18   hook("textfield-bg", control-bg)               → var(control-bg)
+_textfield.scss:20   hook("textfield-border-color", control-border) → var(control-border)
+_toast.scss:39       hook("toast-bg", layer-inverse)                → var(layer-inverse)
+_toast.scss:72       hook("toast-bg", surface-toast-error)          → var(surface-toast-error)
+_tooltip.scss:36     hook("tooltip-bg", layer-inverse)              → var(layer-inverse)
+_tooltip.scss:54     hook("tooltip-bg", layer-inverse)              → var(layer-inverse)</code></pre>
+
+<h4>이름 분리 — 3개 훅이 8개로 (10자리)</h4>
+<pre><code>_button.scss:42   button-min-height (size-field 56px)     → button-height-lg
+_button.scss:92   button-min-height (size-control-xl 48)  → button-height-md
+_button.scss:96   button-min-height (size-control-md 36)  → button-height-sm
+
+_button.scss:43   button-padding-x (space-6 24px)         → button-padding-x-lg
+_button.scss:97   button-padding-x (space-4 16px)         → button-padding-x-sm
+
+_button.scss:47   button-radius (radius-1 4px)            → button-radius
+_button.scss:111  button-radius (radius-full pill)        → button-radius-round
+
+_popup.scss:42    popup-width (30rem)                     → popup-width-md   ← 함정 ①
+_popup.scss:159   popup-width (22.5rem)                   → popup-width-sm
+_popup.scss:163   popup-width (40rem)                     → popup-width-lg</code></pre>
+
+<h4>신설 — 선 두께 훅 8개 (17자리)</h4>
+<pre><code>button-border-width       _button.scss:46
+popup-border-width        _popup.scss:46 · 94 · 135          ← 함정 ②③
+textfield-border-width    _textfield.scss:19
+textarea-border-width     _textarea.scss:16
+select-border-width       _select.scss:35 · 149 · 206        ← 함정 ②④
+accordion-border-width    _accordion.scss:22 · 34 · 46 · 177 ← 함정 ②
+datepicker-border-width   _datepicker.scss:38 · 130 · 262    ← 함정 ②③
+checkbox-border-width     _choice-base.scss:63</code></pre>
+
+<h4>그대로 두는 것</h4>
+<pre><code>selector-size             2자리 — width/height 를 묶어 정사각형을 보장한다
+--nui-_* 내부 배선 9개     공개 API 가 아니다
+focus-width               포커스 링 두께 — 접근성 요소 (2-3)
+나머지 훅 9개              각 1자리. 겹치지 않는다</code></pre>
+
+<h3 id="contract-verify">9-4. 검증 — 무엇으로 "제대로 됐다"고 하나</h3>
+
+<p>
+  이 작업의 성공 기준은 하나다 — <strong>이름만 바뀌고 화면은 그대로.</strong>
+  그걸 어떻게 확인하는지가 아래다.
+</p>
+
+<div class="tw">
+<table>
+  <thead><tr><th>단계</th><th>방법</th><th>통과 기준</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1. 기계 검사</strong></td>
+      <td><code>npm run typecheck</code><br>
+        <code>npm run verify</code> <span class="meta">(css + tokens + publint + attw)</span></td>
+      <td>전부 통과. <strong>새 검사 규칙도 통과</strong></td></tr>
+    <tr><td><strong>2. 빌드</strong></td>
+      <td><code>npm run build:ui</code> · <code>npm run build:docs</code></td>
+      <td>에러 0</td></tr>
+    <tr><td><strong>3. CSS 시각 회귀</strong> ★</td>
+      <td>빌드된 <code>styles/*.css</code> 를 <strong>변경 전후로 비교</strong>한다.
+        토큰 이름을 원래대로 되돌리는 치환을 걸면 <strong>diff 가 0이어야 한다</strong></td>
+      <td><strong>값 변화 0건</strong></td></tr>
+    <tr><td><strong>4. 브라우저</strong></td>
+      <td>문서 사이트 전 페이지 × 라이트/다크 스크린샷<br>
+        <code>npm run verify:console</code></td>
+      <td>콘솔 에러·경고 0 · 시각 차이 0</td></tr>
+    <tr><td><strong>5. 동작 회귀</strong></td>
+      <td><code>verify:select-rhf</code> · <code>verify:datepicker</code> · <code>verify:a11y</code></td>
+      <td>전부 통과</td></tr>
+    <tr><td><strong>6. 훅 대조</strong></td>
+      <td>빌드된 CSS에서 <code>--nui-</code> 훅 이름을 전부 뽑아
+        <strong>9-3 목록과 1:1 대조</strong></td>
+      <td>목록에 없는 훅 0 · 목록에 있는데 없는 훅 0</td></tr>
+    </tbody>
+</table>
+</div>
+
+<div class="note ok">
+  <p style="margin-bottom:0">
+    <strong>3번이 이 작업의 핵심 검증이다.</strong>
+    "화면이 안 바뀐다"는 주장을 <strong>기계가 확인해준다.</strong>
+    눈으로 보는 것보다 확실하고, 빠뜨린 자리도 잡아낸다.
+  </p>
+</div>
+
+<h3 id="contract-rollback">9-5. 되돌리기 · 위험</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th></th><th>내용</th></tr></thead>
+  <tbody>
+    <tr><td><strong>되돌리기</strong></td>
+      <td><code>git</code> 이면 충분하다. <strong>배포되지 않은 상태(0.0.0)</strong>라
+        되돌려도 <strong>소비자 영향이 없다.</strong> 작업 전 커밋을 남기고 시작한다</td></tr>
+    <tr><td><strong>가장 큰 위험</strong></td>
+      <td><strong>이름을 바꾸다 값을 흘리는 것.</strong>
+        <code>hook("button-min-height", size-control-md)</code> 를
+        <code>button-height-md</code> 로 바꾸면 <strong>36px이 48px 자리로 간다.</strong>
+        → 검증 3번(CSS diff)이 잡는다</td></tr>
+    <tr><td><strong>두 번째 위험</strong></td>
+      <td><strong>훅 호출부를 놓치는 것.</strong> 하나라도 남으면 컴파일은 되는데
+        <strong>죽은 훅</strong>이 된다 → 검증 6번(훅 대조)이 잡는다</td></tr>
+    <tr><td><strong>소비자 영향</strong></td>
+      <td><span class="badge b-crit">BREAKING</span>
+        공개 훅 11개가 사라지고 3개의 이름이 바뀐다.
+        <strong>배포 전이라 지금이 가장 싼 시점</strong>이다. changeset에 대응표를 남긴다</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>9-6. 작업 순서</h3>
+
+<ol>
+  <li><strong>실측 4건</strong> (<a href="#s8">8-1</a>) — <code>-static</code> 대상 · 속성 분류 ·
+    선 색 alpha 배정 · 하드코딩 훑기</li>
+  <li><strong><code>_seed.scss</code></strong> — 토큰 먼저. 컴포넌트가 참조할 것이 있어야 한다</li>
+  <li><strong>검사 스크립트</strong> — 새 규칙을 <em>먼저</em> 넣으면 이후 작업이 자동으로 검사된다</li>
+  <li><strong>컴포넌트 SCSS</strong> — 파일 단위로. <strong>한 파일 끝날 때마다 CSS diff 확인</strong></li>
+  <li><strong><code>rules/</code> 문서</strong> — 코드가 확정된 뒤에 쓴다</li>
+  <li><strong>Foundations 페이지</strong></li>
+  <li><strong>changeset</strong> + 전체 검증</li>
+</ol>
+
+<div class="note">
+  <p style="margin-bottom:0">
+    <strong>3번을 4번보다 먼저 하는 것이 요령이다.</strong>
+    검사 규칙을 먼저 넣으면 <strong>컴포넌트를 고치는 동안 실수가 즉시 잡힌다.</strong>
+    나중에 넣으면 다 고치고 나서 한꺼번에 터진다.
+  </p>
+</div>
+
+
+<footer class="doc">
+  next-ui-system 디자인 시스템 재정비 계획 · 이 문서는 대화 중 계속 갱신된다 ·
+  근거 자료는 <code>research/</code> 아래에 있다
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var KEY = "nui-plan-theme";
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem(KEY);
+    if (saved) root.setAttribute("data-theme", saved);
+  } catch (e) {}
+  document.getElementById("themeBtn").addEventListener("click", function () {
+    var cur = root.getAttribute("data-theme");
+    if (!cur) cur = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    var next = cur === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
