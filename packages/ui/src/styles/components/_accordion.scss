@@ -6,7 +6,7 @@
 // variant: --box(카드형, 기본) / --line(구분선형)
 // 상태: .nui-is-active (펼쳐진 항목)
 //
-// 공개 훅: --nui-accordion-gap / -radius
+// 공개 훅: --nui-accordion-gap / -radius / -border-width
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("accordion")} {
@@ -19,7 +19,8 @@
     }
 
     &--line {
-      border-top: var(#{v("border-width-1")}) solid var(#{v("border-divider")});
+      border-top: #{hook("accordion-border-width", var(#{v("border-width-1")}))}
+        solid var(#{v("border-divider")});
     }
 
     &__item {
@@ -31,7 +32,8 @@
 
     &--box &__item {
       background: var(#{v("gradient-panel-soft")});
-      border: var(#{v("border-width-1")}) solid var(#{v("border-form")});
+      border: #{hook("accordion-border-width", var(#{v("border-width-1")}))}
+        solid var(#{v("border-form")});
       border-radius: #{hook("accordion-radius", var(#{v("radius-4")}))};
       box-shadow: var(#{v("shadow-1")});
     }
@@ -43,7 +45,11 @@
 
     &--line &__item {
       background-color: transparent;
-      border-bottom: var(#{v("border-width-1")}) solid var(#{v("border-divider")});
+      border-bottom: #{hook(
+          "accordion-border-width",
+          var(#{v("border-width-1")})
+        )}
+        solid var(#{v("border-divider")});
     }
 
     &--line &__item#{state("active")} {
@@ -98,8 +104,7 @@
       align-items: center;
       gap: var(#{v("space-4")});
       width: 100%;
-      padding: var(#{v("space-panel-compact")})
-        var(#{v("space-panel-card")});
+      padding: var(#{v("space-panel-compact")}) var(#{v("space-panel-card")});
 
       @include motion(background-color, "3");
     }
@@ -171,11 +176,11 @@
       display: flex;
       flex-direction: column;
       gap: var(#{v("space-3")});
-      padding: var(#{v("space-panel-compact")})
-        var(#{v("space-panel-card")}) var(#{v("space-panel-card")});
+      padding: var(#{v("space-panel-compact")}) var(#{v("space-panel-card")})
+        var(#{v("space-panel-card")});
       color: var(#{v("text-secondary")});
-      border-top: var(#{v("border-width")}) solid
-        var(#{v("control-border-disabled")});
+      border-top: #{hook("accordion-border-width", var(#{v("border-width-1")}))}
+        solid var(#{v("control-border-disabled")});
 
       @include typo(3, "regular", 1.7);
 

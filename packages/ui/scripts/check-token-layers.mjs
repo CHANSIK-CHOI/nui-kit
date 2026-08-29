@@ -39,13 +39,15 @@ const ROLE_RULES = [
   {
     role: "테두리색",
     // `border-width*` 는 색이 아니라 두께이므로 제외한다.
-    token: /^(border-(?!width)[a-z-]+|control-border[a-z-]*|action-border[a-z-]*)$/,
+    token:
+      /^(border-(?!width)[a-z-]+|control-border[a-z-]*|action-border[a-z-]*)$/,
     // shorthand(`border-top: 1px solid var(…)`)도 허용한다.
     allow: /^(border[a-z-]*|outline[a-z-]*|box-shadow)$/,
   },
   {
     role: "배경",
-    token: /^(surface-[a-z-]+|layer-[a-z-]+|control-bg[a-z-]*|action-bg[a-z-]*|status-[a-z-]+|gradient-[a-z-]+)$/,
+    token:
+      /^(surface-[a-z-]+|layer-[a-z-]+|control-bg[a-z-]*|action-bg[a-z-]*|status-[a-z-]+|gradient-[a-z-]+)$/,
     allow: /^(background[a-z-]*)$/,
   },
 ];
@@ -161,7 +163,9 @@ const DEPRECATED_SCALE = {
 
 const problems = [];
 
-for (const file of readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss"))) {
+for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
+  f.endsWith(".scss"),
+)) {
   const css = readFileSync(join(COMPONENTS_DIR, file), "utf8");
 
   // 1) primitive 색 직접 참조 금지
@@ -178,7 +182,7 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss")
     for (const rule of ROLE_RULES) {
       if (rule.token.test(token) && !rule.allow.test(property)) {
         problems.push(
-          `${file}: ${rule.role} 토큰 '${token}' 을 '${property}' 에 쓴다 — 역할군과 속성을 맞출 것 (design-system.md §2)`,
+          `${file}: ${rule.role} 토큰 '${token}' 을 '${property}' 에 쓴다 — 역할군과 속성을 맞출 것 (tokens.md §4-3)`,
         );
       }
     }
@@ -198,9 +202,7 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss")
 
     const bad = checkHookName(name);
     if (bad) {
-      problems.push(
-        `${file}: 훅 이름 '${name}' — ${bad} (design-plan 2-3)`,
-      );
+      problems.push(`${file}: 훅 이름 '${name}' — ${bad} (design-plan 2-3)`);
     }
   }
 
@@ -210,7 +212,7 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss")
     for (const t of m[1].matchAll(/v\("([a-z0-9-]+)"\)/g)) {
       if (HOVER_BG_FORBIDDEN.has(t[1])) {
         problems.push(
-          `${file}: hover 배경에 '${t[1]}' 을 쓴다 — 'control-bg-hover' 로 통일할 것 (design-system.md §3-3)`,
+          `${file}: hover 배경에 '${t[1]}' 을 쓴다 — 'control-bg-hover' 로 통일할 것 (design-system.md §2-3)`,
         );
       }
     }
@@ -220,7 +222,9 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss")
 // 5) deprecated 토큰 사용 — 경고만 한다(이행 중이므로 실패시키지 않는다)
 const warnings = [];
 
-for (const file of readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss"))) {
+for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
+  f.endsWith(".scss"),
+)) {
   const css = readFileSync(join(COMPONENTS_DIR, file), "utf8");
 
   for (const m of css.matchAll(/v\("([a-z0-9-]+)"\)/g)) {
@@ -233,7 +237,8 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss")
   }
   for (const m of css.matchAll(/@include motion\([^)]*?"([a-z]+)"\s*\)/g)) {
     const next = DEPRECATED_SCALE.motion[m[1]];
-    if (next) warnings.push(`${file}: motion(…, "${m[1]}") → motion(…, "${next}")`);
+    if (next)
+      warnings.push(`${file}: motion(…, "${m[1]}") → motion(…, "${next}")`);
   }
 }
 
@@ -243,7 +248,9 @@ if (problems.length > 0) {
   process.exit(1);
 }
 
-const count = readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss")).length;
+const count = readdirSync(COMPONENTS_DIR).filter((f) =>
+  f.endsWith(".scss"),
+).length;
 console.log(`✅ 토큰 계층 검사 통과 (${count}개 파일)`);
 
 if (warnings.length > 0) {
@@ -255,11 +262,15 @@ if (warnings.length > 0) {
   console.warn(
     `\n⚠️  구 토큰 이름 ${warnings.length}건 (파일 ${byFile.size}개) — 컴포넌트 반영 단계에서 정리한다.`,
   );
-  console.warn("   대응표는 .claude/rules/tokens.md §6\n");
+  console.warn(
+    "   대응표는 이 스크립트의 DEPRECATED 맵이다 (.claude/rules/tokens.md §6)\n",
+  );
   for (const [file, n] of [...byFile].sort((a, b) => b[1] - a[1])) {
     console.warn(`   ${String(n).padStart(3)}건  ${file}`);
   }
-  console.warn("\n   전체 목록: VERBOSE=1 npm run verify:tokens -w @chansikchoi/next-ui");
+  console.warn(
+    "\n   전체 목록: VERBOSE=1 npm run verify:tokens -w @chansikchoi/next-ui",
+  );
   if (process.env.VERBOSE) {
     console.warn("");
     for (const w of warnings) console.warn(`   ${w}`);

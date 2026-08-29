@@ -57,27 +57,81 @@ import "@chansikchoi/next-ui/styles/preflight.css";
 
 ## 커스터마이징
 
-CSS 변수 2계층 구조. `!important` 없이 덮어쓸 수 있습니다.
+**`!important` 는 필요 없습니다.** 이 라이브러리의 CSS 는 전부 `@layer nui.*` 안에
+있고, 여러분이 그냥 쓴 CSS 는 레이어 밖입니다. Cascade 는 상세도보다 레이어를 **먼저**
+보므로, 레이어 밖 규칙이 상세도와 무관하게 항상 이깁니다.
 
 ```css
-/* 전체 테마 교체 — seed 토큰 */
-:root {
-  --nui-color-primary-500: #ff6b00;
-  --nui-radius-md: 4px;
+/* 이것으로 충분합니다 */
+.my-button {
+  border-radius: 0;
 }
+```
 
-/* 특정 컴포넌트만 — 컴포넌트 토큰 */
+오히려 `!important` 를 붙이면 자기 규칙끼리 부딪힙니다 —
+`.my-button { border-radius: 0 !important }` 를 쓰면 `.my-button:hover` 의 값이 안 먹습니다.
+
+### 색은 역할(semantic) 단위로 바꿉니다
+
+```css
+/* 역할 하나를 바꾸면 그 역할을 쓰는 모든 곳이 함께 따라옵니다 */
 :root {
-  --nui-button-bg: #111;
-  --nui-button-radius: 0;
+  --nui-action-primary: #ff6b00;
+  --nui-action-primary-fg: #fff;
+  --nui-layer-inverse: #222;
 }
 
 /* 부분 테마 — 상속으로 하위에만 적용 */
 .dark-section {
-  --nui-color-surface: #111;
-  --nui-color-text: #fff;
+  --nui-layer-default: #111;
+  --nui-text-primary: #fff;
 }
 ```
+
+**컴포넌트별 색 변수(`--nui-button-bg` 같은 것)는 두지 않습니다.**
+배경과 글자는 짝이라 한쪽만 바꾸면 대비가 깨지는데, 그 사실이 화면에 드러나지 않고
+저시력 사용자에게만 영향을 줍니다. 한 컴포넌트만 바꿔야 한다면 `className` 을 쓰세요 —
+배경과 글자를 같은 자리에 쓰게 되므로 짝을 놓치기 어렵습니다.
+
+```css
+.my-tooltip {
+  background: #222;
+  color: #fff;
+}
+```
+
+### 치수·모양·선 두께는 컴포넌트별로 엽니다
+
+바꾸면 결과가 바로 보이고 짝이 없는 값들입니다. 이름은
+`--nui-{컴포넌트}-{옵션?}-{요소?}-{속성}` 규칙을 따릅니다.
+
+```css
+:root {
+  --nui-button-lg-height: 3.75rem; /* 버튼 · large 옵션 · 높이 */
+  --nui-button-radius: 0;
+  --nui-button-border-width: 2px;
+}
+```
+
+| 컴포넌트 | 공개 변수 |
+| --- | --- |
+| Button | `-lg-height` `-md-height` `-sm-height` · `-lg-padding-x` `-md-padding-x` `-sm-padding-x` · `-min-width` · `-radius` `-round-radius` · `-border-width` |
+| Popup | `-lg-width` `-md-width` `-sm-width` · `-radius` · `-border-width` |
+| Textfield | `-height` · `-radius` · `-border-width` |
+| Textarea | `-min-height` · `-radius` · `-border-width` |
+| Select | `-height` · `-radius` · `-border-width` |
+| Datepicker | `-dropdown-radius` · `-day-size` `-day-button-size` `-day-radius` · `-border-width` |
+| Accordion | `-gap` · `-radius` · `-border-width` |
+| Toast | `-width` · `-radius` |
+| Tooltip | `-max-width` · `-radius` |
+| Checkbox · Radio · Switch | `--nui-selector-size` · `--nui-selector-border-width` · `--nui-switch-width` `--nui-switch-height` |
+
+크기 옵션이 있는 것은 옵션별로 이름이 나뉩니다. `--nui-button-md-height` 하나만 두면
+`:root` 에 값을 넣는 순간 large·medium·small 이 전부 같은 높이가 되어 크기 variant 가
+죽기 때문입니다.
+
+> ⚠️ **`--nui-_` 로 시작하는 변수는 내부 배선입니다.** variant 가 갈아끼우는 수단이므로
+> 덮어쓰면 variant 가 무력화됩니다. 공개 API 가 아니며 예고 없이 바뀔 수 있습니다.
 
 ## 컴포넌트
 
@@ -232,7 +286,7 @@ const OPTIONS = [
 emotion 쪽에서 걷어내** CSS 가 책임지게 합니다.
 
 - 외형은 위 커스터마이징 절의 CSS 변수로 조정합니다
-  (`--nui-select-height` / `-radius` / `-border-color` / `-bg`)
+  (`--nui-select-height` / `-radius` / `-border-width`, 색은 `--nui-control-*` semantic)
 - `styles` prop 을 직접 넘기면 그 정리된 값 위에 얹히므로 의도대로 덧칠됩니다
 - 다만 **메뉴 최대 높이는 CSS 가 아니라 `maxMenuHeight` prop** 으로 조정합니다.
   `react-select` 이 메뉴 배치를 계산할 때 이 값을 참조하므로, CSS 로 덮으면

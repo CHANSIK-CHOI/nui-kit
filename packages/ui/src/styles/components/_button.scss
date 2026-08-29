@@ -4,26 +4,29 @@
 // Button / IconButton / ButtonLink / ButtonGroup
 //
 // 공개 커스터마이징 훅 (덮어써도 안전)
-//   색상    : --nui-button-bg          기본(black) 버튼 배경
-//             --nui-button-primary-bg  / --nui-button-secondary-bg / --nui-button-point-bg
-//             --nui-button-color       라벨 색
-//   치수    : --nui-button-radius / -min-height / -min-width / -padding-x
+//   크기    : --nui-button-lg-height   / -md-height   / -sm-height
+//             --nui-button-lg-padding-x / -md-padding-x / -sm-padding-x
+//             --nui-button-min-width
+//   모양    : --nui-button-radius      / --nui-button-round-radius
+//   선      : --nui-button-border-width
 //
-// ⚠️ variant 별로 훅을 따로 둔 이유:
-//   훅을 하나(--nui-button-bg)만 두면 소비자가 그걸 :root 에 설정한 순간
-//   primary/secondary/point 까지 전부 같은 색이 된다.
+// ⚠️ 색 훅은 두지 않는다 (design-plan 2-1).
+//   배경과 글자는 짝이다. 소비자가 배경만 바꾸면 대비가 깨지는데 **눈에 보이지 않는다**
+//   — 저시력 사용자만 겪는다. 색을 바꾸는 창구는 브랜드 색 생성기와 semantic 덮어쓰기,
+//   그리고 한 컴포넌트만 바꿀 때의 className 이다. className 이면 배경과 글자를
+//   같은 자리에 쓰게 되므로 짝을 놓치기 어렵다.
+//
+// ⚠️ 크기 훅에 옵션 이름이 붙는 이유:
+//   훅 이름을 하나(--nui-button-min-height)만 두면 소비자가 그걸 :root 에 설정한 순간
+//   large/medium/small 세 자리가 전부 같은 높이가 되어 크기 variant 가 죽는다.
 //   (unlayered 선언이 우리 레이어의 variant 규칙보다 항상 우선하므로 막을 수 없다)
-//   → variant 마다 자기 훅을 갖고, 내부 배선(--nui-_*)으로 합류시킨다.
 //
 // 내부 배선 (--nui-_*) 은 덮어쓰지 말 것.
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("button")} {
-    #{iv("button-main")}: #{hook("button-bg", var(#{v("action-neutral")}))};
-    #{iv("button-fg")}: #{hook(
-        "button-color",
-        var(#{v("action-neutral-fg")})
-      )};
+    #{iv("button-main")}: var(#{v("action-neutral")});
+    #{iv("button-fg")}: var(#{v("action-neutral-fg")});
     #{iv("button-shadow")}: var(#{v("shadow-1")});
     #{iv("button-shadow-hover")}: var(#{v("shadow-2")});
     #{iv("button-shadow-active")}: var(#{v("shadow-press")});
@@ -39,11 +42,13 @@
     justify-content: center;
     width: 100%;
     min-width: #{hook("button-min-width", 7.5rem)}; // 120px
-    min-height: #{hook("button-min-height", var(#{v("size-field")}))};
-    padding: 0 #{hook("button-padding-x", var(#{v("space-6")}))};
+    // 기본은 md(48px). 위아래로 lg·sm 이 있는 형태가 표준이다.
+    min-height: #{hook("button-md-height", var(#{v("size-control-xl")}))};
+    padding: 0 #{hook("button-md-padding-x", var(#{v("space-6")}))};
     overflow-wrap: initial;
     background: var(#{iv("button-main")});
-    border: var(#{v("border-width")}) solid var(#{iv("button-main")});
+    border: #{hook("button-border-width", var(#{v("border-width-1")}))} solid
+      var(#{iv("button-main")});
     border-radius: #{hook("button-radius", var(#{v("radius-1")}))};
     box-shadow: var(#{iv("button-shadow")});
 
@@ -88,13 +93,16 @@
     }
 
     // ── size
-    &--medium {
-      min-height: #{hook("button-min-height", var(#{v("size-control-xl")}))};
+    // 옵션 이름은 값의 크기 순서를 따른다 — lg · md(기본) · sm.
+    // lg 와 md 는 지금 같은 여백(24px)이지만 이름을 나눈다. 나중에 따로 조정할 수 있어야 한다.
+    &--large {
+      min-height: #{hook("button-lg-height", var(#{v("size-field")}))};
+      padding: 0 #{hook("button-lg-padding-x", var(#{v("space-6")}))};
     }
 
     &--small {
-      min-height: #{hook("button-min-height", var(#{v("size-control-md")}))};
-      padding: 0 #{hook("button-padding-x", var(#{v("space-4")}))};
+      min-height: #{hook("button-sm-height", var(#{v("size-control-md")}))};
+      padding: 0 #{hook("button-sm-padding-x", var(#{v("space-4")}))};
     }
 
     &--small &__icon {
@@ -108,45 +116,28 @@
 
     // ── shape
     &--round {
-      border-radius: #{hook("button-radius", var(#{v("radius-full")}))};
+      border-radius: #{hook("button-round-radius", var(#{v("radius-full")}))};
     }
 
-    // ── color (variant 별 전용 훅)
+    // ── color
+    // 훅 없이 semantic 을 직접 배선한다. 색은 컴포넌트별로 열지 않는다.
     &--primary {
-      #{iv("button-main")}: #{hook(
-          "button-primary-bg",
-          var(#{v("action-primary")})
-        )};
-      #{iv("button-fg")}: #{hook(
-          "button-primary-color",
-          var(#{v("action-primary-fg")})
-        )};
+      #{iv("button-main")}: var(#{v("action-primary")});
+      #{iv("button-fg")}: var(#{v("action-primary-fg")});
     }
 
     // 되돌릴 수 없는 액션 — 삭제 · 탈퇴 · 결제 취소
     &--danger {
-      #{iv("button-main")}: #{hook(
-          "button-danger-bg",
-          var(#{v("action-danger")})
-        )};
-      #{iv("button-fg")}: #{hook(
-          "button-danger-color",
-          var(#{v("action-danger-fg")})
-        )};
+      #{iv("button-main")}: var(#{v("action-danger")});
+      #{iv("button-fg")}: var(#{v("action-danger-fg")});
     }
 
     // 주의가 필요한 액션 — 확인 후 진행
     &--warning {
-      #{iv("button-main")}: #{hook(
-          "button-warning-bg",
-          var(#{v("action-warning")})
-        )};
+      #{iv("button-main")}: var(#{v("action-warning")});
       // 노랑 배경에 흰 글자는 AA 에 크게 미달한다. 노랑을 어둡게 하면
       // 갈색이 되어 "주의"의 의미를 잃으므로, 배경을 밝게 두고 글자를 어둡게 한다.
-      #{iv("button-fg")}: #{hook(
-          "button-warning-color",
-          var(#{v("action-warning-fg")})
-        )};
+      #{iv("button-fg")}: var(#{v("action-warning-fg")});
     }
 
     // ── variant
@@ -185,6 +176,9 @@
       #{iv("button-fg")}: var(#{v("action-fg-disabled")});
 
       box-shadow: none;
+      // ⚠️ 매트릭스 밖의 값이다. 입력 컨트롤의 비활성(0.2·0.3·0.45)과 기준이 다르고,
+      //    text 버튼 hover(opacity-hover 0.72)와 값이 같아 서로 얽힐 위험이 있다.
+      //    어느 값으로 모을지는 컴포넌트 반영 단계에서 판단한다 — 지금은 남겨둔다.
       opacity: 0.72;
       cursor: not-allowed;
 
@@ -203,26 +197,27 @@
     }
 
     &--text:not([disabled]):hover {
-      opacity: 0.72;
+      opacity: var(#{v("opacity-hover")});
       transform: none;
     }
 
     &--text:not([disabled]):active {
-      opacity: 0.56;
+      opacity: var(#{v("opacity-pressed")});
       transform: none;
     }
   }
 
   // ── IconButton (정사각 고정)
+  // 본체와 같은 크기 축을 쓴다 — 기본이 md(48px), 위아래로 lg·sm.
   #{cls("button")}--icon {
     min-width: auto;
     min-height: auto;
-    width: var(#{v("size-field")});
-    height: var(#{v("size-field")});
+    width: var(#{v("size-control-xl")});
+    height: var(#{v("size-control-xl")});
 
-    &#{cls("button")}--medium {
-      width: var(#{v("size-control-xl")});
-      height: var(#{v("size-control-xl")});
+    &#{cls("button")}--large {
+      width: var(#{v("size-field")});
+      height: var(#{v("size-field")});
     }
 
     &#{cls("button")}--small {

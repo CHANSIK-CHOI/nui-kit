@@ -4,7 +4,9 @@
 // ─────────────────────────────────────────────────────────────
 // Textfield (Search / Password 파생 포함)
 //
-// 공개 훅: --nui-textfield-height / -radius / -border-color / -bg
+// 공개 훅: --nui-textfield-height / -radius / -border-width
+// ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 테두리·글자는 짝이라
+//    한쪽만 바꾸면 대비가 보이지 않게 깨진다. 한 개만 바꿀 때는 className 을 쓴다.
 // 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
@@ -15,9 +17,9 @@
       display: flex;
       align-items: center;
       height: #{hook("textfield-height", var(#{v("size-field")}))};
-      background-color: #{hook("textfield-bg", var(#{v("control-bg")}))};
-      border: var(#{v("border-width")}) solid
-        #{hook("textfield-border-color", var(#{v("control-border")}))};
+      background-color: var(#{v("control-bg")});
+      border: #{hook("textfield-border-width", var(#{v("border-width-1")}))}
+        solid var(#{v("control-border")});
       border-radius: #{hook("textfield-radius", var(#{v("radius-2")}))};
 
       @include motion(
@@ -150,7 +152,7 @@
     }
 
     &__btn[disabled] {
-      opacity: 0.2;
+      opacity: var(#{v("opacity-icon-disabled")});
       cursor: not-allowed;
     }
 
@@ -164,7 +166,7 @@
       border-color: var(#{v("control-border-disabled")});
 
       #{cls("textfield")}__btn {
-        opacity: 0.6;
+        opacity: var(#{v("opacity-icon-readonly")});
       }
 
       #{cls("textfield")}__input {

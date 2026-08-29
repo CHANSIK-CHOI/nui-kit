@@ -6,13 +6,11 @@ import { px } from "../../internal/prefix.js";
 
 const block = px("button");
 
+// 기본은 medium(48px). 위아래로 large(56px)·small(36px)이 있는 형태가 표준이고,
+// 소비자는 small 을 보고 "가장 작은 것"이라고 읽는다.
 export type ButtonSize = "large" | "medium" | "small";
 // 색이 아니라 역할이 이름이다 — "이 버튼은 삭제인가"만 물으면 된다.
-export type ButtonColor =
-  | "neutral"
-  | "primary"
-  | "danger"
-  | "warning";
+export type ButtonColor = "neutral" | "primary" | "danger" | "warning";
 export type ButtonVariant = "solid" | "line" | "text";
 export type ButtonShape = "round" | "square";
 
@@ -49,7 +47,7 @@ export type ButtonClassNameParams = {
 
 export function getButtonClassName({
   className,
-  size = "large",
+  size = "medium",
   color = "neutral",
   variant = "solid",
   shape = "square",
@@ -59,7 +57,7 @@ export function getButtonClassName({
     color !== "neutral" && `${block}--${color}`,
     variant !== "solid" && `${block}--${variant}`,
     variant !== "text" && shape !== "square" && `${block}--${shape}`,
-    size !== "large" && `${block}--${size}`,
+    size !== "medium" && `${block}--${size}`,
     className,
   );
 }
@@ -80,7 +78,7 @@ export default function Button({
   children,
   icon,
   className,
-  size = "large",
+  size = "medium",
   color = "neutral",
   variant = "solid",
   shape = "square",

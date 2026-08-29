@@ -15,7 +15,7 @@ export type IconButtonProps = Omit<ButtonProps, "icon" | "variant"> & {
 export default function IconButton({
   children,
   className,
-  size = "large",
+  size = "medium",
   color = "neutral",
   variant = "solid",
   shape,

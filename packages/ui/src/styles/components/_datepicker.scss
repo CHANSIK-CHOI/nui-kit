@@ -19,8 +19,9 @@
 //   따라서 이 파일에는 `.rdp-*` 셀렉터도 `--rdp-*` 변수도 없다.
 //   두 파일은 함께 움직인다 — 매핑을 바꾸면 여기 셀렉터도 바뀐다.
 //
-// 공개 훅: --nui-datepicker-dropdown-bg / -dropdown-radius
+// 공개 훅: --nui-datepicker-dropdown-radius / -border-width
 //          --nui-datepicker-day-size / -day-button-size / -day-radius
+// ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 글자는 짝이다.
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("datepicker")} {
@@ -35,16 +36,13 @@
       z-index: var(#{v("z-tooltip")});
       min-width: 19.5rem;
       padding: var(#{v("space-4")});
-      border: var(#{v("border-width")}) solid
-        var(#{v("control-border-disabled")});
+      border: #{hook("datepicker-border-width", var(#{v("border-width-1")}))}
+        solid var(#{v("control-border-disabled")});
       border-radius: #{hook(
           "datepicker-dropdown-radius",
           var(#{v("radius-3")})
         )};
-      background-color: #{hook(
-          "datepicker-dropdown-bg",
-          var(#{v("layer-floating")})
-        )};
+      background-color: var(#{v("layer-floating")});
       box-shadow: var(#{v("shadow-2")});
     }
   }
@@ -127,7 +125,8 @@
       min-width: 5.5rem;
       min-height: var(#{v("size-control-md")});
       padding: 0 var(#{v("space-3")});
-      border: var(#{v("border-width")}) solid var(#{v("control-border")});
+      border: #{hook("datepicker-border-width", var(#{v("border-width-1")}))}
+        solid var(#{v("control-border")});
       border-radius: var(#{v("radius-2")});
       background-color: var(#{v("control-bg")});
       color: var(#{v("control-text")});
@@ -259,7 +258,10 @@
       width: var(#{iv("daypicker-day-button-size")});
       height: var(#{iv("daypicker-day-button-size")});
       margin: 0 auto;
-      border: var(#{v("border-width")}) solid transparent;
+      // 보이지 않는 테두리에도 두께 훅을 적용한다 — 안 하면 소비자가 두께를 바꿨을 때
+      // 이 자리만 1px 로 남아 날짜를 선택하는 순간 셀이 밀린다.
+      border: #{hook("datepicker-border-width", var(#{v("border-width-1")}))}
+        solid transparent;
       border-radius: var(#{iv("daypicker-day-radius")});
       background: transparent;
       color: inherit;

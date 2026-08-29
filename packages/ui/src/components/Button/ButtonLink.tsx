@@ -24,7 +24,7 @@ export default function ButtonLink({
   children,
   icon,
   className,
-  size = "large",
+  size = "medium",
   color = "neutral",
   variant = "solid",
   shape,

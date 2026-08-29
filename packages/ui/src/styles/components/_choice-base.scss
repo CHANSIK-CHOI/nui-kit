@@ -60,7 +60,10 @@
       height: 100%;
       color: var(#{v("text-inverse-strong")});
       background-color: var(#{v("control-bg")});
-      border: var(#{v("border-width")}) solid var(#{v("control-border")});
+      // 세 컨트롤이 이 __control 골격을 함께 쓴다. selector-size 와 같은 이유로
+      // 두께도 하나로 묶는다 — 컴포넌트별로 쪼개면 같은 골격이 서로 다른 두께가 된다.
+      border: #{hook("selector-border-width", var(#{v("border-width-1")}))}
+        solid var(#{v("control-border")});
 
       @include motion((border-color, background-color, box-shadow, color));
     }

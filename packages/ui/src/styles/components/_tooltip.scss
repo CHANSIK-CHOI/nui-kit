@@ -6,7 +6,9 @@
 // 트리거를 감싸는 relative 컨테이너 안에서 absolute 로 띄운다 (portal 아님).
 // placement 는 prop 값(카멜)을 kebab 클래스로 옮겨 쓴다 — top-center 등.
 //
-// 공개 훅: --nui-tooltip-bg / -radius / -max-width
+// 공개 훅: --nui-tooltip-max-width / -radius
+// ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 글자는 짝이다.
+//    Tooltip 은 border 를 쓰지 않으므로 두께 훅도 만들지 않는다.
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("tooltip")} {
@@ -33,7 +35,7 @@
     &__bubble {
       position: relative;
       padding: var(#{v("space-2")}) var(#{v("space-3")});
-      background-color: #{hook("tooltip-bg", var(#{v("layer-inverse")}))};
+      background-color: var(#{v("layer-inverse")});
       border-radius: #{hook("tooltip-radius", var(#{v("radius-3")}))};
       box-shadow: var(#{v("shadow-2")});
     }
@@ -51,7 +53,7 @@
       position: absolute;
       width: var(#{v("size-icon-sm")});
       height: var(#{v("size-icon-sm")});
-      background-color: #{hook("tooltip-bg", var(#{v("layer-inverse")}))};
+      background-color: var(#{v("layer-inverse")});
       transform: rotate(45deg);
     }
 

@@ -3,7 +3,9 @@
 
 // ─────────────────────────────────────────────────────────────
 // Textarea
-// 공개 훅: --nui-textarea-min-height / -radius / -border-color / -bg
+// 공개 훅: --nui-textarea-min-height / -radius / -border-width
+// ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 테두리·글자는 짝이라
+//    한쪽만 바꾸면 대비가 보이지 않게 깨진다. 한 개만 바꿀 때는 className 을 쓴다.
 // 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
@@ -12,9 +14,9 @@
 
     &__wrap {
       position: relative;
-      background-color: #{hook("textarea-bg", var(#{v("control-bg")}))};
-      border: var(#{v("border-width")}) solid
-        #{hook("textarea-border-color", var(#{v("control-border")}))};
+      background-color: var(#{v("control-bg")});
+      border: #{hook("textarea-border-width", var(#{v("border-width-1")}))}
+        solid var(#{v("control-border")});
       border-radius: #{hook("textarea-radius", var(#{v("radius-2")}))};
 
       @include motion(

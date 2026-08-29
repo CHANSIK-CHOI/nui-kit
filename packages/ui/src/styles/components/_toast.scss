@@ -3,7 +3,9 @@
 // ─────────────────────────────────────────────────────────────
 // Toast
 // 구조: .nui-toast-portal(고정 레이어) > .nui-toast-stack(하단 정렬) > .nui-toast
-// 공개 훅: --nui-toast-width / -radius / -bg
+// 공개 훅: --nui-toast-width / -radius
+// ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 글자는 짝이다.
+//    Toast 는 border 를 쓰지 않으므로 두께 훅도 만들지 않는다 (죽은 토큰이 된다).
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   // ToastHost 가 portal 컨테이너에 직접 붙이는 클래스
@@ -36,7 +38,7 @@
     width: #{hook("toast-width", min(100%, 26.25rem))};
     padding: var(#{v("space-3")}) var(#{v("space-panel-compact")});
     color: var(#{v("text-inverse-strong")});
-    background: #{hook("toast-bg", var(#{v("layer-inverse")}))};
+    background: var(#{v("layer-inverse")});
     border-radius: #{hook("toast-radius", var(#{v("radius-4")}))};
     box-shadow: var(#{v("shadow-3")}), var(#{v("shadow-inset-inverse")});
     pointer-events: auto;
@@ -69,7 +71,7 @@
     }
 
     &--error {
-      background: #{hook("toast-bg", var(#{v("surface-toast-error")}))};
+      background: var(#{v("surface-toast-error")});
 
       #{cls("toast")}__indicator {
         background: var(#{v("status-error-soft")});

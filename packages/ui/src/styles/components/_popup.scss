@@ -7,7 +7,17 @@
 // variant: --dialog(기본) / --bottom-sheet / --full
 // size:    --small / (regular=기본) / --large
 //
-// 공개 훅: --nui-popup-width / -radius / -bg / -dim
+// 공개 훅
+//   크기 : --nui-popup-lg-width / -md-width / -sm-width
+//   모양 : --nui-popup-radius
+//   선   : --nui-popup-border-width
+//
+// ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 글자는 짝이라
+//    배경만 바꾸면 대비가 보이지 않게 깨진다. 한 팝업만 바꿀 때는 className 을 쓴다.
+//
+// ⚠️ 너비 훅에 옵션 이름이 붙는 이유:
+//    이름을 하나(--nui-popup-width)만 두면 소비자가 그걸 :root 에 설정한 순간
+//    small/regular/large 세 자리가 전부 같은 폭이 되어 크기 variant 가 죽는다.
 //
 // ⏸️ 원본은 데스크톱에서 내부 여백을 card → section 으로 키웠으나
 //    브레이크포인트 대응이 보류 상태라 card 값으로 통일했다.
@@ -21,7 +31,7 @@
     &__dim {
       position: absolute;
       inset: 0;
-      background: #{hook("popup-dim", var(#{v("layer-overlay")}))};
+      background: var(#{v("layer-overlay")});
       pointer-events: auto;
       will-change: opacity;
     }
@@ -39,11 +49,12 @@
     &__panel {
       display: flex;
       flex-direction: column;
-      width: #{hook("popup-width", min(100%, 30rem))};
+      width: #{hook("popup-md-width", min(100%, 30rem))};
       max-height: min(calc(100dvh - 2.5rem), 45rem);
       overflow: hidden;
-      background: #{hook("popup-bg", var(#{v("layer-floating")}))};
-      border: var(#{v("border-width-1")}) solid var(#{v("border-form")});
+      background: var(#{v("layer-floating")});
+      border: #{hook("popup-border-width", var(#{v("border-width-1")}))} solid
+        var(#{v("border-form")});
       border-radius: #{hook("popup-radius", var(#{v("radius-6")}))};
       box-shadow: var(#{v("shadow-3")});
       pointer-events: auto;
@@ -91,7 +102,10 @@
       height: var(#{v("size-control-lg")});
       color: var(#{v("text-secondary")});
       background: transparent;
-      border: var(#{v("border-width")}) solid transparent;
+      // 보이지 않는 테두리에도 두께 훅을 적용한다.
+      // 안 하면 소비자가 두께를 2px 로 바꿨을 때 여기만 1px 로 남아 hover 시 요소가 밀린다.
+      border: #{hook("popup-border-width", var(#{v("border-width-1")}))} solid
+        transparent;
       border-radius: var(#{v("radius-full")});
 
       @include motion((background-color, border-color, color, transform));
@@ -118,8 +132,8 @@
       flex-direction: column;
       gap: var(#{v("space-3")});
       overflow-y: auto;
-      padding: var(#{v("space-panel-compact")})
-        var(#{v("space-panel-card")}) var(#{v("space-panel-card")});
+      padding: var(#{v("space-panel-compact")}) var(#{v("space-panel-card")})
+        var(#{v("space-panel-card")});
     }
 
     &__icon {
@@ -132,7 +146,8 @@
       height: var(#{v("size-field")});
       color: var(#{v("text-info")});
       background: var(#{v("gradient-panel-soft")});
-      border: var(#{v("border-width-1")}) solid var(#{v("border-section")});
+      border: #{hook("popup-border-width", var(#{v("border-width-1")}))} solid
+        var(#{v("border-section")});
       border-radius: var(#{v("radius-full")});
       box-shadow: var(#{v("shadow-inset-soft")});
     }
@@ -156,11 +171,11 @@
 
     // ── 크기
     &--small &__panel {
-      width: #{hook("popup-width", min(100%, 22.5rem))};
+      width: #{hook("popup-sm-width", min(100%, 22.5rem))};
     }
 
     &--large &__panel {
-      width: #{hook("popup-width", min(100%, 40rem))};
+      width: #{hook("popup-lg-width", min(100%, 40rem))};
     }
 
     // ── variant: bottom sheet
