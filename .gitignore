@@ -26,17 +26,16 @@ packages/ui/styles/
 .playwright-mcp/
 coverage/
 
-# claude local overrides
-.claude/settings.local.json
-
-# 외부 디자인 시스템 조사 자료 (로컬 참고용)
-research/
-
 # Claude Code — 외부에 노출하지 않는다
 .claude/
 CLAUDE.md
 .mcp.json
 .mcp.json.bak
 
-# 계획서 — 로컬 참조용
+# 로컬 참조용 — 배포물이 아니다
+# plan      디자인 시스템 계획서 (HTML)
+# research  외부 디자인 시스템 조사 자료
+# design    pen.dev 캔버스와 내보낸 이미지
 plan/
+research/
+design/
