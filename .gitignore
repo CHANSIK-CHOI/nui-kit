@@ -31,3 +31,9 @@ coverage/
 
 # 외부 디자인 시스템 조사 자료 (로컬 참고용)
 research/
+
+# Claude Code — 외부에 노출하지 않는다
+.claude/
+CLAUDE.md
+.mcp.json
+.mcp.json.bak
