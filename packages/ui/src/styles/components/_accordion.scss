@@ -19,7 +19,7 @@
     }
 
     &--line {
-      border-top: var(#{v("border-width")}) solid var(#{v("control-border")});
+      border-top: var(#{v("border-width-1")}) solid var(#{v("border-divider")});
     }
 
     &__item {
@@ -31,7 +31,7 @@
 
     &--box &__item {
       background: var(#{v("gradient-panel-soft")});
-      border: var(#{v("border-width")}) solid var(#{v("border-default")});
+      border: var(#{v("border-width-1")}) solid var(#{v("border-form")});
       border-radius: #{hook("accordion-radius", var(#{v("radius-4")}))};
       box-shadow: var(#{v("shadow-1")});
     }
@@ -43,7 +43,7 @@
 
     &--line &__item {
       background-color: transparent;
-      border-bottom: var(#{v("border-width")}) solid var(#{v("control-border")});
+      border-bottom: var(#{v("border-width-1")}) solid var(#{v("border-divider")});
     }
 
     &--line &__item#{state("active")} {

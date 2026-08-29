@@ -57,6 +57,64 @@ const HOVER_BG_FORBIDDEN = new Set([
 ]);
 
 /**
+ * 공개 훅(`hook()`) 규율 — 무엇을 열고, 이름을 어떻게 짓는가.
+ *
+ * 원칙: **소비자가 잘못 바꿨을 때 자기 눈으로 알아챌 수 있으면 열고, 없으면 막는다.**
+ *
+ *   색      배경과 글자가 짝이다. 배경만 바꾸면 대비가 깨지는데 **소비자는 모른다**
+ *           (저시력 사용자만 겪는다). 그래서 훅을 두지 않는다 —
+ *           창구는 브랜드 색 1개(빌드 타임 생성기)와 semantic 덮어쓰기다.
+ *   치수    바꾸면 결과가 바로 보인다. 짝도 없다. 그래서 컴포넌트별로 연다.
+ *
+ * 예외 하나 — **포커스 링 두께**는 치수지만 막는다. 얇아지면 키보드 사용자만
+ * 영향을 받고 소비자는 알아채지 못한다(색과 같은 성격이다).
+ */
+const COLOR_HOOK = /-(bg|dim|color)$/;
+
+/** 훅 이름의 속성 부분. **긴 것부터** 매칭한다(`max-width` 가 `width` 보다 먼저) */
+const HOOK_PROPS = [
+  "border-width",
+  "min-height",
+  "min-width",
+  "max-width",
+  "padding-x",
+  "padding-y",
+  "padding",
+  "height",
+  "width",
+  "radius",
+  "size",
+  "gap",
+];
+
+/**
+ * 크기·모양 옵션. **컴포넌트 이름 바로 뒤**에 온다 —
+ * `button-lg-height` 처럼 옵션별로 묶여야 소비자가 "lg 버튼을 통째로" 찾을 수 있다.
+ */
+const HOOK_OPTIONS = new Set(["lg", "md", "sm", "round"]);
+
+/** 훅 이름이 `{컴포넌트}-{옵션?}-{요소?}-{속성}` 을 지키는지. 문제가 없으면 null */
+function checkHookName(name) {
+  const prop = HOOK_PROPS.find((p) => name === p || name.endsWith(`-${p}`));
+  if (!prop) {
+    return `속성으로 끝나지 않는다 — 허용: ${HOOK_PROPS.join(" · ")}`;
+  }
+
+  const parts = name
+    .slice(0, name.length - prop.length)
+    .split("-")
+    .filter(Boolean);
+
+  if (parts.length === 0) return "컴포넌트 이름이 없다";
+
+  const optionAt = parts.findIndex((p) => HOOK_OPTIONS.has(p));
+  if (optionAt > 1) {
+    return `옵션 '${parts[optionAt]}' 은 컴포넌트 이름 바로 뒤에 와야 한다`;
+  }
+  return null;
+}
+
+/**
  * 구 이름 → 새 이름. `_seed.scss` 의 DEPRECATED 절과 짝이다.
  * 컴포넌트가 아직 구 이름을 쓰고 있으면 **경고**로 보고한다(실패시키지 않는다) —
  * 이행 중이기 때문이다. 목록이 비면 `_seed.scss` 의 alias 를 지울 수 있다.
@@ -126,7 +184,27 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss")
     }
   }
 
-  // 3) 표면 hover 배경은 control-bg-hover 로 통일
+  // 3) 공개 훅 — 색은 열지 않는다 · 이름은 {컴포넌트}-{옵션}-{속성}
+  for (const m of css.matchAll(/hook\(\s*"([a-z0-9-]+)"/g)) {
+    const name = m[1];
+
+    if (COLOR_HOOK.test(name)) {
+      problems.push(
+        `${file}: 색 훅 '${name}' — 색은 컴포넌트별로 열지 않는다. ` +
+          `창구는 브랜드 색 1개와 semantic 이다 (design-plan 2-1)`,
+      );
+      continue;
+    }
+
+    const bad = checkHookName(name);
+    if (bad) {
+      problems.push(
+        `${file}: 훅 이름 '${name}' — ${bad} (design-plan 2-3)`,
+      );
+    }
+  }
+
+  // 4) 표면 hover 배경은 control-bg-hover 로 통일
   const hoverBlock = /:hover[^{]*\{([^}]*)\}/g;
   for (const m of css.matchAll(hoverBlock)) {
     for (const t of m[1].matchAll(/v\("([a-z0-9-]+)"\)/g)) {
@@ -139,7 +217,7 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss")
   }
 }
 
-// 4) deprecated 토큰 사용 — 경고만 한다(이행 중이므로 실패시키지 않는다)
+// 5) deprecated 토큰 사용 — 경고만 한다(이행 중이므로 실패시키지 않는다)
 const warnings = [];
 
 for (const file of readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss"))) {

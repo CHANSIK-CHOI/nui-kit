@@ -162,113 +162,85 @@ RHF 래퍼는 이식된 컴포넌트 전부에 대해 `/rhf` 서브패스로 제
 
 ---
 
-## 다음 작업 — 디자인 시스템 재정비 (사용자 요청)
+## 다음 작업 — 디자인 시스템 재정비 **2단계 진행 중** (2026-08-29)
 
-계열 이전(5단계)은 끝났다. 다음 세션의 주제는 **디자인 시스템 재정비**다.
+### 계획서가 정본이다 ★
 
-### 지금까지 한 것 — 어디까지 정리됐나
+**모든 결정과 근거는 두 HTML 문서에 있다. 작업 전에 반드시 읽는다.**
 
-2026-08-27 에 토큰 3계층을 재편하고 공통 스타일 계약을 세웠다
-(`rules/design-system.md`). 요지는 **"컴포넌트를 만들 때 무슨 색을 쓸지 고민하지
-않게 한다"** — 상태와 역할이 정해지면 쓸 토큰이 하나로 결정된다.
-
-| 한 것 | 결과 |
+| 문서 | 내용 |
 | --- | --- |
-| Primitive → Semantic → Component 3계층 | 컴포넌트의 primitive 색 직접 참조 **0건** |
-| 원본 유산 alias(`text-color-1~4` 등) 12개 제거 | semantic 이 gray scale 을 직접 참조 |
-| gray scale 50~900 재정의 | 이전 8단계는 **전부 죽은 토큰**이었다(사용처 0) |
-| 상태×속성 매트릭스 | hover 배경 3종 → 1종, 포커스 링 선택 기준 규칙화 |
-| `action-*` / `status-*` / `control-track`·`thumb` 신설 | 다른 역할 토큰을 돌려쓰던 자리를 메움 |
-| `verify:tokens` 기계 검사 | 문서만으로는 다시 어긋나므로 `verify` 체인에 편입 |
-| 대비 AA | primary `#1ca673`→`#16815a`(4.86:1), point 글자 검정(8.03:1) |
+| `design-plan.html` | **확정 기준 전량** — 원칙 · 결정 D-01~D-14 · before/after · 실행 계약 |
+| `brand-color-plan.html` | `D-02` 브랜드 색 생성기 (별도 기능, 2단계 이후) |
 
-### 재정비에서 다룰 만한 것 (사용자와 범위를 먼저 맞출 것)
+두 문서는 **확정 기준만** 담는다. 논의 과정은 넣지 않는다 — 이력은 Git 이 갖는다.
+**계획서 수정은 반드시 `eli5` 스킬을 호출해서** 한다 (사용자 지시).
 
-**이번에 한 것은 "기존 토큰에 규칙을 부여하고 최소 재편"이다.** 더 근본적으로
-손볼 여지가 남아 있고, 무엇을 재정비할지는 **사용자에게 확인하고 시작한다.**
+### 세운 원칙 — 계층과 창구는 다른 축이다
 
-1. **variant 훅 이름 공유** — `--nui-popup-width` 를 small/regular/large 세 규칙이
-   같은 이름으로 읽는다. 소비자가 한 번 설정하면 **size variant 가 전부 무력화**된다.
-   `--nui-button-min-height` / `-padding-x` / `-radius` 도 같은 구조.
-   `styles.md` §3 이 경고하는 형태이고, 고치면 **breaking**
-2. **스케일 체계** — t-shirt 사이즈(`space-2xs`~`2xl`, `size-control-sm`~`xl`)를
-   숫자 스케일로 갈지. 원본 유산이다
-3. **색 팔레트** — secondary(#d92b2b, 4.85:1)가 AA 경계에 가깝다. brand 3색을
-   대비 관점에서 함께 재설계할지
-4. **다크 테마** — 현재 없다. 토큰이 `:root` 단일 선언이라 `[data-theme]` 축을
-   추가하려면 지금이 싸다
-5. **반응형** — `respond-to` 인프라만 있고 사용처가 없다(의도적 보류).
-   재정비와 함께 풀지, 계속 미룰지
-6. **타이포 스케일** — `font-size-label/body-sm/body/title/display` 5단계.
-   컴포넌트가 실제로 쓰는 조합과 맞는지 검증 안 됨
+- **축 1 계층** — 값이 어디서 오는가. 색만 2계층(Primitive → Semantic)
+- **축 2 창구** — 소비자가 어디를 만지는가. 컴포넌트별 훅
 
-### 배포 전에 결정해야 하는 breaking 3건
+> **소비자가 잘못 바꿨을 때 자기 눈으로 알아챌 수 있으면 열고, 없으면 막는다.**
 
-spec §13 에 쌓여 있다. **닫는 것은 breaking, 여는 것은 non-breaking** 이므로
-배포 전이 유일하게 싼 시점이다.
+- **색** — 배경↔글자가 짝이라 배경만 바꾸면 대비가 보이지 않게 깨진다 → **막는다**
+- **포커스 링 두께** — 키보드 사용자만 겪는다 → **막는다**
+- **radius · 간격 · 크기 · 선 두께** — 바꾸면 바로 보인다 → **연다**
 
-1. `IconButton` 의 `aria-label` 을 타입으로 강제할지 (현재 누락이 조용히 통과)
-2. `--nui-popup-width` 가 size variant 를 무력화하는 문제 (위 1번과 같은 뿌리)
-3. `--nui-button-min-height` / `-padding-x` / `-radius` 도 동일
+훅 이름은 `--nui-{컴포넌트}-{옵션?}-{요소?}-{속성}` — "버튼의 lg 옵션의 높이"로 읽힌다.
 
-### 그 외 남은 작업
+### 2단계 진행 상황
 
-- **spec 나머지 12계열** — `_TEMPLATE.md` 형식이 확정됐으므로 이제 찍어낼 수 있다.
-  Button / LayerPopup 두 개가 참고 샘플이다. **한 번에 다 만들지 말 것** (사용자 지시)
-- 배포 준비는 "배포 전 남은 일" 참조. **배포 자체는 사용자가 로컬에서 완성도를
-  확인한 뒤 직접 지시한다** — 먼저 진행하지 않는다
+```
+✅ 1. _seed.scss          선 색 3분할 · border-width-1/2 · opacity-* 4 · scale-* 3
+✅ 2. 검사 스크립트         check-token-layers.mjs 에 색 훅 금지 · 이름 규칙 추가
+🔄 3. 컴포넌트 SCSS         선 색 재편만 완료(Accordion·Popup). 나머지가 다음 작업
+   4. rules/ 문서 3개      tokens.md · design-system.md · styles.md
+   5. Foundations 페이지
+   6. changeset + 전체 검증
+```
 
-### 이전 계열에서 반복해서 나온 함정
+### 다음에 할 일 — 컴포넌트 SCSS
 
-| 함정 | 증상 | 대응 |
-| --- | --- | --- |
-| 전역 reset 의존 | input/button 에 UA 기본 스타일 잔존, box-sizing 없음 | 컴포넌트 자체 정규화 |
-| 상태 우선순위 | error 가 readonly 에 덮임 / hover 가 focus 를 이김 | `:not()` 으로 명시 |
-| RSC dot notation | 런타임에만 `undefined` | named export 동반 |
-| portal 컨테이너 | 없으면 조용히 렌더 안 됨 | Host 가 직접 생성 |
-| controlled 경고 | `checked` + `disabled` 만으로는 React 경고 | `readOnly` 를 DOM 에 전달 |
-| Prettier 재포맷 | 문자열 치환이 **조용히** 실패 | 포맷된 파일은 부분 치환 대신 전체 재작성 |
-| 서드파티 CSS-in-JS | emotion 클래스가 우리 `@layer` 를 항상 이긴다 | 충돌 속성만 라이브러리 쪽에서 제거 → CSS 로 넘긴다 |
-| 중첩 min-height | 자식에도 같은 min-height 를 주면 border 만큼 밀린다 | 높이는 한 요소만 소유 |
-| 서드파티 aria 덮어쓰기 | 라이브러리가 `aria-describedby` 를 자체 계산 | 컨테이너 컴포넌트에서 자식 aria 를 병합 |
-| `forwardRef` 타입 추론 | `--emitDeclarationOnly` 만 TS2883 으로 실패 | `ForwardRefExoticComponent` 명시 |
-| **서드파티 상태 속성** | **`:disabled` 셀렉터가 절대 매치되지 않음** | **라이브러리가 `aria-disabled` 를 쓰는지 확인** |
-| **포커스 복귀 ↔ 자동 열기** | **닫으면서 `focus()` 하면 focus 핸들러가 다시 연다** | **복귀 중임을 ref 로 표시해 순환을 끊는다** |
-| **문서 사이트의 `overflow: hidden`** | **팝업이 잘려 데모를 조작할 수 없다** | **팝업 예제는 `overflow` 를 연다** |
+**`npm run verify:tokens` 가 지금 21건으로 실패한다. 그 목록이 곧 작업 목록이다.**
 
-**정적 검사를 전부 통과하고 브라우저에서만 드러난 결함이 계열마다 나왔다.**
-`verify:console` 과 playwright 조작 검증을 생략하지 말 것.
+1. **색 훅 19개 삭제** (21자리) — `hook("button-bg", X)` → `var(X)`. 목록은 계획서 5-1
+2. **이름 분리** — `button-min-height`(3자리) → `button-lg/md/sm-height` 등. 계획서 5-2
+3. **선 두께 훅 8개 신설** — `border` 를 쓰는 8개 컴포넌트에. 계획서 5-2
+4. **Button 클래스 재편** — `--large` 신설, 기본이 48px(md)가 된다. **시각 변경**
 
-#### 서드파티 CSS-in-JS 를 감쌀 때 (Select)
+### 이번 범위의 시각 변경은 둘뿐이다
 
-`@layer nui.components` 는 소비자가 우리를 쉽게 덮게 해주는 장치인데,
-**같은 성질 때문에 서드파티 emotion/styled-components 도 우리를 덮는다.**
-상세도를 아무리 올려도 진다 (cascade 는 `layer` 를 `specificity` 보다 먼저 본다).
+나머지는 전부 "이름만 바뀌고 화면은 그대로"여야 한다.
 
-원본 프로젝트는 `@layer` 를 쓰지 않아 상세도 싸움이었고 `!important` 로 뚫었다.
-우리는 `!important` 를 쓰면 소비자 커스터마이징까지 막으므로 쓰지 않는다.
-→ **라이브러리의 `styles` API 로 충돌 속성만 걷어내고 CSS 가 책임진다.**
-   (`Select.utils.ts` 의 `CSS_OWNED_PROPERTIES` 참조)
+1. **선 색 위계 교정** — Accordion `line` 구분선이 연해진다 ✅ 적용 완료
+2. **Button 기본 높이** — 56px → 48px (미적용)
 
-단, **기능 스타일은 걷어내면 안 된다** — 메뉴 배치, `maxMenuHeight`,
-`valueContainer` 의 `display` 전환 등. 이런 값은 CSS 로 덮지 말고 prop 으로 조정한다.
+### 검증 — CSS diff 가 핵심이다
 
-#### 서드파티 클래스를 통째로 갈아끼울 때 (Datepicker)
+빌드된 `styles/*.css` 를 변경 전후로 비교하고, **토큰 이름을 되돌리는 치환을 걸면 diff 가 0**이어야 한다.
+위 두 가지 의도된 변경만 예외다. 자세한 것은 계획서 6-2.
 
-react-day-picker 는 emotion 이 아니라 **일반 CSS 클래스**라 접근이 다르다.
-기본 CSS 를 배포하지 않고 `classNames` prop 으로 `.rdp-*` 를 통째로
-`nui-daypicker__*` 로 치환했다 (`Datepicker.utils.ts` 의 `DAYPICKER_CLASS_NAMES`).
+### 알아둘 함정
 
-- 키를 하나씩 적지 않고 **enum 에서 자동 생성**한다 — 빠뜨린 키가 있으면 그 요소만
-  클래스 없이 렌더되어 스타일이 조용히 빠진다
-- 그래도 **라이브러리가 키를 바꾸면 조용히 깨진다** (타입 검사에 안 걸린다).
-  DOM 에 `.rdp-*` 가 0건인지 브라우저로 확인할 것
-- `labels` 는 `locale` 을 따라가지 않는다 — 한국어 기본값을 우리가 채워야 한다
-- 애니메이션(`animate`)은 정리를 `animationend` 에 의존하므로, keyframes 를
-  배포하지 않으면 **DOM 이 누수된다.** 타입에서 막아뒀다
+- **`grep 'hook("..."` 로 훅을 세지 마라.** Prettier 가 줄을 접어서 13개를 놓쳤다.
+  `hook\(\s*"` 로 줄바꿈까지 잡아야 한다. 검사 스크립트가 정확히 센다
+- **`selector-size` 는 쪼개지 않는다** — Checkbox·Radio 의 width/height 를 묶어 정사각형을 보장한다
+- **한 컴포넌트 안의 테두리 두께도 하나로 묶는다** — 같은 이유
+- **`transparent` 테두리에도 두께 훅을 적용한다** — 안 하면 선택 시 요소가 밀린다
+- **`opacity` 는 매트릭스에 있는 4개만 토큰화했다.** 규칙 밖 4자리(Datepicker 0.3·0.45×2,
+  Button disabled 0.72)는 남겨뒀다 — 어느 값으로 모을지는 컴포넌트 반영 단계에서 판단한다
 
-**공개 API 를 닫는 것과 여는 것은 비용이 다르다.** 막았다 나중에 여는 건 non-breaking,
-열었다 닫는 건 breaking 이다. 애매하면 **닫고 시작한다.**
+### 보류 — 이번에 하지 않는 것
+
+`D-02` 브랜드 색 생성기 · `D-03` DESIGN.md · `D-08` elevation ·
+`D-12` 아이콘 라이브러리 · opacity·pressed 값 통일 · 반응형
+
+### 조사 자료 (gitignore — 로컬에만 있다)
+
+- `research/seed-design/` — 당근 SEED 파운데이션 14편 분석
+- `research/figma-palettes/palettes.json` — Figma 400색. 브랜드 생성기 검증용
+- `design/design-system.pen` — pen.dev 캔버스
 
 ## 배포 전 남은 일 (6단계)
 

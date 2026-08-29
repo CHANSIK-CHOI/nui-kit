@@ -43,7 +43,7 @@
       max-height: min(calc(100dvh - 2.5rem), 45rem);
       overflow: hidden;
       background: #{hook("popup-bg", var(#{v("layer-floating")}))};
-      border: var(#{v("border-width")}) solid var(#{v("border-default")});
+      border: var(#{v("border-width-1")}) solid var(#{v("border-form")});
       border-radius: #{hook("popup-radius", var(#{v("radius-6")}))};
       box-shadow: var(#{v("shadow-3")});
       pointer-events: auto;
@@ -104,7 +104,7 @@
       &:hover {
         color: var(#{v("text-primary")});
         background: var(#{v("control-bg-hover")});
-        border-color: var(#{v("border-subtle")});
+        border-color: var(#{v("border-section")});
       }
 
       &:active {
@@ -132,7 +132,7 @@
       height: var(#{v("size-field")});
       color: var(#{v("text-info")});
       background: var(#{v("gradient-panel-soft")});
-      border: var(#{v("border-width")}) solid var(#{v("border-subtle")});
+      border: var(#{v("border-width-1")}) solid var(#{v("border-section")});
       border-radius: var(#{v("radius-full")});
       box-shadow: var(#{v("shadow-inset-soft")});
     }

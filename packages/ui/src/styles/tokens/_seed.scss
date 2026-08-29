@@ -149,7 +149,6 @@
 }
 
 @layer nui.tokens {
-
   :root {
     // ═════════════════════════════════════════════════════════════
     // ═════════════════════════════════════════════════════════════
@@ -318,9 +317,20 @@
       var(#{v("color-gray-2")}) 100%
     );
 
-    // ── semantic / border
-    #{v("border-subtle")}: var(#{v("color-gray-5")});
-    #{v("border-default")}: var(#{v("color-gray-6")});
+    // ── semantic / border ★
+    //
+    // 선은 굵기가 아니라 **한 화면에 몇 번 등장하는가**로 나눈다.
+    // 많이 나올수록 연하게 — 리스트 구분선이 진하면 화면이 줄무늬처럼 보인다.
+    //
+    //   형태선     한 요소에 하나   카드·패널의 외곽
+    //   의미경계선  한 화면에 한두 번  섹션 사이, 헤더와 본문 경계
+    //   구분선     한 화면에 여러 번  리스트 row, 아코디언 항목
+    //
+    // 뒤의 둘이 alpha 인 것은 **어떤 배경 위에 놓일지 모르기 때문**이다.
+    // 불투명 회색은 배경에 따라 튀지만 반투명은 아래 색과 섞여 어디서든 자연스럽다.
+    #{v("border-form")}: var(#{v("color-gray-6")});
+    #{v("border-section")}: var(#{v("color-gray-a5")});
+    #{v("border-divider")}: var(#{v("color-gray-a3")});
     #{v("border-brand")}: var(#{v("color-brand-7")});
     #{v("border-brand-subtle")}: var(#{v("color-brand-6")});
 
@@ -474,10 +484,38 @@
     #{v("size-control-option")}: 2.75rem; // 44px
 
     // ── border width
-    #{v("border-width")}: 1px;
+    // 두께는 연쇄하지 않는다(1px 은 그냥 1px 이다). 그래서 계층 없이 스케일만 둔다.
+    // 컴포넌트가 자기 두께 훅으로 이 값을 덮을 수 있다 — design-system.md 창구 규칙.
+    #{v("border-width-1")}: 1px;
+    #{v("border-width-2")}: 2px;
     // 포커스 시 두께. outline 방식과 border 방식이 같은 값을 쓴다.
+    // ⚠️ **컴포넌트 훅을 두지 않는다.** 포커스 표시가 얇아지면 키보드 사용자만
+    //    영향을 받고 소비자는 알아채지 못한다 — 색과 같은 성격이다.
     #{v("focus-width")}: 2px;
     #{v("focus-offset")}: 0.25rem;
+
+    // ── opacity (상태 표현) ★
+    //
+    // **매트릭스에 이미 규칙이 있는 값만 토큰으로 만든다.**
+    // design-system.md §2-1(입력 컨트롤 disabled·readonly 아이콘)과
+    // §2-4(text 버튼 hover·active)에 정의된 네 값이다.
+    //
+    // ⚠️ 규칙 밖의 opacity 가 아직 4자리 남아 있다 —
+    //    Datepicker 이전/다음 버튼(0.3) · 날짜(0.45 ×2) · Button disabled(0.72).
+    //    "비활성"이라는 같은 상태에 다른 값을 쓰는 자리이고,
+    //    **어느 값으로 모을지는 컴포넌트 반영 단계에서 판단한다.**
+    //    지금 통일하면 시각이 바뀌므로 토큰화하지 않고 남겨둔다.
+    #{v("opacity-icon-disabled")}: 0.2;
+    #{v("opacity-icon-readonly")}: 0.6;
+    #{v("opacity-hover")}: 0.72;
+    #{v("opacity-pressed")}: 0.56;
+
+    // ── scale (눌림 배율) ★
+    // 큰 요소일수록 덜 줄여야 같은 정도로 눌린 느낌이 난다.
+    // 전면 버튼을 0.95 로 줄이면 과하게 움츠러들고, 작은 칩을 0.98 로 줄이면 티가 안 난다.
+    #{v("scale-95")}: 0.95;
+    #{v("scale-97")}: 0.97;
+    #{v("scale-98")}: 0.98;
 
     // ── focus ring ★
     // **elevation 이 아니다.** 그래서 `shadow-*` 가 아니라 `focus-*` 다.
