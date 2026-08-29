@@ -18,7 +18,9 @@ const BASE = process.argv[2] ?? "http://localhost:3000";
 try {
   await fetch(BASE, { signal: AbortSignal.timeout(3000) });
 } catch {
-  console.error(`❌ ${BASE} 에 접속할 수 없다. 먼저 \`npm run dev\` 로 서버를 띄울 것.`);
+  console.error(
+    `❌ ${BASE} 에 접속할 수 없다. 먼저 \`npm run dev\` 로 서버를 띄울 것.`,
+  );
   process.exit(1);
 }
 
@@ -93,15 +95,28 @@ function ratio(a, b) {
   const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
   return (x + 0.05) / (y + 0.05);
 }
-const parse = (css) => (css.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+const parse = (css) =>
+  (css.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
 
-const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+const ctx = await browser.newContext({
+  viewport: { width: 1280, height: 900 },
+});
 const page = await ctx.newPage();
 
 /** [라벨, 페이지, 셀렉터, 최소비율] — 큰 글자(18.66px+ bold, 24px+)는 3.0 */
 const TARGETS = [
-  ["기본 버튼 라벨", "/components/button", ".nui-button .nui-button__wrap", 4.5],
-  ["primary 버튼 라벨", "/components/button", ".nui-button--primary .nui-button__wrap", 4.5],
+  [
+    "기본 버튼 라벨",
+    "/components/button",
+    ".nui-button .nui-button__wrap",
+    4.5,
+  ],
+  [
+    "primary 버튼 라벨",
+    "/components/button",
+    ".nui-button--primary .nui-button__wrap",
+    4.5,
+  ],
   ["입력 글자", "/components/textfield", ".nui-textfield__input", 4.5],
   ["에러 메시지", "/components/textfield", ".nui-message__msg--error", 4.5],
 ];

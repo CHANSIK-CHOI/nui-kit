@@ -116,7 +116,7 @@ export function PopupDemo() {
             openAsync
           </Button>
           {answer ? (
-            <span style={{ fontSize: "var(--nui-font-size-body-sm)" }}>
+            <span style={{ fontSize: "var(--nui-font-size-3)" }}>
               결과: <strong>{answer}</strong>
             </span>
           ) : null}

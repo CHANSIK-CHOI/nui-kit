@@ -1,0 +1,259 @@
+import Link from "next/link";
+import { TokenTable } from "@/components/TokenTable";
+import tokens from "@/generated/tokens.json";
+
+export const metadata = { title: "깊이" };
+
+type Token = { name: string; value: string };
+const DATA = tokens as unknown as Record<string, Token[]>;
+
+/** 고도(elevation)를 나타내는 것만. ring-* · thumb · inset-* 은 내부 전용이다. */
+const ELEVATION = ["1", "2", "3", "press"];
+
+const LAYERS: [string, string, string][] = [
+  ["layer-basement", "바닥", "패널 안쪽 바닥, 비활성 영역"],
+  [
+    "layer-default",
+    "기본",
+    "카드 · 리스트 표면. 대부분의 콘텐츠가 여기 놓인다",
+  ],
+  ["layer-floating", "떠 있음", "팝업 · 드롭다운 · 툴팁 · 달력"],
+  ["layer-overlay", "딤", "모달 뒤를 덮는 어두운 면"],
+];
+
+export default function ElevationPage() {
+  const shadows = (DATA.shadow ?? []).filter((t) =>
+    ELEVATION.includes(t.name.replace("--nui-shadow-", "")),
+  );
+
+  return (
+    <>
+      <h1>깊이</h1>
+      <p className="doc-lead">
+        <strong>이 페이지가 정하는 것</strong> — 무엇이 무엇 위에 놓이는가. 면의
+        층 · 그림자 · 쌓임 순서 셋이 같은 이야기를 다른 수단으로 한다.
+      </p>
+
+      <h2>층 — 콘텐츠를 담는 면</h2>
+      <p>
+        <code>layer-*</code> 는 <strong>컨테이너의 표면색</strong>만 정의한다.
+        글자나 아이콘 같은 개별 요소가 아니라 화면의 캔버스를 만든다.
+      </p>
+
+      <div className="doc-example">
+        <div
+          className="doc-example__preview"
+          style={{
+            background: "var(--nui-layer-basement)",
+            padding: 28,
+            borderRadius: "var(--nui-radius-2)",
+          }}
+        >
+          <div
+            style={{
+              background: "var(--nui-layer-default)",
+              border: "1px solid var(--nui-border-form)",
+              borderRadius: "var(--nui-radius-2)",
+              padding: 28,
+            }}
+          >
+            <div
+              style={{
+                background: "var(--nui-layer-floating)",
+                boxShadow: "var(--nui-shadow-2)",
+                borderRadius: "var(--nui-radius-2)",
+                padding: 20,
+                fontSize: "var(--nui-font-size-3)",
+              }}
+            >
+              떠 있는 면 — <code>layer-floating</code>
+            </div>
+          </div>
+        </div>
+        <p className="doc-example__caption">
+          바깥부터 basement → default → floating. 안쪽으로 갈수록 위에 있다.
+        </p>
+      </div>
+
+      <div className="doc-table-wrap">
+        <table className="doc-table">
+          <thead>
+            <tr>
+              <th>층</th>
+              <th>토큰</th>
+              <th>쓰는 곳</th>
+            </tr>
+          </thead>
+          <tbody>
+            {LAYERS.map(([token, role, where]) => (
+              <tr key={token}>
+                <th scope="row">{role}</th>
+                <td>
+                  <span className="doc-token-name">--nui-{token}</span>
+                </td>
+                <td className="doc-wrap">{where}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="doc-note">
+        <strong>
+          <code>surface-*</code> 는 층이 아니다.
+        </strong>{" "}
+        콘텐츠 <em>위에</em> 얹는 톤(강조면 · 구분면)이라 역할이 다르다.
+        혼용하면 어느 것이 위인지 알 수 없게 된다.
+      </div>
+
+      <div className="doc-note doc-note--warn">
+        <strong>
+          <code>layer-basement</code> 는 아직 쓰는 곳이 없다.
+        </strong>{" "}
+        지우지 않고 두는 이유는{" "}
+        <strong>다크 테마의 축이 layer 이기 때문</strong>
+        이다. &quot;고도가 높을수록 밝아진다&quot;는 규칙은 색을 반전시켜서는
+        만들어지지 않는다. 테마를 넣게 되면 <code>layer-*</code> 를 먼저
+        정의하고 나머지를 얹는다.
+      </div>
+
+      <h2>그림자 — 얼마나 떠 있나</h2>
+      <div className="doc-example">
+        <div
+          className="doc-example__preview doc-example__row"
+          style={{ gap: 24, padding: 32 }}
+        >
+          {shadows.map((token) => (
+            <div key={token.name} style={{ textAlign: "center" }}>
+              <div
+                style={{
+                  width: 92,
+                  height: 56,
+                  background: "var(--nui-layer-floating)",
+                  borderRadius: "var(--nui-radius-2)",
+                  boxShadow: `var(${token.name})`,
+                  marginBottom: 8,
+                }}
+              />
+              <span className="doc-token-name">
+                {token.name.replace("--nui-shadow-", "")}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="doc-table-wrap">
+        <table className="doc-table">
+          <thead>
+            <tr>
+              <th>토큰</th>
+              <th>쓰는 곳</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">
+                <span className="doc-token-name">--nui-shadow-1</span>
+              </th>
+              <td className="doc-wrap">낮게 뜸 — 카드, 인라인 드롭다운</td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <span className="doc-token-name">--nui-shadow-2</span>
+              </th>
+              <td className="doc-wrap">중간 — 팝오버, 메뉴, 달력</td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <span className="doc-token-name">--nui-shadow-3</span>
+              </th>
+              <td className="doc-wrap">최상단 — 모달, 토스트</td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <span className="doc-token-name">--nui-shadow-press</span>
+              </th>
+              <td className="doc-wrap">눌렸을 때 — 아래로 내려간 느낌</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <TokenTable group="shadow" swatch={false} />
+
+      <div className="doc-note">
+        <strong>
+          <code>shadow-ring-*</code> · <code>shadow-thumb</code> ·{" "}
+          <code>shadow-inset-*</code> 은 컴포넌트 내부 전용이다.
+        </strong>{" "}
+        고도를 나타내지 않으므로 위 미리보기에 없다.
+      </div>
+
+      <div className="doc-note doc-note--warn">
+        <strong>포커스 링은 그림자가 아니다.</strong> 생김새가 비슷하지만
+        그림자는 <em>높이</em>를, 링은 <em>상태</em>를 나타낸다. 그래서{" "}
+        <code>shadow-*</code> 가 아니라 <code>focus-ring-*</code> 이고, 고르는
+        기준도 다르다 — <Link href="/foundations/accessibility">접근성</Link>{" "}
+        문서 참조.
+      </div>
+
+      <h2>쌓임 순서</h2>
+      <p>
+        <code>z-index</code> 를 직접 쓰지 않고 이 네 개 안에서 고른다. 값을 직접
+        쓰기 시작하면 <strong>숫자 경쟁</strong>이 벌어진다.
+      </p>
+      <TokenTable group="z-index" swatch={false} />
+
+      <div className="doc-table-wrap">
+        <table className="doc-table">
+          <thead>
+            <tr>
+              <th>토큰</th>
+              <th>왜 그 값인가</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">
+                <span className="doc-token-name">--nui-z-tooltip</span>
+              </th>
+              <td className="doc-wrap">
+                같은 화면 안에서만 떠 있으면 된다 — 툴팁, 인라인 드롭다운
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <span className="doc-token-name">--nui-z-overlay-layer</span>
+              </th>
+              <td className="doc-wrap">팝업과 그 딤</td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <span className="doc-token-name">--nui-z-portal-menu</span>
+              </th>
+              <td className="doc-wrap">
+                <strong>팝업보다 위.</strong> 팝업 <em>안에서</em> 연 셀렉트와
+                달력이 팝업에 가리면 안 된다
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <span className="doc-token-name">--nui-z-toast</span>
+              </th>
+              <td className="doc-wrap">
+                <strong>가장 위.</strong> 팝업 안에서 띄운 토스트도 보여야 한다
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="doc-note">
+        <strong>겹친다고 값을 올리지 않는다.</strong> 새 값이 필요해 보이면
+        대개는 쌓임 맥락(stacking context)이 잘못 잡힌 것이다. 부모에{" "}
+        <code>transform</code> 이나 <code>opacity</code> 가 걸려 있으면 자식의{" "}
+        <code>z-index</code> 는 그 맥락 안에 갇힌다 — 숫자를 키워도 소용없다.
+      </div>
+    </>
+  );
+}

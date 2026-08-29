@@ -6,7 +6,7 @@
   color-scheme: light;
   --doc-sidebar-w: 260px;
   --doc-content-max: 860px;
-  --doc-border: var(--nui-border-default);
+  --doc-border: var(--nui-border-form);
   --doc-bg-subtle: var(--nui-layer-basement);
   // 코드 블록은 테마를 따라가지 않는다 — 라이트에서도 다크에서도 어두운 표면이다.
   // layer-* 를 쓰면 다크에서 배경이 밝아져 글자가 묻힌다.
@@ -122,7 +122,7 @@ body {
 }
 
 .doc-main h2 {
-  font-size: var(--nui-font-size-lg, 1.125rem);
+  font-size: var(--nui-font-size-5);
   margin: 40px 0 12px;
   padding-top: 12px;
   border-top: 1px solid var(--doc-border);
@@ -266,7 +266,7 @@ body {
   width: 44px;
   height: 26px;
   border-radius: 4px;
-  border: 1px solid var(--nui-border-default);
+  border: 1px solid var(--nui-border-form);
   display: block;
 }
 
@@ -371,4 +371,54 @@ body {
   height: 46px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 11px;
+}
+
+// ─── Foundations 전용
+// 값을 눈으로 비교하기 위한 자(ruler). 간격·시간·선처럼 "길이"로 읽히는 값에 쓴다.
+.doc-ruler {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 26px;
+}
+
+.doc-ruler__label {
+  flex-shrink: 0;
+  width: 168px;
+}
+
+.doc-ruler__bar {
+  height: 12px;
+  background: var(--nui-color-brand-9);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.doc-ruler__value {
+  color: var(--nui-text-secondary);
+  font-size: var(--nui-font-size-1);
+  flex-shrink: 0;
+}
+
+// 타이포 스케일 한 줄 — 메타 정보와 실제 글자를 나란히 둔다
+// ⚠️ `.doc-type` 은 PropsTable 의 타입 표기가 이미 쓰고 있다. 이름을 겹치지 않게 둔다.
+.doc-typescale {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--doc-border);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.doc-typescale__meta {
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  width: 152px;
+  font-size: var(--nui-font-size-1);
+  color: var(--nui-text-secondary);
 }

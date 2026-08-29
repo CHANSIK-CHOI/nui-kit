@@ -8,7 +8,7 @@
     "build": "npm run generate && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "generate": "node scripts/extract-props.mjs && node scripts/extract-tokens.mjs",
+    "generate": "node scripts/extract-props.mjs && node scripts/extract-tokens.mjs && node scripts/extract-hooks.mjs",
     "verify:console": "node scripts/check-console.mjs",
     "verify:select-rhf": "node scripts/check-select-rhf.mjs",
     "verify:datepicker": "node scripts/check-datepicker.mjs",

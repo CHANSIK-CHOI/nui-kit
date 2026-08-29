@@ -1,3 +1,4 @@
+import { HookTable } from "@/components/HookTable";
 import { PropsTable } from "@/components/PropsTable";
 import { TooltipDemo } from "./TooltipDemo";
 
@@ -49,30 +50,12 @@ export default function TooltipPage() {
       </div>
 
       <h2>커스터마이징</h2>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>공개 훅</th>
-              <th>대상</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              ["--nui-tooltip-bg", "버블·화살표 배경색"],
-              ["--nui-tooltip-radius", "모서리 반경"],
-              ["--nui-tooltip-max-width", "버블 최대 너비"],
-            ].map(([name, target]) => (
-              <tr key={name}>
-                <td>
-                  <span className="doc-token-name">{name}</span>
-                </td>
-                <td className="doc-wrap">{target}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <p>
+        <strong>색은 컴포넌트별로 열지 않는다.</strong> 버블과 화살표는{" "}
+        <code>--nui-layer-inverse</code> 를 함께 쓴다. 하나만 바꾸면 화살표가
+        따로 논다.
+      </p>
+      <HookTable group="tooltip" />
 
       <h2>API</h2>
       <PropsTable of="Tooltip" />

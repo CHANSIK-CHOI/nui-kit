@@ -36,7 +36,7 @@ export function TooltipDemo() {
             style={{
               textDecoration: "underline dotted",
               cursor: "help",
-              fontSize: "var(--nui-font-size-body-sm)",
+              fontSize: "var(--nui-font-size-3)",
             }}
             tabIndex={0}
           >
@@ -81,9 +81,7 @@ export function TooltipDemo() {
       </p>
       <Example caption="open prop 으로 직접 제어">
         <Tooltip open={isOpen} content="버튼으로 제어되는 툴팁입니다">
-          <span style={{ fontSize: "var(--nui-font-size-body-sm)" }}>
-            대상 요소
-          </span>
+          <span style={{ fontSize: "var(--nui-font-size-3)" }}>대상 요소</span>
         </Tooltip>
         <Button size="small" onClick={() => setIsOpen((prev) => !prev)}>
           {isOpen ? "닫기" : "열기"}

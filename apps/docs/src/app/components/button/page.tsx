@@ -6,6 +6,7 @@ import {
 } from "@chansikchoi/next-ui";
 import { DelIcon } from "@chansikchoi/next-ui/icon";
 import { Example } from "@/components/Example";
+import { HookTable } from "@/components/HookTable";
 import { PropsTable } from "@/components/PropsTable";
 
 export const metadata = { title: "Button" };
@@ -41,9 +42,9 @@ import "@chansikchoi/next-ui/styles/button.css"; // 온디맨드일 때`}</code>
       <h2>색상</h2>
       <p>
         색이 아니라 <strong>역할</strong>이 이름이다. 기본은{" "}
-        <code>neutral</code>, 가장 중요한 액션에는 <code>primary</code>,
-        되돌릴 수 없는 액션(삭제·탈퇴)에는 <code>danger</code>, 확인이 필요한
-        액션에는 <code>warning</code> 을 쓴다.
+        <code>neutral</code>, 가장 중요한 액션에는 <code>primary</code>, 되돌릴
+        수 없는 액션(삭제·탈퇴)에는 <code>danger</code>, 확인이 필요한 액션에는{" "}
+        <code>warning</code> 을 쓴다.
       </p>
       <Example caption="color: neutral | primary | danger | warning">
         <Button>neutral</Button>
@@ -67,10 +68,11 @@ import "@chansikchoi/next-ui/styles/button.css"; // 온디맨드일 때`}</code>
       </Example>
 
       <h2>모양과 크기</h2>
-      <Example caption="shape: square | round · size: large | medium | small">
+      <Example caption="shape: square | round · size: large | medium(기본) | small">
         <Button color="primary" shape="round">
           round
         </Button>
+        <Button size="large">large</Button>
         <Button size="medium">medium</Button>
         <Button size="small">small</Button>
       </Example>
@@ -93,54 +95,31 @@ import "@chansikchoi/next-ui/styles/button.css"; // 온디맨드일 때`}</code>
 
       <h2>커스터마이징</h2>
       <p>
-        <code>--nui-button-bg</code> 는 <strong>기본(neutral) 버튼만</strong>{" "}
-        바꾼다. variant 는 각자의 훅을 갖는다 — 훅 하나로 모든 variant 가 덮이는
-        것을 막기 위해서다.
+        <strong>색은 컴포넌트별로 열지 않는다.</strong> 배경과 글자는 짝이라
+        배경만 바꾸면 대비가 깨지는데 화면에 드러나지 않는다. 버튼 하나의 색을
+        바꿔야 하면 <code>className</code> 을, 전체 톤을 바꿔야 하면{" "}
+        <code>--nui-action-*</code> 역할 토큰을 쓴다 —{" "}
+        <a href="/foundations/color#change">색 문서</a>에 자세히 있다.
       </p>
-      <Example caption="--nui-button-bg 를 바꿔도 primary 는 영향받지 않는다">
+      <p>
+        치수는 <strong>크기 옵션마다 이름이 따로</strong> 있다. 하나로 두면 값을
+        넣는 순간 large · medium · small 이 전부 같은 높이가 된다.
+      </p>
+      <Example caption="large 만 높이를 바꾼다 — medium 은 그대로다">
         <div
           className="doc-example__row"
           style={
             {
-              "--nui-button-bg": "#6d28d9",
+              "--nui-button-lg-height": "4rem",
               "--nui-button-radius": "999px",
             } as React.CSSProperties
           }
         >
-          <Button>덮어쓴 기본 버튼</Button>
-          <Button color="primary">primary 유지</Button>
+          <Button size="large">덮어쓴 large</Button>
+          <Button>medium 유지</Button>
         </div>
       </Example>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>공개 훅</th>
-              <th>대상</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              ["--nui-button-bg", 'color="neutral" 배경'],
-              ["--nui-button-primary-bg", 'color="primary" 배경'],
-              ["--nui-button-danger-bg", 'color="danger" 배경'],
-              ["--nui-button-warning-bg", 'color="warning" 배경'],
-              ["--nui-button-color", "라벨 색"],
-              ["--nui-button-radius", "모서리 반경"],
-              ["--nui-button-min-height", "최소 높이"],
-              ["--nui-button-min-width", "최소 너비"],
-              ["--nui-button-padding-x", "좌우 여백"],
-            ].map(([name, target]) => (
-              <tr key={name}>
-                <td>
-                  <span className="doc-token-name">{name}</span>
-                </td>
-                <td className="doc-wrap">{target}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <HookTable group="button" />
 
       <h2>IconButton</h2>
       <p>

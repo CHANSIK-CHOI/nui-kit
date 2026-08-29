@@ -1,3 +1,4 @@
+import { HookTable } from "@/components/HookTable";
 import { PropsTable } from "@/components/PropsTable";
 import { ToastDemo } from "./ToastDemo";
 
@@ -47,30 +48,17 @@ toast.open({ message: "저장되었습니다." });`}</code>
       </div>
 
       <h2>커스터마이징</h2>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>공개 훅</th>
-              <th>대상</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              ["--nui-toast-width", "카드 최대 너비"],
-              ["--nui-toast-radius", "모서리 반경"],
-              ["--nui-toast-bg", "배경색 (tone 별로 각각 적용됨)"],
-            ].map(([name, target]) => (
-              <tr key={name}>
-                <td>
-                  <span className="doc-token-name">{name}</span>
-                </td>
-                <td className="doc-wrap">{target}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <p>
+        <strong>색은 컴포넌트별로 열지 않는다.</strong> 배경만 바꾸면 글자가
+        따라오지 않아 대비가 깨진다. 톤을 바꾸려면{" "}
+        <code>--nui-layer-inverse</code> 를 덮거나 <code>className</code> 으로
+        배경과 글자를 함께 지정한다.
+      </p>
+      <p>
+        Toast 는 <code>border</code> 를 쓰지 않으므로 두께 변수도 없다 — 안 쓰는
+        변수는 죽은 토큰이 된다.
+      </p>
+      <HookTable group="toast" />
 
       <h2>API</h2>
       <PropsTable of="Toast" />

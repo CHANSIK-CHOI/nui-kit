@@ -1,6 +1,7 @@
 import { Field, FieldLabel } from "@chansikchoi/next-ui";
 import { Textfield } from "@chansikchoi/next-ui/textfield";
 import { Example } from "@/components/Example";
+import { HookTable } from "@/components/HookTable";
 import { PropsTable } from "@/components/PropsTable";
 import { TextfieldDemo } from "./TextfieldDemo";
 
@@ -110,31 +111,12 @@ const { control } = useForm<{ email: string }>();
       </div>
 
       <h2>커스터마이징</h2>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>공개 훅</th>
-              <th>대상</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              ["--nui-textfield-height", "입력 영역 높이"],
-              ["--nui-textfield-radius", "모서리 반경"],
-              ["--nui-textfield-border-color", "테두리 색"],
-              ["--nui-textfield-bg", "배경색"],
-            ].map(([name, target]) => (
-              <tr key={name}>
-                <td>
-                  <span className="doc-token-name">{name}</span>
-                </td>
-                <td className="doc-wrap">{target}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <p>
+        <strong>색은 컴포넌트별로 열지 않는다.</strong> 폼 전체의 톤은{" "}
+        <code>--nui-control-*</code> 역할 토큰으로 바꾼다 —{" "}
+        <a href="/foundations/color">색 문서</a> 참조.
+      </p>
+      <HookTable group="textfield" />
 
       <h2>API</h2>
       <h3>Textfield</h3>

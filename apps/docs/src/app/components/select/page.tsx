@@ -1,3 +1,4 @@
+import { HookTable } from "@/components/HookTable";
 import { PropsTable } from "@/components/PropsTable";
 import { SelectDemo } from "./SelectDemo";
 import { RHFSelectDemo } from "./RHFSelectDemo";
@@ -44,55 +45,11 @@ const OPTIONS = [
         컨트롤 외형은 공개 CSS 변수로 조정한다. 이 변수들은 라이브러리 레이어(
         <code>@layer nui.components</code>) 밖에서 선언하면 언제나 우선한다.
       </p>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>변수</th>
-              <th>기본값</th>
-              <th>설명</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <code>--nui-select-height</code>
-              </td>
-              <td>
-                <code>--nui-size-field</code>
-              </td>
-              <td className="doc-wrap">컨트롤 최소 높이</td>
-            </tr>
-            <tr>
-              <td>
-                <code>--nui-select-radius</code>
-              </td>
-              <td>
-                <code>--nui-radius-sm</code>
-              </td>
-              <td className="doc-wrap">모서리 반경</td>
-            </tr>
-            <tr>
-              <td>
-                <code>--nui-select-border-color</code>
-              </td>
-              <td>
-                <code>--nui-control-border</code>
-              </td>
-              <td className="doc-wrap">테두리 색</td>
-            </tr>
-            <tr>
-              <td>
-                <code>--nui-select-bg</code>
-              </td>
-              <td>
-                <code>--nui-control-bg</code>
-              </td>
-              <td className="doc-wrap">배경색</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <p>
+        <strong>색은 컴포넌트별로 열지 않는다.</strong> 폼 전체의 톤은{" "}
+        <code>--nui-control-*</code> 역할 토큰으로 바꾼다.
+      </p>
+      <HookTable group="select" />
 
       <div className="doc-note doc-note--warn">
         <strong>

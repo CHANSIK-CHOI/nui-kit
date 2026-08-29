@@ -115,7 +115,9 @@ const picked = await formState();
 JSON.stringify(picked.values.interests) === JSON.stringify(["seoul", "gwangju"])
   ? ok("MultiSelect 가 선택 순서를 보존한다")
   : bad(`값 순서가 ${JSON.stringify(picked.values.interests)}`);
-const chips = await multi.locator(".nui-select__multi-value__label").allTextContents();
+const chips = await multi
+  .locator(".nui-select__multi-value__label")
+  .allTextContents();
 JSON.stringify(chips) === JSON.stringify(["서울", "광주"])
   ? ok("칩 렌더 순서도 value 배열과 일치")
   : bad(`칩 순서가 ${JSON.stringify(chips)}`);

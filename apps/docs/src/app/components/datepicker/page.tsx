@@ -1,3 +1,4 @@
+import { HookTable } from "@/components/HookTable";
 import { PropsTable } from "@/components/PropsTable";
 import { DatepickerDemo } from "./DatepickerDemo";
 import { RHFDatepickerDemo } from "./RHFDatepickerDemo";
@@ -33,10 +34,10 @@ export default function DatepickerPage() {
       </div>
 
       <div className="doc-note">
-        <strong>기간은 최소 2일이다.</strong> 같은 날을 두 번 눌러 하루짜리 기간을
-        만들 수 없다 — 두 번째 클릭은 선택 해제로 처리된다 (
-        <code>dayPickerProps.min</code> 기본값 <code>1</code>). 하루도 허용하려면{" "}
-        <code>dayPickerProps={"{{ min: 0 }}"}</code> 를 넘긴다.
+        <strong>기간은 최소 2일이다.</strong> 같은 날을 두 번 눌러 하루짜리
+        기간을 만들 수 없다 — 두 번째 클릭은 선택 해제로 처리된다 (
+        <code>dayPickerProps.min</code> 기본값 <code>1</code>). 하루도
+        허용하려면 <code>dayPickerProps={"{{ min: 0 }}"}</code> 를 넘긴다.
       </div>
 
       <DatepickerDemo />
@@ -45,64 +46,12 @@ export default function DatepickerPage() {
 
       <h2>스타일 커스터마이징</h2>
       <p>공개 CSS 변수로 달력 치수와 팝업 외형을 조정한다.</p>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>변수</th>
-              <th>기본값</th>
-              <th>설명</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <code>--nui-datepicker-dropdown-bg</code>
-              </td>
-              <td>
-                <code>--nui-surface-panel-strong</code>
-              </td>
-              <td className="doc-wrap">캘린더 팝업 배경</td>
-            </tr>
-            <tr>
-              <td>
-                <code>--nui-datepicker-dropdown-radius</code>
-              </td>
-              <td>
-                <code>--nui-radius-md</code>
-              </td>
-              <td className="doc-wrap">캘린더 팝업 모서리</td>
-            </tr>
-            <tr>
-              <td>
-                <code>--nui-datepicker-day-size</code>
-              </td>
-              <td>
-                <code>--nui-size-control-lg</code>
-              </td>
-              <td className="doc-wrap">날짜 칸 크기</td>
-            </tr>
-            <tr>
-              <td>
-                <code>--nui-datepicker-day-button-size</code>
-              </td>
-              <td>
-                <code>--nui-size-control-md</code>
-              </td>
-              <td className="doc-wrap">날짜 버튼 크기</td>
-            </tr>
-            <tr>
-              <td>
-                <code>--nui-datepicker-day-radius</code>
-              </td>
-              <td>
-                <code>--nui-radius-sm</code>
-              </td>
-              <td className="doc-wrap">날짜 버튼 모서리</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <p>
+        <strong>색은 컴포넌트별로 열지 않는다.</strong> 캘린더 팝업의 면은{" "}
+        <code>--nui-layer-floating</code>, 입력 영역은{" "}
+        <code>--nui-control-*</code> 을 따른다.
+      </p>
+      <HookTable group="datepicker" />
 
       <div className="doc-note">
         <strong>

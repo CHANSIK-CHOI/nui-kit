@@ -1,6 +1,7 @@
 import { Field, FieldLabel } from "@chansikchoi/next-ui";
 import { Textarea } from "@chansikchoi/next-ui/textarea";
 import { Example } from "@/components/Example";
+import { HookTable } from "@/components/HookTable";
 import { PropsTable } from "@/components/PropsTable";
 
 export const metadata = { title: "Textarea" };
@@ -52,31 +53,12 @@ export default function TextareaPage() {
       </Example>
 
       <h2>커스터마이징</h2>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>공개 훅</th>
-              <th>대상</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              ["--nui-textarea-min-height", "최소 높이"],
-              ["--nui-textarea-radius", "모서리 반경"],
-              ["--nui-textarea-border-color", "테두리 색"],
-              ["--nui-textarea-bg", "배경색"],
-            ].map(([name, target]) => (
-              <tr key={name}>
-                <td>
-                  <span className="doc-token-name">{name}</span>
-                </td>
-                <td className="doc-wrap">{target}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <p>
+        <strong>색은 컴포넌트별로 열지 않는다.</strong> 폼 전체의 톤은{" "}
+        <code>--nui-control-*</code> 역할 토큰으로 바꾼다 —{" "}
+        <a href="/foundations/color">색 문서</a> 참조.
+      </p>
+      <HookTable group="textarea" />
 
       <h2>API</h2>
       <PropsTable of="Textarea" />

@@ -155,7 +155,9 @@ await page.waitForTimeout(400);
 const formState = JSON.parse(await form.locator("pre code").textContent());
 formState.isValid
   ? ok("RHF 3종 값이 모두 반영되어 isValid true")
-  : bad(`isValid=${formState.isValid} / errors=${JSON.stringify(formState.errors)}`);
+  : bad(
+      `isValid=${formState.isValid} / errors=${JSON.stringify(formState.errors)}`,
+    );
 formState.extraDates?.length === 2
   ? ok("RHFDateMultiplePicker 가 여러 날짜를 누적한다")
   : bad(`다중 값이 ${JSON.stringify(formState.extraDates)}`);
@@ -186,4 +188,6 @@ if (failures.length > 0) {
   console.error(`\n❌ Datepicker 검사 실패 — ${failures.length}건`);
   process.exit(1);
 }
-console.log("\n✅ Datepicker 검사 통과 — 개폐·포커스·팝업 클리핑·RHF 회귀 없음");
+console.log(
+  "\n✅ Datepicker 검사 통과 — 개폐·포커스·팝업 클리핑·RHF 회귀 없음",
+);
