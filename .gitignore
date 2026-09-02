@@ -31,6 +31,9 @@ coverage/
 CLAUDE.md
 .mcp.json
 .mcp.json.bak
+# 루트 scripts/ 는 Context7 캐시 점검 등 Claude 자동화 전용이다.
+# 패키지 안의 scripts/(빌드·검증)는 배포·빌드에 필요하므로 여기 넣지 않는다.
+scripts/*
 
 # 로컬 참조용 — 배포물이 아니다
 # plan      디자인 시스템 계획서 (HTML)
