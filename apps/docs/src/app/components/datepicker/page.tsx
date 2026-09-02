@@ -1,4 +1,4 @@
-import { HookTable } from "@/components/guide";
+import { GuideHeader, HookTable } from "@/components/guide";
 import { PropsTable } from "@/components/guide";
 import { DatepickerDemo } from "./DatepickerDemo";
 import { RHFDatepickerDemo } from "./RHFDatepickerDemo";
@@ -8,14 +8,16 @@ export const metadata = { title: "Datepicker" };
 export default function DatepickerPage() {
   return (
     <>
-      <h1>Datepicker</h1>
-      <p className="doc-lead">
-        입력 필드와 캘린더를 묶은 날짜 선택 컨트롤. 내부적으로{" "}
-        <code>react-day-picker</code> 를 쓰며, 값은 <code>Date</code> 객체로
-        주고받는다. 하나(<code>Datepicker</code>) · 기간(
-        <code>DateRangePicker</code>) · 여러 개(<code>DateMultiplePicker</code>)
-        세 가지가 있다.
-      </p>
+      <GuideHeader
+        title="Datepicker"
+        named={["Datepicker", "DateRangePicker", "DateMultiplePicker"]}
+        subpath="datepicker"
+      >
+        달력에서 날짜를 고른다. 내부는 <code>react-day-picker</code> 이고 값은{" "}
+        <code>Date</code> 객체로 주고받는다. 기간은{" "}
+        <code>DateRangePicker</code>, 여러 날짜는{" "}
+        <code>DateMultiplePicker</code> 다.
+      </GuideHeader>
 
       <pre className="doc-code">
         <code>{`import { Datepicker, DateRangePicker } from "@chansikchoi/next-ui";
@@ -47,9 +49,8 @@ export default function DatepickerPage() {
       <h2>스타일 커스터마이징</h2>
       <p>공개 CSS 변수로 달력 치수와 팝업 외형을 조정한다.</p>
       <p>
-        <strong>색은 컴포넌트별로 열지 않는다.</strong> 캘린더 팝업의 면은{" "}
-        <code>--nui-layer-floating</code>, 입력 영역은{" "}
-        <code>--nui-control-*</code> 을 따른다.
+        색은 컴포넌트별로 열지 않는다. 한 곳만 바꾸려면 <code>className</code>{" "}
+        을, 화면 전체를 바꾸려면 브랜드 프리셋을 쓴다.
       </p>
       <HookTable group="datepicker" />
 

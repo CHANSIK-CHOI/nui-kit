@@ -1,4 +1,4 @@
-import { HookTable } from "@/components/guide";
+import { GuideHeader, HookTable } from "@/components/guide";
 import { PropsTable } from "@/components/guide";
 import { SelectDemo } from "./SelectDemo";
 import { RHFSelectDemo } from "./RHFSelectDemo";
@@ -8,12 +8,15 @@ export const metadata = { title: "Select" };
 export default function SelectPage() {
   return (
     <>
-      <h1>Select</h1>
-      <p className="doc-lead">
-        드롭다운 선택 컨트롤. 내부적으로 <code>react-select</code> 을 쓰지만{" "}
-        <strong>값은 옵션 객체가 아니라 원시값으로 주고받는다</strong> — 폼
-        상태에 그대로 넣을 수 있다. 다중 선택은 <code>MultiSelect</code> 다.
-      </p>
+      <GuideHeader
+        title="Select"
+        named={["Select", "MultiSelect"]}
+        subpath="select"
+      >
+        목록에서 고르는 컨트롤이다. 내부는 <code>react-select</code> 이지만
+        값은 옵션 객체가 아니라 원시값으로 주고받는다. 여러 개를 고르려면{" "}
+        <code>MultiSelect</code> 를 쓴다.
+      </GuideHeader>
 
       <pre className="doc-code">
         <code>{`import { Select, MultiSelect } from "@chansikchoi/next-ui";
@@ -46,8 +49,8 @@ const OPTIONS = [
         <code>@layer nui.components</code>) 밖에서 선언하면 언제나 우선한다.
       </p>
       <p>
-        <strong>색은 컴포넌트별로 열지 않는다.</strong> 폼 전체의 톤은{" "}
-        <code>--nui-control-*</code> 역할 토큰으로 바꾼다.
+        색은 컴포넌트별로 열지 않는다. 한 곳만 바꾸려면 <code>className</code>{" "}
+        을, 화면 전체를 바꾸려면 브랜드 프리셋을 쓴다.
       </p>
       <HookTable group="select" />
 

@@ -1,16 +1,21 @@
-import { PropsTable } from "@/components/guide";
+import { GuideHeader, HookTable, PropsTable } from "@/components/guide";
 import { PopupDemo } from "./PopupDemo";
+import { PopupSizeDemo } from "./PopupSizeDemo";
 
 export const metadata = { title: "Popup" };
 
 export default function PopupPage() {
   return (
     <>
-      <h1>Popup</h1>
-      <p className="doc-lead">
-        모달 계열 5종. 모두 하나의 <code>PopupBase</code> 위에 올라가며 dim ·
-        포커스 트랩 · ESC · 스크롤 잠금 · 배경 inert 를 공유한다.
-      </p>
+      <GuideHeader
+        title="Popup"
+        named={["Alert", "Confirm", "LayerPopup", "PopupHost"]}
+        subpath="popup"
+      >
+        화면을 덮는 대화상자다. 다섯 종류가 하나의 <code>PopupBase</code> 위에
+        올라가며 dim 과 포커스 트랩, Escape, 스크롤 잠금, 배경 inert 를
+        공유한다.
+      </GuideHeader>
 
       <h2>두 가지 사용 방식</h2>
       <div className="doc-table-wrap">
@@ -60,6 +65,9 @@ export function Providers({ children }) {
 
       <PopupDemo />
 
+      <h2>크기</h2>
+      <PopupSizeDemo />
+
       <h2>접근성</h2>
       <ul>
         <li>
@@ -87,6 +95,13 @@ export function Providers({ children }) {
         선택을 요구하는 팝업이 실수로 닫히면 어느 쪽을 골랐는지 모호해지기
         때문이다. 닫으려면 버튼을 눌러야 한다.
       </div>
+
+      <h2>커스터마이징</h2>
+      <p>
+        색은 컴포넌트별로 열지 않는다. 한 곳만 바꾸려면 <code>className</code>{" "}
+        을, 화면 전체를 바꾸려면 브랜드 프리셋을 쓴다.
+      </p>
+      <HookTable group="popup" />
 
       <h2>API</h2>
       <h3>PopupBase</h3>

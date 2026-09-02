@@ -1,5 +1,4 @@
-import { HookTable } from "@/components/guide";
-import { PropsTable } from "@/components/guide";
+import { GuideHeader, HookTable, PropsTable } from "@/components/guide";
 import { TooltipDemo } from "./TooltipDemo";
 
 export const metadata = { title: "Tooltip" };
@@ -7,11 +6,9 @@ export const metadata = { title: "Tooltip" };
 export default function TooltipPage() {
   return (
     <>
-      <h1>Tooltip</h1>
-      <p className="doc-lead">
-        트리거에 hover 하거나 포커스하면 짧은 설명을 띄운다. 트리거 옆에
-        붙으므로 <strong>portal 을 쓰지 않는다</strong>.
-      </p>
+      <GuideHeader title="Tooltip" named={["Tooltip"]} subpath="tooltip">
+        요소에 붙는 짧은 설명이다. 트리거 옆에 붙으므로 portal 을 쓰지 않는다.
+      </GuideHeader>
 
       <pre className="doc-code">
         <code>{`import { Tooltip } from "@chansikchoi/next-ui";
@@ -51,10 +48,14 @@ export default function TooltipPage() {
 
       <h2>커스터마이징</h2>
       <p>
-        <strong>색은 컴포넌트별로 열지 않는다.</strong> 버블과 화살표는{" "}
-        <code>--nui-layer-inverse</code> 를 함께 쓴다. 하나만 바꾸면 화살표가
-        따로 논다.
+        색은 컴포넌트별로 열지 않는다. 한 곳만 바꾸려면 <code>className</code>{" "}
+        을, 화면 전체를 바꾸려면 브랜드 프리셋을 쓴다.
       </p>
+      <div className="doc-note doc-note--warn">
+        <code>className</code> 으로 배경을 바꿀 때는{" "}
+        <strong>버블과 화살표를 함께</strong> 바꾼다. 둘이 같은 색을 쓰므로
+        하나만 바꾸면 화살표가 따로 논다.
+      </div>
       <HookTable group="tooltip" />
 
       <h2>API</h2>

@@ -1,4 +1,4 @@
-import { PropsTable } from "@/components/guide";
+import { GuideHeader, HookTable, PropsTable } from "@/components/guide";
 import { AccordionDemo } from "./AccordionDemo";
 
 export const metadata = { title: "Accordion" };
@@ -6,12 +6,14 @@ export const metadata = { title: "Accordion" };
 export default function AccordionPage() {
   return (
     <>
-      <h1>Accordion</h1>
-      <p className="doc-lead">
-        긴 내용을 접어 목록을 훑기 쉽게 만든다. 항목은 <code>index</code> 로
-        식별하며, <code>Head</code> · <code>Panel</code> 이 같은 index 를 공유해
-        서로 연결된다.
-      </p>
+      <GuideHeader
+        title="Accordion"
+        named={["Accordion"]}
+        subpath="accordion"
+      >
+        접었다 펴는 목록이다. 항목은 <code>index</code> 로 식별하고{" "}
+        <code>Head</code> 와 <code>Panel</code> 이 같은 index 를 공유해 연결된다.
+      </GuideHeader>
 
       <pre className="doc-code">
         <code>{`import { Accordion } from "@chansikchoi/next-ui";
@@ -77,6 +79,13 @@ export default function AccordionPage() {
           <code>prefers-reduced-motion</code> 에서 펼침 애니메이션이 꺼진다
         </li>
       </ul>
+
+      <h2>커스터마이징</h2>
+      <p>
+        색은 컴포넌트별로 열지 않는다. 한 곳만 바꾸려면 <code>className</code>{" "}
+        을, 화면 전체를 바꾸려면 브랜드 프리셋을 쓴다.
+      </p>
+      <HookTable group="accordion" />
 
       <h2>API</h2>
       <h3>Accordion</h3>
