@@ -310,7 +310,13 @@ for (const target of TARGETS) {
   for (const prop of checker.getPropertiesOfType(type)) {
     if (!isOwnDeclaration(prop)) {
       inheritedCount += 1;
-      continue;
+      // 상속 props 는 목록에 넣지 않는다. React DOM props 만 수백 개라 표가 터진다.
+      //
+      // ⚠️ 예외 — **우리가 기본값을 지정한 것은 우리 API 의 일부다.**
+      //    `Select` 는 react-select 의 `isSearchable` 을 `false` 로 뒤집어 넘긴다
+      //    (react-select 기본은 `true`). 그런 자리가 표에 없으면 소비자는 그 prop 이
+      //    있는 줄도 모른다. 실제로 데모와 캡션이 쓰고 있는데 표에만 없었다.
+      if (!(prop.getName() in defaults)) continue;
     }
     const decl = prop.getDeclarations()?.[0];
     const propType = checker.getTypeOfSymbolAtLocation(

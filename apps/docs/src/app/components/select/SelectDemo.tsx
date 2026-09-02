@@ -147,6 +147,13 @@ export function SelectDemo() {
       </Example>
       <Example
         row={false}
+        caption="MultiSelect disabled — 태그도 비활성 색을 따른다"
+        overflow
+      >
+        <MultiSelect options={CITIES} value={["seoul", "busan"]} disabled />
+      </Example>
+      <Example
+        row={false}
         caption="errorMessage — 아이콘과 텍스트를 함께 표시하고 aria-describedby 로 연결한다"
         overflow
       >
