@@ -24,7 +24,8 @@
     "dist",
     "styles",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "presets.json"
   ],
   "exports": {
     ".": {
@@ -107,13 +108,16 @@
     "verify": "npm run verify:css && npm run verify:tokens && publint --strict && attw --pack . --profile esm-only",
     "prepublishOnly": "npm run build",
     "verify:css": "node scripts/check-css-isolation.mjs",
-    "verify:tokens": "node scripts/check-token-layers.mjs"
+    "verify:tokens": "node scripts/check-token-layers.mjs",
+    "color:presets": "node scripts/color/build-presets.mjs",
+    "color:generate": "node scripts/color/generate.mjs",
+    "color:verify": "node scripts/color/verify.mjs"
   },
   "peerDependencies": {
+    "next": ">=14",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "react-hook-form": ">=7.50.0",
-    "next": ">=14"
+    "react-hook-form": ">=7.50.0"
   },
   "peerDependenciesMeta": {
     "react-hook-form": {
@@ -133,15 +137,17 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
+    "@radix-ui/colors": "^3.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "next": "16.3.2",
     "publint": "0.3.24",
+    "radix-theme-generator": "^0.1.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.71.2",
     "sass": "1.103.1",
     "tsup": "8.5.1",
-    "typescript": "7.0.2",
-    "next": "16.3.2"
+    "typescript": "7.0.2"
   }
 }

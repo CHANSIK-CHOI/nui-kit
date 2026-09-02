@@ -1,0 +1,1308 @@
+{
+  "//": "Figma 400색에서 자동 생성. 손으로 고치지 말 것 — npm run color:presets 로 다시 만든다.",
+  "source": {
+    "name": "Figma Community — 100+ Color Palettes",
+    "collected": "2026-08-28",
+    "total": 400
+  },
+  "rule": "선명함(OKLCH C) 0.05 이상만 남겼다. 그 아래는 회색에 가까워 색깔을 믿을 수 없다.",
+  "count": 185,
+  "presets": [
+    {
+      "n": 1,
+      "hex": "#d8abb7",
+      "name": "Pink Nectar",
+      "h": 0.7,
+      "merged": 0
+    },
+    {
+      "n": 2,
+      "hex": "#c74375",
+      "name": "Fuchsia Rose",
+      "h": 0.76,
+      "merged": 0
+    },
+    {
+      "n": 3,
+      "hex": "#e0457f",
+      "name": "Pink Pickled Turnips",
+      "h": 1.84,
+      "merged": 0
+    },
+    {
+      "n": 4,
+      "hex": "#f49fb6",
+      "name": "Rose Harmony",
+      "h": 2.14,
+      "merged": 0
+    },
+    {
+      "n": 5,
+      "hex": "#e22a77",
+      "name": "Pink Sapphire",
+      "h": 2.19,
+      "merged": 0
+    },
+    {
+      "n": 6,
+      "hex": "#d5527d",
+      "name": "",
+      "h": 2.99,
+      "merged": 0
+    },
+    {
+      "n": 7,
+      "hex": "#511628",
+      "name": "",
+      "h": 5.54,
+      "merged": 0
+    },
+    {
+      "n": 8,
+      "hex": "#74404c",
+      "name": "Brownish Purple",
+      "h": 5.73,
+      "merged": 0
+    },
+    {
+      "n": 9,
+      "hex": "#cc135c",
+      "name": "Dark Desire Rose",
+      "h": 6.77,
+      "merged": 0
+    },
+    {
+      "n": 10,
+      "hex": "#febac6",
+      "name": "Cherry Blossom Pink",
+      "h": 7.19,
+      "merged": 0
+    },
+    {
+      "n": 11,
+      "hex": "#d11c5b",
+      "name": "Bright Rose",
+      "h": 8.66,
+      "merged": 0
+    },
+    {
+      "n": 12,
+      "hex": "#86213d",
+      "name": "Red Claret",
+      "h": 9.07,
+      "merged": 0
+    },
+    {
+      "n": 13,
+      "hex": "#800733",
+      "name": "Dark Scarlet Red",
+      "h": 9.11,
+      "merged": 0
+    },
+    {
+      "n": 14,
+      "hex": "#fa376c",
+      "name": "Neon Fuchsia",
+      "h": 11.22,
+      "merged": 0
+    },
+    {
+      "n": 15,
+      "hex": "#ee778a",
+      "name": "Bubblegum",
+      "h": 11.53,
+      "merged": 0
+    },
+    {
+      "n": 16,
+      "hex": "#e9687e",
+      "name": "Ambitious Rose",
+      "h": 11.84,
+      "merged": 0
+    },
+    {
+      "n": 17,
+      "hex": "#f8adb5",
+      "name": "Pink Blush",
+      "h": 12.15,
+      "merged": 0
+    },
+    {
+      "n": 18,
+      "hex": "#fcc4c9",
+      "name": "Crystal Rose",
+      "h": 12.49,
+      "merged": 0
+    },
+    {
+      "n": 19,
+      "hex": "#f38593",
+      "name": "",
+      "h": 12.82,
+      "merged": 0
+    },
+    {
+      "n": 20,
+      "hex": "#d0114d",
+      "name": "",
+      "h": 12.99,
+      "merged": 0
+    },
+    {
+      "n": 21,
+      "hex": "#f01159",
+      "name": "Red Wrath",
+      "h": 13.13,
+      "merged": 0
+    },
+    {
+      "n": 22,
+      "hex": "#ff5976",
+      "name": "Watermelon Candy",
+      "h": 13.81,
+      "merged": 0
+    },
+    {
+      "n": 23,
+      "hex": "#8e1533",
+      "name": "Sweet Cherry Red",
+      "h": 14.09,
+      "merged": 0
+    },
+    {
+      "n": 24,
+      "hex": "#f24463",
+      "name": "Smudged Lips",
+      "h": 15.35,
+      "merged": 0
+    },
+    {
+      "n": 25,
+      "hex": "#820829",
+      "name": "",
+      "h": 15.38,
+      "merged": 0
+    },
+    {
+      "n": 26,
+      "hex": "#9e0131",
+      "name": "",
+      "h": 15.67,
+      "merged": 0
+    },
+    {
+      "n": 27,
+      "hex": "#ffbbbe",
+      "name": "Matte Pink",
+      "h": 15.91,
+      "merged": 0
+    },
+    {
+      "n": 28,
+      "hex": "#711e2b",
+      "name": "Red Berry",
+      "h": 15.93,
+      "merged": 0
+    },
+    {
+      "n": 29,
+      "hex": "#d51d48",
+      "name": "Lusty Lips",
+      "h": 16.32,
+      "merged": 0
+    },
+    {
+      "n": 30,
+      "hex": "#721b29",
+      "name": "",
+      "h": 16.41,
+      "merged": 0
+    },
+    {
+      "n": 31,
+      "hex": "#f47983",
+      "name": "Momo Peach",
+      "h": 16.57,
+      "merged": 0
+    },
+    {
+      "n": 32,
+      "hex": "#c62644",
+      "name": "Pepper Jelly",
+      "h": 17.17,
+      "merged": 0
+    },
+    {
+      "n": 33,
+      "hex": "#b8223c",
+      "name": "Maple Red",
+      "h": 18.13,
+      "merged": 0
+    },
+    {
+      "n": 34,
+      "hex": "#a13842",
+      "name": "Vintage Red",
+      "h": 18.29,
+      "merged": 0
+    },
+    {
+      "n": 35,
+      "hex": "#e04255",
+      "name": "Celestial Coral",
+      "h": 18.43,
+      "merged": 0
+    },
+    {
+      "n": 36,
+      "hex": "#850121",
+      "name": "Aurora Red",
+      "h": 19.03,
+      "merged": 0
+    },
+    {
+      "n": 37,
+      "hex": "#d63447",
+      "name": "Safflower Red",
+      "h": 19.93,
+      "merged": 0
+    },
+    {
+      "n": 38,
+      "hex": "#bc2c3d",
+      "name": "Cherry Lush",
+      "h": 19.96,
+      "merged": 0
+    },
+    {
+      "n": 39,
+      "hex": "#b33b44",
+      "name": "Cherry Bomb",
+      "h": 20.01,
+      "merged": 0
+    },
+    {
+      "n": 40,
+      "hex": "#7b3638",
+      "name": "Red Pear",
+      "h": 20.28,
+      "merged": 0
+    },
+    {
+      "n": 41,
+      "hex": "#ff2047",
+      "name": "Red Flag",
+      "h": 20.56,
+      "merged": 0
+    },
+    {
+      "n": 42,
+      "hex": "#b1002a",
+      "name": "Incarnadine",
+      "h": 20.65,
+      "merged": 0
+    },
+    {
+      "n": 43,
+      "hex": "#b11e31",
+      "name": "Christmas Red",
+      "h": 21.07,
+      "merged": 0
+    },
+    {
+      "n": 44,
+      "hex": "#e75a5f",
+      "name": "Briquette",
+      "h": 21.28,
+      "merged": 0
+    },
+    {
+      "n": 45,
+      "hex": "#f1c5c2",
+      "name": "Cupcake Rose",
+      "h": 22.75,
+      "merged": 0
+    },
+    {
+      "n": 46,
+      "hex": "#ce8884",
+      "name": "Almond Rose",
+      "h": 23.12,
+      "merged": 0
+    },
+    {
+      "n": 47,
+      "hex": "#fbc7c3",
+      "name": "Gossamer Pink",
+      "h": 23.46,
+      "merged": 0
+    },
+    {
+      "n": 48,
+      "hex": "#c53b3d",
+      "name": "Red Safflower",
+      "h": 24.13,
+      "merged": 0
+    },
+    {
+      "n": 49,
+      "hex": "#8d5f5b",
+      "name": "Rose Taupe",
+      "h": 24.82,
+      "merged": 0
+    },
+    {
+      "n": 50,
+      "hex": "#b33534",
+      "name": "Molten Lava",
+      "h": 25.26,
+      "merged": 0
+    },
+    {
+      "n": 51,
+      "hex": "#550d0e",
+      "name": "Maroon Oak",
+      "h": 25.75,
+      "merged": 0
+    },
+    {
+      "n": 52,
+      "hex": "#e0a39c",
+      "name": "Coral Cove",
+      "h": 26.28,
+      "merged": 0
+    },
+    {
+      "n": 53,
+      "hex": "#5b0004",
+      "name": "Rosewood",
+      "h": 27.17,
+      "merged": 0
+    },
+    {
+      "n": 54,
+      "hex": "#9c6f69",
+      "name": "Burlwood",
+      "h": 27.5,
+      "merged": 0
+    },
+    {
+      "n": 55,
+      "hex": "#f9c4ba",
+      "name": "",
+      "h": 30.66,
+      "merged": 0
+    },
+    {
+      "n": 56,
+      "hex": "#d23520",
+      "name": "",
+      "h": 31.06,
+      "merged": 0
+    },
+    {
+      "n": 57,
+      "hex": "#762014",
+      "name": "",
+      "h": 31.07,
+      "merged": 0
+    },
+    {
+      "n": 58,
+      "hex": "#9c3725",
+      "name": "Brownish Red",
+      "h": 32.33,
+      "merged": 0
+    },
+    {
+      "n": 59,
+      "hex": "#8e1a02",
+      "name": "Tomato Sauce",
+      "h": 32.74,
+      "merged": 0
+    },
+    {
+      "n": 60,
+      "hex": "#c93d21",
+      "name": "Tomato Soup",
+      "h": 33.14,
+      "merged": 0
+    },
+    {
+      "n": 61,
+      "hex": "#d8a194",
+      "name": "Auburn Wave",
+      "h": 33.68,
+      "merged": 0
+    },
+    {
+      "n": 62,
+      "hex": "#f85528",
+      "name": "Raw Sunset",
+      "h": 35.59,
+      "merged": 0
+    },
+    {
+      "n": 63,
+      "hex": "#ea4b1d",
+      "name": "Nasturtium Flower",
+      "h": 35.63,
+      "merged": 0
+    },
+    {
+      "n": 64,
+      "hex": "#cb6347",
+      "name": "Great Canyon",
+      "h": 36.06,
+      "merged": 0
+    },
+    {
+      "n": 65,
+      "hex": "#fdc2b1",
+      "name": "Tropical Peach",
+      "h": 36.67,
+      "merged": 0
+    },
+    {
+      "n": 66,
+      "hex": "#9a4d36",
+      "name": "Dark Marmalade",
+      "h": 37.42,
+      "merged": 0
+    },
+    {
+      "n": 67,
+      "hex": "#ffa286",
+      "name": "Tangerine Cream",
+      "h": 37.52,
+      "merged": 0
+    },
+    {
+      "n": 68,
+      "hex": "#f57b51",
+      "name": "Bonfire",
+      "h": 39.35,
+      "merged": 0
+    },
+    {
+      "n": 69,
+      "hex": "#f57a4d",
+      "name": "Coral Rose",
+      "h": 40.2,
+      "merged": 0
+    },
+    {
+      "n": 70,
+      "hex": "#4a2619",
+      "name": "Wild Brown",
+      "h": 40.39,
+      "merged": 0
+    },
+    {
+      "n": 71,
+      "hex": "#9c4a29",
+      "name": "Cinnamon Stick",
+      "h": 41.51,
+      "merged": 0
+    },
+    {
+      "n": 72,
+      "hex": "#8c533d",
+      "name": "Cocoa Dust",
+      "h": 41.7,
+      "merged": 0
+    },
+    {
+      "n": 73,
+      "hex": "#ec7a49",
+      "name": "Sizzling Sunset",
+      "h": 42.87,
+      "merged": 0
+    },
+    {
+      "n": 74,
+      "hex": "#ffa780",
+      "name": "Peach Fizz",
+      "h": 44.56,
+      "merged": 0
+    },
+    {
+      "n": 75,
+      "hex": "#e57b30",
+      "name": "",
+      "h": 51.68,
+      "merged": 0
+    },
+    {
+      "n": 76,
+      "hex": "#f5c6aa",
+      "name": "Desert Sand",
+      "h": 52.35,
+      "merged": 0
+    },
+    {
+      "n": 77,
+      "hex": "#ecc0a5",
+      "name": "Veronese Peach",
+      "h": 53.16,
+      "merged": 0
+    },
+    {
+      "n": 78,
+      "hex": "#9d653f",
+      "name": "Cinnamon Baked",
+      "h": 53.99,
+      "merged": 0
+    },
+    {
+      "n": 79,
+      "hex": "#9c765d",
+      "name": "Chamoisee",
+      "h": 54.6,
+      "merged": 0
+    },
+    {
+      "n": 80,
+      "hex": "#984f0e",
+      "name": "Dry Maple Leaf",
+      "h": 54.72,
+      "merged": 0
+    },
+    {
+      "n": 81,
+      "hex": "#ff8b0d",
+      "name": "Autumn Glory",
+      "h": 57.24,
+      "merged": 0
+    },
+    {
+      "n": 82,
+      "hex": "#cc9972",
+      "name": "Dulce de Leche",
+      "h": 58.44,
+      "merged": 0
+    },
+    {
+      "n": 83,
+      "hex": "#de8626",
+      "name": "French Toast",
+      "h": 62.05,
+      "merged": 0
+    },
+    {
+      "n": 84,
+      "hex": "#fad2ad",
+      "name": "Satin Latour",
+      "h": 64.58,
+      "merged": 0
+    },
+    {
+      "n": 85,
+      "hex": "#fabb7c",
+      "name": "Rich Honey",
+      "h": 65.44,
+      "merged": 0
+    },
+    {
+      "n": 86,
+      "hex": "#b4977b",
+      "name": "Gingerbread Latte",
+      "h": 65.79,
+      "merged": 0
+    },
+    {
+      "n": 87,
+      "hex": "#f3ac61",
+      "name": "Blazing Autumn",
+      "h": 65.88,
+      "merged": 0
+    },
+    {
+      "n": 88,
+      "hex": "#fdb15d",
+      "name": "Soft Orange",
+      "h": 66.68,
+      "merged": 0
+    },
+    {
+      "n": 89,
+      "hex": "#4d3211",
+      "name": "",
+      "h": 68.41,
+      "merged": 0
+    },
+    {
+      "n": 90,
+      "hex": "#f3b062",
+      "name": "Pumpkin Latte",
+      "h": 68.68,
+      "merged": 0
+    },
+    {
+      "n": 91,
+      "hex": "#fbbc58",
+      "name": "Golden Rambler",
+      "h": 76.39,
+      "merged": 0
+    },
+    {
+      "n": 92,
+      "hex": "#c28c2e",
+      "name": "",
+      "h": 77,
+      "merged": 0
+    },
+    {
+      "n": 93,
+      "hex": "#f8c25c",
+      "name": "Saffron Mango",
+      "h": 81.07,
+      "merged": 0
+    },
+    {
+      "n": 94,
+      "hex": "#c5b08b",
+      "name": "Earthy Cane",
+      "h": 81.66,
+      "merged": 0
+    },
+    {
+      "n": 95,
+      "hex": "#9c7627",
+      "name": "Luxor Gold",
+      "h": 81.93,
+      "merged": 0
+    },
+    {
+      "n": 96,
+      "hex": "#dea81c",
+      "name": "Chanterelle",
+      "h": 84.25,
+      "merged": 0
+    },
+    {
+      "n": 97,
+      "hex": "#dabe85",
+      "name": "Barley Seeds",
+      "h": 84.55,
+      "merged": 0
+    },
+    {
+      "n": 98,
+      "hex": "#ffdc8e",
+      "name": "Midday Sun",
+      "h": 86.21,
+      "merged": 0
+    },
+    {
+      "n": 99,
+      "hex": "#dbc797",
+      "name": "Chamomile Tea",
+      "h": 88.02,
+      "merged": 0
+    },
+    {
+      "n": 100,
+      "hex": "#e7d6ac",
+      "name": "Caramelized Pears",
+      "h": 88.6,
+      "merged": 0
+    },
+    {
+      "n": 101,
+      "hex": "#fac600",
+      "name": "Yellow Jelly",
+      "h": 89.45,
+      "merged": 0
+    },
+    {
+      "n": 102,
+      "hex": "#90772f",
+      "name": "Dying Leaves",
+      "h": 89.81,
+      "merged": 0
+    },
+    {
+      "n": 103,
+      "hex": "#fee698",
+      "name": "Pale Daffodil",
+      "h": 92.96,
+      "merged": 0
+    },
+    {
+      "n": 104,
+      "hex": "#c9ba86",
+      "name": "Olive Hint",
+      "h": 93.92,
+      "merged": 0
+    },
+    {
+      "n": 105,
+      "hex": "#f7e298",
+      "name": "Lemon Meringue",
+      "h": 94.14,
+      "merged": 0
+    },
+    {
+      "n": 106,
+      "hex": "#ddc35d",
+      "name": "Cream Gold",
+      "h": 95.18,
+      "merged": 0
+    },
+    {
+      "n": 107,
+      "hex": "#ffd708",
+      "name": "Sunflower Yellow",
+      "h": 95.24,
+      "merged": 0
+    },
+    {
+      "n": 108,
+      "hex": "#fcf2c7",
+      "name": "Spring Lily",
+      "h": 96.42,
+      "merged": 0
+    },
+    {
+      "n": 109,
+      "hex": "#fbdb14",
+      "name": "Bright Sun",
+      "h": 98.27,
+      "merged": 0
+    },
+    {
+      "n": 110,
+      "hex": "#f0ec73",
+      "name": "Sunny",
+      "h": 107.18,
+      "merged": 0
+    },
+    {
+      "n": 111,
+      "hex": "#c7c79e",
+      "name": "Watercress Pesto",
+      "h": 107.56,
+      "merged": 0
+    },
+    {
+      "n": 112,
+      "hex": "#dae3bb",
+      "name": "Aloe Cream",
+      "h": 117.79,
+      "merged": 0
+    },
+    {
+      "n": 113,
+      "hex": "#aebe89",
+      "name": "Fresh Guacamole",
+      "h": 121.78,
+      "merged": 0
+    },
+    {
+      "n": 114,
+      "hex": "#b7df69",
+      "name": "Archipelago Green",
+      "h": 125.08,
+      "merged": 0
+    },
+    {
+      "n": 115,
+      "hex": "#c0e876",
+      "name": "Pisco Sour",
+      "h": 125.29,
+      "merged": 0
+    },
+    {
+      "n": 116,
+      "hex": "#b6df82",
+      "name": "Green Chalk",
+      "h": 128.28,
+      "merged": 0
+    },
+    {
+      "n": 117,
+      "hex": "#cbe3b3",
+      "name": "Beryl Green",
+      "h": 129.37,
+      "merged": 0
+    },
+    {
+      "n": 118,
+      "hex": "#9ccd62",
+      "name": "Woodland",
+      "h": 129.6,
+      "merged": 0
+    },
+    {
+      "n": 119,
+      "hex": "#bed5ae",
+      "name": "Meadow Grass",
+      "h": 132.54,
+      "merged": 0
+    },
+    {
+      "n": 120,
+      "hex": "#a1dd70",
+      "name": "Tropical Light",
+      "h": 132.6,
+      "merged": 0
+    },
+    {
+      "n": 121,
+      "hex": "#95ce67",
+      "name": "Bright Lettuce",
+      "h": 132.72,
+      "merged": 0
+    },
+    {
+      "n": 122,
+      "hex": "#aade87",
+      "name": "Stem Green",
+      "h": 133.61,
+      "merged": 0
+    },
+    {
+      "n": 123,
+      "hex": "#afe19f",
+      "name": "Green Gooseberry",
+      "h": 138.24,
+      "merged": 0
+    },
+    {
+      "n": 124,
+      "hex": "#9beec1",
+      "name": "Nightly Aurora",
+      "h": 159.64,
+      "merged": 0
+    },
+    {
+      "n": 125,
+      "hex": "#096344",
+      "name": "Christmas Tree",
+      "h": 162.73,
+      "merged": 0
+    },
+    {
+      "n": 126,
+      "hex": "#aaf0d1",
+      "name": "Magic Mint",
+      "h": 165.35,
+      "merged": 0
+    },
+    {
+      "n": 127,
+      "hex": "#a5eacf",
+      "name": "Sweet Aqua",
+      "h": 168.23,
+      "merged": 0
+    },
+    {
+      "n": 128,
+      "hex": "#addcca",
+      "name": "Brook Green",
+      "h": 169.61,
+      "merged": 0
+    },
+    {
+      "n": 129,
+      "hex": "#01f9c6",
+      "name": "Bright Teal",
+      "h": 170.81,
+      "merged": 0
+    },
+    {
+      "n": 130,
+      "hex": "#a8ead5",
+      "name": "Brook Green",
+      "h": 172.85,
+      "merged": 0
+    },
+    {
+      "n": 131,
+      "hex": "#6eb5a5",
+      "name": "Glacial Green",
+      "h": 178.03,
+      "merged": 0
+    },
+    {
+      "n": 132,
+      "hex": "#3cad99",
+      "name": "Green Jelly",
+      "h": 178.92,
+      "merged": 0
+    },
+    {
+      "n": 133,
+      "hex": "#97d7cb",
+      "name": "Tropical Freeze",
+      "h": 181.64,
+      "merged": 0
+    },
+    {
+      "n": 134,
+      "hex": "#8ad2c6",
+      "name": "Green Daze",
+      "h": 182.78,
+      "merged": 0
+    },
+    {
+      "n": 135,
+      "hex": "#01796f",
+      "name": "Next UI 기본",
+      "h": 184.82,
+      "merged": 0,
+      "isDefault": true
+    },
+    {
+      "n": 136,
+      "hex": "#52ada2",
+      "name": "Emerald Wave",
+      "h": 184.89,
+      "merged": 0
+    },
+    {
+      "n": 137,
+      "hex": "#13a699",
+      "name": "Stormy Strait Green",
+      "h": 184.91,
+      "merged": 0
+    },
+    {
+      "n": 138,
+      "hex": "#2ed3c6",
+      "name": "Turquoise Gemstone",
+      "h": 186.66,
+      "merged": 0
+    },
+    {
+      "n": 139,
+      "hex": "#a7e9e1",
+      "name": "Mint Macaroon",
+      "h": 186.66,
+      "merged": 0
+    },
+    {
+      "n": 140,
+      "hex": "#9eebe2",
+      "name": "Shallow Blue",
+      "h": 186.67,
+      "merged": 0
+    },
+    {
+      "n": 141,
+      "hex": "#51c9c2",
+      "name": "Jazzy Jade",
+      "h": 189.81,
+      "merged": 0
+    },
+    {
+      "n": 142,
+      "hex": "#5fded7",
+      "name": "Light Turquoise",
+      "h": 190.22,
+      "merged": 0
+    },
+    {
+      "n": 143,
+      "hex": "#a6ebe7",
+      "name": "Mint Macaroon",
+      "h": 191.45,
+      "merged": 0
+    },
+    {
+      "n": 144,
+      "hex": "#95ddda",
+      "name": "Pale Beryl",
+      "h": 192.57,
+      "merged": 0
+    },
+    {
+      "n": 145,
+      "hex": "#a6e0de",
+      "name": "Aqua Island",
+      "h": 193.45,
+      "merged": 0
+    },
+    {
+      "n": 146,
+      "hex": "#1fd8d8",
+      "name": "Beachy Blue",
+      "h": 194.83,
+      "merged": 0
+    },
+    {
+      "n": 147,
+      "hex": "#3ebdc6",
+      "name": "",
+      "h": 201.94,
+      "merged": 0
+    },
+    {
+      "n": 148,
+      "hex": "#44d6e9",
+      "name": "Blue Dacnis",
+      "h": 207.72,
+      "merged": 0
+    },
+    {
+      "n": 149,
+      "hex": "#a7e0e9",
+      "name": "Luminescent Blue",
+      "h": 208.2,
+      "merged": 0
+    },
+    {
+      "n": 150,
+      "hex": "#a5d4dc",
+      "name": "Midwinter Mist",
+      "h": 209.06,
+      "merged": 0
+    },
+    {
+      "n": 151,
+      "hex": "#72d2e3",
+      "name": "Aquamarine Blue",
+      "h": 210.33,
+      "merged": 0
+    },
+    {
+      "n": 152,
+      "hex": "#64d7eb",
+      "name": "Turquoise Blue",
+      "h": 210.55,
+      "merged": 0
+    },
+    {
+      "n": 153,
+      "hex": "#095d6a",
+      "name": "Nocturnal Sea",
+      "h": 211.73,
+      "merged": 0
+    },
+    {
+      "n": 154,
+      "hex": "#82cde5",
+      "name": "Sky of the Ocean",
+      "h": 220.28,
+      "merged": 0
+    },
+    {
+      "n": 155,
+      "hex": "#a9e2f5",
+      "name": "Azure Sky",
+      "h": 220.42,
+      "merged": 0
+    },
+    {
+      "n": 156,
+      "hex": "#52a7cc",
+      "name": "Frozen Wave",
+      "h": 229.05,
+      "merged": 0
+    },
+    {
+      "n": 157,
+      "hex": "#0096d1",
+      "name": "",
+      "h": 235.43,
+      "merged": 0
+    },
+    {
+      "n": 158,
+      "hex": "#003458",
+      "name": "Night Dive",
+      "h": 246.18,
+      "merged": 0
+    },
+    {
+      "n": 159,
+      "hex": "#415a80",
+      "name": "Deep Azure",
+      "h": 258.55,
+      "merged": 0
+    },
+    {
+      "n": 160,
+      "hex": "#182f53",
+      "name": "Storm Blue",
+      "h": 259.04,
+      "merged": 0
+    },
+    {
+      "n": 161,
+      "hex": "#080e2c",
+      "name": "Nyctophile Blue",
+      "h": 270.39,
+      "merged": 0
+    },
+    {
+      "n": 162,
+      "hex": "#171d4b",
+      "name": "Dark Indigo",
+      "h": 273.25,
+      "merged": 0
+    },
+    {
+      "n": 163,
+      "hex": "#908db9",
+      "name": "Purple Amethyst",
+      "h": 287.61,
+      "merged": 0
+    },
+    {
+      "n": 164,
+      "hex": "#caaaf3",
+      "name": "Lavender Cream",
+      "h": 304.14,
+      "merged": 0
+    },
+    {
+      "n": 165,
+      "hex": "#caa6db",
+      "name": "Wisteria",
+      "h": 314.81,
+      "merged": 0
+    },
+    {
+      "n": 166,
+      "hex": "#2f1a35",
+      "name": "Blackcurrant",
+      "h": 318.48,
+      "merged": 0
+    },
+    {
+      "n": 167,
+      "hex": "#35063e",
+      "name": "Dark Purple",
+      "h": 320.48,
+      "merged": 0
+    },
+    {
+      "n": 168,
+      "hex": "#3d1144",
+      "name": "Purple Kiss",
+      "h": 321.9,
+      "merged": 0
+    },
+    {
+      "n": 169,
+      "hex": "#8e6c90",
+      "name": "Dusty Purple",
+      "h": 324.58,
+      "merged": 0
+    },
+    {
+      "n": 170,
+      "hex": "#462b45",
+      "name": "Shadow Purple",
+      "h": 328.05,
+      "merged": 0
+    },
+    {
+      "n": 171,
+      "hex": "#d4a6d1",
+      "name": "Berrie Popsicle",
+      "h": 328.44,
+      "merged": 0
+    },
+    {
+      "n": 172,
+      "hex": "#f5cde6",
+      "name": "Sparkling Pink",
+      "h": 340.39,
+      "merged": 0
+    },
+    {
+      "n": 173,
+      "hex": "#89687d",
+      "name": "Imaginary Mauve",
+      "h": 340.46,
+      "merged": 0
+    },
+    {
+      "n": 174,
+      "hex": "#aa6890",
+      "name": "Purple Starburst",
+      "h": 343.39,
+      "merged": 0
+    },
+    {
+      "n": 175,
+      "hex": "#f3b8d9",
+      "name": "Soft Cashmere",
+      "h": 344.32,
+      "merged": 0
+    },
+    {
+      "n": 176,
+      "hex": "#884a6f",
+      "name": "Twilight Lavender",
+      "h": 344.51,
+      "merged": 0
+    },
+    {
+      "n": 177,
+      "hex": "#631646",
+      "name": "Plum Purple",
+      "h": 346.97,
+      "merged": 0
+    },
+    {
+      "n": 178,
+      "hex": "#f340af",
+      "name": "Royal Fuchsia",
+      "h": 347.43,
+      "merged": 0
+    },
+    {
+      "n": 179,
+      "hex": "#f03e9e",
+      "name": "Majestic Magenta",
+      "h": 352.45,
+      "merged": 0
+    },
+    {
+      "n": 180,
+      "hex": "#a4647f",
+      "name": "Strawberry Mousse",
+      "h": 353.39,
+      "merged": 0
+    },
+    {
+      "n": 181,
+      "hex": "#872657",
+      "name": "Dark Raspberry",
+      "h": 353.5,
+      "merged": 0
+    },
+    {
+      "n": 182,
+      "hex": "#d55f8f",
+      "name": "",
+      "h": 356.89,
+      "merged": 0
+    },
+    {
+      "n": 183,
+      "hex": "#d186a0",
+      "name": "Heirloom Rose",
+      "h": 357.53,
+      "merged": 0
+    },
+    {
+      "n": 184,
+      "hex": "#fcacc7",
+      "name": "Taffy Pink",
+      "h": 357.6,
+      "merged": 0
+    },
+    {
+      "n": 185,
+      "hex": "#dd84a1",
+      "name": "Shimmering Blush",
+      "h": 359.43,
+      "merged": 0
+    }
+  ]
+}
