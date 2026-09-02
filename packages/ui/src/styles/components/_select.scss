@@ -63,7 +63,7 @@
       padding: 0;
       color: var(#{v("control-text")});
 
-      @include typo(4, "regular", 1.5);
+      @include typo(4, "regular");
     }
 
     &__input-container input {
@@ -85,13 +85,13 @@
     &__single-value {
       color: var(#{v("control-text")});
 
-      @include typo(4, "regular", 1.5);
+      @include typo(4, "regular");
     }
 
     &__placeholder {
       color: var(#{v("control-text-placeholder")});
 
-      @include typo(4, "regular", 1.5);
+      @include typo(4, "regular");
     }
 
     // ── indicators
@@ -169,7 +169,7 @@
       color: var(#{v("text-secondary")});
       text-transform: none;
 
-      @include typo(1, "medium", 1.5, 0);
+      @include typo(1, "medium");
     }
 
     // ── option (emotion 이 display / cursor 를 넘겨준 자리)
@@ -183,7 +183,7 @@
       cursor: pointer;
 
       @include motion((background-color, color), "3");
-      @include typo(4, "regular", 1.5);
+      @include typo(4, "regular");
     }
 
     &__option--is-focused {
@@ -225,7 +225,7 @@
       padding: var(#{v("space-2")}) var(#{v("space-1")}) var(#{v("space-2")})
         var(#{v("space-3")});
 
-      @include typo(3, "medium", 1.35, -0.01em);
+      @include typo(3, "medium");
     }
 
     &__multi-value__remove {
@@ -252,7 +252,7 @@
       // 라이브러리 기본값에 기대지 않는다.
       text-align: center;
 
-      @include typo(3, "regular", 1.6);
+      @include typo(3, "regular");
     }
 
     // ── interaction

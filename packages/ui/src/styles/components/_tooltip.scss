@@ -46,7 +46,7 @@
       white-space: normal;
       word-break: keep-all;
 
-      @include typo(3, "regular", 1.6, 0);
+      @include typo(3, "regular");
     }
 
     &__arrow {

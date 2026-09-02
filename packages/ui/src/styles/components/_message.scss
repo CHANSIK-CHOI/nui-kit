@@ -10,7 +10,7 @@
       display: block;
       color: var(#{v("text-secondary")});
 
-      @include typo(1, "regular", 1.55, 0);
+      @include typo(1, "regular");
     }
 
     &__msg--error {

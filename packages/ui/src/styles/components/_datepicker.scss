@@ -92,7 +92,7 @@
     }
 
     &__caption-label {
-      @include typo(4, "semi-bold", 1.4);
+      @include typo(4, "semi-bold");
     }
 
     &__dropdowns {
@@ -156,7 +156,7 @@
       gap: var(#{v("space-2")});
       width: 100%;
 
-      @include typo(3, "semi-bold", 1.35, -0.01em);
+      @include typo(3, "semi-bold");
     }
 
     // ── 이전/다음 달 네비게이션
@@ -236,7 +236,7 @@
       color: var(#{v("text-secondary")});
       text-align: center;
 
-      @include typo(1, "semi-bold", 1.35, 0.04em);
+      @include typo(1, "semi-bold");
     }
 
     &__day {
@@ -267,7 +267,7 @@
       color: inherit;
 
       @include motion((background-color, border-color, color), "3");
-      @include typo(3, "medium", 1.4, -0.01em);
+      @include typo(3, "medium");
     }
 
     &__day:not(#{cls("daypicker")}__selected)

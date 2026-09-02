@@ -91,7 +91,7 @@
       color: var(#{v("control-text")});
       caret-color: var(#{v("control-text")});
 
-      @include typo(4, "regular", 1.5);
+      @include typo(4, "regular");
     }
 
     &__input:focus,
@@ -102,7 +102,7 @@
     &__input::placeholder {
       color: var(#{v("control-text-placeholder")});
 
-      @include typo(4, "regular", 1.5);
+      @include typo(4, "regular");
     }
 
     &__unit {
@@ -110,7 +110,7 @@
       color: var(#{v("control-text")});
 
       @include motion(color, "3");
-      @include typo(4, "regular", 1.5);
+      @include typo(4, "regular");
     }
 
     &__clear {

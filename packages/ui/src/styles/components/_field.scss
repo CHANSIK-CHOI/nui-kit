@@ -30,7 +30,7 @@
     &__label {
       color: var(#{v("text-primary")});
 
-      @include typo(3, "medium", 1.5, -0.01em);
+      @include typo(3, "medium");
     }
 
     label#{cls("field")}__label {
@@ -47,7 +47,7 @@
       margin: -0.125rem 0 0; // -2px
       color: var(#{v("text-secondary")});
 
-      @include typo(1, "regular", 1.55, 0);
+      @include typo(1, "regular");
     }
 
     &__message {

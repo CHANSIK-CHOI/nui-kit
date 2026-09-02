@@ -83,7 +83,7 @@
     &__title {
       color: var(#{v("text-primary")});
 
-      @include typo(6, "bold", 1.15);
+      @include typo(6, "bold");
     }
 
     &__close {
@@ -156,7 +156,7 @@
     &__description {
       color: var(#{v("text-secondary")});
 
-      @include typo(3, "regular", 1.7);
+      @include typo(3, "regular");
     }
 
     &__foot {
@@ -255,7 +255,7 @@
     }
 
     #{cls("popup")}__title {
-      @include typo(6, "bold", 1.12);
+      @include typo(6, "bold");
     }
 
     #{cls("popup")}__description {
