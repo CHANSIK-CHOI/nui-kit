@@ -62,12 +62,12 @@ export default function CustomizingPage() {
           <tbody>
             <tr>
               <th scope="row" className="doc-wrap">
-                색
+                색 전체
               </th>
               <td className="doc-wrap">
-                <code>:root</code> 에서 <strong>역할(semantic)</strong> 덮어쓰기
+                <strong>브랜드 색 프리셋</strong> — 준비 중
               </td>
-              <td className="doc-wrap">그 역할을 쓰는 모든 곳</td>
+              <td className="doc-wrap">화면 전체</td>
             </tr>
             <tr>
               <th scope="row" className="doc-wrap">
@@ -173,7 +173,7 @@ export default function CustomizingPage() {
                 <strong>화면에 드러나지 않는다</strong>
               </td>
               <td className="doc-wrap">
-                역할 덮어쓰기 또는 <code>className</code>
+                <code>className</code> 또는 브랜드 색 프리셋
               </td>
             </tr>
             <tr>

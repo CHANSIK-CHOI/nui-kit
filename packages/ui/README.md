@@ -71,34 +71,33 @@ import "@chansikchoi/next-ui/styles/preflight.css";
 오히려 `!important` 를 붙이면 자기 규칙끼리 부딪힙니다 —
 `.my-button { border-radius: 0 !important }` 를 쓰면 `.my-button:hover` 의 값이 안 먹습니다.
 
-### 색은 역할(semantic) 단위로 바꿉니다
+### 색은 CSS 변수로 열지 않습니다
+
+**색 변수는 공개 API 가 아닙니다.** 컴포넌트별(`--nui-button-bg`)이든
+역할별(`--nui-action-primary`)이든 덮어쓰기를 권하지 않습니다.
+
+배경과 글자는 짝이기 때문입니다. 배경만 바꾸면 글자색은 우리 값이 그대로 남아
+대비가 깨지는데, **그 사실이 화면에 드러나지 않습니다.** 저시력 사용자에게만 영향을
+줍니다.
+
+색을 바꾸는 방법은 둘입니다.
+
+| 범위 | 방법 |
+| --- | --- |
+| **한 컴포넌트만** | `className` 으로 직접 씁니다 |
+| **전체** | 브랜드 색 프리셋 — **준비 중** |
 
 ```css
-/* 역할 하나를 바꾸면 그 역할을 쓰는 모든 곳이 함께 따라옵니다 */
-:root {
-  --nui-action-primary: #ff6b00;
-  --nui-action-primary-fg: #fff;
-  --nui-layer-inverse: #222;
-}
-
-/* 부분 테마 — 상속으로 하위에만 적용 */
-.dark-section {
-  --nui-layer-default: #111;
-  --nui-text-primary: #fff;
-}
-```
-
-**컴포넌트별 색 변수(`--nui-button-bg` 같은 것)는 두지 않습니다.**
-배경과 글자는 짝이라 한쪽만 바꾸면 대비가 깨지는데, 그 사실이 화면에 드러나지 않고
-저시력 사용자에게만 영향을 줍니다. 한 컴포넌트만 바꿔야 한다면 `className` 을 쓰세요 —
-배경과 글자를 같은 자리에 쓰게 되므로 짝을 놓치기 어렵습니다.
-
-```css
+/* 한 컴포넌트만 — 배경과 글자를 같은 자리에 쓰게 되므로 짝을 놓치지 않습니다 */
 .my-tooltip {
   background: #222;
   color: #fff;
 }
 ```
+
+**전체 브랜드 색은 프리셋으로 제공할 예정입니다.** 준비된 색 중 하나를 고르면
+버튼·입력창·선택 컨트롤·회색까지 **대비를 유지한 채** 함께 바뀝니다.
+그때까지는 색 변경을 `className` 으로 해주세요.
 
 ### 치수·모양·선 두께는 컴포넌트별로 엽니다
 
@@ -285,8 +284,8 @@ const OPTIONS = [
 항상 우선합니다. 그래서 이 컴포넌트는 `unstyled` 로 구동하면서 **충돌하는 속성만
 emotion 쪽에서 걷어내** CSS 가 책임지게 합니다.
 
-- 외형은 위 커스터마이징 절의 CSS 변수로 조정합니다
-  (`--nui-select-height` / `-radius` / `-border-width`, 색은 `--nui-control-*` semantic)
+- 치수·모양은 위 커스터마이징 절의 CSS 변수로 조정합니다
+  (`--nui-select-height` / `-radius` / `-border-width`). 색은 `className` 으로 씁니다
 - `styles` prop 을 직접 넘기면 그 정리된 값 위에 얹히므로 의도대로 덧칠됩니다
 - 다만 **메뉴 최대 높이는 CSS 가 아니라 `maxMenuHeight` prop** 으로 조정합니다.
   `react-select` 이 메뉴 배치를 계산할 때 이 값을 참조하므로, CSS 로 덮으면
