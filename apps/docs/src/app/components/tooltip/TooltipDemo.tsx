@@ -25,7 +25,12 @@ export function TooltipDemo() {
   return (
     <>
       <h2>기본</h2>
-      <Example caption="hover 하거나 Tab 으로 포커스해보세요">
+      <Example
+        caption="hover 하거나 Tab 으로 포커스해보세요"
+        code={`<Tooltip content="삭제하면 되돌릴 수 없습니다">
+  <IconButton aria-label="삭제"><DelIcon /></IconButton>
+</Tooltip>`}
+      >
         <Tooltip content="삭제한 항목은 되돌릴 수 없습니다">
           <IconButton aria-label="삭제">
             <DelIcon />
@@ -49,7 +54,11 @@ export function TooltipDemo() {
       <p>
         <code>placement</code> 6종. 트리거 기준 위/아래 × 좌/중앙/우다.
       </p>
-      <Example row={false} caption="placement — 각 버튼에 hover 해보세요">
+      <Example
+        row={false}
+        caption="placement — 각 버튼에 hover 해보세요"
+        code={`<Tooltip content="설명" placement="bottomLeft">…</Tooltip>`}
+      >
         <div
           style={{
             display: "grid",
@@ -79,7 +88,10 @@ export function TooltipDemo() {
         <code>open</code> 을 주면 열림 상태를 소비자가 소유한다. 온보딩 안내처럼
         hover 와 무관하게 띄워야 할 때 쓴다.
       </p>
-      <Example caption="open prop 으로 직접 제어">
+      <Example
+        caption="open prop 으로 직접 제어"
+        code={`<Tooltip content="설명" open={isOpen} onOpenChange={setIsOpen}>…</Tooltip>`}
+      >
         <Tooltip open={isOpen} content="버튼으로 제어되는 툴팁입니다">
           <span style={{ fontSize: "var(--nui-font-size-3)" }}>대상 요소</span>
         </Tooltip>
@@ -89,7 +101,10 @@ export function TooltipDemo() {
       </Example>
 
       <h2>비활성</h2>
-      <Example caption="disabled — 열려 있어도 즉시 닫힌다">
+      <Example
+        caption="disabled — 열려 있어도 즉시 닫힌다"
+        code={`<Tooltip content="설명" disabled>…</Tooltip>`}
+      >
         <Tooltip content="이 툴팁은 보이지 않습니다" disabled>
           <Button size="small" variant="line">
             disabled

@@ -29,6 +29,7 @@ export function DatepickerDemo() {
       <Example
         row={false}
         caption="선택하면 닫힌다 (shouldCloseOnSelect 기본값)"
+        code={`<Datepicker selected={date} onSelectedChange={setDate} />`}
         overflow
       >
         <Datepicker selected={date} onSelectedChange={setDate} isClearable />
@@ -44,7 +45,12 @@ export function DatepickerDemo() {
         <code>onSelectedChange</code> 가 <code>undefined</code> 를 넘긴다 —
         불완전한 기간이 폼에 들어가지 않는다.
       </p>
-      <Example row={false} caption="from → to 순서로 선택" overflow>
+      <Example
+        row={false}
+        caption="from → to 순서로 선택"
+        code={`<DateRangePicker selected={range} onSelectedChange={setRange} />`}
+        overflow
+      >
         <DateRangePicker
           selected={range}
           onSelectedChange={setRange}
@@ -67,7 +73,12 @@ export function DatepickerDemo() {
         날짜를 여러 개 고른다. 선택할 때마다 달력이 닫히면 불편하므로 열린
         상태를 유지한다.
       </p>
-      <Example row={false} caption="선택해도 닫히지 않는다" overflow>
+      <Example
+        row={false}
+        caption="선택해도 닫히지 않는다"
+        code={`<DateMultiplePicker selected={dates} onSelectedChange={setDates} />`}
+        overflow
+      >
         <DateMultiplePicker
           selected={dates}
           onSelectedChange={setDates}
@@ -86,6 +97,7 @@ export function DatepickerDemo() {
       <Example
         row={false}
         caption="dayPickerProps.disabled 로 과거 차단"
+        code={`dayPickerProps={{ disabled: { before: new Date() } }}`}
         overflow
       >
         <Datepicker
@@ -96,7 +108,12 @@ export function DatepickerDemo() {
       </Example>
 
       <h2>상태</h2>
-      <Example row={false} caption="disabled" overflow>
+      <Example
+        row={false}
+        caption="disabled"
+        code={`<Datepicker selected={date} errorMessage="날짜를 선택해주세요" />`}
+        overflow
+      >
         <Datepicker selected={TODAY} disabled />
       </Example>
       <Example

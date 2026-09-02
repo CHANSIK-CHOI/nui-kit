@@ -44,13 +44,18 @@ export function AccordionDemo() {
       <Example
         row={false}
         caption='type="single" — 하나를 열면 다른 하나가 닫힌다'
+        code={`<Accordion type="single" defaultActiveIndices={[0]}>…</Accordion>`}
       >
         <Accordion type="single" defaultActiveIndices={[0]}>
           <WholeHeaderItems />
         </Accordion>
       </Example>
 
-      <Example row={false} caption='type="multiple" (기본) — 여러 개 동시에'>
+      <Example
+        row={false}
+        caption='type="multiple" (기본) — 여러 개 동시에'
+        code={`<Accordion type="multiple">…</Accordion>`}
+      >
         <Accordion defaultActiveIndices={[0, 1]}>
           <WholeHeaderItems />
         </Accordion>
@@ -62,7 +67,13 @@ export function AccordionDemo() {
         헤더 안에 체크박스처럼 다른 조작 요소를 둔다면 반드시 아이콘만 버튼으로
         해야 한다 — <strong>버튼 안에 버튼을 넣을 수 없기 때문</strong>이다.
       </p>
-      <Example row={false} caption="모드 A — 헤더 전체가 버튼">
+      <Example
+        row={false}
+        caption="모드 A — 헤더 전체가 버튼"
+        code={`<Accordion.Button index={0}>
+  <Accordion.Head>제목</Accordion.Head>
+</Accordion.Button>`}
+      >
         <Accordion type="single" defaultActiveIndices={[0]}>
           <WholeHeaderItems />
         </Accordion>
@@ -70,6 +81,7 @@ export function AccordionDemo() {
       <Example
         row={false}
         caption="모드 B — 화살표 아이콘만 버튼 (Head 에 buttonIndex)"
+        code={`<Accordion.Head buttonIndex={0}>제목</Accordion.Head>`}
       >
         <Accordion type="single">
           {FAQ.slice(0, 2).map((item, index) => (
@@ -82,7 +94,11 @@ export function AccordionDemo() {
       </Example>
 
       <h2>변형</h2>
-      <Example row={false} caption='variant="line" — 카드 대신 구분선'>
+      <Example
+        row={false}
+        caption='variant="line" — 카드 대신 구분선'
+        code={`<Accordion variant="line" type="single">…</Accordion>`}
+      >
         <Accordion variant="line" type="single">
           <WholeHeaderItems />
         </Accordion>
@@ -93,7 +109,11 @@ export function AccordionDemo() {
         <code>Accordion.Button</code> 에 <code>disabled</code> 를 준다. 배경이
         없는 버튼이라 글자와 화살표 색만 바뀐다.
       </p>
-      <Example row={false} caption="disabled — 펼칠 수 없다">
+      <Example
+        row={false}
+        caption="disabled — 펼칠 수 없다"
+        code={`<Accordion.Button index={1} disabled>…</Accordion.Button>`}
+      >
         <Accordion type="single">
           <Accordion.Item index={0}>
             <Accordion.Button index={0}>
@@ -118,7 +138,11 @@ export function AccordionDemo() {
       <p>
         <code>activeIndices</code> 를 주면 열림 상태를 소비자가 소유한다.
       </p>
-      <Example row={false} caption="activeIndices + onChange">
+      <Example
+        row={false}
+        caption="activeIndices + onChange"
+        code={`<Accordion activeIndices={indices} onChange={setIndices}>…</Accordion>`}
+      >
         <div
           style={{ display: "flex", gap: 8, marginBottom: 12, maxWidth: 320 }}
         >
@@ -150,6 +174,7 @@ export function AccordionDemo() {
       <Example
         row={false}
         caption="shouldKeepMounted — 접었다 펴도 입력값이 유지된다"
+        code={`<Accordion shouldKeepMounted type="single">…</Accordion>`}
       >
         <Accordion shouldKeepMounted type="single" defaultActiveIndices={[0]}>
           <Accordion.Item index={0}>

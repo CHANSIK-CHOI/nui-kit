@@ -58,6 +58,7 @@ export function SelectDemo() {
       <Example
         row={false}
         caption="선택한 값이 그대로 상태에 들어간다"
+        code={`<Select options={OPTIONS} value={city} onChange={setCity} />`}
         overflow
       >
         <Select
@@ -75,7 +76,12 @@ export function SelectDemo() {
         <code>isSearchable</code> 로 타이핑 필터를, <code>isClearable</code> 로
         선택 해제 버튼을 켠다. 둘 다 기본값은 <code>false</code> 다.
       </p>
-      <Example row={false} caption="isSearchable + isClearable" overflow>
+      <Example
+        row={false}
+        caption="isSearchable + isClearable"
+        code={`<Select options={OPTIONS} isSearchable isClearable />`}
+        overflow
+      >
         <Select
           options={CITIES}
           value={searchable}
@@ -89,6 +95,7 @@ export function SelectDemo() {
       <Example
         row={false}
         caption="options 에 { label, options } 를 넣는다"
+        code={`options={[{ label: "수도권", options: [{ label: "서울", value: "seoul" }] }]}`}
         overflow
       >
         <Select
@@ -103,7 +110,12 @@ export function SelectDemo() {
         <code>MultiSelect</code> 는 값이 배열이다. 선택 항목은 칩으로 표시되고
         칩의 × 로 개별 해제한다.
       </p>
-      <Example row={false} caption="값이 원시값 배열로 들어온다" overflow>
+      <Example
+        row={false}
+        caption="값이 원시값 배열로 들어온다"
+        code={`<MultiSelect options={OPTIONS} value={cities} onChange={setCities} />`}
+        overflow
+      >
         <MultiSelect
           options={CITIES}
           value={cities}
@@ -122,7 +134,12 @@ export function SelectDemo() {
         <code>readOnly</code> 는 값을 보여주되 메뉴를 열지 않는다 —{" "}
         <code>disabled</code> 와 달리 포커스는 받는다.
       </p>
-      <Example row={false} caption="disabled" overflow>
+      <Example
+        row={false}
+        caption="disabled"
+        code={`<Select options={OPTIONS} errorMessage="지역을 선택해주세요" />`}
+        overflow
+      >
         <Select options={CITIES} value="seoul" disabled />
       </Example>
       <Example row={false} caption="readOnly — 열리지 않는다" overflow>

@@ -10,7 +10,11 @@ export function ToastDemo() {
   return (
     <>
       <h2>기본</h2>
-      <Example row={false} caption="기본 지속시간 2400ms">
+      <Example
+        row={false}
+        caption="기본 지속시간 2400ms"
+        code={`toast.open({ message: "저장되었습니다." });`}
+      >
         <div
           style={{
             display: "grid",
@@ -41,7 +45,11 @@ export function ToastDemo() {
       </Example>
 
       <h2>지속시간</h2>
-      <Example row={false} caption="duration — 0 이하면 자동으로 닫히지 않는다">
+      <Example
+        row={false}
+        caption="duration — 0 이하면 자동으로 닫히지 않는다"
+        code={`toast.open({ message: "저장 실패", tone: "error", duration: 0 });`}
+      >
         <div
           style={{
             display: "grid",
@@ -70,7 +78,11 @@ export function ToastDemo() {
         토스트는 스택으로 쌓이고 아래에서 위로 정렬된다. <code>closeAll()</code>{" "}
         로 한 번에 닫을 수 있다.
       </p>
-      <Example row={false} caption="스택 동작">
+      <Example
+        row={false}
+        caption="스택 동작"
+        code={`// ToastHost 를 앱 최상단에 한 번 놓는다\n<ToastHost>{children}</ToastHost>`}
+      >
         <div
           style={{
             display: "grid",
