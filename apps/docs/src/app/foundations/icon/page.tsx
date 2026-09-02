@@ -29,11 +29,10 @@ export default function IconPage() {
     <>
       <h1>아이콘</h1>
       <p className="doc-lead">
-        <strong>이 페이지가 정하는 것</strong> — 아이콘을 얼마나 크게 그리고,
-        스크린리더에 어떻게 읽히게 하는가.
+        아이콘을 얼마나 크게 그리고 스크린리더에 어떻게 읽히게 할지 정한다.
       </p>
 
-      <h2>크기 5단계</h2>
+      <h2>크기</h2>
       <div className="doc-example">
         <div
           className="doc-example__preview doc-example__row"
@@ -63,17 +62,17 @@ export default function IconPage() {
       </div>
 
       <p>
-        값이 10 · 14 · 16 · 20 · 24px 로 <strong>등간격이 아니다.</strong>{" "}
-        그래서 숫자가 아니라 역할 이름을 쓴다 —{" "}
-        <Link href="/foundations/tokens">디자인 토큰</Link> 문서의 이름 규칙을
-        따른다. (<code>xl</code> 은 없다. 쓰이지 않아서 만들지 않았다.)
+        값이 10 · 14 · 16 · 20 · 24px 로 등간격이 아니다. 값이 불규칙해서
+        숫자가 아니라 역할 이름을 쓴다(
+        <Link href="/foundations/tokens">디자인 토큰</Link>). <code>xl</code> 은
+        쓰이지 않아서 만들지 않았다.
       </p>
 
       <h2>어느 크기를 고르나</h2>
       <p>
-        <strong>아이콘은 나란히 놓인 글자보다 한 단계 크다.</strong> 같은 크기로
-        맞추면 아이콘이 글자보다 작아 보인다 — 글자는 획이 촘촘하고 아이콘은
-        비어 있기 때문이다.
+        <strong>아이콘은 나란히 놓인 글자보다 한 단계 크다.</strong> 같은
+        크기로 맞추면 아이콘이 글자보다 작아 보인다. 글자는 획이 촘촘하고
+        아이콘은 비어 있기 때문이다.
       </p>
 
       <div className="doc-table-wrap">
@@ -223,17 +222,15 @@ export default function IconPage() {
       </pre>
 
       <div className="doc-note doc-note--warn">
-        <strong>접근 이름을 두 번 주지 않는다.</strong> 아이콘 전용 버튼에서는{" "}
-        <strong>버튼이</strong> 이름을 갖고 아이콘은 장식으로 둔다. 둘 다 주면
+        <strong>접근 이름을 두 번 주지 않는다.</strong> 아이콘 전용
+        버튼에서는 버튼에 이름을 주고 아이콘은 장식으로 둔다. 둘 다 주면
         스크린리더가 같은 말을 두 번 읽는다.
       </div>
 
       <h2>아이콘 세트</h2>
       <p>
-        지금은 필요한 아이콘만 라이브러리 안에 직접 그려 넣었다.{" "}
-        <code>@chansikchoi/next-ui/icon</code> 에서 가져온다. 외부 아이콘
-        라이브러리를 채택할지는 <strong>아직 정하지 않았다</strong> — 번들 크기
-        · 트리셰이킹 · 라이선스 · 위 5단계 스케일과의 궁합을 비교한 뒤 정한다.
+        컴포넌트가 쓰는 아이콘만 들어 있고{" "}
+        <code>@chansikchoi/next-ui/icon</code> 에서 가져온다.
       </p>
       <p>
         직접 만든 SVG 를 쓸 때는 <code>Icon</code> 으로 감싸면 크기·색·접근성

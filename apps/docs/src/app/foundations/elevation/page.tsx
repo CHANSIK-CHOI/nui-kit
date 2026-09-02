@@ -30,13 +30,13 @@ export default function ElevationPage() {
     <>
       <h1>깊이</h1>
       <p className="doc-lead">
-        <strong>이 페이지가 정하는 것</strong> — 무엇이 무엇 위에 놓이는가. 면의
-        층 · 그림자 · 쌓임 순서 셋이 같은 이야기를 다른 수단으로 한다.
+        무엇이 무엇 위에 놓이는지 정한다. 면의 층과 그림자, 쌓임 순서 셋이 같은
+        이야기를 다른 수단으로 한다.
       </p>
 
-      <h2>층 — 콘텐츠를 담는 면</h2>
+      <h2>층</h2>
       <p>
-        <code>layer-*</code> 는 <strong>컨테이너의 표면색</strong>만 정의한다.
+        <code>layer-*</code> 는 컨테이너의 표면색만 정의한다.
         글자나 아이콘 같은 개별 요소가 아니라 화면의 캔버스를 만든다.
       </p>
 
@@ -110,14 +110,10 @@ export default function ElevationPage() {
         <strong>
           <code>layer-basement</code> 는 아직 쓰는 곳이 없다.
         </strong>{" "}
-        지우지 않고 두는 이유는{" "}
-        <strong>다크 테마의 축이 layer 이기 때문</strong>
-        이다. &quot;고도가 높을수록 밝아진다&quot;는 규칙은 색을 반전시켜서는
-        만들어지지 않는다. 테마를 넣게 되면 <code>layer-*</code> 를 먼저
-        정의하고 나머지를 얹는다.
+        다크 테마를 넣을 때 기준이 되는 층이라 지우지 않고 뒀다.
       </div>
 
-      <h2>그림자 — 얼마나 떠 있나</h2>
+      <h2>그림자</h2>
       <div className="doc-example">
         <div
           className="doc-example__preview doc-example__row"
@@ -192,15 +188,15 @@ export default function ElevationPage() {
       <div className="doc-note doc-note--warn">
         <strong>포커스 링은 그림자가 아니다.</strong> 생김새가 비슷하지만
         그림자는 <em>높이</em>를, 링은 <em>상태</em>를 나타낸다. 그래서{" "}
-        <code>shadow-*</code> 가 아니라 <code>focus-ring-*</code> 이고, 고르는
-        기준도 다르다 — <Link href="/foundations/accessibility">접근성</Link>{" "}
-        문서 참조.
+        <code>shadow-*</code> 가 아니라 <code>focus-ring-*</code> 이다. 고르는
+        기준은 <Link href="/foundations/accessibility">접근성</Link> 문서에
+        있다.
       </div>
 
       <h2>쌓임 순서</h2>
       <p>
         <code>z-index</code> 를 직접 쓰지 않고 이 네 개 안에서 고른다. 값을 직접
-        쓰기 시작하면 <strong>숫자 경쟁</strong>이 벌어진다.
+        쓰기 시작하면 숫자 경쟁이 벌어진다.
       </p>
       <TokenTable group="z-index" swatch={false} />
 
@@ -252,7 +248,7 @@ export default function ElevationPage() {
         <strong>겹친다고 값을 올리지 않는다.</strong> 새 값이 필요해 보이면
         대개는 쌓임 맥락(stacking context)이 잘못 잡힌 것이다. 부모에{" "}
         <code>transform</code> 이나 <code>opacity</code> 가 걸려 있으면 자식의{" "}
-        <code>z-index</code> 는 그 맥락 안에 갇힌다 — 숫자를 키워도 소용없다.
+        <code>z-index</code> 는 그 맥락 안에 갇힌다. 숫자를 키워도 소용없다.
       </div>
     </>
   );
