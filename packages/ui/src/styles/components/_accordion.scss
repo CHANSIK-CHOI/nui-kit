@@ -85,9 +85,17 @@
       }
     }
 
+    // 비활성은 색으로 표현한다. 헤더는 누르는 것이므로 액션 매트릭스를 따른다
+    // (design-system.md §2-3). Button 과 달리 이 버튼은 배경이 없어서
+    // (`background: transparent` · `color: inherit`) 글자와 아이콘 색만 바뀐다.
+    // `__title` 이 자기 색을 갖고 있으므로 함께 덮는다.
     &__button:disabled {
-      opacity: 0.72;
+      color: var(#{v("action-fg-disabled")});
       cursor: not-allowed;
+    }
+
+    &__button:disabled #{cls("accordion")}__title {
+      color: var(#{v("action-fg-disabled")});
     }
 
     &__button--icon {
@@ -117,7 +125,7 @@
     &__title {
       color: var(#{v("text-primary")});
 
-      @include typo(4, "semi-bold", 1.45, -0.02em);
+      @include typo(4, "semi-bold");
     }
 
     // 헤더에 폼 컨트롤을 넣는 경우가 있어 폭을 채워준다
@@ -182,7 +190,7 @@
       border-top: #{hook("accordion-border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border-disabled")});
 
-      @include typo(3, "regular", 1.7);
+      @include typo(3, "regular");
 
       > * {
         margin: 0;

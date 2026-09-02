@@ -88,6 +88,32 @@ export function AccordionDemo() {
         </Accordion>
       </Example>
 
+      <h2>비활성</h2>
+      <p>
+        <code>Accordion.Button</code> 에 <code>disabled</code> 를 준다. 배경이
+        없는 버튼이라 글자와 화살표 색만 바뀐다.
+      </p>
+      <Example row={false} caption="disabled — 펼칠 수 없다">
+        <Accordion type="single">
+          <Accordion.Item index={0}>
+            <Accordion.Button index={0}>
+              <Accordion.Head>
+                <span className="nui-accordion__title">열 수 있는 항목</span>
+              </Accordion.Head>
+            </Accordion.Button>
+            <Accordion.Panel index={0}>펼쳐진 내용이다.</Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item index={1}>
+            <Accordion.Button index={1} disabled>
+              <Accordion.Head>
+                <span className="nui-accordion__title">비활성 항목</span>
+              </Accordion.Head>
+            </Accordion.Button>
+            <Accordion.Panel index={1}>열리지 않는다.</Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      </Example>
+
       <h2>제어 모드</h2>
       <p>
         <code>activeIndices</code> 를 주면 열림 상태를 소비자가 소유한다.
