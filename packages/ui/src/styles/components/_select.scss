@@ -314,8 +314,10 @@
       opacity: var(#{v("opacity-icon-disabled")});
     }
 
+    // 입력 컨트롤 안의 값 표시라 §2-1 을 따른다. 배경도 함께 바꾼다.
     &#{state("disabled")} &__multi-value {
-      opacity: 0.7;
+      background-color: var(#{v("control-bg-disabled")});
+      color: var(#{v("control-text-disabled")});
     }
 
     // ── error

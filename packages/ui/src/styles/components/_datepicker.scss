@@ -133,8 +133,12 @@
 
       @include motion((border-color, background-color), "3");
 
+      // 입력 컨트롤 부류라 §2-1 매트릭스를 따른다. 투명도를 덧칠하지 않는다.
       &[data-disabled="true"] {
-        opacity: 0.45;
+        background-color: var(#{v("control-bg-disabled")});
+        border-color: var(#{v("control-border-disabled")});
+        color: var(#{v("control-text-disabled")});
+        cursor: not-allowed;
       }
     }
 
@@ -207,7 +211,8 @@
     &__button-next[aria-disabled="true"],
     &__button-previous:disabled,
     &__button-next:disabled {
-      opacity: 0.3;
+      // 표면 hover 부류라 §2-3 매트릭스를 따른다. 배경은 그대로 두고 글자만 바꾼다.
+      color: var(#{v("action-fg-disabled")});
       cursor: not-allowed;
     }
 
@@ -308,7 +313,6 @@
 
     &__disabled &__day-button {
       color: var(#{v("text-disabled")});
-      opacity: 0.45;
       cursor: not-allowed;
     }
 
