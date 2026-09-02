@@ -1,4 +1,10 @@
-import { PropsTable } from "@/components/guide";
+import { Radio } from "@chansikchoi/next-ui";
+import {
+  GuideHeader,
+  ChoiceStateCases,
+  HookTable,
+  PropsTable,
+} from "@/components/guide";
 import { RadioDemo } from "./RadioDemo";
 
 export const metadata = { title: "Radio" };
@@ -6,23 +12,39 @@ export const metadata = { title: "Radio" };
 export default function RadioPage() {
   return (
     <>
-      <h1>Radio</h1>
-      <p className="doc-lead">
-        단일 선택. 같은 <code>name</code> 을 공유하는 항목끼리 배타 선택된다 —{" "}
-        <code>RadioGroup</code> 이 <code>name</code> 을 하위에 전파한다.
-      </p>
-
-      <pre className="doc-code">
-        <code>{`import { Radio, RadioGroup } from "@chansikchoi/next-ui";`}</code>
-      </pre>
+      <GuideHeader
+        title="Radio"
+        named={["Radio", "RadioGroup"]}
+        subpath="radio"
+      >
+        하나만 고르는 선택 컨트롤이다.
+      </GuideHeader>
 
       <RadioDemo />
 
+      <h2>상태</h2>
+      <ChoiceStateCases
+        columns={4}
+        caption="checked 가 다른 상태와 겹치면 함께 그린다"
+        code={`<Radio name="plan" checked={v === "a"} onChange={onChange} />`}
+        render={(p, key) => <Radio name={`state-${key}`} {...p} />}
+      />
       <div className="doc-note">
-        <code>RadioGroup</code> 은 <code>role=&quot;radiogroup&quot;</code> 이며
-        Field 의 label 을 <code>aria-labelledby</code> 로 연결한다. 그룹 자체에{" "}
+        선택된 채로 에러면 빨강, 비활성이면 회색이다. 케이스마다{" "}
+        <code>name</code> 이 다르다. 같은 <code>name</code> 이면 브라우저가
+        하나만 선택되게 만든다.
+      </div>
+
+      <h2>그룹</h2>
+      <div className="doc-note">
+        <code>RadioGroup</code> 이 <code>name</code> 을 전파해 같은 그룹으로
+        묶는다. <code>role=&quot;radiogroup&quot;</code> 이며 Field 의 label 을{" "}
+        <code>aria-labelledby</code> 로 연결한다. 그룹 자체에{" "}
         <code>aria-invalid</code> 도 붙는다.
       </div>
+
+      <h2>커스터마이징</h2>
+      <HookTable group="choice-base" />
 
       <h2>API</h2>
       <h3>Radio</h3>

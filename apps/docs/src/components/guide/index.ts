@@ -10,6 +10,7 @@ export { Case, CaseGrid, CaseMatrix } from "./CaseGrid";
 export {
   StateCases,
   InputStateCases,
+  ChoiceStateCases,
   INPUT_STATES,
   CHOICE_STATES,
 } from "./StateCases";

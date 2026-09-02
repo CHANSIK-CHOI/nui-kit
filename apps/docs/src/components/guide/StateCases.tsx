@@ -57,11 +57,68 @@ export function StateCases<K extends string>({
   );
 }
 
+/**
+ * 선택 컨트롤용 단축 — `checked` 축이 겹치는 조합까지 전개한다.
+ *
+ * `design-system.md §3-2` 가 "함께 그린다"로 정한 `checked + isError` 와
+ * `checked + disabled` 가 페이지마다 빠져 있었다.
+ *
+ * ⚠️ `checked` 대신 `defaultChecked` 를 넘긴다. `checked` 를 주면서 `onChange`
+ *    도 `readOnly` 도 없으면 React 가 controlled 경고를 낸다. `checked + readOnly`
+ *    로 고정할 수도 있지만, 그러면 모든 칸이 readOnly 가 되어 readOnly 케이스와
+ *    구분이 사라진다. uncontrolled 라 눌러볼 수도 있다.
+ */
+export function ChoiceStateCases({
+  render,
+  columns = 4,
+  caption,
+  code,
+}: {
+  /**
+   * 두 번째 인자로 케이스 키를 받는다. Radio 처럼 케이스마다 고유한 `name` 이
+   * 필요할 때 쓴다 — 같은 `name` 이면 브라우저가 하나만 선택되게 만든다.
+   */
+  render: (
+    props: {
+      defaultChecked?: boolean;
+      isError?: boolean;
+      disabled?: boolean;
+      readOnly?: boolean;
+    },
+    key: ChoiceStateKey,
+  ) => ReactNode;
+  columns?: number;
+  caption?: string;
+  code?: string;
+}) {
+  const propsOf = (key: ChoiceStateKey) =>
+    ({
+      default: {},
+      checked: { defaultChecked: true },
+      error: { isError: true },
+      checkedError: { defaultChecked: true, isError: true },
+      disabled: { disabled: true },
+      checkedDisabled: { defaultChecked: true, disabled: true },
+      readOnly: { readOnly: true },
+    })[key];
+
+  return (
+    <CaseGrid columns={columns} caption={caption} code={code}>
+      {CHOICE_STATES.map((s) => (
+        <Case key={s.key} label={s.label} note={s.note}>
+          {render(propsOf(s.key), s.key)}
+        </Case>
+      ))}
+    </CaseGrid>
+  );
+}
+
 /** 입력 컨트롤용 단축 — 상태 키를 prop 으로 바꿔 넘긴다 */
 export function InputStateCases({
   render,
   columns = 2,
   caption,
+  code,
 }: {
   render: (props: {
     isError?: boolean;
@@ -70,6 +127,7 @@ export function InputStateCases({
   }) => ReactNode;
   columns?: number;
   caption?: string;
+  code?: string;
 }) {
   const propsOf = (key: InputStateKey) =>
     key === "error"
@@ -81,11 +139,12 @@ export function InputStateCases({
           : {};
 
   return (
-    <StateCases
-      states={INPUT_STATES}
-      columns={columns}
-      caption={caption}
-      render={(key) => render(propsOf(key))}
-    />
+    <CaseGrid columns={columns} caption={caption} code={code}>
+      {INPUT_STATES.map((s) => (
+        <Case key={s.key} label={s.label} note={s.note}>
+          {render(propsOf(s.key))}
+        </Case>
+      ))}
+    </CaseGrid>
   );
 }
