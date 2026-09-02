@@ -8,6 +8,7 @@ export const NAV: NavSection[] = [
     items: [
       { title: "개요", href: "/" },
       { title: "설치와 사용", href: "/get-started" },
+      { title: "브랜드 색 고르기", href: "/brand-colors" },
     ],
   },
   {

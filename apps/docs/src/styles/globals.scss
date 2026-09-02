@@ -422,3 +422,328 @@ body {
   font-size: var(--nui-font-size-1);
   color: var(--nui-text-secondary);
 }
+
+/* ──────────────────────────────────────────────
+   브랜드 색 고르기 (/brand-colors)
+
+   스와치는 한 벌만 그린다. 라이트·다크 두 색을 --l / --d 로 넘기고
+   여기서 갈아끼운다 — 두 벌을 다 그리면 DOM 이 12,000 개가 된다.
+   ────────────────────────────────────────────── */
+
+.preset-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--doc-border);
+    border-radius: 999px;
+    font-size: 0.875rem;
+    text-decoration: none;
+
+    span {
+      font-size: 0.75rem;
+      opacity: 0.6;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+.preset-note {
+  font-size: 0.875rem;
+  opacity: 0.75;
+}
+
+.preset-range {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+.preset-list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.preset-card {
+  border: 1px solid var(--doc-border);
+  border-radius: 10px;
+  padding: 0.875rem 1rem 1rem;
+  background: var(--doc-bg-subtle);
+  scroll-margin-top: 1rem;
+}
+
+.preset-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.625rem;
+}
+
+.preset-seed {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 1px solid rgb(0 0 0 / 12%);
+  flex-shrink: 0;
+}
+
+.preset-n {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  opacity: 0.55;
+  min-width: 1.75rem;
+}
+
+.preset-name {
+  font-size: 0.9375rem;
+}
+
+.preset-hex,
+.preset-hue {
+  font-size: 0.75rem;
+  opacity: 0.65;
+}
+
+.preset-hue {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 12칸 바. 사용자가 보여준 형태 그대로 — 칸마다 단계 번호가 보인다. */
+.preset-scale {
+  display: flex;
+  gap: 2px;
+  margin: 0.25rem 0;
+}
+
+.preset-swatch {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 2.5rem;
+  border-radius: 4px;
+  background: var(--l);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  /* 칸마다 대비를 계산해 넣은 글자색. 흰색으로 통일하면 밝은 칸에서 안 읽힌다 */
+  color: var(--tl);
+}
+
+[data-theme="dark"] .preset-swatch {
+  background: var(--d);
+  color: var(--td);
+}
+
+/* 반투명 칸은 체크무늬 위에 얹어야 투명한 게 보인다 */
+.preset-alpha-row {
+  display: grid;
+  grid-template-columns: 4fr 5fr;
+  gap: 0.75rem;
+
+  .preset-swatch {
+    background-color: var(--l);
+    background-image:
+      linear-gradient(45deg, rgb(128 128 128 / 22%) 25%, transparent 25%),
+      linear-gradient(-45deg, rgb(128 128 128 / 22%) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgb(128 128 128 / 22%) 75%),
+      linear-gradient(-45deg, transparent 75%, rgb(128 128 128 / 22%) 75%);
+    background-size: 10px 10px;
+    background-position: 0 0, 0 5px, 5px -5px, -5px 0;
+  }
+
+  [data-theme="dark"] & .preset-swatch {
+    background-color: var(--d);
+  }
+}
+
+.preset-cmd {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: var(--doc-code-bg);
+  /* 배경만 주고 글자색을 빠뜨리면 어두운 배경에 어두운 글자가 얹힌다 */
+  color: var(--doc-code-fg);
+  font-size: 0.8125rem;
+  overflow-x: auto;
+}
+
+.preset-cmd code {
+  color: inherit;
+  background: none;
+  padding: 0;
+}
+
+.preset-more {
+  margin-top: 0.625rem;
+
+  summary {
+    cursor: pointer;
+    font-size: 0.8125rem;
+    opacity: 0.75;
+  }
+}
+
+.preset-more-body {
+  padding-top: 0.5rem;
+}
+
+.preset-label {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 650;
+
+  span {
+    font-weight: 400;
+    opacity: 0.6;
+    margin-left: 0.4rem;
+  }
+}
+
+.preset-contrast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.preset-chip {
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  background: var(--l);
+  color: var(--fl);
+  font-size: 0.875rem;
+}
+
+[data-theme="dark"] .preset-chip {
+  background: var(--d);
+  color: var(--fd);
+}
+
+.preset-ratio {
+  font-size: 0.8125rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 개요 페이지의 색깔 카드 */
+.preset-groups {
+  display: grid;
+  /* 11rem 아래로 좁아지면 "연두" 같은 두 글자가 세로로 쪼개진다 */
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.625rem;
+  margin: 1rem 0;
+}
+
+.preset-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--doc-border);
+  border-radius: 8px;
+  text-decoration: none;
+
+  strong {
+    font-size: 0.9375rem;
+    white-space: nowrap;
+  }
+}
+
+.preset-group-chip {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: var(--c);
+  flex-shrink: 0;
+}
+
+.preset-group-meta {
+  margin-left: auto;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.preset-crumb {
+  font-size: 0.8125rem;
+  margin-bottom: 0.5rem;
+}
+
+.preset-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2rem 0 1rem;
+  font-size: 0.9375rem;
+}
+
+.preset-jump a[aria-current="page"] {
+  border-color: currentcolor;
+  font-weight: 650;
+}
+
+.preset-badge {
+  font-size: 0.6875rem;
+  font-weight: 650;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  /* --doc-brand 는 링크색이라 흰 글자와 대비가 모자란다. 테두리형으로 둔다 */
+  border: 1px solid currentcolor;
+  color: var(--nui-action-primary);
+  white-space: nowrap;
+}
+
+/* 결과가 같아 합쳐진 팔레트 색의 개수 */
+.preset-merged {
+  font-size: 0.6875rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--doc-border);
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.preset-card:has(.preset-badge) {
+  border-color: var(--nui-action-primary);
+}
+
+/* 고른 색이 9번에 그대로 앉지 못했을 때의 표시 */
+.preset-adjusted {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+/* 9번 칸 — 고른 색이 앉는 자리.
+   배경이 밝을 수도 어두울 수도 있으므로 흰 테두리와 검은 테두리를 겹쳐 두른다.
+   한 색으로 두르면 비슷한 밝기의 칸에서 사라진다. */
+.preset-swatch--mark {
+  box-shadow:
+    0 0 0 2px rgb(255 255 255 / 90%),
+    0 0 0 4px rgb(0 0 0 / 75%);
+  z-index: 1;
+  position: relative;
+}
+
+[data-theme="dark"] .preset-swatch--mark {
+  box-shadow:
+    0 0 0 2px rgb(0 0 0 / 75%),
+    0 0 0 4px rgb(255 255 255 / 90%);
+}
+
+/* 테두리가 이웃 칸에 가리지 않도록 여백을 조금 준다 */
+.preset-scale {
+  padding: 3px 0;
+}
