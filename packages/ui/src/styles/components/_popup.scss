@@ -108,7 +108,7 @@
         transparent;
       border-radius: var(#{v("radius-full")});
 
-      @include motion((background-color, border-color, color, transform));
+      @include motion-press((background-color, border-color, color));
 
       &:focus-visible {
         outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
@@ -122,7 +122,8 @@
       }
 
       &:active {
-        transform: scale(0.96);
+        // 중간 크기 — design-system.md §6-3
+        transform: scale(var(#{v("scale-96")}));
       }
     }
 

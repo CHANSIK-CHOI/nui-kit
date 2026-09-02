@@ -41,6 +41,37 @@
   height: $h;
 }
 
+// 눌림이 있는 요소용 — `transform` 만 눌림 3축으로 걸고 나머지는 기본 전환.
+//
+// **`transition` 은 한 번만 선언할 수 있어서** `motion()` 을 두 번 부르면 뒤가 앞을
+// 덮는다. 실제로 `_textfield` 가 `@include motion(...)` 바로 뒤에 `transition:` 을
+// 손으로 써서 믹스인 결과를 통째로 버리고 있었다.
+//
+// 눌림의 시간·곡선은 색 전환과 다르다 — tokens.md §3-11.
+@mixin motion-press($properties, $duration: "4", $easing: "standard") {
+  @if meta.type-of($properties) != list {
+    $properties: ($properties);
+  }
+
+  $result: ();
+
+  @each $property in $properties {
+    $result: list.append(
+      $result,
+      #{$property}
+        var(#{v("duration-#{$duration}")})
+        var(#{v("easing-#{$easing}")}),
+      comma
+    );
+  }
+
+  transition: list.append(
+    $result,
+    transform var(#{v("duration-pressed")}) var(#{v("easing-pressed")}),
+    comma
+  );
+}
+
 // duration/easing 토큰 기반 transition
 @mixin motion($properties, $duration: "4", $easing: "standard") {
   @if meta.type-of($properties) != list {

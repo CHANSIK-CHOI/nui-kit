@@ -119,11 +119,7 @@
       border-radius: var(#{v("radius-circle")});
       color: var(#{v("control-icon")});
       cursor: pointer;
-      transition:
-        color var(#{v("duration-3")}) var(#{v("easing-standard")}),
-        background-color var(#{v("duration-3")}) var(#{v("easing-standard")}),
-        transform var(#{v("duration-2")}) var(#{v("easing-standard")}),
-        opacity var(#{v("duration-3")}) var(#{v("easing-standard")});
+      @include motion-press((color, background-color, opacity), "3");
     }
 
     &__clear-indicator:first-child,
@@ -292,7 +288,8 @@
       &__dropdown-indicator:active,
     &:not(#{state("disabled")}):not(#{state("readonly")})
       &__multi-value__remove:active {
-      transform: scale(0.94);
+      // 작은 아이콘 버튼 — design-system.md §6-3
+      transform: scale(var(#{v("scale-94")}));
     }
 
     // ── 상태 우선순위: disabled > error > readonly (rules/styles.md §7)

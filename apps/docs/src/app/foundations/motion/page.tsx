@@ -198,14 +198,6 @@ export default function MotionPage() {
       </p>
       <TokenTable group="etc" only="scale-" swatch={false} />
 
-      <div className="doc-note doc-note--warn">
-        <strong>컴포넌트는 아직 이 토큰을 참조하지 않는다.</strong>{" "}
-        <code>Button</code> 은 <code>translateY</code> 로, <code>Select</code>{" "}
-        와 <code>Textfield</code>, <code>Popup</code> 은 원시값{" "}
-        <code>scale</code> 로 눌림을 표현한다. 두 방식을 토큰으로 모으는 작업이
-        남아 있다.
-      </div>
-
       <p>
         투명도로 상태를 표현하는 값(<code>opacity-*</code>)은{" "}
         <Link href="/foundations/state">상태</Link> 문서에 있다.

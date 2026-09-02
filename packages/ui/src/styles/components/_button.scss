@@ -10,10 +10,10 @@
 //   모양    : --nui-button-radius      / --nui-button-round-radius
 //   선      : --nui-button-border-width
 //
-// ⚠️ 색 훅은 두지 않는다 (design-plan 2-1).
+// ⚠️ 색 훅은 두지 않는다 (tokens.md §1-2).
 //   배경과 글자는 짝이다. 소비자가 배경만 바꾸면 대비가 깨지는데 **눈에 보이지 않는다**
-//   — 저시력 사용자만 겪는다. 색을 바꾸는 창구는 브랜드 색 생성기와 semantic 덮어쓰기,
-//   그리고 한 컴포넌트만 바꿀 때의 className 이다. className 이면 배경과 글자를
+//   — 저시력 사용자만 겪는다. 색을 바꾸는 창구는 **브랜드 색 프리셋**과
+//   한 컴포넌트만 바꿀 때의 className 둘뿐이다. className 이면 배경과 글자를
 //   같은 자리에 쓰게 되므로 짝을 놓치기 어렵다.
 //
 // ⚠️ 크기 훅에 옵션 이름이 붙는 이유:
@@ -52,8 +52,8 @@
     border-radius: #{hook("button-radius", var(#{v("radius-1")}))};
     box-shadow: var(#{iv("button-shadow")});
 
-    @include motion(
-      (background-color, border-color, color, box-shadow, transform, opacity)
+    @include motion-press(
+      (background-color, border-color, color, box-shadow, opacity)
     );
 
     &:focus-visible {
@@ -69,7 +69,8 @@
 
     &:not([disabled]):active {
       box-shadow: var(#{iv("button-shadow-active")});
-      transform: translateY(1px);
+      // 전면 버튼이라 가장 덜 줄인다 — design-system.md §6-3
+      transform: scale(var(#{v("scale-98")}));
     }
 
     &__wrap {
@@ -82,7 +83,7 @@
       color: var(#{iv("button-fg")});
       text-align: center;
 
-      @include typo(4, "semi-bold", 1.2, -0.01em);
+      @include typo(4, "semi-bold");
     }
 
     &__icon {
@@ -111,7 +112,7 @@
     }
 
     &--small &__wrap {
-      @include typo(3, "semi-bold", 1.2, -0.01em);
+      @include typo(3, "semi-bold");
     }
 
     // ── shape
@@ -176,10 +177,9 @@
       #{iv("button-fg")}: var(#{v("action-fg-disabled")});
 
       box-shadow: none;
-      // ⚠️ 매트릭스 밖의 값이다. 입력 컨트롤의 비활성(0.2·0.3·0.45)과 기준이 다르고,
-      //    text 버튼 hover(opacity-hover 0.72)와 값이 같아 서로 얽힐 위험이 있다.
-      //    어느 값으로 모을지는 컴포넌트 반영 단계에서 판단한다 — 지금은 남겨둔다.
-      opacity: 0.72;
+      // 비활성은 색으로만 표현한다. `action-bg-disabled` 와 `action-fg-disabled` 는
+      // 이미 그 조합에서 대비를 맞춰 고른 값이라, opacity 를 덧칠하면 그 계산이 깨진다.
+      // 당근 SEED 도 비활성에 opacity 축을 두지 않고 전용 색만 쓴다.
       cursor: not-allowed;
 
       &#{cls("button")}--line {
