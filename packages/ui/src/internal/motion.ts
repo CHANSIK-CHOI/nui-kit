@@ -1,102 +1,117 @@
 /**
  * framer-motion 용 트랜지션 토큰.
  *
- * SCSS 의 --nui-duration-* / --nui-easing-* 과 **같은 값을 유지**한다.
- * (framer-motion 은 CSS 변수를 읽지 못하므로 부득이하게 이중 정의한다.
- *  한쪽만 고치면 CSS 전환과 모션이 어긋나므로 항상 함께 바꾼다.)
+ * framer-motion 은 CSS 변수를 읽지 못한다. 그래서 `--nui-duration-*` /
+ * `--nui-easing-*` 과 **같은 값을 여기에도 적는다.**
+ *
+ * ⚠️ **이름을 SCSS 토큰과 똑같이 맞춰 뒀다.** 예전에는 `quick`·`fast`·`slow`
+ *    같은 이름을 써서 어느 스케일 단계인지 알 수 없었고, 실제로 일곱 값 중
+ *    둘만 SCSS 와 일치했다(120·180·240·340·380ms 는 스케일에 없는 값이었다).
+ *    이제 `d4` 를 보면 `--nui-duration-4` 를 찾으면 된다.
+ *
+ * 한쪽만 고치면 CSS 전환과 framer-motion 이 다른 속도로 움직인다. 항상 함께 바꾼다.
  */
 import type { Transition } from "framer-motion";
 
+/** `--nui-duration-1` ~ `-8` 과 같은 값 (초 단위) */
 export const motionDuration = {
-  quick: 0.12,
-  fast: 0.18,
-  base: 0.2,
-  slow: 0.24,
-  deliberate: 0.3,
-  measured: 0.34,
-  relaxed: 0.38,
+  d1: 0.05,
+  d2: 0.1,
+  d3: 0.15,
+  d4: 0.2, // 마이크로/매크로 경계
+  d5: 0.25,
+  d6: 0.3,
+  d7: 0.35,
+  d8: 0.4,
 } as const;
 
+/** `--nui-easing-*` 과 같은 값 */
 export const motionEase = {
   linear: "linear",
   standard: [0.2, 0, 0, 1],
-  emphasized: [0.16, 1, 0.3, 1],
-  exit: [0.4, 0, 1, 1],
+  enter: [0, 0, 0.15, 1],
+  exit: [0.35, 0, 1, 1],
+  enterEmphasized: [0.16, 1, 0.3, 1],
+  exitEmphasized: [0.35, 0, 0.95, 0.55],
+  expand: [0.5, 1, 0.89, 1],
+  pressed: [0, 0, 0.15, 1],
 } as const;
 
 export const motionTransition = {
   // dialog — 작은 요소, 빠른 인지
   panelDialog: {
-    duration: motionDuration.deliberate,
-    ease: motionEase.emphasized,
+    duration: motionDuration.d6,
+    ease: motionEase.enterEmphasized,
   } satisfies Transition,
   panelDialogExit: {
-    duration: motionDuration.base,
+    duration: motionDuration.d4,
     ease: motionEase.exit,
   } satisfies Transition,
+
   // bottomSheet — 큰 면적, 아래에서 위로
   panelSheet: {
-    duration: motionDuration.relaxed,
-    ease: motionEase.emphasized,
+    duration: motionDuration.d8,
+    ease: motionEase.enterEmphasized,
   } satisfies Transition,
   panelSheetExit: {
-    duration: motionDuration.slow,
+    duration: motionDuration.d5,
     ease: motionEase.exit,
   } satisfies Transition,
+
   // fullPopup — 전체 화면 슬라이드
   panelFull: {
-    duration: motionDuration.measured,
-    ease: motionEase.emphasized,
+    duration: motionDuration.d7,
+    ease: motionEase.enterEmphasized,
   } satisfies Transition,
   panelFullExit: {
-    duration: motionDuration.base,
+    duration: motionDuration.d4,
     ease: motionEase.exit,
   } satisfies Transition,
+
   // dim — 패널보다 살짝 길게
   overlayDialog: {
-    duration: 0.22,
+    duration: motionDuration.d5,
     ease: motionEase.standard,
   } satisfies Transition,
   overlayDialogExit: {
-    duration: motionDuration.fast,
+    duration: motionDuration.d4,
     ease: motionEase.exit,
   } satisfies Transition,
-  // 레이아웃 전환(아코디언 펼침 등)
+
+  // 레이아웃 전환
   panel: {
-    duration: motionDuration.slow,
-    ease: motionEase.emphasized,
+    duration: motionDuration.d5,
+    ease: motionEase.enterEmphasized,
   } satisfies Transition,
   panelExit: {
-    duration: motionDuration.fast,
+    duration: motionDuration.d3,
     ease: motionEase.exit,
   } satisfies Transition,
+
   // tooltip / popover — 가볍고 빠르게
   popover: {
-    duration: motionDuration.fast,
+    duration: motionDuration.d4,
     ease: motionEase.standard,
   } satisfies Transition,
   popoverExit: {
-    duration: motionDuration.quick,
+    duration: motionDuration.d3,
     ease: motionEase.exit,
   } satisfies Transition,
+
   toast: {
-    duration: motionDuration.slow,
-    ease: motionEase.emphasized,
+    duration: motionDuration.d5,
+    ease: motionEase.enterEmphasized,
   } satisfies Transition,
+
   // 접힘/펼침 — 높이가 움직이므로 팝업 개폐에 가까운 매크로 모션이다.
-  //
-  // ⚠️ 이 둘만 SCSS 값과 정확히 맞다. 위쪽 항목들은 아직 어긋나 있다 —
-  //    `motionEase.emphasized` 는 SCSS 의 `easing-enter-emphasized`
-  //    (0.03, 0.4, 0.1, 1) 와 다르고, `quick`·`fast`·`measured`·`relaxed` 는
-  //    SCSS duration 스케일(50·100·150·200·250·300ms)에 없는 값이다.
-  //    전체 정합은 별도로 다룬다.
+  // 크기 변화에는 전용 곡선을 쓴다 — tokens.md §3-6.
   collapse: {
-    duration: 0.25, // --nui-duration-5
-    ease: [0.5, 1, 0.89, 1], // --nui-easing-expand
+    duration: motionDuration.d5,
+    ease: motionEase.expand,
   } satisfies Transition,
   collapseExit: {
-    duration: 0.2, // --nui-duration-4
-    ease: [0.35, 0, 1, 1], // --nui-easing-exit
+    duration: motionDuration.d4,
+    ease: motionEase.exit,
   } satisfies Transition,
 } as const;
 
@@ -123,7 +138,9 @@ export function reduceMotion<T extends Record<string, unknown>>(
   if (!shouldReduce) return variant;
 
   // 페이드는 남긴다 — 완전히 없애면 요소가 갑자기 나타나 오히려 인지 부담이 크다.
-  return "opacity" in variant ? ({ opacity: variant.opacity } as Pick<T, "opacity">) : variant;
+  return "opacity" in variant
+    ? ({ opacity: variant.opacity } as Pick<T, "opacity">)
+    : variant;
 }
 
 /** 모션 감소 시 전환을 즉시 끝낸다. */

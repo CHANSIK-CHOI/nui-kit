@@ -553,6 +553,10 @@
     #{v("duration-4")}: 200ms;
     #{v("duration-5")}: 250ms;
     #{v("duration-6")}: 300ms;
+    // 매크로 위쪽 두 단계. framer-motion 이 맡는 팝업·시트 개폐가 이 구간을 쓴다.
+    // 6단계로는 매크로가 250·300 둘뿐이라 시트 슬라이드에 여유가 없었다.
+    #{v("duration-7")}: 350ms;
+    #{v("duration-8")}: 400ms;
 
     // ── easing — enter 와 exit 은 대칭이 아니다 ★
     // 나타날 때는 결과를 인지할 시간을 주고(느리게 끝남),
@@ -562,7 +566,10 @@
     #{v("easing-standard")}: cubic-bezier(0.2, 0, 0, 1); // 기능적 마이크로
     #{v("easing-enter")}: cubic-bezier(0, 0, 0.15, 1); // ease-out 계열
     #{v("easing-exit")}: cubic-bezier(0.35, 0, 1, 1); // ease-in 계열
-    #{v("easing-enter-emphasized")}: cubic-bezier(0.03, 0.4, 0.1, 1);
+    // 실측으로 고른 값이다. 300ms·60fps 프레임당 진행률 —
+    //   (0.03, 0.4, 0.1, 1)  첫 38% → 15.8%  두 번째에 2.4배로 급락한다
+    //   (0.16, 1, 0.3, 1)    첫 31% → 22.5%  완만하게 줄어든다
+    #{v("easing-enter-emphasized")}: cubic-bezier(0.16, 1, 0.3, 1);
     #{v("easing-exit-emphasized")}: cubic-bezier(0.35, 0, 0.95, 0.55);
 
     // ── 크기가 변하는 모션 전용 ★
@@ -626,6 +633,8 @@
       #{v("duration-4")}: 1ms;
       #{v("duration-5")}: 1ms;
       #{v("duration-6")}: 1ms;
+      #{v("duration-7")}: 1ms;
+      #{v("duration-8")}: 1ms;
     }
   }
 }
