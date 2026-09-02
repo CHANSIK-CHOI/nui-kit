@@ -63,8 +63,20 @@ function groupOf(name) {
 const groups = {};
 let count = 0;
 
+/**
+ * 같은 이름의 두 번째 선언은 버린다 — **첫 선언이 기본값**이다.
+ *
+ * `_seed.scss` 는 `prefers-reduced-motion: reduce` 블록에서 `duration-1~6` 을
+ * 1ms 로 다시 선언한다. 이걸 그대로 긁으면 문서에 duration 이 12줄로 나오고,
+ * 뒤 6줄은 값이 전부 1ms 라 소비자가 실제 기본값을 알 수 없다.
+ * React 도 key 중복으로 에러를 낸다.
+ */
+const seen = new Set();
+
 for (const m of scss.matchAll(TOKEN_RE)) {
   const [, name, rawValue, comment] = m;
+  if (seen.has(name)) continue;
+  seen.add(name);
   const value = rawValue
     .replace(/var\(#\{v\("([^"]+)"\)\}\)/g, (_, ref) => `var(--nui-${ref})`)
     .replace(/\s+/g, " ")

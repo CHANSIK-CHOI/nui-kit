@@ -26,41 +26,16 @@ export default function MotionPage() {
     <>
       <h1>모션</h1>
       <p className="doc-lead">
-        <strong>이 페이지가 정하는 것</strong> — 얼마나 오래, 어떤 곡선으로
-        움직이는가. <strong>무엇이 움직이는지 정하면 시간이 따라온다</strong> —
-        0.2초가 경계다.
+        얼마나 오래, 어떤 곡선으로 움직이는지 정한다. 무엇이 움직이는지 정하면
+        시간이 따라온다.
       </p>
 
-      <h2>시간 — 0.2초로 갈린다</h2>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>종류</th>
-              <th>시간</th>
-              <th>예</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">마이크로</th>
-              <td>
-                <code>duration-4</code>(200ms) <strong>이하</strong>
-              </td>
-              <td className="doc-wrap">버튼 눌림, 포커스, 색·테두리 전환</td>
-            </tr>
-            <tr>
-              <th scope="row">매크로</th>
-              <td>
-                <code>duration-4</code> <strong>초과</strong>
-              </td>
-              <td className="doc-wrap">
-                팝업 개폐, 시트 슬라이드, 페이지 전환
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <h2>시간</h2>
+      <p>
+        0.2초가 경계다. 버튼 눌림과 포커스, 색 전환 같은 마이크로 모션은{" "}
+        <code>duration-4</code> 이하를 쓴다. 팝업 개폐와 시트 슬라이드, 페이지
+        전환은 <code>duration-4</code> 를 넘는다.
+      </p>
 
       <div className="doc-example">
         <div className="doc-example__preview">
@@ -84,11 +59,11 @@ export default function MotionPage() {
         </p>
       </div>
 
-      <h2>곡선 — 나타남과 사라짐은 대칭이 아니다</h2>
+      <h2>곡선</h2>
       <p>
-        <strong>하나의 곡선으로 개폐 양방향을 처리하지 않는다.</strong> 나타날
-        때는 결과를 인지할 시간을 주고(천천히 끝남), 사라질 때는 이미 끝난 것에
-        시간을 쓰지 않는다(빠르게 끝남). 같은 곡선을 쓰면 이 차이가 사라진다.
+        나타날 때와 사라질 때 다른 곡선을 쓴다. 나타날 때는 천천히 끝나 결과를
+        인지할 시간을 준다. 사라질 때는 빠르게 끝나 이미 끝난 일에 시간을 쓰지
+        않는다. 하나의 곡선으로 양방향을 처리하면 이 차이가 사라진다.
       </p>
 
       <div className="doc-example">
@@ -151,23 +126,24 @@ export default function MotionPage() {
         </table>
       </div>
 
-      <h2>모션을 줄여달라는 요청을 지킨다</h2>
+      <h2>모션 줄이기</h2>
       <p>
-        OS 에서 <strong>&quot;동작 줄이기&quot;</strong> 를 켠 사용자에게는{" "}
-        <code>prefers-reduced-motion: reduce</code> 가 전달된다. 이때 모든{" "}
-        <code>duration-*</code> 토큰이 <strong>1ms 로 무력화</strong>된다.
+        OS 에서 동작 줄이기를 켜면 <code>prefers-reduced-motion: reduce</code>{" "}
+        가 전달되고 <code>duration</code> 토큰이 전부 1ms 가 된다. 라이브러리
+        컴포넌트는 이 설정을 따른다.
       </p>
+      <p>
+        커스텀 애니메이션에 시간을 하드코딩하면 이 장치를 우회한다.{" "}
+        <code>0.2s</code> 라고 직접 적는 대신 <code>duration</code> 토큰을
+        참조한다.
+      </p>
+
       <div className="doc-note doc-note--warn">
-        <strong>컴포넌트에서 시간을 하드코딩하면 이 장치를 우회한다.</strong>{" "}
-        <code>transition: 0.2s</code> 라고 쓰면 설정을 켠 사용자에게도 그대로
-        움직인다. 반드시 <code>--nui-duration-*</code> 을 쓴다.
-        <br />
-        <br />
         <strong>framer-motion 은 CSS 토큰을 읽지 않는다.</strong>{" "}
         <code>reducedMotion</code> 기본값이 <code>&quot;never&quot;</code> 라{" "}
-        <code>useReducedMotion()</code> 으로 분기하지 않으면 설정이{" "}
-        <strong>조용히 무시된다.</strong> Popup · Toast · Tooltip 이 실제로
-        그랬다.
+        <code>useReducedMotion()</code> 으로 분기해야 설정이 반영된다.
+        라이브러리의 <code>Popup</code> 과 <code>Toast</code>,{" "}
+        <code>Tooltip</code> 은 분기해 두었다.
       </div>
 
       <pre className="doc-code">
@@ -181,19 +157,22 @@ export default function MotionPage() {
 
       <h2>눌림 배율</h2>
       <p>
-        <strong>큰 요소일수록 덜 줄여야 같은 정도로 눌린 느낌이 난다.</strong>{" "}
-        전면 버튼을 0.95 로 줄이면 과하게 움츠러들고, 작은 칩을 0.98 로 줄이면
-        티가 안 난다.
+        큰 요소일수록 덜 줄여야 같은 정도로 눌린 느낌이 난다. 전면 버튼을 0.95
+        로 줄이면 과하게 움츠러들고 작은 칩을 0.98 로 줄이면 티가 안 난다.
       </p>
       <TokenTable group="etc" only="scale-" swatch={false} />
+
+      <div className="doc-note doc-note--warn">
+        <strong>컴포넌트는 아직 눌림 배율 토큰을 참조하지 않는다.</strong>{" "}
+        <code>Button</code> 은 <code>translateY</code> 로, <code>Select</code>{" "}
+        와 <code>Textfield</code>, <code>Popup</code> 은 원시값{" "}
+        <code>scale</code> 로 눌림을 표현한다. 두 방식을 토큰으로 모으는 작업이
+        남아 있다.
+      </div>
+
       <p>
         투명도로 상태를 표현하는 값(<code>opacity-*</code>)은{" "}
         <Link href="/foundations/state">상태</Link> 문서에 있다.
-      </p>
-      <p className="doc-note">
-        ⏸️ <strong>아직 토큰만 있다.</strong> 컴포넌트는 지금{" "}
-        <code>transform: translateY(1px)</code> 로 눌림을 표현한다. 바꾸면
-        화면이 달라지므로 컴포넌트 반영 단계에서 일괄로 옮긴다.
       </p>
 
       <h2>전체 토큰</h2>
