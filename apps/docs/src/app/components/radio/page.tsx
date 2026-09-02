@@ -1,4 +1,4 @@
-import { PropsTable } from "@/components/PropsTable";
+import { PropsTable } from "@/components/guide";
 import { RadioDemo } from "./RadioDemo";
 
 export const metadata = { title: "Radio" };

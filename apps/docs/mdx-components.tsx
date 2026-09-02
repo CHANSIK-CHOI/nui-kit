@@ -1,5 +1,5 @@
 import type { MDXComponents } from "mdx/types";
-import { CodeBlock } from "@/components/CodeBlock";
+import { CodeBlock } from "@/components/guide";
 
 /**
  * MDX 전역 컴포넌트 매핑. App Router 에서 @next/mdx 를 쓰려면

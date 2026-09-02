@@ -11,7 +11,7 @@ import {
   useLayerPopup,
   type LayerPopupComponentProps,
 } from "@chansikchoi/next-ui/popup";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 /** 명령형으로 등록할 팝업 내용. PopupHost 가 런타임 props 를 주입한다. */
 function ProfilePopup({

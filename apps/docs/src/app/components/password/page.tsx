@@ -1,7 +1,7 @@
 import { Field, FieldLabel } from "@chansikchoi/next-ui";
 import { Password } from "@chansikchoi/next-ui/textfield";
-import { Example } from "@/components/Example";
-import { PropsTable } from "@/components/PropsTable";
+import { Example } from "@/components/guide";
+import { PropsTable } from "@/components/guide";
 
 export const metadata = { title: "Password" };
 

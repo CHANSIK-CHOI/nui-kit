@@ -1,4 +1,4 @@
-import { PropsTable } from "@/components/PropsTable";
+import { PropsTable } from "@/components/guide";
 import { AccordionDemo } from "./AccordionDemo";
 
 export const metadata = { title: "Accordion" };

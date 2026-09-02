@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HookTable, HOOK_COUNT } from "@/components/HookTable";
+import { HookTable, HOOK_COUNT } from "@/components/guide";
 
 export const metadata = { title: "커스터마이징" };
 

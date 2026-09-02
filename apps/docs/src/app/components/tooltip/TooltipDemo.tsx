@@ -8,7 +8,7 @@ import {
   type TooltipPlacement,
 } from "@chansikchoi/next-ui";
 import { DelIcon } from "@chansikchoi/next-ui/icon";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 const PLACEMENTS: TooltipPlacement[] = [
   "topLeft",

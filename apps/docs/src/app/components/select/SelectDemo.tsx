@@ -9,7 +9,7 @@ import {
   type SelectOption,
   type SingleSelectValue,
 } from "@chansikchoi/next-ui";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 const CITIES: SelectOption[] = [
   { label: "서울", value: "seoul" },

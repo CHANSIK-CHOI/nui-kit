@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { Button, Field, type SelectOption } from "@chansikchoi/next-ui";
 import { RHFMultiSelect, RHFSelect } from "@chansikchoi/next-ui/rhf";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 const CITIES: SelectOption[] = [
   { label: "서울", value: "seoul" },

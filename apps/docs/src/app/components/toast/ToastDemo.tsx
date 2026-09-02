@@ -2,7 +2,7 @@
 
 import { Button } from "@chansikchoi/next-ui";
 import { useToast } from "@chansikchoi/next-ui/toast";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 export function ToastDemo() {
   const toast = useToast();

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import tokens from "@/generated/tokens.json";
-import { HOOK_COUNT } from "@/components/HookTable";
+import { HOOK_COUNT } from "@/components/guide";
 
 export const metadata = { title: "Foundations" };
 

@@ -1,5 +1,5 @@
-import { HookTable } from "@/components/HookTable";
-import { PropsTable } from "@/components/PropsTable";
+import { HookTable } from "@/components/guide";
+import { PropsTable } from "@/components/guide";
 import { SelectDemo } from "./SelectDemo";
 import { RHFSelectDemo } from "./RHFSelectDemo";
 

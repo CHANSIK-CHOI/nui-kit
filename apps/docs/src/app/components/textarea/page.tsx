@@ -1,8 +1,8 @@
 import { Field, FieldLabel } from "@chansikchoi/next-ui";
 import { Textarea } from "@chansikchoi/next-ui/textarea";
-import { Example } from "@/components/Example";
-import { HookTable } from "@/components/HookTable";
-import { PropsTable } from "@/components/PropsTable";
+import { Example } from "@/components/guide";
+import { HookTable } from "@/components/guide";
+import { PropsTable } from "@/components/guide";
 
 export const metadata = { title: "Textarea" };
 

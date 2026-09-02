@@ -1,5 +1,5 @@
-import { HookTable } from "@/components/HookTable";
-import { PropsTable } from "@/components/PropsTable";
+import { HookTable } from "@/components/guide";
+import { PropsTable } from "@/components/guide";
 import { TooltipDemo } from "./TooltipDemo";
 
 export const metadata = { title: "Tooltip" };

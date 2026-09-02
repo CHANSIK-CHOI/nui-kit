@@ -233,6 +233,60 @@ body {
   align-items: center;
 }
 
+// 케이스 격자 — 라벨과 실물을 묶어 어느 것이 어느 옵션인지 드러낸다.
+.doc-case-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.doc-case {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.doc-case__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.doc-case__label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+  font-size: var(--nui-font-size-1);
+  color: var(--nui-text-secondary);
+}
+
+.doc-case__note {
+  color: var(--nui-text-tertiary, var(--nui-text-secondary));
+}
+
+// 두 축 조합표 — 셀 안에 실물이 들어간다.
+.doc-matrix td {
+  vertical-align: middle;
+}
+
+// 예제 안의 대표 코드. 바깥 .doc-code 와 달리 예제 상자에 붙는다.
+.doc-example__code {
+  margin: 0;
+  padding: 12px 16px;
+  border-top: 1px solid var(--doc-border);
+  background: var(--doc-bg-code, var(--doc-bg-subtle));
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--nui-font-size-1);
+  line-height: var(--nui-line-height-1);
+  color: var(--nui-text-primary);
+}
+
 .doc-example__caption {
   padding: 8px 12px;
   border-top: 1px solid var(--doc-border);

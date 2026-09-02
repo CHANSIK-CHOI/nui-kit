@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Checkbox, CheckboxGroup, Field } from "@chansikchoi/next-ui";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 const OPTIONS = [
   { value: "email", label: "이메일" },

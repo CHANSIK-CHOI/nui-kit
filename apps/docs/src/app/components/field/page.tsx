@@ -6,8 +6,8 @@ import {
   FieldItem,
 } from "@chansikchoi/next-ui";
 import { Textfield } from "@chansikchoi/next-ui/textfield";
-import { Example } from "@/components/Example";
-import { PropsTable } from "@/components/PropsTable";
+import { Example } from "@/components/guide";
+import { PropsTable } from "@/components/guide";
 
 export const metadata = { title: "Field" };
 

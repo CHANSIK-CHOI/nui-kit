@@ -1,4 +1,4 @@
-import { PropsTable } from "@/components/PropsTable";
+import { PropsTable } from "@/components/guide";
 import { SwitchDemo } from "./SwitchDemo";
 
 export const metadata = { title: "Switch" };

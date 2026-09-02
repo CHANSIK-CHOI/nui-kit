@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Field, Radio, RadioGroup } from "@chansikchoi/next-ui";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 const OPTIONS = [
   { value: "card", label: "신용카드" },

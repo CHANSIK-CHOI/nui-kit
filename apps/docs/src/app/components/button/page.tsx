@@ -1,36 +1,49 @@
+import Link from "next/link";
 import {
   Button,
   IconButton,
   ButtonGroup,
   ButtonGroupItem,
+  ButtonLink,
 } from "@chansikchoi/next-ui";
 import { DelIcon } from "@chansikchoi/next-ui/icon";
-import { Example } from "@/components/Example";
-import { HookTable } from "@/components/HookTable";
-import { PropsTable } from "@/components/PropsTable";
+import {
+  GuideHeader,
+  Case,
+  CaseGrid,
+  CaseMatrix,
+  Example,
+  HookTable,
+  PropsTable,
+} from "@/components/guide";
 
 export const metadata = { title: "Button" };
+
+/** 축은 소스 타입과 같은 순서로 둔다 — packages/ui/src/components/Button/Button.tsx */
+const COLORS = ["neutral", "primary", "danger", "warning"] as const;
+const VARIANTS = ["solid", "line", "text"] as const;
+const SIZES = [
+  ["large", "56px"],
+  ["medium", "48px"],
+  ["small", "36px"],
+] as const;
 
 export default function ButtonPage() {
   return (
     <>
-      <h1>Button</h1>
-      <p className="doc-lead">
-        누르는 동작을 담는다. <code>color</code> · <code>variant</code> ·{" "}
-        <code>shape</code> · <code>size</code> 를 조합한다.
-      </p>
+      <GuideHeader
+        title="Button"
+        named={["Button", "IconButton", "ButtonGroup", "ButtonLink"]}
+        subpath="button"
+      >
+        누르는 동작을 담는다.
+      </GuideHeader>
 
-      <pre className="doc-code">
-        <code>{`import { Button } from "@chansikchoi/next-ui";
-import "@chansikchoi/next-ui/styles/button.css"; // 온디맨드일 때`}</code>
-      </pre>
-
-      <h2>레이아웃 — 기본이 전체 너비다</h2>
+      <h2>기본이 전체 너비다</h2>
       <p>
-        <code>Button</code> 은 <code>width: 100%</code> 다. 모바일 우선 폼을
-        전제로 한 기본값이라, 아래 예제에서도 버튼이 한 줄을 모두 차지한다.
-        너비를 제어하려면 <strong>바깥 컨테이너로 감싸거나</strong>{" "}
-        <code>ButtonGroup</code> 을 쓴다.
+        <code>Button</code> 은 <code>width: 100%</code> 다. 모바일 폼을 전제로 한
+        기본값이라 아래 예제에서도 한 줄을 모두 차지한다. 너비를 제한하려면 바깥
+        컨테이너로 감싸거나 <code>ButtonGroup</code> 을 쓴다.
       </p>
       <Example row={false} caption="컨테이너로 너비를 제한한 예">
         <div style={{ display: "flex", gap: 8, maxWidth: 320 }}>
@@ -39,71 +52,206 @@ import "@chansikchoi/next-ui/styles/button.css"; // 온디맨드일 때`}</code>
         </div>
       </Example>
 
-      <h2>색상</h2>
+      <h2>색과 변형</h2>
       <p>
-        색이 아니라 <strong>역할</strong>이 이름이다. 기본은{" "}
-        <code>neutral</code>, 가장 중요한 액션에는 <code>primary</code>, 되돌릴
-        수 없는 액션(삭제·탈퇴)에는 <code>danger</code>, 확인이 필요한 액션에는{" "}
-        <code>warning</code> 을 쓴다.
+        색이 아니라 <strong>역할</strong>이 이름이다. 화면의 주 행동에는{" "}
+        <code>primary</code>, 되돌릴 수 없는 삭제나 탈퇴에는 <code>danger</code>,
+        확인이 필요한 진행에는 <code>warning</code> 을 쓴다.
       </p>
-      <Example caption="color: neutral | primary | danger | warning">
-        <Button>neutral</Button>
-        <Button color="primary">primary</Button>
-        <Button color="danger">danger</Button>
-        <Button color="warning">warning</Button>
-      </Example>
+      <CaseMatrix
+        rows={VARIANTS}
+        cols={COLORS}
+        caption="variant × color 12조합"
+        code={`<Button variant="line" color="danger">삭제</Button>`}
+        render={(variant, color) => (
+          <div style={{ minWidth: 108 }}>
+            <Button
+              {...(variant === "text"
+                ? { variant: "text" as const }
+                : { variant })}
+              color={color}
+            >
+              라벨
+            </Button>
+          </div>
+        )}
+      />
+      <div className="doc-note">
+        <code>warning</code> 만 글자가 어둡다. 노랑 배경에 흰 글자는 대비가 크게
+        미달한다.
+      </div>
 
-      <h2>변형</h2>
-      <p>
-        <code>solid</code> 는 채움, <code>line</code> 은 테두리,{" "}
-        <code>text</code> 는 배경 없는 형태다. <code>text</code> 는 크기·모양
-        옵션을 갖지 않는다.
-      </p>
-      <Example caption="variant: solid | line | text">
-        <Button color="primary">solid</Button>
-        <Button color="primary" variant="line">
-          line
-        </Button>
-        <Button variant="text">text</Button>
-      </Example>
+      <h2>크기</h2>
+      <CaseGrid
+        columns={3}
+        caption="size: large | medium(기본) | small"
+        code={`<Button size="large">라벨</Button>`}
+      >
+        {SIZES.map(([size, px]) => (
+          <Case key={size} label={size} note={px}>
+            <Button size={size}>라벨</Button>
+          </Case>
+        ))}
+      </CaseGrid>
 
-      <h2>모양과 크기</h2>
-      <Example caption="shape: square | round · size: large | medium(기본) | small">
-        <Button color="primary" shape="round">
-          round
-        </Button>
-        <Button size="large">large</Button>
-        <Button size="medium">medium</Button>
-        <Button size="small">small</Button>
-      </Example>
+      <h2>모양</h2>
+      <CaseGrid
+        columns={2}
+        caption="shape: square(기본) | round"
+        code={`<Button shape="round" color="primary">라벨</Button>`}
+      >
+        <Case label="square" note="기본">
+          <Button color="primary" shape="square">
+            라벨
+          </Button>
+        </Case>
+        <Case label="round" note="양끝이 반원">
+          <Button color="primary" shape="round">
+            라벨
+          </Button>
+        </Case>
+      </CaseGrid>
+
+      <div className="doc-note doc-note--warn">
+        <code>variant=&quot;text&quot;</code> 는 크기와 모양 옵션이 없다.{" "}
+        <strong>타입이 막는다</strong> — <code>size</code> 와{" "}
+        <code>shape</code> 가 <code>never</code> 로 선언되어 있다.
+      </div>
 
       <h2>아이콘</h2>
-      <Example caption="icon prop 으로 라벨 앞에 아이콘을 넣는다">
-        <Button icon={<DelIcon />}>삭제</Button>
-        <Button icon={<DelIcon />} size="small" variant="line">
-          삭제
-        </Button>
-      </Example>
+      <p>
+        <code>icon</code> prop 으로 라벨 앞에 넣는다.
+      </p>
+      <CaseGrid
+        columns={3}
+        caption="아이콘 크기는 버튼 크기를 따라간다"
+        code={`<Button icon={<DelIcon />}>삭제</Button>`}
+      >
+        {SIZES.map(([size]) => (
+          <Case key={size} label={`icon + ${size}`}>
+            <Button icon={<DelIcon />} size={size}>
+              삭제
+            </Button>
+          </Case>
+        ))}
+      </CaseGrid>
 
       <h2>비활성</h2>
-      <Example caption="disabled 는 solid · line 모두 대응한다">
-        <Button disabled>disabled</Button>
-        <Button variant="line" disabled>
-          disabled
-        </Button>
+      <CaseGrid
+        columns={3}
+        caption="disabled — 세 변형 모두 대응한다"
+        code={`<Button disabled>라벨</Button>`}
+      >
+        {VARIANTS.map((variant) => (
+          <Case key={variant} label={`${variant} + disabled`}>
+            <Button
+              {...(variant === "text"
+                ? { variant: "text" as const }
+                : { variant })}
+              color="primary"
+              disabled
+            >
+              라벨
+            </Button>
+          </Case>
+        ))}
+      </CaseGrid>
+
+      <h2>IconButton</h2>
+      <p>
+        아이콘만 담는 정사각 버튼이다. <code>aria-label</code> 을 반드시 준다.
+        없으면 스크린리더가 읽을 것이 없다. <code>variant</code> 는{" "}
+        <code>solid</code> 와 <code>line</code> 둘뿐이다.
+      </p>
+      <CaseGrid
+        columns={3}
+        caption="크기 3 × 변형 2 + disabled"
+        code={`<IconButton aria-label="삭제"><DelIcon /></IconButton>`}
+      >
+        {SIZES.map(([size, px]) => (
+          <Case key={size} label={size} note={px}>
+            <IconButton aria-label="삭제" size={size}>
+              <DelIcon />
+            </IconButton>
+            <IconButton
+              aria-label="삭제"
+              size={size}
+              variant="line"
+              color="primary"
+            >
+              <DelIcon />
+            </IconButton>
+          </Case>
+        ))}
+        <Case label="disabled">
+          <IconButton aria-label="삭제" disabled>
+            <DelIcon />
+          </IconButton>
+          <IconButton aria-label="삭제" variant="line" disabled>
+            <DelIcon />
+          </IconButton>
+        </Case>
+      </CaseGrid>
+
+      <h2>ButtonGroup</h2>
+      <p>
+        기본은 균등 분할이다. <code>shouldAutoWidth</code> 를 주면 그 항목만
+        내용 폭이 된다.
+      </p>
+      <Example row={false} caption="균등 분할 — 기본">
+        <ButtonGroup>
+          <ButtonGroupItem>
+            <Button variant="line">취소</Button>
+          </ButtonGroupItem>
+          <ButtonGroupItem>
+            <Button color="primary">확인</Button>
+          </ButtonGroupItem>
+        </ButtonGroup>
       </Example>
+      <Example row={false} caption="shouldAutoWidth — 왼쪽만 내용 폭">
+        <ButtonGroup>
+          <ButtonGroupItem shouldAutoWidth>
+            <Button variant="line">취소</Button>
+          </ButtonGroupItem>
+          <ButtonGroupItem>
+            <Button color="primary">확인</Button>
+          </ButtonGroupItem>
+        </ButtonGroup>
+      </Example>
+
+      <h2>ButtonLink</h2>
+      <p>
+        생김새는 <code>Button</code> 과 같다. 누르는 대신 이동한다.{" "}
+        <code>next/link</code> 를 쓰는 유일한 컴포넌트라 <code>next</code> 가
+        optional peer 다. 이 컴포넌트를 쓰지 않으면 설치할 필요가 없다.
+      </p>
+      <CaseGrid
+        columns={2}
+        caption="href 가 필수다"
+        code={`<ButtonLink href="/components" color="primary">목록</ButtonLink>`}
+      >
+        <Case label="solid">
+          <ButtonLink href="/components" color="primary">
+            컴포넌트 목록
+          </ButtonLink>
+        </Case>
+        <Case label="line">
+          <ButtonLink href="/components" variant="line">
+            컴포넌트 목록
+          </ButtonLink>
+        </Case>
+      </CaseGrid>
 
       <h2>커스터마이징</h2>
       <p>
-        <strong>색은 컴포넌트별로 열지 않는다.</strong> 배경과 글자는 짝이라
-        배경만 바꾸면 대비가 깨지는데 화면에 드러나지 않는다. 버튼 하나의 색을
-        바꿔야 하면 <code>className</code> 을, 전체 톤을 바꿔야 하면{" "}
-        <code>--nui-action-*</code> 역할 토큰을 쓴다 —{" "}
-        <a href="/foundations/color#change">색 문서</a>에 자세히 있다.
+        색은 컴포넌트별로 열지 않는다. 배경과 글자는 짝이라 배경만 바꾸면 대비가
+        깨지는데 화면에 드러나지 않는다. 버튼 하나의 색을 바꾸려면{" "}
+        <code>className</code> 을, 화면 전체를 바꾸려면{" "}
+        <Link href="/brand-colors">브랜드 프리셋</Link>을 쓴다.
       </p>
       <p>
-        치수는 <strong>크기 옵션마다 이름이 따로</strong> 있다. 하나로 두면 값을
-        넣는 순간 large · medium · small 이 전부 같은 높이가 된다.
+        치수는 크기 옵션마다 이름이 따로 있다. 하나로 두면 값을 넣는 순간 세
+        크기가 전부 같아진다.
       </p>
       <Example caption="large 만 높이를 바꾼다 — medium 은 그대로다">
         <div
@@ -121,35 +269,6 @@ import "@chansikchoi/next-ui/styles/button.css"; // 온디맨드일 때`}</code>
       </Example>
       <HookTable group="button" />
 
-      <h2>IconButton</h2>
-      <p>
-        아이콘만 담는 정사각 버튼이다. <strong>접근 이름을 반드시 준다</strong>{" "}
-        — <code>aria-label</code> 이 없으면 스크린리더가 읽을 것이 없다.
-      </p>
-      <Example caption="IconButton — aria-label 필수">
-        <IconButton aria-label="삭제">
-          <DelIcon />
-        </IconButton>
-        <IconButton aria-label="삭제" variant="line" color="primary">
-          <DelIcon />
-        </IconButton>
-        <IconButton aria-label="삭제" size="small">
-          <DelIcon />
-        </IconButton>
-      </Example>
-
-      <h2>ButtonGroup</h2>
-      <Example caption="ButtonGroup — 기본은 균등 분할" row={false}>
-        <ButtonGroup>
-          <ButtonGroupItem>
-            <Button variant="line">취소</Button>
-          </ButtonGroupItem>
-          <ButtonGroupItem>
-            <Button color="primary">확인</Button>
-          </ButtonGroupItem>
-        </ButtonGroup>
-      </Example>
-
       <h2>API</h2>
       <h3>Button</h3>
       <PropsTable of="Button" />
@@ -160,11 +279,6 @@ import "@chansikchoi/next-ui/styles/button.css"; // 온디맨드일 때`}</code>
       <h3>ButtonGroup.Item</h3>
       <PropsTable of="ButtonGroup.Item" />
       <h3>ButtonLink</h3>
-      <p className="doc-note">
-        <code>ButtonLink</code> 만 <code>next/link</code> 를 쓴다.{" "}
-        <code>next</code> 는 optional peer 이므로 이 컴포넌트를 쓰지 않으면
-        설치할 필요가 없다.
-      </p>
       <PropsTable of="ButtonLink" />
     </>
   );

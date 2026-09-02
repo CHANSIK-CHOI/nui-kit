@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Accordion, Button, Field, Textfield } from "@chansikchoi/next-ui";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 const FAQ = [
   {

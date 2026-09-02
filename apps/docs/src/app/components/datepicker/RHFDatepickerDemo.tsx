@@ -8,7 +8,7 @@ import {
   RHFDatepicker,
 } from "@chansikchoi/next-ui/rhf";
 import type { DateRange } from "react-day-picker";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 type FormValues = {
   visitDate: Date | undefined;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Field, Textfield } from "@chansikchoi/next-ui";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 /** 값 소유가 필요한 예제이므로 Client Component 로 분리한다. */
 export function TextfieldDemo() {

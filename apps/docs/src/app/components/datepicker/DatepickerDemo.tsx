@@ -8,7 +8,7 @@ import {
   Field,
 } from "@chansikchoi/next-ui";
 import type { DateRange } from "react-day-picker";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 const TODAY = new Date();
 

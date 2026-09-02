@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Field, Switch } from "@chansikchoi/next-ui";
-import { Example } from "@/components/Example";
+import { Example } from "@/components/guide";
 
 export function SwitchDemo() {
   const [on, setOn] = useState(true);

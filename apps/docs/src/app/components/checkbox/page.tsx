@@ -1,4 +1,4 @@
-import { PropsTable } from "@/components/PropsTable";
+import { PropsTable } from "@/components/guide";
 import { CheckboxDemo } from "./CheckboxDemo";
 
 export const metadata = { title: "Checkbox" };
