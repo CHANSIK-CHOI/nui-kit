@@ -565,6 +565,20 @@
     #{v("easing-enter-emphasized")}: cubic-bezier(0.03, 0.4, 0.1, 1);
     #{v("easing-exit-emphasized")}: cubic-bezier(0.35, 0, 0.95, 0.55);
 
+    // ── 크기가 변하는 모션 전용 ★
+    //
+    // 높이·너비가 늘어나는 것은 페이드·이동과 다르다. **매 프레임 아래 요소를
+    // 밀어내므로** 한 프레임의 변화량이 크면 눈에 띄게 튄다.
+    //
+    // 실측(62px · 250ms · 60fps)의 프레임당 최대 증분 —
+    //   easing-enter            15px  (첫 프레임에 24% 가 열린다)
+    //   easing-standard         14px
+    //   easing-expand            8px  ← 가장 고르다
+    //
+    // `easing-enter` 는 팝업이 나타날 때를 위한 곡선이다. 초반이 가팔라서
+    // 크기 변화에 쓰면 "훅 뛰었다가 기어가는" 느낌이 된다.
+    #{v("easing-expand")}: cubic-bezier(0.5, 1, 0.89, 1);
+
     // ── 눌림 — 배율·시간·곡선 세 축이 한 세트다 ★
     //
     // 치수·모션 primitive 에는 역할 계층을 두지 않는 것이 원칙인데(tokens.md §1-1),

@@ -83,9 +83,20 @@ export const motionTransition = {
     duration: motionDuration.slow,
     ease: motionEase.emphasized,
   } satisfies Transition,
+  // 접힘/펼침 — 높이가 움직이므로 팝업 개폐에 가까운 매크로 모션이다.
+  //
+  // ⚠️ 이 둘만 SCSS 값과 정확히 맞다. 위쪽 항목들은 아직 어긋나 있다 —
+  //    `motionEase.emphasized` 는 SCSS 의 `easing-enter-emphasized`
+  //    (0.03, 0.4, 0.1, 1) 와 다르고, `quick`·`fast`·`measured`·`relaxed` 는
+  //    SCSS duration 스케일(50·100·150·200·250·300ms)에 없는 값이다.
+  //    전체 정합은 별도로 다룬다.
   collapse: {
-    duration: motionDuration.quick,
-    ease: motionEase.linear,
+    duration: 0.25, // --nui-duration-5
+    ease: [0.5, 1, 0.89, 1], // --nui-easing-expand
+  } satisfies Transition,
+  collapseExit: {
+    duration: 0.2, // --nui-duration-4
+    ease: [0.35, 0, 1, 1], // --nui-easing-exit
   } satisfies Transition,
 } as const;
 
