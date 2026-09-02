@@ -153,6 +153,9 @@ const DEPRECATED = {
   "surface-panel-muted": "layer-floating-muted",
   "surface-inverse": "layer-inverse",
   "surface-overlay-dim": "layer-overlay",
+  // 눌림 배율을 컴포넌트 실측(0.94 · 0.96)에 맞추며 이름이 함께 옮겨갔다.
+  "scale-95": "scale-94",
+  "scale-97": "scale-96",
 };
 
 /** `typo()` / `motion()` 믹스인이 이름을 조립할 때 쓰는 구 스케일 키 */

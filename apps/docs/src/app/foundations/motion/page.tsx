@@ -155,15 +155,51 @@ export default function MotionPage() {
 />`}</code>
       </pre>
 
-      <h2>눌림 배율</h2>
+      <h2>눌림</h2>
       <p>
-        큰 요소일수록 덜 줄여야 같은 정도로 눌린 느낌이 난다. 전면 버튼을 0.95
-        로 줄이면 과하게 움츠러들고 작은 칩을 0.98 로 줄이면 티가 안 난다.
+        눌림은 배율과 시간, 곡선 세 축을 함께 쓴다. 하나만 골라 쓰면 같은 눌림이
+        컴포넌트마다 다르게 느껴진다.
+      </p>
+      <div className="doc-table-wrap">
+        <table className="doc-table">
+          <thead>
+            <tr>
+              <th>축</th>
+              <th>토큰</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">변형량</th>
+              <td className="doc-wrap">
+                <span className="doc-token-name">--nui-scale-94</span> 작은 요소
+                · <span className="doc-token-name">-96</span> 중간 ·{" "}
+                <span className="doc-token-name">-98</span> 큰 요소
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">시간</th>
+              <td>
+                <span className="doc-token-name">--nui-duration-pressed</span>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">곡선</th>
+              <td>
+                <span className="doc-token-name">--nui-easing-pressed</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        큰 요소일수록 덜 줄여야 같은 정도로 눌린 느낌이 난다. 전면 버튼을 0.94
+        로 줄이면 과하게 움츠러들고 작은 버튼을 0.98 로 줄이면 티가 안 난다.
       </p>
       <TokenTable group="etc" only="scale-" swatch={false} />
 
       <div className="doc-note doc-note--warn">
-        <strong>컴포넌트는 아직 눌림 배율 토큰을 참조하지 않는다.</strong>{" "}
+        <strong>컴포넌트는 아직 이 토큰을 참조하지 않는다.</strong>{" "}
         <code>Button</code> 은 <code>translateY</code> 로, <code>Select</code>{" "}
         와 <code>Textfield</code>, <code>Popup</code> 은 원시값{" "}
         <code>scale</code> 로 눌림을 표현한다. 두 방식을 토큰으로 모으는 작업이
