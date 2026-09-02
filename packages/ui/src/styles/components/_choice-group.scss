@@ -9,7 +9,7 @@
   #{cls("checkbox-group")},
   #{cls("radio-group")} {
     display: flex;
-    gap: var(#{v("space-3")});
+    gap: var(#{v("space-component-gap")});
 
     &--row {
       flex-direction: row;

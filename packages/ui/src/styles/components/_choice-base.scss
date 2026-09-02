@@ -58,7 +58,7 @@
       justify-content: center;
       width: 100%;
       height: 100%;
-      color: var(#{v("text-inverse-strong")});
+      color: var(#{v("text-on-accent")});
       background-color: var(#{v("control-bg")});
       // 세 컨트롤이 이 __control 골격을 함께 쓴다. selector-size 와 같은 이유로
       // 두께도 하나로 묶는다 — 컴포넌트별로 쪼개면 같은 골격이 서로 다른 두께가 된다.
@@ -75,11 +75,13 @@
       @include motion((opacity, transform, background-color));
     }
 
-    &:not(#{state("disabled")}):not(#{state("readonly")}):not(
-        #{state("error")}
-      ):hover
-      &__control {
-      border-color: var(#{v("control-accent")});
+    @include hoverable {
+      &:not(#{state("disabled")}):not(#{state("readonly")}):not(
+          #{state("error")}
+        ):hover
+        &__control {
+        border-color: var(#{v("control-accent")});
+      }
     }
 
     &#{state("error")} &__control {

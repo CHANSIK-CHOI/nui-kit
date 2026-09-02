@@ -31,7 +31,8 @@
     }
 
     &--box &__item {
-      background: var(#{v("gradient-panel-soft")});
+      // 카드 표면 — design-system.md §2-5-1. 그라디언트는 쓰지 않는다.
+      background: var(#{v("layer-default")});
       border: #{hook("accordion-border-width", var(#{v("border-width-1")}))}
         solid var(#{v("border-form")});
       border-radius: #{hook("accordion-radius", var(#{v("radius-4")}))};
@@ -74,14 +75,23 @@
 
       @include motion((background-color, color));
 
+      // `overflow: hidden` 항목 안이라 바깥 offset 이 잘린다. 안쪽으로 그리는
+      // 문서화된 유일한 예외다 — design-system.md §4-1. 숫자를 적지 않는다.
       &:focus-visible {
         outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
-        outline-offset: -2px;
+        outline-offset: calc(-1 * var(#{v("focus-width")}));
       }
 
-      &:not(#{cls("accordion")}__button--icon):not(:disabled):hover
+      @include hoverable {
+        &:not(#{cls("accordion")}__button--icon):not(:disabled):hover
+          #{cls("accordion")}__head {
+          background-color: var(#{v("control-bg-hover")});
+        }
+      }
+
+      &:not(#{cls("accordion")}__button--icon):not(:disabled):active
         #{cls("accordion")}__head {
-        background-color: var(#{v("control-bg-hover")});
+        background-color: var(#{v("control-bg-active")});
       }
     }
 
@@ -143,14 +153,25 @@
       height: var(#{v("size-control-md")});
       margin-top: 0.0625rem;
       color: var(#{v("text-secondary")});
-      background: var(#{v("layer-floating-muted")});
+      // 카드 위에 얹는 은은한 면 — layer 가 아니라 surface 다 (design-system.md §2-5)
+      background: var(#{v("surface-neutral-soft")});
       border-radius: var(#{v("radius-full")});
     }
 
-    &__button--icon:not(:disabled):hover,
+    @include hoverable {
+      &__button--icon:not(:disabled):hover {
+        color: var(#{v("text-primary")});
+        background: var(#{v("control-bg-hover")});
+      }
+    }
+
     &__button--icon:not(:disabled):focus-visible {
       color: var(#{v("text-primary")});
       background: var(#{v("control-bg-hover")});
+    }
+
+    &__button--icon:not(:disabled):active {
+      background: var(#{v("control-bg-active")});
     }
 
     &__arrow-icon {
@@ -183,12 +204,13 @@
     &__panel-box {
       display: flex;
       flex-direction: column;
-      gap: var(#{v("space-3")});
+      gap: var(#{v("space-component-gap")});
       padding: var(#{v("space-panel-compact")}) var(#{v("space-panel-card")})
         var(#{v("space-panel-card")});
       color: var(#{v("text-secondary")});
+      // 헤더/본문 경계 — 한 화면에 한두 번 나오는 의미경계선 (design-system.md §2-6)
       border-top: #{hook("accordion-border-width", var(#{v("border-width-1")}))}
-        solid var(#{v("control-border-disabled")});
+        solid var(#{v("border-section")});
 
       @include typo(3, "regular");
 

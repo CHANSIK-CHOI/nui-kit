@@ -42,7 +42,7 @@
 
     &__content {
       display: block;
-      color: var(#{v("text-inverse-strong")});
+      color: var(#{v("text-on-inverse")});
       white-space: normal;
       word-break: keep-all;
 
@@ -51,8 +51,9 @@
 
     &__arrow {
       position: absolute;
-      width: var(#{v("size-icon-sm")});
-      height: var(#{v("size-icon-sm")});
+      // 화살표는 아이콘이 아니라 점·표시 크기다 — design-system.md §5-2
+      width: var(#{v("size-dot-md")});
+      height: var(#{v("size-dot-md")});
       background-color: var(#{v("layer-inverse")});
       transform: rotate(45deg);
     }

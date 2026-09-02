@@ -118,8 +118,16 @@
     }
 
     // ── interaction
-    &:not(#{state("disabled")}):not(#{state("readonly")}):hover &__wrap {
-      border-color: var(#{v("control-border-hover")});
+    @include hoverable {
+      &:not(#{state("disabled")}):not(#{state("readonly")}):hover &__wrap {
+        border-color: var(#{v("control-border-hover")});
+      }
+
+      // 지우기·표시 버튼은 표면 hover 부류다 — design-system.md §2-3
+      &:not(#{state("disabled")}):not(#{state("readonly")}) &__btn:hover {
+        color: var(#{v("control-icon-strong")});
+        background-color: var(#{v("control-bg-hover")});
+      }
     }
 
     &:not(#{state("disabled")}):not(#{state("readonly")}):focus-within &__wrap {
@@ -128,12 +136,8 @@
       box-shadow: var(#{v("focus-ring")});
     }
 
-    &:not(#{state("disabled")}):not(#{state("readonly")}) &__btn:hover {
-      color: var(#{v("control-icon-strong")});
-      background-color: var(#{v("control-bg-subtle")});
-    }
-
     &:not(#{state("disabled")}):not(#{state("readonly")}) &__btn:active {
+      background-color: var(#{v("control-bg-active")});
       // 작은 아이콘 버튼 — design-system.md §6-3
       transform: scale(var(#{v("scale-94")}));
     }
@@ -191,9 +195,13 @@
       color: var(#{v("control-text-error")});
     }
 
-    &#{state("error")}:not(#{state("disabled")}):not(#{state("readonly")}):hover
-      &__wrap {
-      border-color: var(#{v("control-border-error")});
+    @include hoverable {
+      &#{state("error")}:not(#{state("disabled")}):not(
+          #{state("readonly")}
+        ):hover
+        &__wrap {
+        border-color: var(#{v("control-border-error")});
+      }
     }
 
     &#{state("error")}:not(#{state("disabled")}):not(

@@ -18,7 +18,6 @@ const EASINGS: [string, string][] = [
   ["easing-exit", "사라짐 — 천천히 시작해 빠르게 빠짐"],
   ["easing-enter-emphasized", "강조가 필요한 등장"],
   ["easing-exit-emphasized", "강조가 필요한 퇴장"],
-  ["easing-linear", "등속 — 스피너"],
 ];
 
 export default function MotionPage() {

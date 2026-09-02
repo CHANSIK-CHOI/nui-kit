@@ -6,6 +6,13 @@
     margin-top: var(#{v("space-2")});
     padding-left: var(#{v("space-2")});
 
+    // `aria-live` 영역은 내용이 생기기 전에 DOM 에 있어야 읽힌다. 빈 상태는
+    // 자리를 차지하지 않게 시각적으로만 숨긴다 — `display: none` 은 live 를 죽인다.
+    // absolute 라 flex 부모의 gap 도 먹지 않는다.
+    &--empty {
+      @include a11y-hidden;
+    }
+
     &__msg {
       display: block;
       color: var(#{v("text-secondary")});

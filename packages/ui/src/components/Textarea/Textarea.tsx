@@ -22,6 +22,8 @@ type TextareaBaseProps = {
   errorMessage?: string;
   isClearable?: boolean;
   onClear?: () => void;
+  /** 지우기 버튼의 접근 이름. 소비자의 어휘·언어로 바꿀 수 있어야 한다 (a11y.md §9) */
+  clearButtonTitle?: string;
   /** 사용자 크기 조절 허용 여부 */
   resize?: TextareaResize;
 };
@@ -52,6 +54,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       errorMessage = "",
       isClearable = false,
       onClear,
+      clearButtonTitle = "내용 지우기",
       resize = "vertical",
       "aria-describedby": ariaDescribedBy,
       ...rest
@@ -108,7 +111,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             <div className={`${block}__actions`}>
               <TextfieldBtn
                 icon="clear"
-                title="내용 지우기"
+                title={clearButtonTitle}
                 onClick={onClear}
                 disabled={disabled}
                 className={`${block}__clear`}

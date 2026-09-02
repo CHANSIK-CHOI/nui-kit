@@ -72,18 +72,20 @@
     }
 
     // ── interaction
-    &:not(#{state("disabled")}):not(#{state("readonly")}):hover &__wrap {
-      border-color: var(#{v("control-border-hover")});
+    @include hoverable {
+      &:not(#{state("disabled")}):not(#{state("readonly")}):hover &__wrap {
+        border-color: var(#{v("control-border-hover")});
+      }
+
+      &:not(#{state("disabled")}):not(#{state("readonly")}) &__clear:hover {
+        color: var(#{v("control-icon-strong")});
+      }
     }
 
     &:not(#{state("disabled")}):not(#{state("readonly")}):focus-within &__wrap {
       border-color: var(#{v("focus-color")});
       border-width: var(#{v("focus-width")});
       box-shadow: var(#{v("focus-ring")});
-    }
-
-    &:not(#{state("disabled")}):not(#{state("readonly")}) &__clear:hover {
-      color: var(#{v("control-icon-strong")});
     }
 
     // ── disabled
@@ -118,9 +120,13 @@
       caret-color: var(#{v("control-text-error")});
     }
 
-    &#{state("error")}:not(#{state("disabled")}):not(#{state("readonly")}):hover
-      &__wrap {
-      border-color: var(#{v("control-border-error")});
+    @include hoverable {
+      &#{state("error")}:not(#{state("disabled")}):not(
+          #{state("readonly")}
+        ):hover
+        &__wrap {
+        border-color: var(#{v("control-border-error")});
+      }
     }
 
     &#{state("error")}:not(#{state("disabled")}):not(

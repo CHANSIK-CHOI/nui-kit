@@ -52,10 +52,16 @@ const ROLE_RULES = [
   },
 ];
 
-/** 표면 hover 에 쓰면 안 되는 토큰 → 대신 써야 하는 것 */
+/**
+ * 표면 hover 에 쓰면 안 되는 토큰 — 정적인 면(카드·구분 영역·읽기 전용)의 배경이다.
+ * hover 는 `control-bg-hover`, active 는 `control-bg-active` 로 통일한다
+ * (design-system.md §2-3).
+ */
 const HOVER_BG_FORBIDDEN = new Set([
   "surface-neutral-soft",
   "surface-neutral-subtle",
+  "control-bg-subtle",
+  "control-bg-readonly",
 ]);
 
 /**
@@ -65,7 +71,7 @@ const HOVER_BG_FORBIDDEN = new Set([
  *
  *   색      배경과 글자가 짝이다. 배경만 바꾸면 대비가 깨지는데 **소비자는 모른다**
  *           (저시력 사용자만 겪는다). 그래서 훅을 두지 않는다 —
- *           창구는 브랜드 색 1개(빌드 타임 생성기)와 semantic 덮어쓰기다.
+ *           창구는 브랜드 색 프리셋과 className 둘뿐이다 (tokens.md §6-1).
  *   치수    바꾸면 결과가 바로 보인다. 짝도 없다. 그래서 컴포넌트별로 연다.
  *
  * 예외 하나 — **포커스 링 두께**는 치수지만 막는다. 얇아지면 키보드 사용자만
@@ -156,6 +162,25 @@ const DEPRECATED = {
   // 눌림 배율을 컴포넌트 실측(0.94 · 0.96)에 맞추며 이름이 함께 옮겨갔다.
   "scale-95": "scale-94",
   "scale-97": "scale-96",
+  // 2026-09-03 규칙 정본 갱신 (tokens.md §4-0 · §4-1 · §5-3)
+  "text-inverse-strong":
+    "text-on-inverse (layer-inverse 위) · text-on-accent (accent 채움 위)",
+  "layer-floating-muted": "surface-neutral-soft",
+  "gradient-panel-soft":
+    "layer-default (카드) · surface-neutral-soft (얹는 면)",
+  "size-icon-sm": "size-dot-md",
+  "easing-linear": "(삭제 — 쓰는 곳이 없다)",
+  "action-success": "(삭제 — Button variant 가 없다)",
+  "action-info": "(삭제 — Button variant 가 없다)",
+  "action-success-fg": "(삭제)",
+  "action-info-fg": "(삭제)",
+  "font-size-2": "(삭제 — 매트릭스 밖)",
+  "font-size-8": "(삭제 — 매트릭스 밖)",
+  "line-height-2": "(삭제)",
+  "line-height-8": "(삭제)",
+  "letter-spacing-8": "(삭제)",
+  "space-5": "(삭제 — 참조 0건)",
+  "space-8": "(삭제 — 참조 0건)",
 };
 
 /** `typo()` / `motion()` 믹스인이 이름을 조립할 때 쓰는 구 스케일 키 */
@@ -198,7 +223,7 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
     if (COLOR_HOOK.test(name)) {
       problems.push(
         `${file}: 색 훅 '${name}' — 색은 컴포넌트별로 열지 않는다. ` +
-          `창구는 브랜드 색 1개와 semantic 이다 (design-plan 2-1)`,
+          `창구는 브랜드 색 프리셋과 className 뿐이다 (tokens.md §6-1)`,
       );
       continue;
     }
@@ -210,7 +235,9 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
   }
 
   // 4) 표면 hover 배경은 control-bg-hover 로 통일
-  const hoverBlock = /:hover[^{]*\{([^}]*)\}/g;
+  // ⚠️ `[^}]*` 로 블록을 잡으면 `#{v("…")}` 의 `}` 에서 끊겨 두 번째 선언부터 못 본다.
+  //    실제로 Textfield 지우기 버튼의 hover 배경을 놓치고 있었다. 줄 첫머리의 `}` 까지 읽는다.
+  const hoverBlock = /:hover[^{]*\{([\s\S]*?)\n\s*\}/g;
   for (const m of css.matchAll(hoverBlock)) {
     for (const t of m[1].matchAll(/v\("([a-z0-9-]+)"\)/g)) {
       if (HOVER_BG_FORBIDDEN.has(t[1])) {

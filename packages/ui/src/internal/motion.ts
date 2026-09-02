@@ -27,7 +27,6 @@ export const motionDuration = {
 
 /** `--nui-easing-*` 과 같은 값 */
 export const motionEase = {
-  linear: "linear",
   standard: [0.2, 0, 0, 1],
   enter: [0, 0, 0.15, 1],
   exit: [0.35, 0, 1, 1],

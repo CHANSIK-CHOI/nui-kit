@@ -9,7 +9,7 @@
   #{cls("field")} {
     display: flex;
     width: 100%;
-    gap: var(#{v("space-3")});
+    gap: var(#{v("space-component-gap")});
 
     &--row {
       flex-direction: row;
@@ -58,6 +58,12 @@
       }
     }
 
+    // 비어 있어도 live 영역을 남긴다 (_message.scss 와 같은 이유). 래퍼까지 숨겨야
+    // flex-wrap 부모에서 빈 줄과 gap 을 먹지 않는다.
+    &__message--empty {
+      @include a11y-hidden;
+    }
+
     &__grid {
       display: grid;
       gap: var(#{v("space-4")});
@@ -81,7 +87,7 @@
       display: flex;
       flex-wrap: wrap;
       width: 100%;
-      gap: var(#{v("space-3")});
+      gap: var(#{v("space-component-gap")});
 
       &--row {
         flex-direction: row;

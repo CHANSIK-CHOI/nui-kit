@@ -25,7 +25,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(#{v("space-3")});
+    gap: var(#{v("space-component-gap")});
     padding: 0 var(#{v("space-panel-card")})
       calc(var(#{v("space-panel-card")}) + env(safe-area-inset-bottom))
       var(#{v("space-panel-card")});
@@ -34,10 +34,10 @@
   #{cls("toast")} {
     display: flex;
     align-items: flex-start;
-    gap: var(#{v("space-3")});
+    gap: var(#{v("space-component-gap")});
     width: #{hook("toast-width", min(100%, 26.25rem))};
     padding: var(#{v("space-3")}) var(#{v("space-panel-compact")});
-    color: var(#{v("text-inverse-strong")});
+    color: var(#{v("text-on-inverse")});
     background: var(#{v("layer-inverse")});
     border-radius: #{hook("toast-radius", var(#{v("radius-4")}))};
     box-shadow: var(#{v("shadow-3")}), var(#{v("shadow-inset-inverse")});
@@ -45,8 +45,10 @@
 
     &__indicator {
       flex-shrink: 0;
-      width: var(#{v("size-icon-sm")});
-      height: var(#{v("size-icon-sm")});
+      // 표시점은 아이콘이 아니라 점이다 — design-system.md §5-2
+      width: var(#{v("size-dot-md")});
+      height: var(#{v("size-dot-md")});
+      // 첫 줄 글자(14px · 행간 21px)의 세로 중앙에 점을 맞춘다: (21 - 10) / 2 ≈ 5px
       margin-top: 0.3125rem;
       background: var(#{v("control-accent-soft")});
       border-radius: var(#{v("radius-full")});

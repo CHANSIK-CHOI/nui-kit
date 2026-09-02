@@ -32,6 +32,8 @@ type TextfieldBaseProps = {
   unit?: string;
   isClearable?: boolean;
   onClear?: () => void;
+  /** 지우기 버튼의 접근 이름. 소비자의 어휘·언어로 바꿀 수 있어야 한다 (a11y.md §9) */
+  clearButtonTitle?: string;
 };
 
 export type TextfieldProps = TextfieldBaseProps &
@@ -63,6 +65,7 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
       unit = "",
       isClearable = false,
       onClear,
+      clearButtonTitle = "내용 지우기",
       "aria-describedby": ariaDescribedBy,
       ...rest
     },
@@ -120,7 +123,7 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
             {canClear ? (
               <TextfieldBtn
                 icon="clear"
-                title="내용 지우기"
+                title={clearButtonTitle}
                 onClick={onClear}
                 disabled={disabled}
                 className={`${block}__clear`}

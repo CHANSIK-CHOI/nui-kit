@@ -16,16 +16,18 @@
 //   배포 라이브러리는 reset 을 내보내지 않으므로 그 전제가 성립하지 않는다.
 //   → 모든 치수를 16px 루트 기준으로 환산했다. 실제 픽셀값은 원본과 동일하다.
 //
-// 커스터마이징
-//   전체 테마 → 여기 seed 값을 덮어쓴다
-//   부분 테마 → 임의 조상 요소에서 재선언하면 상속으로 하위에만 적용된다
+// 커스터마이징 — 창구는 둘뿐이다 (tokens.md §1-2 · §6-1)
+//   색 전체   → 브랜드 색 프리셋. 여기 값을 :root 에서 덮어쓰는 것은 창구가 아니다
+//              (배경만 바뀌고 짝인 글자색이 남아 대비가 조용히 깨진다)
+//   치수·모양 → 컴포넌트별 공개 훅 --nui-{컴포넌트}-{옵션?}-{요소?}-{속성}
+//   한 컴포넌트만 → className
 // ═══════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════
-// 다크 테마 — primitive 만 갈아끼운다
+// 다크 테마 — primitive 만 갈아끼운다 (tokens.md §4-1-1)
 //
 // semantic 이름은 그대로 두고 참조하는 primitive 값만 바꾼다.
 // 그래서 컴포넌트 SCSS 는 한 줄도 수정하지 않아도 다크가 적용된다.
-// 유일한 예외가 layer-* 다 (아래 주석 참조).
+// 예외는 셋 — layer-* · surface-toast-error · 반전 짝 text-on-inverse (아래 주석 참조).
 //
 // 적용 순서
 //   1) 소비자가 [data-theme="dark"] 를 지정하면 그것이 이긴다
@@ -144,8 +146,9 @@
   #{v("layer-basement")}: var(#{v("color-gray-1")});
   #{v("layer-default")}: var(#{v("color-gray-2")});
   #{v("layer-floating")}: var(#{v("color-gray-3")});
-  #{v("layer-floating-muted")}: var(#{v("color-gray-2")});
   #{v("surface-toast-error")}: var(#{v("color-danger-3")});
+  // 반전 표면이 밝아졌으므로 그 위 글자는 어두워진다. 실측 1.16:1 → 15.2:1
+  #{v("text-on-inverse")}: var(#{v("color-gray-1")});
 }
 
 @layer nui.tokens {
@@ -293,7 +296,11 @@
     #{v("text-disabled")}: var(#{v("color-gray-9")});
     #{v("text-danger")}: var(#{v("color-danger-11")});
     #{v("text-info")}: var(#{v("color-info-11")});
-    #{v("text-inverse-strong")}: var(#{v("color-white")});
+    // 반전 짝 — 한 이름이 두 자리를 맡으면 다크에서 깨진다 (tokens.md §4-1-2).
+    //   text-on-inverse  layer-inverse(토스트·툴팁) 위. 다크에서 표면이 밝아지므로 글자는 어두워진다
+    //   text-on-accent   control-accent · action 채움 위. 테마와 무관하게 brand-9 라 흰색으로 남는다
+    #{v("text-on-inverse")}: var(#{v("color-white")});
+    #{v("text-on-accent")}: var(#{v("color-white")});
 
     // ── semantic / layer (컨테이너 표면) ★
     // 다크 테마에서 basement 와 default 가 자리를 바꾼다 —
@@ -302,20 +309,16 @@
     #{v("layer-basement")}: var(#{v("color-gray-2")});
     #{v("layer-default")}: var(#{v("color-gray-1")});
     #{v("layer-floating")}: var(#{v("color-gray-1")});
-    #{v("layer-floating-muted")}: var(#{v("color-gray-2")});
+    // 반전 표면 — 토스트·툴팁. 위에 놓는 글자는 text-on-inverse 다.
     #{v("layer-inverse")}: var(#{v("color-gray-12")});
     #{v("layer-overlay")}: rgb(0 0 0 / 50%);
 
     // ── semantic / surface — layer 가 아니라 콘텐츠 위에 얹는 톤
+    // soft 는 Accordion 화살표 · Popup 아이콘처럼 카드 위의 은은한 면이다.
+    // 그라디언트는 두지 않는다 — 고도는 표면색·그림자·선 셋으로 표현한다 (design-system.md §2-5).
     #{v("surface-neutral-soft")}: var(#{v("color-gray-a3")});
     #{v("surface-neutral-subtle")}: var(#{v("color-gray-a4")});
     #{v("surface-toast-error")}: var(#{v("color-danger-12")});
-
-    #{v("gradient-panel-soft")}: linear-gradient(
-      180deg,
-      var(#{v("color-gray-1")}) 0%,
-      var(#{v("color-gray-2")}) 100%
-    );
 
     // ── semantic / border ★
     //
@@ -346,9 +349,11 @@
     #{v("control-bg-disabled")}: var(#{v("color-gray-3")});
     #{v("control-bg-readonly")}: var(#{v("color-gray-2")});
     #{v("control-bg-subtle")}: var(#{v("color-gray-3")});
-    // 목록 행·패널 헤더·아이콘 버튼처럼 면 전체가 반응하는 hover 배경.
-    // Radix 4단계가 hover, 3단계가 정적 강조면이다. 값이 다르므로 이제 진짜로 구분된다.
-    #{v("control-bg-hover")}: var(#{v("color-gray-4")});
+    // 목록 행·패널 헤더·아이콘 버튼처럼 면 전체가 반응하는 hover·active 배경.
+    // **알파다** — 어떤 표면 위(카드·패널·다크)에서도 같은 진하기가 된다
+    // (design-system.md §2-3). Radix a4 가 hover, a5 가 active 자리다.
+    #{v("control-bg-hover")}: var(#{v("color-gray-a4")});
+    #{v("control-bg-active")}: var(#{v("color-gray-a5")});
     #{v("control-border")}: var(#{v("color-gray-7")});
     #{v("control-border-hover")}: var(#{v("color-gray-8")});
     #{v("control-border-disabled")}: var(#{v("color-gray-6")});
@@ -374,16 +379,15 @@
     #{v("action-primary")}: var(#{v("color-brand-9")});
     #{v("action-danger")}: var(#{v("color-danger-9")});
     #{v("action-warning")}: var(#{v("color-warning-9")});
-    #{v("action-success")}: var(#{v("color-success-9")});
-    #{v("action-info")}: var(#{v("color-info-9")});
     #{v("action-neutral-fg")}: var(#{v("color-gray-1")});
     #{v("action-primary-fg")}: var(#{v("color-brand-contrast")});
     #{v("action-danger-fg")}: var(#{v("color-danger-contrast")});
     #{v("action-warning-fg")}: var(#{v("color-warning-contrast")});
-    #{v("action-success-fg")}: var(#{v("color-success-contrast")});
-    #{v("action-info-fg")}: var(#{v("color-info-contrast")});
-    #{v("action-bg-hover")}: var(#{v("color-gray-a3")});
-    #{v("action-bg-active")}: var(#{v("color-gray-a4")});
+    // 역할은 넷이다 — Button variant 와 같다. success · info 가 필요해지면 variant 와 함께 더한다.
+    // 표면 hover·active(`control-bg-hover/-active`)와 같은 값이다. 역할이 달라
+    // 이름을 나눈다 — 한쪽만 조정할 수 있어야 한다 (tokens.md §5-1).
+    #{v("action-bg-hover")}: var(#{v("color-gray-a4")});
+    #{v("action-bg-active")}: var(#{v("color-gray-a5")});
     #{v("action-bg-disabled")}: var(#{v("color-gray-3")});
     #{v("action-fg-disabled")}: var(#{v("color-gray-9")});
     #{v("action-border-disabled")}: var(#{v("color-gray-6")});
@@ -397,14 +401,12 @@
     // ═════════════════════════════════════════════════════════════
 
     // ── space (4px 기준)
-    // 7·9 가 없는 것은 쓰이지 않아서다. 스케일은 기계적으로 채우지 않는다.
+    // 5·7·8·9 가 없는 것은 쓰이지 않아서다. 스케일은 기계적으로 채우지 않는다.
     #{v("space-1")}: 0.25rem; // 4px
     #{v("space-2")}: 0.5rem; // 8px
     #{v("space-3")}: 0.75rem; // 12px
     #{v("space-4")}: 1rem; // 16px
-    #{v("space-5")}: 1.25rem; // 20px
     #{v("space-6")}: 1.5rem; // 24px
-    #{v("space-8")}: 2rem; // 32px
 
     // 의미 간격 — "규칙이 따로 없으면 이것" ★
     // 모든 조합에 간격을 정의하려다 실패하는 대신 fallback 을 명시적 토큰으로 만든다.
@@ -430,31 +432,29 @@
     // 토큰으로 한 겹 더 감싸면 출처가 둘이 되어 어긋난다.
     #{v("font-family-base")}: inherit; // 라이브러리는 폰트를 배포하지 않는다
 
+    // 번호는 1·3·4·5·6 이다. 매트릭스 아홉 줄이 1·3·4·6 을 쓰고 5 는 문서 사이트가 쓴다.
+    // 2·8 은 참조 0건이라 지웠다 — 새 번호가 필요하면 크기·행간·자간 세 줄을 같이 만든다.
     #{v("font-size-1")}: 0.75rem; // 12px
-    #{v("font-size-2")}: 0.8125rem; // 13px
     #{v("font-size-3")}: 0.875rem; // 14px
     #{v("font-size-4")}: 1rem; // 16px
     #{v("font-size-5")}: 1.125rem; // 18px
     #{v("font-size-6")}: 1.25rem; // 20px
-    #{v("font-size-8")}: 2rem; // 32px
 
     // 같은 번호끼리 짝지어 쓴다. 배수가 일정하지 않은 것은 **광학 보정**이다 —
     // 큰 글자일수록 줄 높이 배수를 줄인다. 단일 배수면 큰 제목이 헐거워진다.
     // 배수(unitless)로 둔 것은 소비자가 font-size 를 덮어도 비율이 유지되게 하기 위함이다.
     #{v("line-height-1")}: 1.5; // 12 → 18px
-    #{v("line-height-2")}: 1.46; // 13 → 19px
     #{v("line-height-3")}: 1.5; // 14 → 21px
     #{v("line-height-4")}: 1.5; // 16 → 24px
     #{v("line-height-5")}: 1.44; // 18 → 26px
     #{v("line-height-6")}: 1.4; // 20 → 28px
-    #{v("line-height-8")}: 1.19; // 32 → 38px
 
     // 큰 글자일수록 자간을 좁히는 광학 보정. 같은 번호끼리 짝지어 쓴다.
     #{v("letter-spacing-1")}: 0.08em; // 12px — 작은 라벨은 오히려 넓힌다
     #{v("letter-spacing-3")}: -0.01em; // 14px
     #{v("letter-spacing-4")}: -0.02em; // 16px
+    #{v("letter-spacing-5")}: -0.03em; // 18px
     #{v("letter-spacing-6")}: -0.04em; // 20px
-    #{v("letter-spacing-8")}: -0.06em; // 32px
 
     #{v("font-weight-regular")}: 400;
     #{v("font-weight-medium")}: 500;
@@ -462,15 +462,17 @@
     #{v("font-weight-bold")}: 700;
 
     // ── size (불규칙 실측값 — 역할 이름을 유지한다)
-    #{v("size-icon-sm")}: 0.625rem; // 10px
+    // 어느 자리에 어느 크기를 쓰는지는 design-system.md §5-2 아이콘 매트릭스가 정한다.
     #{v("size-icon-md")}: 0.875rem; // 14px
     #{v("size-icon-lg")}: 1rem; // 16px
     #{v("size-icon-2xl")}: 1.25rem; // 20px
     #{v("size-icon-3xl")}: 1.5rem; // 24px
 
-    // 선택 컨트롤 (Checkbox / Radio / Switch)
+    // 점·표시 — 라디오 점 · 체크 표시 · 화살표 · 토스트 표시점. 아이콘이 아니다.
+    // (10px 는 `size-icon-sm` 이었는데 10px 아이콘은 없었고 점만 쓰고 있었다)
     #{v("size-dot-xs")}: 0.375rem; // 6px
     #{v("size-dot-sm")}: 0.5rem; // 8px
+    #{v("size-dot-md")}: 0.625rem; // 10px
     #{v("size-selector")}: 1.375rem; // 22px
     #{v("size-switch-track-w")}: 2.875rem; // 46px
     #{v("size-switch-track-h")}: 1.625rem; // 26px
@@ -500,11 +502,7 @@
     // design-system.md §2-1(입력 컨트롤 disabled·readonly 아이콘)과
     // §2-4(text 버튼 hover·active)에 정의된 네 값이다.
     //
-    // ⚠️ 규칙 밖의 opacity 가 아직 4자리 남아 있다 —
-    //    Datepicker 이전/다음 버튼(0.3) · 날짜(0.45 ×2) · Button disabled(0.72).
-    //    "비활성"이라는 같은 상태에 다른 값을 쓰는 자리이고,
-    //    **어느 값으로 모을지는 컴포넌트 반영 단계에서 판단한다.**
-    //    지금 통일하면 시각이 바뀌므로 토큰화하지 않고 남겨둔다.
+    // 규칙 밖 opacity 는 0건이다 (a05d7af). 비활성은 색으로만 표현한다 — tokens.md §3-9.
     #{v("opacity-icon-disabled")}: 0.2;
     #{v("opacity-icon-readonly")}: 0.6;
     #{v("opacity-hover")}: 0.72;
@@ -562,7 +560,6 @@
     // 나타날 때는 결과를 인지할 시간을 주고(느리게 끝남),
     // 사라질 때는 이미 끝난 것에 시간을 쓰지 않는다(빠르게 끝남).
     // 하나의 곡선으로 개폐 양방향을 처리하면 이 차이가 사라진다.
-    #{v("easing-linear")}: linear;
     #{v("easing-standard")}: cubic-bezier(0.2, 0, 0, 1); // 기능적 마이크로
     #{v("easing-enter")}: cubic-bezier(0, 0, 0.15, 1); // ease-out 계열
     #{v("easing-exit")}: cubic-bezier(0.35, 0, 1, 1); // ease-in 계열

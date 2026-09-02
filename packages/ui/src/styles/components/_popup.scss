@@ -112,16 +112,19 @@
 
       &:focus-visible {
         outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
-        outline-offset: 0.125rem;
+        outline-offset: var(#{v("focus-offset")});
       }
 
-      &:hover {
-        color: var(#{v("text-primary")});
-        background: var(#{v("control-bg-hover")});
-        border-color: var(#{v("border-section")});
+      @include hoverable {
+        &:hover {
+          color: var(#{v("text-primary")});
+          background: var(#{v("control-bg-hover")});
+          border-color: var(#{v("border-section")});
+        }
       }
 
       &:active {
+        background: var(#{v("control-bg-active")});
         // 중간 크기 — design-system.md §6-3
         transform: scale(var(#{v("scale-96")}));
       }
@@ -131,7 +134,7 @@
       display: flex;
       flex: 1 1 auto;
       flex-direction: column;
-      gap: var(#{v("space-3")});
+      gap: var(#{v("space-component-gap")});
       overflow-y: auto;
       padding: var(#{v("space-panel-compact")}) var(#{v("space-panel-card")})
         var(#{v("space-panel-card")});
@@ -146,7 +149,8 @@
       width: var(#{v("size-field")});
       height: var(#{v("size-field")});
       color: var(#{v("text-info")});
-      background: var(#{v("gradient-panel-soft")});
+      // 콘텐츠 위에 얹는 은은한 면 — 그라디언트는 쓰지 않는다 (design-system.md §2-5)
+      background: var(#{v("surface-neutral-soft")});
       border: #{hook("popup-border-width", var(#{v("border-width-1")}))} solid
         var(#{v("border-section")});
       border-radius: var(#{v("radius-full")});

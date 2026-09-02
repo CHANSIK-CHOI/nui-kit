@@ -36,8 +36,9 @@
       z-index: var(#{v("z-tooltip")});
       min-width: 19.5rem;
       padding: var(#{v("space-4")});
+      // 떠 있는 컨테이너의 외곽선 — design-system.md §2-5-1
       border: #{hook("datepicker-border-width", var(#{v("border-width-1")}))}
-        solid var(#{v("control-border-disabled")});
+        solid var(#{v("border-form")});
       border-radius: #{hook(
           "datepicker-dropdown-radius",
           var(#{v("radius-3")})
@@ -142,9 +143,11 @@
       }
     }
 
-    &__dropdown-root:hover {
-      border-color: var(#{v("control-border-hover")});
-      background-color: var(#{v("control-bg-subtle")});
+    // 입력 컨트롤의 hover 는 테두리만 바뀐다 — design-system.md §2-1
+    @include hoverable {
+      &__dropdown-root:not([data-disabled="true"]):hover {
+        border-color: var(#{v("control-border-hover")});
+      }
     }
 
     &__dropdown:focus-visible + &__caption-label {
@@ -198,10 +201,24 @@
       @include motion((background-color, color, opacity), "3");
     }
 
-    &__button-previous:hover,
-    &__button-next:hover {
-      background-color: var(#{v("control-bg-hover")});
-      color: var(#{v("control-icon-strong")});
+    @include hoverable {
+      &__button-previous:hover,
+      &__button-next:hover {
+        background-color: var(#{v("control-bg-hover")});
+        color: var(#{v("control-icon-strong")});
+      }
+
+      // 비활성 버튼은 hover 피드백도 주지 않는다.
+      &__button-previous[aria-disabled="true"]:hover,
+      &__button-next[aria-disabled="true"]:hover {
+        background-color: transparent;
+        color: var(#{v("control-icon")});
+      }
+    }
+
+    &__button-previous:not([aria-disabled="true"]):active,
+    &__button-next:not([aria-disabled="true"]):active {
+      background-color: var(#{v("control-bg-active")});
     }
 
     // ⚠️ react-day-picker v9 는 월 경계에서 `disabled` 속성이 아니라
@@ -214,13 +231,6 @@
       // 표면 hover 부류라 §2-3 매트릭스를 따른다. 배경은 그대로 두고 글자만 바꾼다.
       color: var(#{v("action-fg-disabled")});
       cursor: not-allowed;
-    }
-
-    // 비활성 버튼은 hover 피드백도 주지 않는다.
-    &__button-previous[aria-disabled="true"]:hover,
-    &__button-next[aria-disabled="true"]:hover {
-      background-color: transparent;
-      color: var(#{v("control-icon")});
     }
 
     &__chevron {
@@ -275,9 +285,16 @@
       @include typo(3, "medium");
     }
 
+    @include hoverable {
+      &__day:not(#{cls("daypicker")}__selected)
+        &__day-button:hover:not(:disabled) {
+        background-color: var(#{v("control-bg-hover")});
+      }
+    }
+
     &__day:not(#{cls("daypicker")}__selected)
-      &__day-button:hover:not(:disabled) {
-      background-color: var(#{v("control-bg-hover")});
+      &__day-button:active:not(:disabled) {
+      background-color: var(#{v("control-bg-active")});
     }
 
     &__day-button:focus-visible {
@@ -332,7 +349,7 @@
     &__range-end &__day-button {
       background-color: var(#{v("control-accent")});
       border-color: var(#{v("control-accent")});
-      color: var(#{v("text-inverse-strong")});
+      color: var(#{v("text-on-accent")});
     }
 
     &__range-middle {

@@ -315,10 +315,17 @@ export function FieldMessage({
     return registerMessage?.(resolvedMessageId);
   }, [hasMessageContent, registerMessage, resolvedMessageId]);
 
-  if (!hasMessageContent) return null;
-
+  // 비어 있어도 렌더한다 — `aria-live` 영역은 내용이 생기기 전에 DOM 에 있어야
+  // 스크린리더가 읽는다 (Message.tsx 참조). 빈 상태는 `--empty` 로 시각만 숨긴다.
   return (
-    <div id={resolvedMessageId} className={cn(`${block}__message`, className)}>
+    <div
+      id={hasMessageContent ? resolvedMessageId : undefined}
+      className={cn(
+        `${block}__message`,
+        className,
+        !hasMessageContent && `${block}__message--empty`,
+      )}
+    >
       <Message infoMessage={infoMessage} errorMessage={errorMessage} />
     </div>
   );

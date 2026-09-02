@@ -69,7 +69,8 @@ const Select: ForwardRefExoticComponent<
       styles,
       isSearchable = false,
       isClearable = false,
-      noOptionsMessage = () => "선택 가능한 항목이 없습니다.",
+      // 라벨·안내 문구에는 마침표를 붙이지 않는다 (SEED writing 규칙과 같다)
+      noOptionsMessage = () => "선택 가능한 항목이 없습니다",
       // 메뉴 최대 높이는 react-select 이 소유한다 (배치 계산이 이 값을 참조하므로
       // CSS 의 max-height 로 덮지 않는다). 기본값만 우리 치수에 맞춘다.
       maxMenuHeight = 240,
