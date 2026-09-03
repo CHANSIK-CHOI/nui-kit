@@ -108,6 +108,8 @@
         transparent;
       border-radius: var(#{v("radius-full")});
 
+      // 보이는 것은 40 이지만 누를 수 있는 것은 44 — a11y.md §8
+      @include hit-area;
       @include motion-press((background-color, border-color, color));
 
       &:focus-visible {

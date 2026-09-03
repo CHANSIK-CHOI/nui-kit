@@ -14,9 +14,8 @@ export default function DatepickerPage() {
         subpath="datepicker"
       >
         달력에서 날짜를 고른다. 내부는 <code>react-day-picker</code> 이고 값은{" "}
-        <code>Date</code> 객체로 주고받는다. 기간은{" "}
-        <code>DateRangePicker</code>, 여러 날짜는{" "}
-        <code>DateMultiplePicker</code> 다.
+        <code>Date</code> 객체로 주고받는다. 기간은 <code>DateRangePicker</code>
+        , 여러 날짜는 <code>DateMultiplePicker</code> 다.
       </GuideHeader>
 
       <pre className="doc-code">
@@ -90,6 +89,11 @@ export default function DatepickerPage() {
         </li>
         <li>
           <code>prefers-reduced-motion</code> 에서 팝업 애니메이션이 꺼진다
+        </li>
+        <li>
+          날짜 셀과 이전/다음 버튼은 누르는 범위가 44px 이다. 날짜 버튼은 36px,
+          화살표는 32px 로 보이고 히트만 넓혔다. 셀 크기는{" "}
+          <code>--nui-datepicker-day-size</code> 로 바꿀 수 있다
         </li>
       </ul>
 

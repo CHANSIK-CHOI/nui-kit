@@ -164,8 +164,9 @@ export default function IconPage() {
 
       <h2>보이는 크기와 누를 수 있는 크기는 다르다</h2>
       <div className="doc-note doc-note--warn">
-        <strong>아이콘이 16px 이어도 히트 영역은 44px 이어야 한다.</strong>{" "}
-        <code>padding</code> 이나 가상요소로 넓힌다. 기준과 예외는{" "}
+        <strong>아이콘이 16px 이어도 누르는 범위는 따로 정한다.</strong> 팝업
+        닫기와 달력의 이전/다음·날짜는 가상요소로 44px 을 누르고, 입력 안 보조
+        버튼은 둘이 붙어 있어 하한 24px 에 둔다. 자리별 결정은{" "}
         <Link href="/foundations/accessibility">접근성</Link> 문서에 있다.
       </div>
 

@@ -68,8 +68,9 @@ export default function AccessibilityPage() {
       </div>
       <p>
         <code>npm run verify:a11y</code> 가 브라우저에서 두 테마의 값을 다시
-        재고 기준에 미달하면 실패시킨다. 터치 영역도 같이 잰다 — 24px 미만은
-        실패, 44px 미만은 경고.
+        재고 기준에 미달하면 실패시킨다. 터치 영역도 같이 잰다. 박스가 아니라
+        실제로 눌리는 범위를 재고, 24px 미만은 실패, 이유 없는 44px 미만은
+        경고다.
       </p>
       <div className="doc-note">
         <strong>다크가 이 검사를 만들었다.</strong> 토스트·툴팁의 반전 표면이
@@ -120,9 +121,66 @@ export default function AccessibilityPage() {
       </div>
       <p>
         <strong>보이는 크기와 누를 수 있는 크기는 다르다.</strong> 아이콘이 16px
-        이어도 히트 영역은 44px 이어야 한다. <code>padding</code> 이나
-        가상요소로 넓힌다.
+        이어도 누르는 범위는 따로 넓힐 수 있다. 가상요소로 가운데 정렬된 44px
+        정사각형을 깔면 모양은 그대로인 채 히트만 커진다.
       </p>
+      <div className="doc-table-wrap">
+        <table className="doc-table">
+          <thead>
+            <tr>
+              <th>자리</th>
+              <th>보이는 크기</th>
+              <th>누르는 크기</th>
+              <th>왜</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Popup 닫기</td>
+              <td>40px</td>
+              <td>
+                <strong>44px</strong>
+              </td>
+              <td className="doc-wrap">가상요소로 넓혔다</td>
+            </tr>
+            <tr>
+              <td>Datepicker 이전/다음</td>
+              <td>32px</td>
+              <td>
+                <strong>44px</strong>
+              </td>
+              <td className="doc-wrap">
+                가상요소로 넓히고 두 버튼 사이를 12px 로 뒀다. 4px 이면 두
+                히트가 겹친다
+              </td>
+            </tr>
+            <tr>
+              <td>Datepicker 날짜</td>
+              <td>36px</td>
+              <td>
+                <strong>44px</strong>
+              </td>
+              <td className="doc-wrap">
+                격자라 셀이 히트의 상한이다. 셀을 44px 로 두고 버튼의 히트가
+                셀을 채운다. <code>--nui-datepicker-day-size</code> 로 줄일 수
+                있다
+              </td>
+            </tr>
+            <tr>
+              <td className="doc-wrap">
+                Textfield 지우기 · Password 토글 · Search · 달력 열기 · Select
+                화살표·지우기
+              </td>
+              <td>24px</td>
+              <td>24px (하한)</td>
+              <td className="doc-wrap">
+                입력 안에 버튼 둘이 8px 로 붙는다. 44 를 채우면 서로 겹쳐 38 이
+                상한이라 하한을 쓴다
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div className="doc-note doc-note--warn">
         <strong>선택 컨트롤은 예외가 필요하다.</strong> Checkbox 와 Radio 는

@@ -50,9 +50,11 @@
 
   // ── 달력 본체
   #{cls("daypicker")} {
+    // 날짜 셀은 격자로 붙어 있어 히트 영역의 상한이 셀 크기다. 그래서 셀이 터치 하한
+    // 44 다 — a11y.md §8. 보이는 날짜 버튼(36)은 아래 `day-button-size` 가 따로 갖는다.
     #{iv("daypicker-day-size")}: #{hook(
         "datepicker-day-size",
-        var(#{v("size-control-lg")})
+        var(#{v("size-control-option")})
       )};
     #{iv("daypicker-day-button-size")}: #{hook(
         "datepicker-day-button-size",
@@ -173,7 +175,9 @@
       right: 0;
       display: flex;
       align-items: center;
-      gap: var(#{v("space-1")});
+      // 버튼(32)의 히트를 44 로 넓히면 양옆으로 6px 씩 나간다. 간격이 12 라야
+      // 두 히트가 겹치지 않는다 — 캡션의 `padding-right`(4.75rem = 32+12+32)와 맞다.
+      gap: var(#{v("space-3")});
       // 캡션 위에 겹쳐 있으므로 버튼 자신만 이벤트를 받는다
       pointer-events: none;
     }
@@ -198,6 +202,8 @@
       color: var(#{v("control-icon")});
       pointer-events: auto;
 
+      // 보이는 것은 32, 누를 수 있는 것은 44 — a11y.md §8
+      @include hit-area;
       @include motion((background-color, color, opacity), "3");
     }
 
@@ -282,6 +288,8 @@
       background: transparent;
       color: inherit;
 
+      // 누를 수 있는 것은 셀(44) 전체다. 보이는 버튼은 36 그대로 — a11y.md §8
+      @include hit-area(var(#{iv("daypicker-day-size")}));
       @include motion((background-color, border-color, color), "3");
       @include typo(3, "medium");
     }

@@ -78,6 +78,25 @@
   );
 }
 
+// 보이는 크기는 그대로 두고 누를 수 있는 영역만 넓힌다 — a11y.md §8.
+//
+// 가운데 정렬된 `$size` 정사각형을 `::before` 로 깐다. 가상요소는 그림이 없고
+// 이벤트는 원래 요소로 가므로 클릭·hover·`elementFromPoint` 가 전부 요소로 잡힌다.
+// 요소가 `$size` 보다 크면 가상요소가 안쪽에 들어가 아무 효과가 없다.
+//
+// ⚠️ 이웃 타겟이 넓힌 범위 안에 있으면 뒤 요소의 히트가 앞 요소를 덮는다.
+//    붙어 있는 버튼은 간격이 `($size - 박스) / 2 × 2` 이상이어야 한다 —
+//    Datepicker 이전/다음이 그래서 `space-3` 간격이다.
+@mixin hit-area($size: var(#{v("size-control-option")})) {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: calc(50% - #{$size} / 2);
+  }
+}
+
 // hover 는 hover 가 있는 기기에서만 그린다 — styles.md §9.
 // 터치 기기는 탭한 뒤에 `:hover` 가 남아 버튼이 눌린 채로 보인다.
 // `:focus-visible` 과 `:active` 는 감싸지 않는다 — 키보드와 터치에 둘 다 필요하다.

@@ -11,7 +11,8 @@
  *    다크는 OS 설정만으로 자동 적용되므로 라이트와 같은 정본이다 (tokens.md §4-1-1).
  *    비활성은 AA 에서 빠지지만 하한 2.0:1 을 둔다 (design-system.md §2).
  * 3. 터치 영역 — 누를 수 있는 것의 히트 영역 실측 (a11y.md §8)
- *    24px 미만은 실패, 44px 미만은 경고.
+ *    박스가 아니라 `elementFromPoint` 로 실제 눌리는 범위를 잰다.
+ *    24px 미만은 실패, 44px 미만은 경고. 이유가 적힌 예외는 통과.
  *
  * 사용: dev server 기동 후  node scripts/check-a11y.mjs [baseUrl]
  */
@@ -231,9 +232,25 @@ for (const theme of ["light", "dark"]) {
 }
 
 // ── 3) 터치 영역
-console.log("\n■ 터치 영역 (24px 미만 실패 · 44px 미만 경고)");
+console.log(
+  "\n■ 터치 영역 (24px 미만 실패 · 44px 미만 경고 · 예외는 이유와 함께 통과)",
+);
 
-/** [라벨, 페이지, 셀렉터, 열기] */
+/**
+ * [라벨, 페이지, 셀렉터, 열기, 예외 이유?]
+ *
+ * 박스가 아니라 **실제로 눌리는 범위**를 잰다. `::before` 로 넓힌 히트 영역은
+ * `getBoundingClientRect` 에 안 잡히므로, 중심에서 사방으로 1px 씩 나가며
+ * `elementFromPoint` 가 그 요소(또는 자손)를 돌려주는 범위를 센다.
+ * 이웃 버튼이나 옆 날짜 셀에서 끊기므로 정직한 값이 나온다.
+ *
+ * 예외 이유가 있는 자리는 44 미만이어도 경고하지 않는다 (a11y.md §8 — 하한 24).
+ * **이유 없는 44 미만만 경고다.** 그래야 "경고 0" 이 "이유 없이 작은 자리가 없다" 는 뜻이 된다.
+ * 예외를 더할 때는 a11y.md §8 의 표에도 같은 이유를 적는다.
+ */
+const INPUT_AUX_REASON =
+  "입력 안에 버튼 둘이 8px 로 붙는다. 44 를 채우면 히트가 겹쳐 인접 시 38 이 상한이라 하한 24 를 쓴다";
+
 const TOUCH_TARGETS = [
   ["IconButton", "/components/button", ".nui-button--icon"],
   [
@@ -241,9 +258,22 @@ const TOUCH_TARGETS = [
     "/components/textfield",
     ".nui-textfield__btn",
     async (page) => page.locator(".nui-textfield__input").first().fill("값"),
+    INPUT_AUX_REASON,
   ],
-  ["Password 토글", "/components/password", ".nui-textfield__btn"],
-  ["Select 화살표", "/components/select", ".nui-select__dropdown-indicator"],
+  [
+    "Password 토글",
+    "/components/password",
+    ".nui-textfield__btn",
+    null,
+    INPUT_AUX_REASON,
+  ],
+  [
+    "Select 화살표",
+    "/components/select",
+    ".nui-select__dropdown-indicator",
+    null,
+    INPUT_AUX_REASON,
+  ],
   [
     "Datepicker 이전/다음",
     "/components/datepicker",
@@ -270,7 +300,7 @@ const TOUCH_TARGETS = [
 {
   const ctx = await browser.newContext({ viewport: VIEWPORT });
   const page = await ctx.newPage();
-  for (const [label, url, selector, open] of TOUCH_TARGETS) {
+  for (const [label, url, selector, open, exception] of TOUCH_TARGETS) {
     await page.goto(BASE + url, { waitUntil: "networkidle" });
     if (open) {
       try {
@@ -289,14 +319,44 @@ const TOUCH_TARGETS = [
       warn(`${label}: 요소를 찾지 못했다 (${selector})`);
       continue;
     }
-    const { w, h } = await el.evaluate((node) => {
+    // 팝업·달력은 scale 0.98 → 1 로 등장한다. 도중에 재면 모든 치수가 0.99배로
+    // 나와 44 가 43 이 된다. 매크로 모션 상한(duration-8 = 400ms)을 넘겨 기다린다.
+    await page.waitForTimeout(500);
+    const { box, hit } = await el.evaluate((node) => {
+      // 히트 영역이 박스 밖으로 나가므로 요소를 화면 가운데에 둔다.
+      // 가장자리에 걸치면 탐침이 뷰포트 밖으로 나가 짧게 잰다.
+      node.scrollIntoView({ block: "center", inline: "center" });
       const r = node.getBoundingClientRect();
-      return { w: Math.round(r.width), h: Math.round(r.height) };
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const hits = (x, y) => {
+        const t = document.elementFromPoint(x, y);
+        return t !== null && (t === node || node.contains(t));
+      };
+      // 중심에서 한 방향으로 히트가 이어지는 길이. 뷰포트 끝까지 본다.
+      // 요소가 0.5px 좌표에 놓일 수 있어 반 픽셀씩 나간다 — 정수로 나가면 1px 더 센다.
+      const STEP = 0.5;
+      const limit = Math.max(window.innerWidth, window.innerHeight);
+      const extent = (dx, dy) => {
+        let d = 0;
+        while (d < limit && hits(cx + dx * (d + STEP), cy + dy * (d + STEP)))
+          d += STEP;
+        return d;
+      };
+      return {
+        box: { w: Math.round(r.width), h: Math.round(r.height) },
+        hit: {
+          w: Math.round(extent(-1, 0) + extent(1, 0)),
+          h: Math.round(extent(0, -1) + extent(0, 1)),
+        },
+      };
     });
-    const line = `${label} ${w}×${h}`;
-    if (Math.min(w, h) < 24) bad(`${line} — 하한 24px 미만`);
-    else if (Math.min(w, h) < 44) warn(`${line} — 44px 미만`);
-    else ok(line);
+    const line = `${label} 히트 ${hit.w}×${hit.h} (박스 ${box.w}×${box.h})`;
+    const min = Math.min(hit.w, hit.h);
+    if (min < 24) bad(`${line} — 하한 24px 미만`);
+    else if (min >= 44) ok(line);
+    else if (exception) ok(`${line} — 예외: ${exception}`);
+    else warn(`${line} — 44px 미만`);
   }
   await ctx.close();
 }

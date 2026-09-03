@@ -154,11 +154,13 @@ export default function SpacingPage() {
 
       <div className="doc-note doc-note--warn">
         <strong>
-          <code>size-control-option</code>(44px)은 터치 영역의 하한이다.
+          <code>size-control-option</code>(44px)은 터치 영역의 기준이다.
         </strong>{" "}
-        단독으로 누를 수 있는 것은 이보다 작지 않아야 한다. 보이는 크기와 누를
-        수 있는 크기는 다르다. 아이콘이 16px 이어도 히트 영역은{" "}
-        <code>padding</code> 이나 가상요소로 44px 을 채운다.
+        단독으로 누를 수 있는 것은 이 크기를 향한다. 보이는 크기와 누를 수 있는
+        크기는 다르다. 팝업 닫기와 달력 날짜는 모양을 그대로 두고 가상요소로
+        44px 을 누르고, 입력 안 보조 버튼처럼 44 를 채울 수 없는 자리는 하한
+        24px 에 둔다. 자리별 결정은{" "}
+        <Link href="/foundations/accessibility">접근성</Link> 문서에 있다.
         <br />
         <br />
         자기 치수를 갖는 선택 컨트롤(Checkbox · Radio 22px, Switch 46×26)은

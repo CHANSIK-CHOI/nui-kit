@@ -88,6 +88,10 @@ export function Providers({ children }) {
           열려 있는 동안 배경은 <code>inert</code> + <code>aria-hidden</code> 이
           되고 스크롤이 잠긴다
         </li>
+        <li>
+          닫기 버튼은 40px 로 보이지만 누르는 범위는 44px 이다. 모양은 그대로
+          두고 히트만 넓혔다
+        </li>
       </ul>
 
       <div className="doc-note doc-note--warn">
