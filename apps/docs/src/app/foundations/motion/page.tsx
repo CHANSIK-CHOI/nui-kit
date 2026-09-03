@@ -10,6 +10,8 @@ const DURATIONS: [number, string, string][] = [
   [4, "200ms", "경계"],
   [5, "250ms", "매크로"],
   [6, "300ms", "매크로"],
+  [7, "350ms", "매크로 — 시트 슬라이드"],
+  [8, "400ms", "매크로 — 시트 슬라이드"],
 ];
 
 const EASINGS: [string, string][] = [
@@ -18,6 +20,10 @@ const EASINGS: [string, string][] = [
   ["easing-exit", "사라짐 — 천천히 시작해 빠르게 빠짐"],
   ["easing-enter-emphasized", "강조가 필요한 등장"],
   ["easing-exit-emphasized", "강조가 필요한 퇴장"],
+  [
+    "easing-expand",
+    "크기가 변하는 것 — 접힘/펼침. easing-enter 를 쓰지 않는다",
+  ],
 ];
 
 export default function MotionPage() {
@@ -31,9 +37,16 @@ export default function MotionPage() {
 
       <h2>시간</h2>
       <p>
-        0.2초가 경계다. 버튼 눌림과 포커스, 색 전환 같은 마이크로 모션은{" "}
+        0.2초가 경계다. 버튼 눌림과 포커스, 회전 같은 마이크로 모션은{" "}
         <code>duration-4</code> 이하를 쓴다. 팝업 개폐와 시트 슬라이드, 페이지
         전환은 <code>duration-4</code> 를 넘는다.
+      </p>
+      <p>
+        <strong>
+          색 · 테두리 · 배경 전환은 <code>duration-3</code>(150ms) 하나다.
+        </strong>{" "}
+        hover · error · disabled 로 바뀌는 순간 전부가 여기 해당하고, 눌림(
+        <code>duration-pressed</code>)과 같은 시계다.
       </p>
 
       <div className="doc-example">

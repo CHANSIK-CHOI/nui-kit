@@ -19,7 +19,12 @@ const INPUT: [string, string, string, string][] = [
     "control-border-disabled",
     "control-text-muted",
   ],
-  ["error", "control-bg", "control-border-error", "control-text-error"],
+  [
+    "error",
+    "control-bg",
+    "control-border-error",
+    "변화 없음 · caret · 단위만 control-text-error",
+  ],
   ["placeholder", "—", "—", "control-text-placeholder"],
 ];
 
@@ -49,9 +54,7 @@ export default function StatePage() {
       </p>
 
       <h2>상태에는 두 종류가 있다</h2>
-      <p>
-        누가 그 상태를 만드는지가 다르다. 이 구분이 겹침 규칙의 근거다.
-      </p>
+      <p>누가 그 상태를 만드는지가 다르다. 이 구분이 겹침 규칙의 근거다.</p>
       <div className="doc-table-wrap">
         <table className="doc-table">
           <thead>
@@ -89,9 +92,7 @@ export default function StatePage() {
       </div>
 
       <h2>컨트롤을 두 부류로 나눈다</h2>
-      <p>
-        어느 쪽인지 정하면 색은 표에서 읽는다.
-      </p>
+      <p>어느 쪽인지 정하면 색은 표에서 읽는다.</p>
 
       <h3>입력 컨트롤</h3>
       <p>타이핑하거나 목록에서 고르는 것이다.</p>
@@ -209,9 +210,7 @@ export default function StatePage() {
               <th scope="row" className="doc-wrap">
                 hover + error
               </th>
-              <td className="doc-wrap">
-                테두리는 에러 색을 유지
-              </td>
+              <td className="doc-wrap">테두리는 에러 색을 유지</td>
               <td className="doc-wrap">
                 hover 로 덮으면 에러가 사라진 것처럼 보인다
               </td>
@@ -231,9 +230,7 @@ export default function StatePage() {
               <th scope="row" className="doc-wrap">
                 focus + readonly
               </th>
-              <td className="doc-wrap">
-                링을 그린다. 배경은 readonly 유지
-              </td>
+              <td className="doc-wrap">링을 그린다. 배경은 readonly 유지</td>
               <td className="doc-wrap">
                 readonly 도 포커스를 받는다. 값을 읽을 수 있어야 한다
               </td>
@@ -242,9 +239,7 @@ export default function StatePage() {
               <th scope="row" className="doc-wrap">
                 hover + disabled
               </th>
-              <td className="doc-wrap">
-                아무것도 그리지 않는다
-              </td>
+              <td className="doc-wrap">아무것도 그리지 않는다</td>
               <td className="doc-wrap">
                 누를 수 없는 것에 반응을 주면 누를 수 있다고 오해한다
               </td>
@@ -277,18 +272,14 @@ export default function StatePage() {
               <th scope="row">
                 <code>disabled</code>
               </th>
-              <td className="doc-wrap">
-                지금은 안 되지만 조건이 맞으면 된다
-              </td>
+              <td className="doc-wrap">지금은 안 되지만 조건이 맞으면 된다</td>
               <td className="doc-wrap">필수 항목 미입력 시의 제출 버튼</td>
             </tr>
             <tr>
               <th scope="row">
                 <code>readonly</code>
               </th>
-              <td className="doc-wrap">
-                값은 보여주되 바꿀 수 없다
-              </td>
+              <td className="doc-wrap">값은 보여주되 바꿀 수 없다</td>
               <td className="doc-wrap">조회 전용 필드</td>
             </tr>
           </tbody>
@@ -302,19 +293,31 @@ export default function StatePage() {
 
       <h2>면 전체가 반응할 때</h2>
       <p>
-        목록 행, 패널 헤더, 아이콘 전용 버튼처럼 면이 통째로 반응하는 자리는{" "}
-        <code>control-bg-hover</code> 하나로 통일한다.
+        목록 행, 패널 헤더, 아이콘 전용 버튼처럼 면이 통째로 반응하는 자리는 두
+        값으로 통일한다. hover 는 <code>control-bg-hover</code>, 누르는 순간은{" "}
+        <code>control-bg-active</code>. 둘 다 반투명이라 카드 위든 패널 위든
+        다크든 같은 진하기가 된다. 비활성은 배경을 바꾸지 않고 글자만{" "}
+        <code>action-fg-disabled</code> 로 바꾼다.
       </p>
       <div className="doc-note doc-note--warn">
         <code>surface-neutral-soft</code> · <code>surface-neutral-subtle</code>{" "}
-        을 hover 에 쓰지 않는다. 그 둘은 카드나 구분 영역처럼 정적인 면의
-        배경이다.
+        · <code>control-bg-subtle</code> · <code>control-bg-readonly</code> 를
+        hover 에 쓰지 않는다. 카드·구분 영역·읽기 전용처럼 정적인 면의 배경이다.{" "}
+        <code>verify:tokens</code> 가 잡는다.
       </div>
+      <p>
+        <strong>hover 는 hover 가 있는 기기에서만 그린다.</strong> 터치 기기는
+        탭한 뒤에 hover 가 남아 버튼이 눌린 채로 보인다. 모든 hover 가{" "}
+        <code>@media (hover: hover)</code> 안에 있다.
+      </p>
 
       <h2>색이 아닌 상태 표현</h2>
       <p>
-        비활성이나 눌림을 색이 아니라 투명도로 표현하는 자리가 있다. 규칙이
-        이미 있는 값만 토큰으로 만들었다.
+        투명도로 표현하는 자리는 넷뿐이다. 입력 컨트롤 안 아이콘의
+        disabled·readonly, text 버튼의 hover·active. 그 밖의 비활성은 전부
+        색으로만 표현한다. 비활성 글자는 대비 요구에서 빠지지만{" "}
+        <strong>2.0:1 아래로는 내려가지 않는다</strong> — 회색이 배경에 녹으면
+        &quot;비활성&quot;이 아니라 &quot;없음&quot;으로 읽힌다.
       </p>
       <TokenTable group="etc" only="opacity-" swatch={false} />
     </>

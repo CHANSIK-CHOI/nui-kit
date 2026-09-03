@@ -51,8 +51,8 @@ export default function SpacingPage() {
         <code>space-2</code> 사이가 필요하면 <code>space-1_5</code> 다.
       </p>
       <p>
-        <code>space-7</code> · <code>space-9</code> 는 없다. 쓰이지 않아서
-        만들지 않았다.
+        <code>space-5</code> · <code>space-7</code> · <code>space-8</code> ·{" "}
+        <code>space-9</code> 는 없다. 쓰이지 않아서 만들지 않았다.
       </p>
 
       <h2>정해진 게 없으면 이것</h2>
@@ -69,8 +69,8 @@ export default function SpacingPage() {
 
       <h2>크기</h2>
       <p>
-        값이 불규칙해서 역할 이름을 쓴다. 컨트롤 높이는 32 · 36 · 40 · 48 ·
-        56px 이라 숫자 스케일의 이점이 둘 다 없다.
+        값이 불규칙해서 역할 이름을 쓴다. 컨트롤 높이는 32 · 36 · 40 · 48 · 56px
+        이라 숫자 스케일의 이점이 둘 다 없다.
       </p>
 
       <h3>컨트롤 높이</h3>
@@ -156,10 +156,9 @@ export default function SpacingPage() {
         <strong>
           <code>size-control-option</code>(44px)은 터치 영역의 하한이다.
         </strong>{" "}
-        단독으로 누를 수 있는 것은 이보다 작지 않아야 한다.{" "}
-        보이는 크기와 누를 수 있는 크기는 다르다. 아이콘이 16px 이어도 히트
-        영역은 <code>padding</code> 이나 가상요소로 44px 을
-        채운다.
+        단독으로 누를 수 있는 것은 이보다 작지 않아야 한다. 보이는 크기와 누를
+        수 있는 크기는 다르다. 아이콘이 16px 이어도 히트 영역은{" "}
+        <code>padding</code> 이나 가상요소로 44px 을 채운다.
         <br />
         <br />
         자기 치수를 갖는 선택 컨트롤(Checkbox · Radio 22px, Switch 46×26)은

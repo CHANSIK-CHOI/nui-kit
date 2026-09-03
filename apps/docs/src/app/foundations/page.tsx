@@ -31,7 +31,7 @@ const SECTIONS: {
       {
         title: "아이콘",
         href: "/foundations/icon",
-        desc: "크기 5단계와 접근 이름",
+        desc: "크기 4단계와 접근 이름",
       },
       {
         title: "간격과 크기",

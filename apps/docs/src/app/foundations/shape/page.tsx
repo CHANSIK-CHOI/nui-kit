@@ -27,8 +27,8 @@ export default function ShapePage() {
       <h1>모양과 선</h1>
       <p className="doc-lead">
         모서리를 얼마나 둥글게 하고 선을 어떤 색과 두께로 그릴지 정한다.
-        그림자와 쌓임 순서는{" "}
-        <Link href="/foundations/elevation">깊이</Link> 문서에 있다.
+        그림자와 쌓임 순서는 <Link href="/foundations/elevation">깊이</Link>{" "}
+        문서에 있다.
       </p>
 
       <h2>모서리</h2>
@@ -131,19 +131,17 @@ export default function ShapePage() {
 
       <div className="doc-note">
         <strong>입력 컨트롤은 이 표를 쓰지 않는다.</strong>{" "}
-        <code>control-border</code> 가 따로 있고 형태선보다 한 단계 진하다.
-        누를 수 있는 것과 가만히 있는 것을 진하기로 구분한다. 상태별로 무엇을
-        쓰는지는{" "}
-        <Link href="/foundations/state">상태</Link> 문서에 있다.
+        <code>control-border</code> 가 따로 있고 형태선보다 한 단계 진하다. 누를
+        수 있는 것과 가만히 있는 것을 진하기로 구분한다. 상태별로 무엇을
+        쓰는지는 <Link href="/foundations/state">상태</Link> 문서에 있다.
       </div>
 
       <TokenTable group="border" omit="border-width" />
 
       <h2>두께</h2>
       <p>
-        색과 달리 두께는 연쇄하지 않는다. 1px 은 그냥 1px 이고,
-        하나를 바꿔도 다른 데로 퍼지지 않는다. 그래서 역할 계층 없이 스케일만
-        둔다.
+        색과 달리 두께는 연쇄하지 않는다. 1px 은 그냥 1px 이고, 하나를 바꿔도
+        다른 데로 퍼지지 않는다. 그래서 역할 계층 없이 스케일만 둔다.
       </p>
       <TokenTable group="border" only="border-width" swatch={false} />
       <p>
@@ -155,8 +153,8 @@ export default function ShapePage() {
       <div className="doc-note doc-note--warn">
         <strong>투명한 테두리에도 두께가 적용된다.</strong> Popup 닫기 버튼과
         Datepicker 날짜 칸은 <code>border: … solid transparent</code> 로 자리만
-        잡아둔 곳이다. 여기를 빼면 두께를 2px 로 바꿨을 때 이 자리만 1px 로
-        남아 선택하는 순간 요소가 밀린다.
+        잡아둔 곳이다. 여기를 빼면 두께를 2px 로 바꿨을 때 이 자리만 1px 로 남아
+        선택하는 순간 요소가 밀린다.
       </div>
     </>
   );

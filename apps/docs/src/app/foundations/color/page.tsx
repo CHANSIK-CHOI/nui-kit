@@ -146,18 +146,33 @@ import "./nui-theme.css";
       ))}
 
       <div className="doc-note">
-        밝은 쪽 1번부터 7번까지는 어두운 글자를, 어두운 쪽 8번부터 12번까지는
-        밝은 글자를 얹도록 만들었다. 스케일이 그 경계에서 뒤집히므로{" "}
-        <strong>같은 번호를 쓰면 대비가 자동으로 확보된다.</strong>
+        라이트에서 1번부터 7번까지는 어두운 글자를, 8번부터 12번까지는 밝은
+        글자를 얹도록 만들었다. 다크에서는 스케일 전체가 뒤집혀 같은 번호가 반대
+        밝기가 된다. 그래서{" "}
+        <strong>
+          같은 번호를 쓰면 어느 테마에서든 대비가 자동으로 확보된다.
+        </strong>
       </div>
 
       <h2>다크 테마</h2>
       <p>
-        아직 없다. 넣을 때도 이름은 바뀌지 않는다. 12단계가{" "}
-        <code>data-theme</code> 에서 다른 값으로 다시 선언되고{" "}
-        <code>action-primary</code> 같은 역할 이름은 그대로다. 컴포넌트 CSS 는
-        고칠 필요가 없다.
+        OS 가 다크면 아무 설정 없이 다크로 그려진다. 순서는 셋이다.{" "}
+        <code>data-theme=&quot;dark&quot;</code> 를 주면 그것이 이기고, 없으면
+        OS 설정을 따르고, <code>data-theme=&quot;light&quot;</code> 를 주면 OS
+        가 다크여도 라이트를 유지한다.
       </p>
+      <p>
+        바뀌는 것은 12단계 값뿐이다. <code>action-primary</code> 같은 역할
+        이름은 그대로라 컴포넌트 CSS 는 고칠 것이 없다. 예외는 셋 — 층(
+        <code>layer-*</code>)은 &quot;위가 밝다&quot;를 지키려고 순서를 바꾸고,
+        토스트·툴팁 위 글자(<code>text-on-inverse</code>)는 표면이 밝아지므로
+        어두워지고, 에러 토스트 배경이 진해진다.
+      </p>
+      <div className="doc-note doc-note--warn">
+        <strong>다크는 옵션이 아니라 두 번째 정본이다.</strong> 라이트에서
+        통과한 대비는 다크에서도 통과해야 한다. <code>verify:a11y</code> 가 두
+        테마를 다 잰다.
+      </div>
 
       <h2>팔레트 전량</h2>
       <p>

@@ -11,13 +11,18 @@ const DATA = tokens as unknown as Record<string, Token[]>;
 const ELEVATION = ["1", "2", "3", "press"];
 
 const LAYERS: [string, string, string][] = [
-  ["layer-basement", "바닥", "패널 안쪽 바닥, 비활성 영역"],
+  [
+    "layer-basement",
+    "바닥",
+    "화면의 바닥. 앱이 쓰는 층이고 컴포넌트는 쓰지 않는다",
+  ],
   [
     "layer-default",
     "기본",
-    "카드 · 리스트 표면. 대부분의 콘텐츠가 여기 놓인다",
+    "카드 · 리스트 · 입력 컨트롤 표면. 대부분의 콘텐츠가 여기 놓인다",
   ],
-  ["layer-floating", "떠 있음", "팝업 · 드롭다운 · 툴팁 · 달력"],
+  ["layer-floating", "떠 있음", "팝업 · Select 메뉴 · Datepicker 팝업"],
+  ["layer-inverse", "반전", "토스트 · 툴팁. 글자는 text-on-inverse"],
   ["layer-overlay", "딤", "모달 뒤를 덮는 어두운 면"],
 ];
 
@@ -36,8 +41,8 @@ export default function ElevationPage() {
 
       <h2>층</h2>
       <p>
-        <code>layer-*</code> 는 컨테이너의 표면색만 정의한다.
-        글자나 아이콘 같은 개별 요소가 아니라 화면의 캔버스를 만든다.
+        <code>layer-*</code> 는 컨테이너의 표면색만 정의한다. 글자나 아이콘 같은
+        개별 요소가 아니라 화면의 캔버스를 만든다.
       </p>
 
       <div className="doc-example">
@@ -107,10 +112,12 @@ export default function ElevationPage() {
       </div>
 
       <div className="doc-note doc-note--warn">
-        <strong>
-          <code>layer-basement</code> 는 아직 쓰는 곳이 없다.
-        </strong>{" "}
-        다크 테마를 넣을 때 기준이 되는 층이라 지우지 않고 뒀다.
+        <strong>라이트에서 같고 다크에서 갈리는 쌍이 있다.</strong>{" "}
+        <code>control-bg</code> 와 <code>layer-floating</code> 은 라이트에서 둘
+        다 gray-1 이라 헷갈려 써도 안 보이지만, 다크에서는 gray-2 와 gray-3 으로
+        갈린다. 그래서 자리로 정한다 — 입력 컨트롤 본체는{" "}
+        <code>control-bg</code>, 메뉴·팝업·달력은 <code>layer-floating</code>.
+        다크에서는 층이 올라갈수록 밝아진다.
       </div>
 
       <h2>그림자</h2>
@@ -242,6 +249,12 @@ export default function ElevationPage() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div className="doc-note">
+        <strong>팝업끼리는 나중에 연 것이 위다.</strong> 값을 나누지 않는다.
+        Alert 이 열린 BottomSheet 위에 오는 것은 이 순서의 결과다. 반대로 Alert
+        위로 시트를 여는 것은 흐름 오류다.
       </div>
 
       <div className="doc-note">

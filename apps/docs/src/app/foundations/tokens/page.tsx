@@ -79,8 +79,7 @@ export default function TokensPage() {
         <code>space-2</code> 사이는 <code>space-1_5</code>).
       </p>
       <p>
-        아이콘 크기는 10, 14, 16, 20, 24px 로 불규칙해서 숫자의 두 이점이 모두
-        없다.
+        아이콘 크기는 14, 16, 20, 24px 로 불규칙해서 숫자의 두 이점이 모두 없다.
       </p>
 
       <h2>색만 한 겹을 더 둔다</h2>
@@ -102,9 +101,8 @@ export default function TokensPage() {
 
       <h2>전량 {total}개</h2>
       <p>
-        이 목록은{" "}
-        <code>packages/ui/src/styles/tokens/_seed.scss</code> 에서 자동
-        생성한다.
+        이 목록은 <code>packages/ui/src/styles/tokens/_seed.scss</code> 에서
+        자동 생성한다.
       </p>
 
       {GROUPS.map(([key, label]) => (
