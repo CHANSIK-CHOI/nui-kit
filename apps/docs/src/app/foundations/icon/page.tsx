@@ -9,12 +9,11 @@ const DATA = tokens as unknown as Record<string, Token[]>;
 
 /** 실제 컴포넌트가 어느 크기를 쓰는지 — 코드에서 확인한 현행이다. */
 const USAGE: [string, string, string][] = [
-  ["sm", "10px", "Checkbox 체크 표시 · Toast 아이콘 · Tooltip 화살표"],
   ["md", "14px", "Select 태그 제거(×) 버튼"],
   [
     "lg",
     "16px",
-    "Button small 의 아이콘 · Accordion 화살표 · Datepicker 화살표 · Message 아이콘",
+    "Button small 의 아이콘 · Datepicker 이전/다음 · Accordion 화살표 · Message 아이콘",
   ],
   ["2xl", "20px", "Button 기본 크기의 아이콘 · Switch 썸"],
   ["3xl", "24px", "Textfield 안 아이콘 · Select 드롭다운 표시"],
@@ -62,17 +61,22 @@ export default function IconPage() {
       </div>
 
       <p>
-        값이 10 · 14 · 16 · 20 · 24px 로 등간격이 아니다. 값이 불규칙해서
-        숫자가 아니라 역할 이름을 쓴다(
+        값이 14 · 16 · 20 · 24px 로 등간격이 아니다. 값이 불규칙해서 숫자가
+        아니라 역할 이름을 쓴다(
         <Link href="/foundations/tokens">디자인 토큰</Link>). <code>xl</code> 은
         쓰이지 않아서 만들지 않았다.
       </p>
+      <div className="doc-note">
+        <strong>점과 표시는 아이콘이 아니다.</strong> 라디오 점(8) · 체크
+        표시(6×10) · 토스트 표시점(10) · 툴팁 화살표(10)는{" "}
+        <code>size-dot-xs / sm / md</code> 다. 10px 아이콘은 하나도 없었다.
+      </div>
 
       <h2>어느 크기를 고르나</h2>
       <p>
-        <strong>아이콘은 나란히 놓인 글자보다 한 단계 크다.</strong> 같은
-        크기로 맞추면 아이콘이 글자보다 작아 보인다. 글자는 획이 촘촘하고
-        아이콘은 비어 있기 때문이다.
+        <strong>아이콘은 나란히 놓인 글자보다 한 단계 크다.</strong> 같은 크기로
+        맞추면 아이콘이 글자보다 작아 보인다. 글자는 획이 촘촘하고 아이콘은 비어
+        있기 때문이다.
       </p>
 
       <div className="doc-table-wrap">
@@ -101,7 +105,7 @@ export default function IconPage() {
               <td>
                 <span className="doc-token-name">size-icon-lg</span> 16px
               </td>
-              <td className="doc-wrap">Button small · Accordion 화살표</td>
+              <td className="doc-wrap">Button small · Datepicker 이전/다음</td>
             </tr>
             <tr>
               <td className="doc-wrap">
@@ -123,13 +127,12 @@ export default function IconPage() {
             </tr>
             <tr>
               <td className="doc-wrap">
-                <strong>컨트롤 안의 작은 표시</strong>
+                <strong>태그 제거</strong>
               </td>
               <td>
-                <span className="doc-token-name">size-icon-sm</span> 10px ·{" "}
-                <span className="doc-token-name">-md</span> 14px
+                <span className="doc-token-name">size-icon-md</span> 14px
               </td>
-              <td className="doc-wrap">체크 표시 · 태그 제거 버튼</td>
+              <td className="doc-wrap">MultiSelect 태그의 × 버튼</td>
             </tr>
           </tbody>
         </table>
@@ -222,16 +225,29 @@ export default function IconPage() {
       </pre>
 
       <div className="doc-note doc-note--warn">
-        <strong>접근 이름을 두 번 주지 않는다.</strong> 아이콘 전용
-        버튼에서는 버튼에 이름을 주고 아이콘은 장식으로 둔다. 둘 다 주면
-        스크린리더가 같은 말을 두 번 읽는다.
+        <strong>접근 이름을 두 번 주지 않는다.</strong> 아이콘 전용 버튼에서는
+        버튼에 이름을 주고 아이콘은 장식으로 둔다. 둘 다 주면 스크린리더가 같은
+        말을 두 번 읽는다.
       </div>
 
       <h2>아이콘 세트</h2>
       <p>
-        컴포넌트가 쓰는 아이콘만 들어 있고{" "}
-        <code>@chansikchoi/next-ui/icon</code> 에서 가져온다.
+        아이콘은 <code>lucide-react</code> 다. 24px 격자에 stroke 2 인 line
+        아이콘이고, 크기에 비례해 선이 가늘어진다. 컴포넌트가 쓰는 일곱
+        개(지우기 · 검색 · 비밀번호 보기/숨기기 · 닫기 · 달력 · 주의)는{" "}
+        <code>@chansikchoi/next-ui/icon</code> 에서 가져온다. Select 의 화살표와
+        지우기, Datepicker 의 이전/다음, Accordion 의 화살표도 같은 세트다.
       </p>
+      <p>
+        직접 넣을 아이콘은 <code>lucide-react</code> 에서 바로 가져온다.{" "}
+        <code>size</code> 에 14 · 16 · 20 · 24 를 주면 위 표와 같은 자리에
+        놓인다. 라이브러리가 쓰는 세트와 같아 선 굵기가 섞이지 않는다.
+      </p>
+      <pre className="doc-code">
+        <code>{`import { Trash2 } from "lucide-react";
+
+<Button icon={<Trash2 size={20} />}>삭제</Button>`}</code>
+      </pre>
       <p>
         직접 만든 SVG 를 쓸 때는 <code>Icon</code> 으로 감싸면 크기·색·접근성
         처리가 함께 따라온다.

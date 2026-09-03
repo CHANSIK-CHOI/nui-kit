@@ -85,7 +85,7 @@ import "@chansikchoi/next-ui/styles/preflight.css";
 | 범위 | 방법 |
 | --- | --- |
 | **한 컴포넌트만** | `className` 으로 직접 씁니다 |
-| **전체** | 브랜드 색 프리셋 — **준비 중** |
+| **전체** | 브랜드 색 프리셋 185색 중 하나를 고릅니다 |
 
 ```css
 /* 한 컴포넌트만 — 배경과 글자를 같은 자리에 쓰게 되므로 짝을 놓치지 않습니다 */
@@ -95,9 +95,10 @@ import "@chansikchoi/next-ui/styles/preflight.css";
 }
 ```
 
-**전체 브랜드 색은 프리셋으로 제공할 예정입니다.** 준비된 색 중 하나를 고르면
-버튼·입력창·선택 컨트롤·회색까지 **대비를 유지한 채** 함께 바뀝니다.
-그때까지는 색 변경을 `className` 으로 해주세요.
+**전체 브랜드 색은 프리셋으로 바꿉니다.** 185색 중 하나를 고르면 버튼·입력창·선택
+컨트롤·회색까지 **대비를 유지한 채** 함께 바뀝니다. 고르는 법과 미리보기는 문서
+사이트의 「브랜드 색 고르기」에 있습니다. 다크는 OS 설정을 자동으로 따르고,
+`<html data-theme="dark">` 또는 `"light"` 로 강제할 수 있습니다.
 
 ### 치수·모양·선 두께는 컴포넌트별로 엽니다
 
@@ -152,6 +153,21 @@ import "@chansikchoi/next-ui/styles/preflight.css";
 | `Icon` | `/icon` | `icon.css` |
 
 **서브패스 이름과 CSS 이름은 항상 같습니다.** 온디맨드로 쓸 때 헷갈릴 일이 없습니다.
+
+### 아이콘
+
+아이콘은 [`lucide-react`](https://lucide.dev) 입니다. 컴포넌트가 쓰는 일곱 개(`DelIcon` ·
+`SearchIcon` · `ShowPwIcon` · `HidePwIcon` · `CloseIcon` · `CalendarIcon` · `AttentionIcon`)는
+`/icon` 에서 가져오고, `title` 을 주면 스크린리더가 읽고 없으면 장식으로 건너뜁니다.
+
+직접 넣을 아이콘은 `lucide-react` 에서 바로 가져오면 라이브러리와 선 굵기가 맞습니다.
+`size` 는 14 · 16 · 20 · 24 를 씁니다.
+
+```tsx
+import { Trash2 } from "lucide-react";
+
+<Button icon={<Trash2 size={20} />}>삭제</Button>;
+```
 
 `Toast` 와 팝업 계열을 **명령형으로**(`useToast()` · `useAlert()` · `useConfirm()` ·
 `useLayerPopup()`) 쓰려면 Host 로 앱을 **감싸야** 합니다. 앱 루트에서 한 번만 합니다.

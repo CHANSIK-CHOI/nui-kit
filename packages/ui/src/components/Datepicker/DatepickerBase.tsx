@@ -22,6 +22,7 @@ import {
   type OnSelectHandler,
 } from "react-day-picker";
 import { px } from "../../internal/prefix.js";
+import { DaypickerChevron } from "./DaypickerChevron.js";
 import { motionTransition } from "../../internal/motion.js";
 import Textfield, { type TextfieldProps } from "../Textfield/Textfield.js";
 import TextfieldBtn from "../Textfield/TextfieldBtn.js";
@@ -488,6 +489,10 @@ export default function DatepickerBase<
               modifiers={resolvedModifiers}
               modifiersClassNames={resolvedModifiersClassNames}
               classNames={resolvedClassNames}
+              components={{
+                Chevron: DaypickerChevron,
+                ...dayPickerProps?.components,
+              }}
               labels={resolvedLabels}
               defaultMonth={resolvedDefaultMonth}
               startMonth={resolvedStartMonth}

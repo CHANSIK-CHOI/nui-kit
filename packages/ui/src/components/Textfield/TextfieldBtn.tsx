@@ -43,7 +43,7 @@ export default function TextfieldBtn({
   return (
     <button
       type={type}
-      className={cn(`${block}__btn`, className)}
+      className={cn(`${block}__btn`, `${block}__btn--${icon}`, className)}
       disabled={disabled}
       onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}

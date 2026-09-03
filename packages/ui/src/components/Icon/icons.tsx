@@ -1,178 +1,85 @@
 "use client";
 
-import Icon, { type IconBaseProps } from "./Icon.js";
+import cn from "classnames";
+import {
+  Calendar,
+  CircleAlert,
+  Eye,
+  EyeOff,
+  Search,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+import type { CSSProperties } from "react";
+import { px } from "../../internal/prefix.js";
+import type { IconBaseProps } from "./Icon.js";
 
-/** 입력값 지우기 */
-export function DelIcon(props: IconBaseProps) {
-  return (
-    <Icon viewBox="0 0 20 20" fill="none" {...props}>
-      <circle cx="10" cy="10" r="7" fill="currentColor" opacity="0.12" />
-      <path
-        d="M7 7L13 13"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="M13 7L7 13"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </Icon>
-  );
+/**
+ * lucide 아이콘을 우리 `Icon` 계약에 맞춘다 (a11y.md §4).
+ *
+ *   title 없음 → `aria-hidden`      장식. 옆 글자나 버튼이 뜻을 전한다
+ *   title 있음 → `role="img"` + `<title>`   아이콘만으로 뜻을 전한다
+ *
+ * lucide 는 `title`·`aria-*`·`role` 이 하나라도 있으면 자기 `aria-hidden` 을 빼고,
+ * `role="img"` 는 붙이지 않는다 — 그래서 여기서 붙인다
+ * (.claude/references/lucide-icons-lucide/react-props-accessibility.md).
+ *
+ * 크기는 CSS 가 정한다. `.nui-icon { width: 100%; height: 100% }` 가 lucide 의
+ * `width="24"` 속성을 이기므로 자리(버튼 박스)가 곧 크기다 — design-system.md §5-2.
+ * `width`·`height` 를 직접 주면 그 값이 인라인 스타일로 들어간다.
+ */
+function fromLucide(LucideComponent: LucideIcon, displayName: string) {
+  function NuiIcon({
+    className,
+    color,
+    size,
+    width,
+    height,
+    style,
+    title,
+    focusable = false,
+    ...rest
+  }: IconBaseProps) {
+    const iconStyle: CSSProperties = { ...style };
+    if (color) iconStyle.color = color;
+    if (width) iconStyle.width = width;
+    if (height) iconStyle.height = height;
+
+    return (
+      <LucideComponent
+        className={cn(px("icon"), className)}
+        size={size ?? width ?? height}
+        style={iconStyle}
+        focusable={focusable}
+        {...(title ? { role: "img" } : { "aria-hidden": true })}
+        {...rest}
+      >
+        {title ? <title>{title}</title> : null}
+      </LucideComponent>
+    );
+  }
+
+  NuiIcon.displayName = displayName;
+  return NuiIcon;
 }
 
-/** 에러/주의 표시 */
-export function AttentionIcon(props: IconBaseProps) {
-  return (
-    <Icon viewBox="0 0 20 20" fill="none" {...props}>
-      <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.6" />
-      <path
-        d="M10 6.5V10.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <circle cx="10" cy="13.5" r="1" fill="currentColor" />
-    </Icon>
-  );
-}
+/** 지우기 — Textfield · Textarea · Search 의 값 비우기 */
+export const DelIcon = fromLucide(X, "DelIcon");
+
+/** 주의 — Message 의 에러 표시 · Alert · Confirm */
+export const AttentionIcon = fromLucide(CircleAlert, "AttentionIcon");
 
 /** 검색 */
-export function SearchIcon(props: IconBaseProps) {
-  return (
-    <Icon viewBox="0 0 20 20" fill="none" {...props}>
-      <circle cx="9" cy="9" r="4.5" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M12.5 12.5L16 16"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </Icon>
-  );
-}
+export const SearchIcon = fromLucide(Search, "SearchIcon");
 
-/** 비밀번호 표시 */
-export function ShowPwIcon(props: IconBaseProps) {
-  return (
-    <Icon viewBox="0 0 20 20" fill="none" {...props}>
-      <path
-        d="M2.5 10C3.9 6.9 6.6 5 10 5C13.4 5 16.1 6.9 17.5 10C16.1 13.1 13.4 15 10 15C6.6 15 3.9 13.1 2.5 10Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.6" />
-    </Icon>
-  );
-}
+/** 비밀번호 보기 */
+export const ShowPwIcon = fromLucide(Eye, "ShowPwIcon");
 
-/** 비밀번호 숨김 */
-export function HidePwIcon(props: IconBaseProps) {
-  return (
-    <Icon viewBox="0 0 20 20" fill="none" {...props}>
-      <path
-        d="M3.5 4L16.5 16"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="M7 6.1C7.9 5.4 8.9 5 10 5C13.4 5 16.1 6.9 17.5 10C16.9 11.3 16.1 12.4 15.1 13.2"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12.4 14.6C11.7 14.9 10.9 15 10 15C6.6 15 3.9 13.1 2.5 10C3.1 8.8 3.8 7.8 4.8 7"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M8.6 8.6C8.2 8.95 8 9.45 8 10C8 11.1 8.9 12 10 12C10.55 12 11.05 11.8 11.4 11.4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </Icon>
-  );
-}
+/** 비밀번호 숨기기 */
+export const HidePwIcon = fromLucide(EyeOff, "HidePwIcon");
 
-/** 닫기 */
-export function CloseIcon(props: IconBaseProps) {
-  return (
-    <Icon viewBox="0 0 20 20" fill="none" {...props}>
-      <path
-        d="M5 5L15 15"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="M15 5L5 15"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </Icon>
-  );
-}
+/** 닫기 — Popup */
+export const CloseIcon = fromLucide(X, "CloseIcon");
 
 /** 캘린더 — Datepicker 의 달력 열기 버튼 */
-export function CalendarIcon(props: IconBaseProps) {
-  return (
-    <Icon viewBox="0 0 20 20" fill="none" {...props}>
-      <rect
-        x="3"
-        y="4.5"
-        width="14"
-        height="12.5"
-        rx="2"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-      <path
-        d="M6.5 3V6"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M13.5 3V6"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M3 8H17"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M6.5 11H8.5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M11.5 11H13.5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M6.5 14H8.5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </Icon>
-  );
-}
+export const CalendarIcon = fromLucide(Calendar, "CalendarIcon");

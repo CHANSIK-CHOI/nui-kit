@@ -5,7 +5,6 @@ import { forwardRef, useId, type TextareaHTMLAttributes } from "react";
 import { px } from "../../internal/prefix.js";
 import { getMergedAriaIds, useFieldContext } from "../Field/Field.context.js";
 import Message from "../Textfield/Message.js";
-import TextfieldBtn from "../Textfield/TextfieldBtn.js";
 
 const block = px("textarea");
 
@@ -20,14 +19,13 @@ type TextareaBaseProps = {
   disabled?: boolean;
   infoMessage?: string;
   errorMessage?: string;
-  isClearable?: boolean;
-  onClear?: () => void;
-  /** 지우기 버튼의 접근 이름. 소비자의 어휘·언어로 바꿀 수 있어야 한다 (a11y.md §9) */
-  clearButtonTitle?: string;
   /** 사용자 크기 조절 허용 여부 */
   resize?: TextareaResize;
 };
 
+// 지우기 버튼(isClearable)은 두지 않는다. 여러 줄 본문은 실수로 지우면 잃는 것이
+// 크고, 통째로 되돌리는 장치는 검색어·태그처럼 짧은 값 하나의 것이다.
+// 주요 디자인 시스템 대부분이 textarea 에 지우기를 두지 않는다 (2026-09-03 결정).
 export type TextareaProps = TextareaBaseProps &
   Omit<
     TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -52,9 +50,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       disabled = false,
       infoMessage = "",
       errorMessage = "",
-      isClearable = false,
-      onClear,
-      clearButtonTitle = "내용 지우기",
       resize = "vertical",
       "aria-describedby": ariaDescribedBy,
       ...rest
@@ -76,13 +71,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       ...fieldDescribedByIds,
       hasOwnMessage ? generatedMessageId : null,
     );
-    const hasValue = value != null && String(value).length > 0;
-    const canClear =
-      isClearable &&
-      typeof onClear === "function" &&
-      hasValue &&
-      !readOnly &&
-      !disabled;
 
     return (
       <div
@@ -107,17 +95,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             aria-describedby={resolvedAriaDescribedBy}
             aria-invalid={resolvedIsError ? true : undefined}
           />
-          {canClear ? (
-            <div className={`${block}__actions`}>
-              <TextfieldBtn
-                icon="clear"
-                title={clearButtonTitle}
-                onClick={onClear}
-                disabled={disabled}
-                className={`${block}__clear`}
-              />
-            </div>
-          ) : null}
         </div>
         <Message
           id={hasOwnMessage ? generatedMessageId : undefined}

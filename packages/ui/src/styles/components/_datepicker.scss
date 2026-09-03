@@ -233,10 +233,11 @@
       cursor: not-allowed;
     }
 
+    // lucide 화살표는 stroke 로 그린다. `fill: currentColor` 를 주면 속성 `fill="none"` 을
+    // CSS 가 이겨 도형이 채워진다.
     &__chevron {
       width: var(#{v("size-icon-lg")});
       height: var(#{v("size-icon-lg")});
-      fill: currentColor;
     }
 
     // ── 날짜 그리드

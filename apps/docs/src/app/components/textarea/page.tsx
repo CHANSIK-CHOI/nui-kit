@@ -83,8 +83,8 @@ export default function TextareaPage() {
       <h2>커스터마이징</h2>
       <p>
         색은 컴포넌트별로 열지 않는다. 한 곳만 바꾸려면 <code>className</code>{" "}
-        을, 화면 전체를 바꾸려면{" "}
-        <Link href="/brand-colors">브랜드 프리셋</Link>을 쓴다.
+        을, 화면 전체를 바꾸려면 <Link href="/brand-colors">브랜드 프리셋</Link>
+        을 쓴다.
       </p>
       <HookTable group="textarea" />
 

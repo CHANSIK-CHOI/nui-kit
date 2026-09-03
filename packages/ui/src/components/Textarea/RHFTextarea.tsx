@@ -39,7 +39,6 @@ export default function RHFTextarea<
   disabled = false,
   errorMessage,
   formatValue,
-  onClear,
   ...restTextareaProps
 }: RHFTextareaProps<TFormValues, TFieldName>) {
   const { field, fieldState } = useController({
@@ -58,11 +57,6 @@ export default function RHFTextarea<
     );
   };
 
-  const handleClear = () => {
-    field.onChange(formatValue ? formatValue("") : "");
-    onClear?.();
-  };
-
   return (
     <Textarea
       {...restTextareaProps}
@@ -71,7 +65,6 @@ export default function RHFTextarea<
       value={field.value ?? ""}
       disabled={disabled}
       onChange={handleChange}
-      onClear={handleClear}
       errorMessage={fieldState.error?.message ?? errorMessage}
     />
   );

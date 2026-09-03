@@ -1,0 +1,68 @@
+@use "../abstracts" as *;
+
+// ─────────────────────────────────────────────────────────────
+// 입력 컨트롤 안의 보조 버튼 — `TextfieldBtn` (nui-textfield__btn)
+//
+// Textfield · Search · Password · Datepicker 가 같은 버튼을 쓴다.
+// 폼 요소의 X(지우기) · 눈(비밀번호) · 달력 버튼이 전부 이 하나의 정의다 —
+// Select 의 인디케이터(`_select.scss`)와 같은 골격이다: 24px 박스 · 4px 여백 · 16px 글리프.
+// Textarea 에는 지우기 버튼이 없다 — 여러 줄 본문에 통째 지우기는 관습이 아니다.
+//
+// ⚠️ 이 파일은 단독으로 쓰지 않는다. `_textfield.scss` 가 `@use` 한다.
+// ─────────────────────────────────────────────────────────────
+@layer nui.components {
+  #{cls("textfield")}__btn {
+    // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
+    appearance: none;
+    margin: 0;
+    background-color: transparent;
+    border: 0;
+    font-family: var(#{v("font-family-base")});
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(#{v("size-icon-3xl")});
+    height: var(#{v("size-icon-3xl")});
+    margin-left: var(#{v("space-2")});
+    padding: var(#{v("space-1")});
+    color: var(#{v("control-icon")});
+    border-radius: var(#{v("radius-circle")});
+
+    // 눌림은 시간·곡선이 다르므로 전용 믹스인을 쓴다 — design-system.md §6-3
+    @include motion-press((color, background-color, opacity), "3");
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    #{cls("icon")} {
+      width: 100%;
+      height: 100%;
+    }
+
+    // 지우기(X)는 정적 면 위에 놓는다 — Select 의 지우기와 같다
+    &--clear {
+      background-color: var(#{v("control-bg-subtle")});
+    }
+
+    // 표면 hover 부류 — design-system.md §2-3
+    @include hoverable {
+      &:not([disabled]):hover {
+        color: var(#{v("control-icon-strong")});
+        background-color: var(#{v("control-bg-hover")});
+      }
+    }
+
+    &:not([disabled]):active {
+      background-color: var(#{v("control-bg-active")});
+      transform: scale(var(#{v("scale-94")}));
+    }
+
+    &[disabled] {
+      opacity: var(#{v("opacity-icon-disabled")});
+      cursor: not-allowed;
+    }
+  }
+}

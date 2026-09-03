@@ -1,6 +1,7 @@
 "use client";
 
 import cn from "classnames";
+import { ChevronDown } from "lucide-react";
 import { type HTMLAttributes, type ReactNode } from "react";
 import { px } from "../../internal/prefix.js";
 import AccordionButton from "./AccordionButton.js";
@@ -53,10 +54,13 @@ export default function AccordionHead({
             aria-label={titleId ? undefined : toggleLabel}
             aria-labelledby={titleId}
           >
-            <span className={`${block}__arrow-icon`} aria-hidden="true" />
+            <ChevronDown
+              className={`${block}__arrow-icon`}
+              aria-hidden="true"
+            />
           </AccordionButton>
         ) : (
-          <span className={`${block}__arrow-icon`} aria-hidden="true" />
+          <ChevronDown className={`${block}__arrow-icon`} aria-hidden="true" />
         )}
       </span>
     </div>

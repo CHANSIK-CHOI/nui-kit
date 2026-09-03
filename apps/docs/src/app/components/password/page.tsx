@@ -7,6 +7,7 @@ import {
   InputStateCases,
   PropsTable,
 } from "@/components/guide";
+import { PasswordDemo } from "./PasswordDemo";
 
 export const metadata = { title: "Password" };
 
@@ -28,7 +29,7 @@ export default function PasswordPage() {
       </p>
       <CaseGrid
         columns={2}
-        code={`<Password placeholder="8자 이상" isClearable onClear={clear} />`}
+        code={`<Password placeholder="8자 이상" defaultIsPasswordVisible />`}
       >
         <Case label="기본" note="숨김">
           <Field>
@@ -44,6 +45,13 @@ export default function PasswordPage() {
         </Case>
       </CaseGrid>
 
+      <h2>지우기</h2>
+      <p>
+        <code>isClearable</code> 과 <code>onClear</code> 를 함께 준다. 지우기
+        버튼은 표시 토글 왼쪽에 놓이고, Textfield · Textarea · Datepicker ·
+        Select 의 지우기와 같은 버튼이다.
+      </p>
+      <PasswordDemo />
       <div className="doc-note">
         값을 지우면 표시 상태가 숨김으로 되돌아간다. 지운 뒤 새로 입력할 때
         비밀번호가 노출된 채로 남지 않게 한 동작이다.

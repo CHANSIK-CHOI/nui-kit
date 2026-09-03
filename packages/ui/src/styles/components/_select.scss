@@ -275,11 +275,13 @@
         border-color: var(#{v("control-border-hover")});
       }
 
+      // Textfield 의 보조 버튼(`_textfield-btn.scss`)과 같은 반응 — 폼 요소 공통
       &:not(#{state("disabled")}):not(#{state("readonly")})
         &__clear-indicator:hover,
       &:not(#{state("disabled")}):not(#{state("readonly")})
         &__dropdown-indicator:hover {
         color: var(#{v("control-icon-strong")});
+        background-color: var(#{v("control-bg-hover")});
       }
     }
 
@@ -288,6 +290,13 @@
       border-color: var(#{v("focus-color")});
       border-width: var(#{v("focus-width")});
       box-shadow: var(#{v("focus-ring")});
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__clear-indicator:active,
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__dropdown-indicator:active {
+      background-color: var(#{v("control-bg-active")});
     }
 
     &:not(#{state("disabled")}):not(#{state("readonly")})

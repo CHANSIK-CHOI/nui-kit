@@ -18,6 +18,11 @@ import type {
   ValueContainerProps,
 } from "react-select";
 import { components as reactSelectComponents } from "react-select";
+import {
+  NuiClearIndicator,
+  NuiDropdownIndicator,
+  NuiMultiValueRemove,
+} from "./SelectIndicators.js";
 import { getMergedAriaIds } from "../Field/Field.context.js";
 import { pv } from "../../internal/prefix.js";
 import SelectAriaContext from "./Select.context.js";
@@ -215,7 +220,7 @@ export function createAriaValueContainer<IsMulti extends boolean>(
       // 이 조건이 깨지면 타입도 빌드도 통과한 채 aria 연결만 조용히 사라진다.
       // react-select 업그레이드가 시끄럽게 깨지도록 알린다.
       console.warn(
-        "[nui-select] ValueContainer 에서 role=\"combobox\" 인 자식을 찾지 못했습니다. " +
+        '[nui-select] ValueContainer 에서 role="combobox" 인 자식을 찾지 못했습니다. ' +
           "react-select 의 내부 구조가 바뀐 것으로 보이며, aria-describedby 연결이 " +
           "끊어졌습니다. Select.utils.ts 의 createAriaValueContainer 를 확인하세요.",
       );
@@ -237,11 +242,9 @@ export function createAriaValueContainer<IsMulti extends boolean>(
  * 렌더 새 객체를 만든다. remount 를 유발하는 것은 **컴포넌트 함수 identity** 뿐이다.
  */
 export function getResolvedSelectComponents<IsMulti extends boolean>(
-  components: SelectComponentsConfig<
-    SelectOption,
-    IsMulti,
-    GroupBase<SelectOption>
-  > | undefined,
+  components:
+    | SelectComponentsConfig<SelectOption, IsMulti, GroupBase<SelectOption>>
+    | undefined,
   overrides: SelectComponentsConfig<
     SelectOption,
     IsMulti,
@@ -250,6 +253,11 @@ export function getResolvedSelectComponents<IsMulti extends boolean>(
 ): SelectComponentsConfig<SelectOption, IsMulti, GroupBase<SelectOption>> {
   return {
     IndicatorSeparator: null,
+    // 인디케이터 3종은 lucide 로 바꾼 우리 기본값이다. 소비자 `components` 가 뒤에
+    // 오므로 소비자가 자기 것으로 갈아끼울 수 있다 — 기본값이지 소유가 아니다.
+    DropdownIndicator: NuiDropdownIndicator,
+    ClearIndicator: NuiClearIndicator,
+    MultiValueRemove: NuiMultiValueRemove,
     ...components,
     ...overrides,
   };

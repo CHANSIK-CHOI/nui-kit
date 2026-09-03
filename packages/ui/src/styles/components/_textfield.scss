@@ -1,5 +1,6 @@
 @use "../abstracts" as *;
 @use "message";
+@use "textfield-btn";
 
 // ─────────────────────────────────────────────────────────────
 // Textfield (Search / Password 파생 포함)
@@ -42,38 +43,7 @@
       padding: 0 var(#{v("space-4")});
     }
 
-    &__btn {
-      // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
-      appearance: none;
-      margin: 0;
-      padding: 0;
-      background-color: transparent;
-      border: 0;
-      font-family: var(#{v("font-family-base")});
-      cursor: pointer;
-
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: var(#{v("size-icon-3xl")});
-      height: var(#{v("size-icon-3xl")});
-      margin-left: var(#{v("space-2")});
-      color: var(#{v("control-icon")});
-      border-radius: var(#{v("radius-circle")});
-
-      // ⚠️ 예전에는 `motion()` 뒤에 `transition:` 을 손으로 또 써서 믹스인 결과가
-      //    통째로 버려지고 있었다. 눌림은 시간·곡선이 다르므로 전용 믹스인을 쓴다.
-      @include motion-press((color, background-color, opacity), "3");
-    }
-
-    &__btn:first-child {
-      margin-left: 0;
-    }
-
-    &__btn #{cls("icon")} {
-      width: 100%;
-      height: 100%;
-    }
+    // 보조 버튼(지우기 · 눈 · 달력)은 `_textfield-btn.scss` 가 정한다 — 폼 요소 공통.
 
     &__input {
       // UA 기본 스타일 무력화 — 원본은 전역 reset 에 의존했으나
@@ -113,20 +83,10 @@
       @include typo(4, "regular");
     }
 
-    &__clear {
-      color: var(#{v("control-icon")});
-    }
-
     // ── interaction
     @include hoverable {
       &:not(#{state("disabled")}):not(#{state("readonly")}):hover &__wrap {
         border-color: var(#{v("control-border-hover")});
-      }
-
-      // 지우기·표시 버튼은 표면 hover 부류다 — design-system.md §2-3
-      &:not(#{state("disabled")}):not(#{state("readonly")}) &__btn:hover {
-        color: var(#{v("control-icon-strong")});
-        background-color: var(#{v("control-bg-hover")});
       }
     }
 
@@ -134,12 +94,6 @@
       border-color: var(#{v("focus-color")});
       border-width: var(#{v("focus-width")});
       box-shadow: var(#{v("focus-ring")});
-    }
-
-    &:not(#{state("disabled")}):not(#{state("readonly")}) &__btn:active {
-      background-color: var(#{v("control-bg-active")});
-      // 작은 아이콘 버튼 — design-system.md §6-3
-      transform: scale(var(#{v("scale-94")}));
     }
 
     // ── disabled
@@ -150,11 +104,6 @@
 
     &__input[disabled] {
       color: var(#{v("control-text-disabled")});
-      cursor: not-allowed;
-    }
-
-    &__btn[disabled] {
-      opacity: var(#{v("opacity-icon-disabled")});
       cursor: not-allowed;
     }
 

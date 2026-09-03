@@ -23,7 +23,7 @@
 
 - 안내·에러 `Message` 가 비어 있어도 `aria-live="polite"` 영역을 남깁니다. RHF 검증
   실패처럼 포커스 이동 없이 메시지가 생겨도 스크린리더가 읽습니다
-- `Textfield` · `Textarea` 에 `clearButtonTitle`, `Accordion.Head` 에 `toggleLabel` prop 을
+- `Textfield` 에 `clearButtonTitle`, `Accordion.Head` 에 `toggleLabel` prop 을
   엽니다. 기본값은 그대로이고, 소비자의 언어와 어휘로 바꿀 수 있습니다
 - `Select` · `MultiSelect` 의 기본 안내 문구에서 마침표를 뺍니다
 

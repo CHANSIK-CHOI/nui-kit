@@ -174,26 +174,13 @@
       background: var(#{v("control-bg-active")});
     }
 
+    // lucide ChevronDown. 상태·안내 아이콘 자리라 16px 이다 — design-system.md §5-2
     &__arrow-icon {
-      position: relative;
       display: block;
       width: var(#{v("size-icon-lg")});
       height: var(#{v("size-icon-lg")});
 
       @include motion(transform, "3");
-    }
-
-    // 아이콘은 SVG 없이 테두리 두 변을 회전시켜 만든다 (자산 의존 제거)
-    &__arrow-icon::before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: var(#{v("size-dot-sm")});
-      height: var(#{v("size-dot-sm")});
-      border-right: 2px solid currentColor;
-      border-bottom: 2px solid currentColor;
-      transform: translate(-50%, -65%) rotate(45deg);
     }
 
     &__panel {
