@@ -7,6 +7,7 @@ import {
   ButtonLink,
 } from "@chansikchoi/next-ui";
 import { DelIcon } from "@chansikchoi/next-ui/icon";
+import { LoadingDemo } from "./LoadingDemo";
 import {
   GuideHeader,
   Case,
@@ -41,9 +42,9 @@ export default function ButtonPage() {
 
       <h2>기본이 전체 너비다</h2>
       <p>
-        <code>Button</code> 은 <code>width: 100%</code> 다. 모바일 폼을 전제로 한
-        기본값이라 아래 예제에서도 한 줄을 모두 차지한다. 너비를 제한하려면 바깥
-        컨테이너로 감싸거나 <code>ButtonGroup</code> 을 쓴다.
+        <code>Button</code> 은 <code>width: 100%</code> 다. 모바일 폼을 전제로
+        한 기본값이라 아래 예제에서도 한 줄을 모두 차지한다. 너비를 제한하려면
+        바깥 컨테이너로 감싸거나 <code>ButtonGroup</code> 을 쓴다.
       </p>
       <Example row={false} caption="컨테이너로 너비를 제한한 예">
         <div style={{ display: "flex", gap: 8, maxWidth: 320 }}>
@@ -55,8 +56,8 @@ export default function ButtonPage() {
       <h2>색과 변형</h2>
       <p>
         색이 아니라 <strong>역할</strong>이 이름이다. 화면의 주 행동에는{" "}
-        <code>primary</code>, 되돌릴 수 없는 삭제나 탈퇴에는 <code>danger</code>,
-        확인이 필요한 진행에는 <code>warning</code> 을 쓴다.
+        <code>primary</code>, 되돌릴 수 없는 삭제나 탈퇴에는 <code>danger</code>
+        , 확인이 필요한 진행에는 <code>warning</code> 을 쓴다.
       </p>
       <CaseMatrix
         rows={VARIANTS}
@@ -114,8 +115,8 @@ export default function ButtonPage() {
 
       <div className="doc-note doc-note--warn">
         <code>variant=&quot;text&quot;</code> 는 크기와 모양 옵션이 없다.{" "}
-        <strong>타입이 막는다</strong> — <code>size</code> 와{" "}
-        <code>shape</code> 가 <code>never</code> 로 선언되어 있다.
+        <strong>타입이 막는다</strong> — <code>size</code> 와 <code>shape</code>{" "}
+        가 <code>never</code> 로 선언되어 있다.
       </div>
 
       <h2>아이콘</h2>
@@ -135,6 +136,53 @@ export default function ButtonPage() {
           </Case>
         ))}
       </CaseGrid>
+
+      <h2>로딩</h2>
+      <p>
+        <code>isLoading</code> 이면 아이콘 자리에 스피너가 돌고 클릭·Enter·폼
+        제출이 막히며 <code>aria-busy</code> 가 붙는다. 라벨은 그대로 보이고
+        스크린리더에는 라벨 뒤에 <code>loadingLabel</code>(기본 &quot;처리
+        중&quot;)이 붙는다. 색은 바뀌지 않고 포커스도 남는다 — disabled 가
+        아니다.
+      </p>
+      <CaseGrid
+        columns={3}
+        caption="isLoading — 세 변형, 아이콘 유무"
+        code={`<Button isLoading>저장</Button>`}
+      >
+        {VARIANTS.map((variant) => (
+          <Case key={variant} label={`${variant} + isLoading`}>
+            <Button
+              {...(variant === "text"
+                ? { variant: "text" as const }
+                : { variant })}
+              color="primary"
+              isLoading
+            >
+              저장
+            </Button>
+          </Case>
+        ))}
+        <Case label="icon + isLoading" note="스피너가 아이콘 자리를 대신한다">
+          <Button icon={<DelIcon />} color="danger" isLoading>
+            삭제
+          </Button>
+        </Case>
+        <Case label="small + isLoading" note="스피너도 16px">
+          <Button size="small" isLoading>
+            저장
+          </Button>
+        </Case>
+        <Case
+          label="disabled + isLoading"
+          note="색·커서는 disabled, 스피너는 남는다"
+        >
+          <Button disabled isLoading>
+            저장
+          </Button>
+        </Case>
+      </CaseGrid>
+      <LoadingDemo />
 
       <h2>비활성</h2>
       <CaseGrid
@@ -165,7 +213,7 @@ export default function ButtonPage() {
       </p>
       <CaseGrid
         columns={3}
-        caption="크기 3 × 변형 2 + disabled"
+        caption="크기 3 × 변형 2 + disabled + isLoading"
         code={`<IconButton aria-label="삭제"><DelIcon /></IconButton>`}
       >
         {SIZES.map(([size, px]) => (
@@ -188,6 +236,14 @@ export default function ButtonPage() {
             <DelIcon />
           </IconButton>
           <IconButton aria-label="삭제" variant="line" disabled>
+            <DelIcon />
+          </IconButton>
+        </Case>
+        <Case label="isLoading" note="아이콘 자리에 스피너. 정사각 그대로">
+          <IconButton aria-label="삭제" isLoading>
+            <DelIcon />
+          </IconButton>
+          <IconButton aria-label="삭제" variant="line" isLoading>
             <DelIcon />
           </IconButton>
         </Case>

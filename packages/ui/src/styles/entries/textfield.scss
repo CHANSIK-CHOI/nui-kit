@@ -3,4 +3,6 @@
 @use "abstracts/layer";
 @use "base/normalize";
 @use "components/icon";
+// 지우기·표시 버튼의 sr-only 라벨이 온디맨드에서도 숨겨져야 한다.
+@use "utilities/a11y";
 @use "components/textfield";

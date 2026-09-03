@@ -90,6 +90,29 @@ for (const [label, url, open, panel] of [
   await ctx.close();
 }
 
+// 1-b) 로딩 스피너 — 회전 duration 이 스케일 밖(1s 고정)이라 1ms 무력화를 타지 않는다.
+//      `animation: none` 으로 직접 멈춰야 한다 (a11y.md §6 · specs/Button.md §7).
+{
+  const ctx = await browser.newContext({
+    reducedMotion: "reduce",
+    viewport: VIEWPORT,
+  });
+  const page = await ctx.newPage();
+  await page.goto(BASE + "/components/button", { waitUntil: "networkidle" });
+  const spinner = page.locator(".nui-icon--spin").first();
+  if ((await spinner.count()) === 0) {
+    bad("Button 로딩 스피너: 요소를 찾지 못했다 (.nui-icon--spin)");
+  } else {
+    const name = await spinner.evaluate(
+      (el) => getComputedStyle(el).animationName,
+    );
+    name === "none"
+      ? ok("Button 로딩 스피너 — reduce 에서 회전 없음")
+      : bad(`Button 로딩 스피너: reduce 인데 돈다 (animation-name: ${name})`);
+  }
+  await ctx.close();
+}
+
 // ── 2) 명도 대비 — 라이트 · 다크
 /** sRGB 상대 휘도 */
 function luminance([r, g, b]) {

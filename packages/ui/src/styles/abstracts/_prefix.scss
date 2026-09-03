@@ -38,3 +38,10 @@ $prefix: "nui" !default;
 @function hook($public-token, $fallback) {
   @return var(#{v($public-token)}, #{$fallback});
 }
+
+// keyframes 이름:  #{kf("spin")}             -> nui-spin
+// @keyframes 이름은 전역이라 @layer 로 격리되지 않는다. 소비자의 `spin` 과 충돌하지 않게
+// 클래스와 같은 프리픽스를 거친다. check-css-isolation 이 검사한다.
+@function kf($name) {
+  @return "#{$prefix}-#{$name}";
+}

@@ -3,6 +3,7 @@ export type {
   ButtonProps,
   ButtonBaseProps,
   ButtonDesignProps,
+  ButtonLoadingProps,
   ButtonClassNameParams,
   ButtonSize,
   ButtonColor,

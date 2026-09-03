@@ -1,4 +1,7 @@
 // → styles/button.css  (온디맨드: tokens.css 와 함께 import)
 @use "abstracts/layer";
 @use "base/normalize";
+// 로딩 스피너(icon)와 sr-only 안내(utilities/a11y)를 함께 포함한다 — 온디맨드로 써도 동작해야 한다.
+@use "components/icon";
+@use "utilities/a11y";
 @use "components/button";

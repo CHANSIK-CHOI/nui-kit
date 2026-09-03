@@ -6,6 +6,7 @@ import {
   CircleAlert,
   Eye,
   EyeOff,
+  LoaderCircle,
   Search,
   X,
   type LucideIcon,
@@ -28,7 +29,11 @@ import type { IconBaseProps } from "./Icon.js";
  * `width="24"` 속성을 이기므로 자리(버튼 박스)가 곧 크기다 — design-system.md §5-2.
  * `width`·`height` 를 직접 주면 그 값이 인라인 스타일로 들어간다.
  */
-function fromLucide(LucideComponent: LucideIcon, displayName: string) {
+function fromLucide(
+  LucideComponent: LucideIcon,
+  displayName: string,
+  extraClassName?: string,
+) {
   function NuiIcon({
     className,
     color,
@@ -47,7 +52,7 @@ function fromLucide(LucideComponent: LucideIcon, displayName: string) {
 
     return (
       <LucideComponent
-        className={cn(px("icon"), className)}
+        className={cn(px("icon"), extraClassName, className)}
         size={size ?? width ?? height}
         style={iconStyle}
         focusable={focusable}
@@ -83,3 +88,10 @@ export const CloseIcon = fromLucide(X, "CloseIcon");
 
 /** 캘린더 — Datepicker 의 달력 열기 버튼 */
 export const CalendarIcon = fromLucide(Calendar, "CalendarIcon");
+
+/** 로딩 — Button 의 `isLoading`. 회전은 `_icon.scss` 의 `--spin` 이 담당한다 */
+export const SpinnerIcon = fromLucide(
+  LoaderCircle,
+  "SpinnerIcon",
+  `${px("icon")}--spin`,
+);

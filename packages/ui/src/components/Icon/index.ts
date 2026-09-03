@@ -8,4 +8,5 @@ export {
   HidePwIcon,
   CloseIcon,
   CalendarIcon,
+  SpinnerIcon,
 } from "./icons.js";

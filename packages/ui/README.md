@@ -239,6 +239,19 @@ import { RHFTextfield } from "@chansikchoi/next-ui/rhf";
 배럴로 가져오든 서브패스로 가져오든 **같은 React Context 를 공유**하므로
 `Field` + `Textfield` 조합을 서로 다른 경로에서 import 해도 정상 동작합니다.
 
+### Button 로딩
+
+```tsx
+<Button isLoading={isSaving} onClick={save}>저장</Button>
+```
+
+`isLoading` 이면 아이콘 자리에 스피너가 돌고 이 버튼을 거치는 클릭·Enter·Space 와 폼
+제출이 막히며 `aria-busy="true"` 가 붙습니다. `form.requestSubmit()` 이나 핸들러 직접
+호출은 막지 않으니 재진입 방지는 핸들러 쪽에서 합니다. 라벨은 그대로 보이고,
+스크린리더에는 이름 뒤에 `loadingLabel`(기본 "처리 중")이 설명으로 읽힙니다. `disabled` 와는 다릅니다 — 색이 바뀌지 않고
+포커스가 남습니다. "조건이 맞으면 된다"가 disabled, "지금 처리 중"이 loading 입니다.
+`ButtonLink` 는 받지 않습니다.
+
 ### ⚠️ Server Component 에서 쓸 때 — dot notation 불가
 
 모든 컴포넌트는 `"use client"` 로 배포됩니다. Server Component 에서 이들을 import 하면

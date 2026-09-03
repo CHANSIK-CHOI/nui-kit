@@ -1,10 +1,28 @@
 @use "../abstracts" as *;
 
+// 회전 1주기는 duration 스케일(최대 400ms) 밖이라 여기 고정한다.
+// 반복 모션은 스케일을 쓰지 않는다 — design-system.md §6-4. 이름은 전역이라 프리픽스를 거친다.
+@keyframes #{kf("spin")} {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @layer nui.components {
   #{cls("icon")} {
     display: block;
     flex-shrink: 0;
     width: 100%;
     height: 100%;
+
+    // 로딩 스피너. a11y.md §6 "2초 초과 금지"의 유일한 예외 — 멈추는 수단은
+    // OS 의 모션 감소 설정과 로딩 종료다. reduce 에서는 정지한 호 + 문자열로 충분하다.
+    &--spin {
+      animation: #{kf("spin")} 1s linear infinite;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
   }
 }

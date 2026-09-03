@@ -73,7 +73,17 @@ function check(file, css) {
     problems.push(`${file}: @layer ${PREFIX}.* 선언 없음`);
   }
 
-  // 5) tokens.css 는 값 선언만 — 어떤 셀렉터에도 스타일을 적용하지 않아야 한다.
+  // 5) @keyframes 이름은 전역이다 — @layer 로 격리되지 않으므로 프리픽스가 붙어야 한다.
+  //    소비자의 `spin` 과 이름이 같으면 나중에 선언된 쪽이 양쪽 애니메이션을 바꾼다.
+  for (const m of css.matchAll(
+    /@(?:-webkit-)?keyframes\s+([a-zA-Z_][a-zA-Z0-9_-]*)/g,
+  )) {
+    if (!m[1].startsWith(`${PREFIX}-`)) {
+      problems.push(`${file}: 프리픽스 없는 @keyframes ${m[1]}`);
+    }
+  }
+
+  // 6) tokens.css 는 값 선언만 — 어떤 셀렉터에도 스타일을 적용하지 않아야 한다.
   if (DECLARATION_ONLY.has(file) && classes.size > 0) {
     problems.push(
       `${file}: 변수 전용 파일인데 클래스 셀렉터가 있다 (${[...classes].join(", ")})`,
