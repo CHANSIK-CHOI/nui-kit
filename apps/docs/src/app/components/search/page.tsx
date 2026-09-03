@@ -1,11 +1,8 @@
 import { Field, FieldLabel } from "@chansikchoi/next-ui";
 import { Search } from "@chansikchoi/next-ui/textfield";
-import {
-  GuideHeader,
-  InputStateCases,
-  PropsTable,
-} from "@/components/guide";
+import { GuideHeader, InputStateCases, PropsTable } from "@/components/guide";
 import { SearchDemo } from "./SearchDemo";
+import { RHFSearchDemo } from "./RHFSearchDemo";
 
 export const metadata = { title: "Search" };
 
@@ -28,8 +25,8 @@ export default function SearchPage() {
       <div className="doc-note">
         <code>onSearch</code> 를 주면 버튼이{" "}
         <code>type=&quot;button&quot;</code> 으로, 주지 않으면{" "}
-        <code>type=&quot;submit&quot;</code> 으로 동작한다. 폼 안에서 엔터 제출을
-        그대로 쓰려면 <code>onSearch</code> 를 주지 않는다.
+        <code>type=&quot;submit&quot;</code> 으로 동작한다. 폼 안에서 엔터
+        제출을 그대로 쓰려면 <code>onSearch</code> 를 주지 않는다.
       </div>
       <p>
         <code>searchButtonTitle</code> 로 버튼의 접근 이름을 바꾼다.
@@ -52,6 +49,8 @@ export default function SearchPage() {
           </Field>
         )}
       />
+
+      <RHFSearchDemo />
 
       <h2>API</h2>
       <PropsTable of="Search" />

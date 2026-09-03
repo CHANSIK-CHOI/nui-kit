@@ -6,6 +6,7 @@ import {
   PropsTable,
 } from "@/components/guide";
 import { CheckboxDemo } from "./CheckboxDemo";
+import { RHFCheckboxDemo } from "./RHFCheckboxDemo";
 
 export const metadata = { title: "Checkbox" };
 
@@ -58,6 +59,8 @@ export default function CheckboxPage() {
 <Checkbox checked onChange={handleChange} />`}</code>
         </pre>
       </div>
+
+      <RHFCheckboxDemo />
 
       <h2>커스터마이징</h2>
       <HookTable group="choice-base" />

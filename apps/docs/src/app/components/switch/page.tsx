@@ -6,6 +6,7 @@ import {
   PropsTable,
 } from "@/components/guide";
 import { SwitchDemo } from "./SwitchDemo";
+import { RHFSwitchDemo } from "./RHFSwitchDemo";
 
 export const metadata = { title: "Switch" };
 
@@ -36,6 +37,8 @@ export default function SwitchPage() {
         <code>role=&quot;switch&quot;</code> 를 붙인다. 스크린리더가 체크박스가
         아니라 스위치로 안내하고 켬과 끔으로 읽는다.
       </div>
+
+      <RHFSwitchDemo />
 
       <h2>커스터마이징</h2>
       <p>

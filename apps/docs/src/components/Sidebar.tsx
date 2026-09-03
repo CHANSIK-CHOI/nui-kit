@@ -2,10 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV } from "@/site/nav";
+import { NAV, type NavItem } from "@/site/nav";
 
 export function Sidebar() {
   const pathname = usePathname();
+
+  const renderLink = (item: NavItem) => (
+    <Link
+      key={item.href}
+      href={item.href}
+      className="doc-nav-link"
+      aria-current={pathname === item.href ? "page" : undefined}
+    >
+      {item.title}
+    </Link>
+  );
 
   return (
     <aside className="doc-sidebar">
@@ -18,15 +29,12 @@ export function Sidebar() {
         {NAV.map((section) => (
           <div key={section.title} className="doc-nav-section">
             <p className="doc-nav-title">{section.title}</p>
-            {section.items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="doc-nav-link"
-                aria-current={pathname === item.href ? "page" : undefined}
-              >
-                {item.title}
-              </Link>
+            {section.items?.map(renderLink)}
+            {section.groups?.map((group) => (
+              <div key={group.title} className="doc-nav-group">
+                <p className="doc-nav-group-title">{group.title}</p>
+                {group.items.map(renderLink)}
+              </div>
             ))}
           </div>
         ))}

@@ -89,6 +89,18 @@ body {
   padding-left: 8px;
 }
 
+.doc-nav-group {
+  margin-top: 10px;
+}
+
+.doc-nav-group-title {
+  margin: 0 0 2px;
+  padding: 0 8px;
+  font-size: var(--nui-font-size-1);
+  font-weight: var(--nui-font-weight-medium);
+  color: var(--nui-text-disabled);
+}
+
 .doc-nav-link {
   display: block;
   padding: 5px 8px;

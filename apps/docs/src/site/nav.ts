@@ -1,7 +1,19 @@
 export type NavItem = { title: string; href: string };
-export type NavSection = { title: string; items: NavItem[] };
+/** 섹션 안의 소묶음. Components 처럼 항목이 많은 섹션이 계열별로 나눠 쓴다 */
+export type NavGroup = { title: string; items: NavItem[] };
+export type NavSection = {
+  title: string;
+  items?: NavItem[];
+  groups?: NavGroup[];
+};
 
-/** 사이드바 네비게이션 단일 출처. 페이지를 추가하면 여기에 등록한다. */
+/**
+ * 사이드바 네비게이션 단일 출처. 페이지를 추가하면 여기에 등록한다.
+ * `verify:console` 이 이 파일의 `href` 를 뽑아 검사 대상을 만든다.
+ *
+ * Components 의 묶음은 CLAUDE.md 의 계열 표와 같다 —
+ * Button · Form · Popup · Feedback · Disclosure.
+ */
 export const NAV: NavSection[] = [
   {
     title: "시작하기",
@@ -30,23 +42,49 @@ export const NAV: NavSection[] = [
   },
   {
     title: "Components",
-    items: [
-      { title: "개요", href: "/components" },
-      { title: "Button", href: "/components/button" },
-      { title: "Field", href: "/components/field" },
-      { title: "Textfield", href: "/components/textfield" },
-      { title: "Textarea", href: "/components/textarea" },
-      { title: "Search", href: "/components/search" },
-      { title: "Password", href: "/components/password" },
-      { title: "Checkbox", href: "/components/checkbox" },
-      { title: "Radio", href: "/components/radio" },
-      { title: "Switch", href: "/components/switch" },
-      { title: "Popup", href: "/components/popup" },
-      { title: "Toast", href: "/components/toast" },
-      { title: "Tooltip", href: "/components/tooltip" },
-      { title: "Select", href: "/components/select" },
-      { title: "Datepicker", href: "/components/datepicker" },
-      { title: "Accordion", href: "/components/accordion" },
+    items: [{ title: "개요", href: "/components" }],
+    groups: [
+      {
+        title: "Button",
+        items: [{ title: "Button", href: "/components/button" }],
+      },
+      {
+        title: "Form",
+        items: [
+          { title: "Field", href: "/components/field" },
+          { title: "Textfield", href: "/components/textfield" },
+          { title: "Textarea", href: "/components/textarea" },
+          { title: "Search", href: "/components/search" },
+          { title: "Password", href: "/components/password" },
+          { title: "Checkbox", href: "/components/checkbox" },
+          { title: "Radio", href: "/components/radio" },
+          { title: "Switch", href: "/components/switch" },
+          { title: "Select", href: "/components/select" },
+          { title: "Datepicker", href: "/components/datepicker" },
+        ],
+      },
+      {
+        title: "Popup",
+        items: [
+          { title: "개요 · PopupHost", href: "/components/popup" },
+          { title: "Alert", href: "/components/alert" },
+          { title: "Confirm", href: "/components/confirm" },
+          { title: "LayerPopup", href: "/components/layer-popup" },
+          { title: "BottomSheet", href: "/components/bottom-sheet" },
+          { title: "FullPopup", href: "/components/full-popup" },
+        ],
+      },
+      {
+        title: "Feedback",
+        items: [
+          { title: "Toast", href: "/components/toast" },
+          { title: "Tooltip", href: "/components/tooltip" },
+        ],
+      },
+      {
+        title: "Disclosure",
+        items: [{ title: "Accordion", href: "/components/accordion" }],
+      },
     ],
   },
 ];

@@ -114,42 +114,37 @@ const GROUPS = [
     ],
   },
   {
-    title: "Overlay",
+    title: "Popup",
     items: [
       {
-        name: "Alert",
+        name: "PopupHost",
         href: "/components/popup",
+        desc: "명령형 팝업이 렌더될 자리. 앱 루트에 한 번 둔다",
+      },
+      {
+        name: "Alert",
+        href: "/components/alert",
         desc: "알림 팝업. 확인 버튼 하나",
       },
       {
         name: "Confirm",
-        href: "/components/popup",
-        desc: "확인/취소 팝업",
+        href: "/components/confirm",
+        desc: "확인/취소 팝업. openAsync 로 결과를 받는다",
       },
       {
         name: "LayerPopup",
-        href: "/components/popup",
-        desc: "가운데 레이어 팝업",
+        href: "/components/layer-popup",
+        desc: "가운데 레이어 팝업. 크기 셋",
       },
       {
         name: "BottomSheet",
-        href: "/components/popup",
+        href: "/components/bottom-sheet",
         desc: "아래에서 올라오는 시트",
       },
       {
         name: "FullPopup",
-        href: "/components/popup",
+        href: "/components/full-popup",
         desc: "전체 화면 팝업",
-      },
-      {
-        name: "PopupHost",
-        href: "/components/popup",
-        desc: "팝업이 렌더될 자리. 앱 루트에 한 번 둔다",
-      },
-      {
-        name: "Tooltip",
-        href: "/components/tooltip",
-        desc: "포인터·포커스로 뜨는 설명",
       },
     ],
   },
@@ -165,6 +160,11 @@ const GROUPS = [
         name: "ToastHost",
         href: "/components/toast",
         desc: "토스트가 렌더될 자리. 앱 루트에 한 번 둔다",
+      },
+      {
+        name: "Tooltip",
+        href: "/components/tooltip",
+        desc: "포인터·포커스로 뜨는 설명",
       },
     ],
   },
@@ -217,11 +217,6 @@ export default function ComponentsPage() {
           </div>
         </section>
       ))}
-
-      <div className="doc-note">
-        나머지 컴포넌트(Select · Checkbox · Radio · Switch · Datepicker · Popup
-        · Toast · Tooltip · Accordion 등)는 순차 이전 예정이다.
-      </div>
     </>
   );
 }

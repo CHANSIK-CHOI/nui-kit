@@ -6,6 +6,7 @@ import {
   PropsTable,
 } from "@/components/guide";
 import { RadioDemo } from "./RadioDemo";
+import { RHFRadioDemo } from "./RHFRadioDemo";
 
 export const metadata = { title: "Radio" };
 
@@ -42,6 +43,8 @@ export default function RadioPage() {
         <code>aria-labelledby</code> 로 연결한다. 그룹 자체에{" "}
         <code>aria-invalid</code> 도 붙는다.
       </div>
+
+      <RHFRadioDemo />
 
       <h2>커스터마이징</h2>
       <HookTable group="choice-base" />

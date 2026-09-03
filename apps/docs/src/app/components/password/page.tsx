@@ -8,6 +8,7 @@ import {
   PropsTable,
 } from "@/components/guide";
 import { PasswordDemo } from "./PasswordDemo";
+import { RHFPasswordDemo } from "./RHFPasswordDemo";
 
 export const metadata = { title: "Password" };
 
@@ -78,6 +79,8 @@ export default function PasswordPage() {
           </Field>
         )}
       />
+
+      <RHFPasswordDemo />
 
       <h2>API</h2>
       <PropsTable of="Password" />

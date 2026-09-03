@@ -51,7 +51,7 @@ const isStill = (transform) =>
 
 for (const [label, url, open, panel] of [
   ["Tooltip", "/components/tooltip", ".nui-tooltip", ".nui-tooltip__panel"],
-  ["Popup", "/components/popup", null, ".nui-popup__panel"],
+  ["Popup", "/components/layer-popup", null, ".nui-popup__panel"],
 ]) {
   const ctx = await browser.newContext({
     reducedMotion: "reduce",
@@ -288,7 +288,7 @@ const TOUCH_TARGETS = [
   ],
   [
     "Popup 닫기",
-    "/components/popup",
+    "/components/layer-popup",
     ".nui-popup__close",
     // Alert 은 닫기 버튼이 없다. 헤더가 있는 LayerPopup 을 연다.
     async (page) =>

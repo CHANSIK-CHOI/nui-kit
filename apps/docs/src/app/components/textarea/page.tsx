@@ -8,6 +8,7 @@ import {
   HookTable,
   PropsTable,
 } from "@/components/guide";
+import { RHFTextareaDemo } from "./RHFTextareaDemo";
 
 export const metadata = { title: "Textarea" };
 
@@ -79,6 +80,8 @@ export default function TextareaPage() {
           </Field>
         )}
       />
+
+      <RHFTextareaDemo />
 
       <h2>커스터마이징</h2>
       <p>

@@ -145,6 +145,16 @@ const TARGETS = [
     type: "LayerPopupProps",
   },
   {
+    name: "BottomSheet",
+    file: "components/Popup/Popup.types.ts",
+    type: "BottomSheetProps",
+  },
+  {
+    name: "FullPopup",
+    file: "components/Popup/Popup.types.ts",
+    type: "FullPopupProps",
+  },
+  {
     name: "Toast",
     file: "components/Toast/Toast.types.ts",
     type: "ToastProps",
