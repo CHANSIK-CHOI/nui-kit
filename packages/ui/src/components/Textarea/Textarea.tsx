@@ -116,7 +116,6 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       >
         <div className={`${block}__wrap`}>
           <textarea
-            autoComplete="off"
             {...rest}
             ref={ref}
             id={resolvedId}

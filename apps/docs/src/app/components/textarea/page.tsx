@@ -120,6 +120,12 @@ export default function TextareaPage() {
 
       <RHFTextareaDemo />
 
+      <div className="doc-note">
+        <code>autoComplete</code> 를 기본으로 끄지 않는다. 긴 글에는 브라우저가
+        제안할 것이 거의 없지만, 끄고 싶으면{" "}
+        <code>autoComplete=&quot;off&quot;</code> 를 명시한다.
+      </div>
+
       <h2>커스터마이징</h2>
       <p>
         색은 컴포넌트별로 열지 않는다. 한 곳만 바꾸려면 <code>className</code>{" "}

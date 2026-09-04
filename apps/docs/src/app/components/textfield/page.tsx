@@ -26,10 +26,10 @@ export default function TextfieldPage() {
         caption="Field 와 함께 쓰면 id·label 이 자동 연결된다"
         code={`<Textfield placeholder="내용" value={v} onChange={onChange} />`}
       >
-        <Case label="기본">
+        <Case label="기본" note="개인정보 필드에는 autoComplete 를 준다">
           <Field>
             <FieldLabel>이름</FieldLabel>
-            <Textfield placeholder="내용을 입력해주세요" />
+            <Textfield placeholder="내용을 입력해주세요" autoComplete="name" />
           </Field>
         </Case>
         <Case label="unit" note="값이 오른쪽으로 정렬된다">
@@ -120,6 +120,22 @@ export default function TextfieldPage() {
         나타난다.
       </p>
       <TextfieldDemo />
+
+      <h2>자동 완성</h2>
+      <p>
+        <code>autoComplete</code> 를 <strong>기본으로 끄지 않는다.</strong> 이름
+        · 이메일 · 전화 · 주소 · 생년월일처럼 개인정보를 받는 입력에는 용도를
+        지정한다 — WCAG 1.3.5 와 KRDS 체크리스트 [텍스트 입력 필드 5] 가
+        요구하는 것이고, 손 떨림 · 인지 장애 · 모바일 사용자에게는 실질적인
+        접근성 장치다. <code>Search</code> · <code>Password</code> ·{" "}
+        <code>Datepicker</code> 도 이 필드를 그대로 쓴다.
+      </p>
+      <pre className="doc-code">
+        <code>{`<Textfield autoComplete="email" />                 // 켠다
+<Search autoComplete="off" />                     // 검색어 이력이 싫으면 끈다
+<Datepicker autoComplete="bday" />                // 생년월일
+<Password autoComplete="current-password" />      // 비밀번호 관리자`}</code>
+      </pre>
 
       <h2>react-hook-form</h2>
       <p>

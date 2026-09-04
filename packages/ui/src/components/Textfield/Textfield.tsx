@@ -106,7 +106,6 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
         <div className={`${block}__wrap`}>
           <div className={`${block}__input-box`}>
             <input
-              autoComplete="off"
               {...rest}
               ref={ref}
               id={resolvedId}
