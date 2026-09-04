@@ -248,9 +248,61 @@ import { RHFTextfield } from "@chansikchoi/next-ui/rhf";
 `isLoading` 이면 아이콘 자리에 스피너가 돌고 이 버튼을 거치는 클릭·Enter·Space 와 폼
 제출이 막히며 `aria-busy="true"` 가 붙습니다. `form.requestSubmit()` 이나 핸들러 직접
 호출은 막지 않으니 재진입 방지는 핸들러 쪽에서 합니다. 라벨은 그대로 보이고,
-스크린리더에는 이름 뒤에 `loadingLabel`(기본 "처리 중")이 설명으로 읽힙니다. `disabled` 와는 다릅니다 — 색이 바뀌지 않고
+스크린리더에는 이름 뒤에 `loadingLabel`(기본 "처리 중")이 설명으로 읽힙니다.
+**포커스가 그 버튼에 없어도 들립니다** — 문구가 화면 밖 공용 `role="status"` 영역에
+놓이므로, 폼에서 Enter 로 제출해 포커스가 입력창에 있을 때도 로딩 시작이 읽힙니다.
+다만 **완료는 알리지 않습니다.** 버튼은 결과가 성공인지 실패인지 모르기 때문에,
+결과는 `Toast` 나 에러 메시지로 알립니다. `disabled` 와는 다릅니다 — 색이 바뀌지 않고
 포커스가 남습니다. "조건이 맞으면 된다"가 disabled, "지금 처리 중"이 loading 입니다.
 `ButtonLink` 는 받지 않습니다.
+
+### 폼 입력의 자동 완성
+
+**`autoComplete` 를 기본으로 끄지 않습니다.** 이름 · 이메일 · 전화 · 주소 · 생년월일처럼
+개인정보를 받는 입력에는 용도를 지정하세요 — WCAG 1.3.5(Identify Input Purpose)와 KRDS
+가 요구하는 것이고, 손 떨림 · 인지 장애 · 모바일 사용자에게는 실질적인 접근성 장치입니다.
+
+```tsx
+<Textfield autoComplete="name" />                 // 켠다 (권장)
+<Search autoComplete="off" />                     // 검색어 이력이 싫으면 끈다
+<Datepicker autoComplete="bday" />                // 생년월일
+<Password autoComplete="current-password" />      // 비밀번호 관리자
+```
+
+### 선택 컨트롤의 중간 상태
+
+하위 항목이 **일부만** 선택된 "전체 선택" 체크박스는 `indeterminate` 로 그립니다.
+대시(−)로 보이고 스크린리더에는 `aria-checked="mixed"` 로 읽힙니다. `CheckboxGroup` 이
+대신 계산해 주지는 않습니다 — 값은 소비자가 소유합니다.
+
+```tsx
+<Checkbox
+  checked={checked.length === options.length}
+  indeterminate={checked.length > 0 && checked.length < options.length}
+  onChange={toggleAll}
+/>
+```
+
+### 여러 줄 입력의 글자 수
+
+`Textarea` 에 `maxLength` 를 주면 영역 아래 오른쪽에 카운터가 붙습니다. 제한이 곧
+조건이라 켜고 끄는 별도 prop 은 없습니다. 세는 단위는 브라우저의 `maxlength` 와 같은
+UTF-16 코드 단위여서 이모지는 2로 세집니다.
+
+### 툴팁이 잘릴 때
+
+말풍선은 트리거 옆에 붙으므로 `overflow: hidden` 인 조상에서 잘립니다. `hasPortal` 을
+켜면 `body` 로 내보내고 스크롤 · 창 크기 변화를 따라갑니다 — 팝업 패널 안의 툴팁이
+대표적인 자리입니다. 터치 기기에서는 탭으로 열고 닫습니다.
+
+```tsx
+<Tooltip content="설명" hasPortal>
+  <IconButton aria-label="도움말"><InfoIcon /></IconButton>
+</Tooltip>
+```
+
+⚠️ 잘림만 없앱니다. 뷰포트 밖으로 밀리는 것은 그대로여서 화면 가장자리에서는
+`placement` 를 골라야 합니다.
 
 ### ⚠️ Server Component 에서 쓸 때 — dot notation 불가
 
@@ -320,6 +372,15 @@ emotion 쪽에서 걷어내** CSS 가 책임지게 합니다.
   `react-select` 이 메뉴 배치를 계산할 때 이 값을 참조하므로, CSS 로 덮으면
   실제 높이와 계산이 어긋납니다 (기본값 `240`)
 
+**칩의 × 는 Tab 으로 닿는 버튼입니다.** 칩이 여럿이면 앞에서부터 하나씩 잡히고 그다음이
+입력창입니다. <kbd>Enter</kbd>·<kbd>Space</kbd> 로 지우고, 지운 뒤 포커스는 이전 칩(없으면
+입력창)으로 갑니다. 접근 이름은 기본 "서울 옵션 삭제" 이고 `removeButtonLabel` 로 바꿉니다 —
+라벨을 끼워 넣는 자리가 언어마다 달라 문자열이 아니라 함수를 받습니다.
+
+```tsx
+<MultiSelect removeButtonLabel={(label) => `Remove ${label}`} />
+```
+
 **`value` 는 `options` 안에 존재하는 값이어야 합니다.** 옵션을 비동기로 불러오는
 동안처럼 `options` 에 없는 값을 넣으면 선택이 표시되지 않고 placeholder 가 보입니다
 (원시값 API 의 구조적 특성입니다).
@@ -352,7 +413,12 @@ import { Datepicker, DateRangePicker } from "@chansikchoi/next-ui";
 <DateRangePicker selected={range} onSelectedChange={setRange} />;
 ```
 
-- 입력창은 직접 타이핑할 수 없습니다. 달력으로만 값을 바꿉니다
+- **입력창에 날짜를 직접 칠 수 있습니다.** 형식은 `displayFormat`(기본 `yyyy.MM.dd`),
+  기간은 `2026.09.01 - 2026.09.05` 처럼 앞뒤 공백을 둔 대시로 잇습니다.
+  읽을 수 없는 글자나 절반만 친 기간은 입력창을 벗어나는 순간 **치기 전 값으로**
+  되돌아갑니다. 달력으로 고를 수 없는 날짜(`disabled` · `startMonth`~`endMonth` 밖)는
+  쳐서도 넣을 수 없습니다. 예전처럼 달력으로만 받으려면 `isTextInputBlocked` 를 줍니다
+- `DateMultiplePicker` 는 아직 읽기 전용입니다 — 날짜 목록의 구분자 규칙이 따로 필요합니다
 - `DateRangePicker` 는 시작·종료가 모두 정해지기 전까지 `undefined` 를 넘깁니다
 - `dayPickerProps` 로 `react-day-picker` 설정을 그대로 전달합니다
 

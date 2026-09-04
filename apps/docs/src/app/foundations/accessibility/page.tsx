@@ -178,6 +178,14 @@ export default function AccessibilityPage() {
                 상한이라 하한을 쓴다
               </td>
             </tr>
+            <tr>
+              <td>MultiSelect 칩 ×</td>
+              <td>28×32px</td>
+              <td>28×32px (하한)</td>
+              <td className="doc-wrap">
+                칩이 서로 붙어 있어 44 를 채우면 이웃 칩의 히트를 삼킨다
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -295,10 +303,37 @@ export default function AccessibilityPage() {
         를 함께 건다. 둘 다 필요하다. <code>describedby</code> 는 이 필드의
         설명이고 <code>live</code> 는 지금 바뀌었다는 신호다.
       </p>
+      <div className="doc-note doc-note--warn">
+        <strong>live 영역은 요소 밖에 둔다.</strong>{" "}
+        <code>&lt;button&gt;</code> 안의 live 영역은 보조기술이 &quot;live
+        갱신&quot;이 아니라 <strong>버튼 이름의 변경</strong>으로 처리해 대체로
+        무시한다. 그래서 <code>Button</code> 의 로딩 안내는 화면 밖 공용{" "}
+        <code>role=&quot;status&quot;</code> 영역에 놓인다. 그 영역은{" "}
+        <strong>문구가 생기기 전에</strong> 문서에 있어야 읽힌다.
+        <br />
+        <strong>완료를 함부로 알리지 않는다.</strong> 로딩이 끝난 것이 성공인지
+        실패인지 컴포넌트는 모른다 — 결과 알림은 <code>Toast</code> 나 에러
+        메시지 몫이다.
+      </div>
       <p>
         이 영역은 메시지가 없어도 DOM 에 있다. 내용과 함께 새로 끼워 넣은 live
         영역은 읽히지 않는 경우가 많아서다. 빈 상태는 시각적으로만 숨긴다.
       </p>
+
+      <h2>자동 완성</h2>
+      <p>
+        개인정보를 받는 입력에는 <code>autoComplete</code> 로 용도를 지정한다 —
+        이름 · 이메일 · 전화 · 주소 · 생년월일. WCAG 1.3.5(Identify Input
+        Purpose)와 KRDS 가 요구하는 것이고, 손 떨림 · 인지 장애 · 모바일
+        사용자에게는 실질적인 입력 보조다.
+      </p>
+      <div className="doc-note">
+        <strong>컴포넌트가 이것을 기본값으로 막지 않는다.</strong>{" "}
+        <code>Textfield</code> 와 <code>Textarea</code> 가{" "}
+        <code>autoComplete=&quot;off&quot;</code> 를 기본으로 넣고 있었고 뺐다.
+        소비자가 알아채려면 라이브러리 소스를 읽어야 하는 종류의 기본값이었다.
+        끄는 것은 소비자가 명시한다.
+      </div>
 
       <h2>이미 보장하는 것</h2>
       <div className="doc-table-wrap">

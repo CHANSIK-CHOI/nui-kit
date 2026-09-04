@@ -202,8 +202,8 @@ export default function ElevationPage() {
 
       <h2>쌓임 순서</h2>
       <p>
-        <code>z-index</code> 를 직접 쓰지 않고 이 네 개 안에서 고른다. 값을 직접
-        쓰기 시작하면 숫자 경쟁이 벌어진다.
+        <code>z-index</code> 를 직접 쓰지 않고 이 다섯 개 안에서 고른다. 값을
+        직접 쓰기 시작하면 숫자 경쟁이 벌어진다.
       </p>
       <TokenTable group="z-index" swatch={false} />
 
@@ -221,7 +221,7 @@ export default function ElevationPage() {
                 <span className="doc-token-name">--nui-z-tooltip</span>
               </th>
               <td className="doc-wrap">
-                같은 화면 안에서만 떠 있으면 된다 — 툴팁, 인라인 드롭다운
+                제자리 툴팁 — 자기 부모 안에서만 떠 있으면 된다
               </td>
             </tr>
             <tr>
@@ -244,7 +244,17 @@ export default function ElevationPage() {
                 <span className="doc-token-name">--nui-z-toast</span>
               </th>
               <td className="doc-wrap">
-                <strong>가장 위.</strong> 팝업 안에서 띄운 토스트도 보여야 한다
+                팝업 안에서 띄운 토스트도 보여야 한다
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <span className="doc-token-name">--nui-z-tooltip-portal</span>
+              </th>
+              <td className="doc-wrap">
+                <strong>가장 위.</strong> <code>hasPortal</code> 로 body 에 나간
+                툴팁이다. 지금 가리키고 있는 것의 설명이라 무엇에도 가리면 안
+                된다
               </td>
             </tr>
           </tbody>
@@ -255,6 +265,16 @@ export default function ElevationPage() {
         <strong>팝업끼리는 나중에 연 것이 위다.</strong> 값을 나누지 않는다.
         Alert 이 열린 BottomSheet 위에 오는 것은 이 순서의 결과다. 반대로 Alert
         위로 시트를 여는 것은 흐름 오류다.
+      </div>
+
+      <div className="doc-note doc-note--warn">
+        <strong>body 로 나가는 것끼리는 서로를 죽이지 않는다.</strong> 팝업이
+        열리면 배경을 격리하려고 <code>body</code> 의 직계 자식을 전부{" "}
+        <code>inert</code> 처리한다. 토스트 · 툴팁 · 로딩 알림 컨테이너도{" "}
+        <code>body</code> 의 직계 자식이라, 표시가 없으면{" "}
+        <strong>z 는 팝업 위인데 눌리지도 읽히지도 않는</strong> 상태가 된다.
+        우리 컨테이너에는 <code>data-nui-portal-root</code> 가 붙어 격리에서
+        빠진다.
       </div>
 
       <div className="doc-note">

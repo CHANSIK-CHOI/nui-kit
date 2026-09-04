@@ -168,7 +168,9 @@ export function Providers({ children }) {
         <li>Tab 이 패널 밖으로 나가지 않는다 (포커스 트랩)</li>
         <li>
           열려 있는 동안 배경은 <code>inert</code> + <code>aria-hidden</code> 이
-          되고 스크롤이 잠긴다
+          되고 스크롤이 잠긴다. <strong>토스트 · 툴팁 · 로딩 알림은 예외다</strong>{" "}
+          — 팝업 안에서 띄운 것도 눌리고 읽혀야 하므로 우리 portal 컨테이너는
+          격리에서 빠진다
         </li>
         <li>
           닫기 버튼은 40px 로 보이지만 누르는 범위는 44px 이다. 모양은 그대로
