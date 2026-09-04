@@ -1,7 +1,7 @@
 "use client";
 
 import cn from "classnames";
-import { getDay, type Locale } from "date-fns";
+import { endOfMonth, getDay, startOfMonth, type Locale } from "date-fns";
 import { ko } from "date-fns/locale";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -11,6 +11,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ChangeEventHandler,
   type FocusEventHandler,
   type KeyboardEventHandler,
   type MouseEventHandler,
@@ -18,6 +19,7 @@ import {
 } from "react";
 import {
   DayPicker,
+  dateMatchModifiers,
   type DayPickerProps,
   type OnSelectHandler,
 } from "react-day-picker";
@@ -77,7 +79,7 @@ export type DatepickerBaseProps<
   TDayPickerProps extends DayPickerSelectionShape,
 > = Omit<
   TextfieldProps,
-  "children" | "isTextInputBlocked" | "onChange" | "type" | "value"
+  "children" | "onChange" | "type" | "value"
 > & {
   mode: DatepickerMode;
   selected?: TSelected | undefined;
@@ -89,6 +91,21 @@ export type DatepickerBaseProps<
     locale: Locale;
     selected: TSelected | undefined;
   }) => string;
+  /**
+   * 글자 → 값. `formatDisplayValue` 의 역방향이다.
+   *
+   * **이것을 넘긴 모드만 직접 입력이 열린다** (KRDS 가이드 675쪽 접근성 01 —
+   * 선택기가 있어도 입력 필드를 읽기 전용으로 만들지 않는다).
+   * 넘기지 않으면 예전처럼 `readonly` 입력이다.
+   */
+  parseDisplayValue?: (options: {
+    text: string;
+    displayFormat: string;
+    locale: Locale;
+    isDateAllowed: (date: Date) => boolean;
+    /** 타이핑이 끝난 시점(blur)의 판정인지. 절반만 친 값을 걸러내는 데 쓴다. */
+    isFinal?: boolean;
+  }) => TSelected | undefined;
   getDefaultMonth: (options: {
     selected: TSelected | undefined;
   }) => Date | undefined;
@@ -119,6 +136,7 @@ export default function DatepickerBase<
   dayPickerProps,
   displayFormat = "yyyy.MM.dd",
   formatDisplayValue,
+  parseDisplayValue,
   getDefaultMonth,
   getShouldCloseOnSelect,
   calendarButtonTitle,
@@ -131,11 +149,13 @@ export default function DatepickerBase<
   className,
   placeholder = "날짜를 선택해주세요",
   readOnly = false,
+  isTextInputBlocked = false,
   disabled = false,
   isClearable = false,
   onClear,
   onClick,
   onFocus,
+  onBlur,
   onKeyDown,
   ...restTextfieldProps
 }: DatepickerBaseProps<TSelected, TDayPickerProps> &
@@ -152,6 +172,14 @@ export default function DatepickerBase<
   const isSelfInitiatedFocusRef = useRef(false);
   const calendarDropdownId = useId();
   const [isCalendarOpen, setIsCalendarOpen] = useState(defaultIsCalendarOpen);
+  // 타이핑 중인 글자. `null` 이면 표시값을 `selected` 에서 계산한다.
+  const [draftText, setDraftText] = useState<string | null>(null);
+  // 타이핑을 시작하기 직전의 값. 다 치고 났는데 읽을 수 없으면 여기로 되돌린다.
+  const valueBeforeTypingRef = useRef<TSelected | undefined>(undefined);
+  // 달력이 보고 있는 달. 소비자가 `dayPickerProps.month` 를 주면 그쪽이 이긴다.
+  const [month, setMonth] = useState<Date | undefined>(undefined);
+  // 선택도 기본 달도 없을 때의 기준. 렌더마다 새 Date 를 만들면 달력이 매번 다시 잡힌다.
+  const todayRef = useRef(new Date());
 
   // 소비자(또는 RHF)의 ref 와 내부 ref 를 함께 채운다.
   // 내부 ref 는 캘린더를 닫을 때 포커스를 입력창으로 되돌리는 데 쓴다.
@@ -183,6 +211,9 @@ export default function DatepickerBase<
   );
   const resolvedDefaultMonth =
     dayPickerProps?.defaultMonth ?? getDefaultMonth({ selected });
+  // 달력을 열 때는 고른 값의 달로 돌아간다 — 닫을 때 `month` 를 비우기 때문이다.
+  const resolvedMonth =
+    dayPickerProps?.month ?? month ?? resolvedDefaultMonth ?? todayRef.current;
   const resolvedStartMonth =
     dayPickerProps?.startMonth ?? new Date(CURRENT_YEAR - 100, 0, 1);
   const resolvedEndMonth =
@@ -190,6 +221,20 @@ export default function DatepickerBase<
   const resolvedCalendarButtonTitle =
     calendarButtonTitle ?? (isCalendarOpen ? "캘린더 닫기" : "날짜 선택하기");
   const isDayPickerDisabled = readOnly ? true : dayPickerProps?.disabled;
+  // 파서를 넘긴 모드만 타이핑이 열린다. 소비자는 `isTextInputBlocked` 로 다시 막을 수 있다.
+  const canTypeDate = Boolean(parseDisplayValue) && !isTextInputBlocked;
+  // 달력으로 고를 수 없는 날짜는 타이핑으로도 들어오지 못한다.
+  const isDateAllowed = useCallback(
+    (date: Date) => {
+      if (date < startOfMonth(resolvedStartMonth)) return false;
+      if (date > endOfMonth(resolvedEndMonth)) return false;
+
+      const disabledMatcher = dayPickerProps?.disabled;
+
+      return !(disabledMatcher && dateMatchModifiers(date, disabledMatcher));
+    },
+    [dayPickerProps?.disabled, resolvedEndMonth, resolvedStartMonth],
+  );
   const resolvedIsClearable = isClearable && !dayPickerProps?.required;
   const resolvedCaptionLayout = dayPickerProps?.captionLayout ?? "dropdown";
   const resolvedModifiers = useMemo(
@@ -238,6 +283,11 @@ export default function DatepickerBase<
     (nextIsOpen: boolean, shouldRestoreFocus = false) => {
       setIsCalendarOpen(nextIsOpen);
       onCalendarOpenChange?.(nextIsOpen);
+
+      // 닫으면 보고 있던 달을 잊는다 — 다음에 열 때 고른 값의 달에서 시작한다.
+      if (!nextIsOpen) {
+        setMonth(undefined);
+      }
 
       if (!nextIsOpen && shouldRestoreFocus) {
         // ⚠️ `focus()` 는 `handleInputFocus` 를 **동기적으로** 부른다.
@@ -296,13 +346,21 @@ export default function DatepickerBase<
     event,
   ) => {
     if (!disabled && !readOnly) {
-      if (
-        event.key === "ArrowDown" ||
-        event.key === "Enter" ||
-        event.key === " "
-      ) {
+      // 타이핑이 열려 있으면 Space·Enter 를 가로채지 않는다 — 글자를 못 치게 되고
+      // 폼 제출도 막힌다. 여는 키는 combobox 관습대로 ArrowDown 하나로 좁힌다.
+      const isOpenKey = canTypeDate
+        ? event.key === "ArrowDown"
+        : event.key === "ArrowDown" ||
+          event.key === "Enter" ||
+          event.key === " ";
+
+      if (isOpenKey) {
         event.preventDefault();
         setIsCalendarOpenState(true);
+      } else if (canTypeDate && event.key === "Enter" && isCalendarOpen) {
+        // 친 값은 이미 반영돼 있다. Enter 는 달력을 닫는 몫만 한다.
+        event.preventDefault();
+        setIsCalendarOpenState(false, true);
       }
 
       if (event.key === "Escape") {
@@ -311,6 +369,68 @@ export default function DatepickerBase<
     }
 
     onKeyDown?.(event);
+  };
+
+  const handleInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    if (!canTypeDate) return;
+
+    const text = event.target.value;
+
+    // 타이핑의 첫 글자에서 되돌아갈 자리를 기억해 둔다.
+    if (draftText === null) {
+      valueBeforeTypingRef.current = selected;
+    }
+
+    setDraftText(text);
+
+    if (!text.trim()) {
+      onSelectedChange?.(undefined);
+      return;
+    }
+
+    const parsed = parseDisplayValue?.({
+      text,
+      displayFormat,
+      locale: resolvedLocale,
+      isDateAllowed,
+    });
+
+    // 읽을 수 없는 글자에는 **아무 일도 하지 않는다.** 여기서 값을 지우면
+    // `2026.0` 을 지나는 순간마다 소비자(또는 RHF)의 값이 날아간다.
+    if (parsed === undefined) return;
+
+    onSelectedChange?.(parsed);
+
+    const nextMonth = getDefaultMonth({ selected: parsed });
+
+    if (nextMonth) {
+      setMonth(nextMonth);
+    }
+  };
+
+  const handleInputBlur: FocusEventHandler<HTMLInputElement> = (event) => {
+    // ⚠️ 글자마다 파싱하므로 **중간 단계가 값으로 확정될 수 있다.**
+    //    `2021.02.31` 을 치면 `2021.02.3` 에서 한 번 성공해 3일이 남는다.
+    //    다 친 글자를 다시 읽어보고 실패하면 **타이핑 전 값으로** 되돌린다 —
+    //    화면의 글자와 실제 값이 어긋난 채로 끝나지 않게.
+    if (draftText !== null && draftText.trim()) {
+      const parsed = parseDisplayValue?.({
+        text: draftText,
+        displayFormat,
+        locale: resolvedLocale,
+        isDateAllowed,
+        isFinal: true,
+      });
+
+      if (parsed === undefined) {
+        onSelectedChange?.(valueBeforeTypingRef.current);
+      }
+    }
+
+    // 초안을 버리면 표시값이 다시 `selected` 에서 계산된다 —
+    // `2026.9.5` → `2026.09.05` 정규화도 여기서 따라온다.
+    setDraftText(null);
+    onBlur?.(event);
   };
 
   const handleDayPickerSelect: OnSelectHandler<TSelected | undefined> = (
@@ -323,6 +443,7 @@ export default function DatepickerBase<
       return;
     }
 
+    setDraftText(null);
     onSelectedChange?.(nextSelected);
     (
       dayPickerProps?.onSelect as
@@ -335,6 +456,7 @@ export default function DatepickerBase<
   };
 
   const handleClear = () => {
+    setDraftText(null);
     onSelectedChange?.(undefined);
     onClear?.();
   };
@@ -420,15 +542,17 @@ export default function DatepickerBase<
         {...restTextfieldProps}
         ref={setInputRef}
         className={cn(className, `${block}__textfield`)}
-        value={resolvedDisplayValue}
+        value={draftText ?? resolvedDisplayValue}
         placeholder={placeholder}
         readOnly={readOnly}
-        isTextInputBlocked
+        isTextInputBlocked={!canTypeDate}
         disabled={disabled}
         isClearable={resolvedIsClearable}
         onClear={handleClear}
         onClick={handleInputClick}
         onFocus={handleInputFocus}
+        onBlur={handleInputBlur}
+        onChange={handleInputChange}
         onKeyDown={handleInputKeyDown}
         // `textbox` 롤은 `aria-expanded` 를 지원하지 않아 AT 가 무시한다.
         // `combobox` 로 올려 펼침 상태가 실제로 전달되게 한다 (APG Date Picker Combobox).
@@ -494,7 +618,11 @@ export default function DatepickerBase<
                 ...dayPickerProps?.components,
               }}
               labels={resolvedLabels}
-              defaultMonth={resolvedDefaultMonth}
+              month={resolvedMonth}
+              onMonthChange={(nextMonth) => {
+                setMonth(nextMonth);
+                dayPickerProps?.onMonthChange?.(nextMonth);
+              }}
               startMonth={resolvedStartMonth}
               endMonth={resolvedEndMonth}
               disabled={isDayPickerDisabled}

@@ -7,6 +7,7 @@ import {
   formatSingleDateValue,
   getShouldCloseSingleOnSelect,
   getSingleDefaultMonth,
+  parseSingleDateValue,
 } from "./Datepicker.utils.js";
 
 type DatepickerDayPickerProps = PropsSingle | PropsSingleRequired;
@@ -21,6 +22,7 @@ export type DatepickerProps = Omit<
   "formatDisplayValue" | "getDefaultMonth" | "mode" | "getShouldCloseOnSelect"
 > & {
   formatDisplayValue?: DatepickerBaseSingleProps["formatDisplayValue"];
+  parseDisplayValue?: DatepickerBaseSingleProps["parseDisplayValue"];
   getDefaultMonth?: DatepickerBaseSingleProps["getDefaultMonth"];
   getShouldCloseOnSelect?: DatepickerBaseSingleProps["getShouldCloseOnSelect"];
 };
@@ -29,6 +31,7 @@ const Datepicker = forwardRef<HTMLInputElement, DatepickerProps>(
   (
     {
       formatDisplayValue = formatSingleDateValue,
+      parseDisplayValue = parseSingleDateValue,
       getDefaultMonth = getSingleDefaultMonth,
       getShouldCloseOnSelect = getShouldCloseSingleOnSelect,
       ...restProps
@@ -41,6 +44,7 @@ const Datepicker = forwardRef<HTMLInputElement, DatepickerProps>(
         inputRef={ref}
         mode="single"
         formatDisplayValue={formatDisplayValue}
+        parseDisplayValue={parseDisplayValue}
         getDefaultMonth={getDefaultMonth}
         getShouldCloseOnSelect={getShouldCloseOnSelect}
       />

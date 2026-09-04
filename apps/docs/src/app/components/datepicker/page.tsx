@@ -27,12 +27,71 @@ export default function DatepickerPage() {
 
       <div className="doc-note">
         <strong>controlled 전용이다.</strong> <code>selected</code> 와{" "}
-        <code>onSelectedChange</code> 를 소비자가 소유한다. 입력창은 직접
-        타이핑할 수 없고(<code>isTextInputBlocked</code>) 달력으로만 값을 바꾼다
-        — 잘못된 형식의 문자열이 값으로 들어오는 경로를 없앴다. react-hook-form
-        을 쓴다면 <code>@chansikchoi/next-ui/rhf</code> 의{" "}
+        <code>onSelectedChange</code> 를 소비자가 소유한다. react-hook-form 을
+        쓴다면 <code>@chansikchoi/next-ui/rhf</code> 의{" "}
         <code>RHFDatepicker</code> 계열을 쓴다.
       </div>
+
+      <h2>직접 입력</h2>
+      <p>
+        <code>Datepicker</code> 와 <code>DateRangePicker</code> 는 입력창에
+        날짜를 <strong>직접 칠 수 있다.</strong> 달력이 있어도 입력 필드를 읽기
+        전용으로 만들지 않는다는 KRDS 기준(가이드 675쪽)을 따른다. 형식은{" "}
+        <code>displayFormat</code> (기본 <code>yyyy.MM.dd</code>), 기간은{" "}
+        <code>2026.09.01 - 2026.09.05</code> 처럼 앞뒤에 공백을 둔 대시로 잇는다.
+      </p>
+      <div className="doc-table-wrap">
+        <table className="doc-table">
+          <thead>
+            <tr>
+              <th>이렇게 치면</th>
+              <th>이렇게 된다</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <code>2026.9.5</code>
+              </td>
+              <td>
+                값으로 읽고, 입력창을 벗어나면 <code>2026.09.05</code> 로
+                정리한다
+              </td>
+            </tr>
+            <tr>
+              <td>읽을 수 없는 글자 · 없는 날짜(2026.02.31) · 절반만 친 기간</td>
+              <td>
+                입력창을 벗어나는 순간 <strong>치기 전 값으로 되돌린다.</strong>{" "}
+                에러 메시지는 띄우지 않는다 — 검증은 소비자 몫이다
+              </td>
+            </tr>
+            <tr>
+              <td>달력이 막아 둔 날짜 · 이동할 수 없는 연도</td>
+              <td>
+                받지 않는다. <code>dayPickerProps</code> 의{" "}
+                <code>disabled</code> · <code>startMonth</code> ·{" "}
+                <code>endMonth</code> 를 타이핑에도 똑같이 적용한다
+              </td>
+            </tr>
+            <tr>
+              <td>입력창을 비움</td>
+              <td>
+                값이 <code>undefined</code> 가 된다
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        치는 동안 달력은 <strong>그 날짜의 달로 따라 이동한다.</strong> 예전처럼
+        달력으로만 값을 받고 싶으면 <code>isTextInputBlocked</code> 를 준다.{" "}
+        <code>DateMultiplePicker</code> 는 아직 읽기 전용이다 — 날짜 목록의
+        구분자 규칙이 따로 필요해 다음 단계로 미뤘다.
+      </p>
+      <p>
+        형식 안내는 <code>infoMessage</code> 로 적는다. 플레이스홀더만으로
+        형식을 알리지 않는다 — 값을 치기 시작하면 사라지기 때문이다.
+      </p>
 
       <div className="doc-note">
         <strong>기간은 최소 2일이다.</strong> 같은 날을 두 번 눌러 하루짜리

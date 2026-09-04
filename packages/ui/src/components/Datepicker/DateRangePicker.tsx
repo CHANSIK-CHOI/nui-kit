@@ -11,6 +11,7 @@ import {
   formatRangeDateValue,
   getRangeDefaultMonth,
   getShouldCloseRangeOnSelect,
+  parseRangeDateValue,
 } from "./Datepicker.utils.js";
 
 type DateRangePickerDayPickerProps = PropsRange | PropsRangeRequired;
@@ -25,6 +26,7 @@ export type DateRangePickerProps = Omit<
   "formatDisplayValue" | "getDefaultMonth" | "mode" | "getShouldCloseOnSelect"
 > & {
   formatDisplayValue?: DateRangePickerBaseProps["formatDisplayValue"];
+  parseDisplayValue?: DateRangePickerBaseProps["parseDisplayValue"];
   getDefaultMonth?: DateRangePickerBaseProps["getDefaultMonth"];
   getShouldCloseOnSelect?: DateRangePickerBaseProps["getShouldCloseOnSelect"];
 };
@@ -43,6 +45,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(
       dayPickerProps,
       defaultIsCalendarOpen = false,
       formatDisplayValue = formatRangeDateValue,
+      parseDisplayValue = parseRangeDateValue,
       getDefaultMonth = getRangeDefaultMonth,
       getShouldCloseOnSelect = getShouldCloseRangeOnSelect,
       ...restProps
@@ -102,6 +105,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(
         onSelectedChange={handleSelectedChange}
         dayPickerProps={resolvedDayPickerProps}
         formatDisplayValue={formatDisplayValue}
+        parseDisplayValue={parseDisplayValue}
         getDefaultMonth={getDefaultMonth}
         getShouldCloseOnSelect={getShouldCloseOnSelect}
         defaultIsCalendarOpen={defaultIsCalendarOpen}

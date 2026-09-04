@@ -1,6 +1,6 @@
 "use client";
 
-import { format, type Locale } from "date-fns";
+import { format, isValid, parse, type Locale } from "date-fns";
 import {
   Animation,
   DayFlag,
@@ -98,6 +98,16 @@ export function formatMultipleDateValue({
     .join(", ");
 }
 
+/**
+ * 범위 표시값의 구분자. `formatRangeDateValue` 와 `parseRangeDateValue` 가 함께 쓴다.
+ *
+ * ⚠️ 앞뒤 공백이 구분자의 일부다. `displayFormat` 이 `yyyy-MM-dd` 처럼 대시를
+ *    포함할 수 있어서, 대시 하나만으로 나누면 날짜 안쪽에서 잘린다.
+ */
+const RANGE_SEPARATOR = " - ";
+/** 뒤가 아직 비어 있는 `2026.09.01 -` 도 타이핑 도중에 나온다. */
+const RANGE_SEPARATOR_PATTERN = /\s-\s|\s-$/;
+
 export function formatRangeDateValue({
   displayFormat,
   locale,
@@ -108,10 +118,10 @@ export function formatRangeDateValue({
   const from = format(selected.from, displayFormat, { locale });
 
   if (!selected.to) {
-    return `${from} -`;
+    return `${from}${RANGE_SEPARATOR.trimEnd()}`;
   }
 
-  return `${from} - ${format(selected.to, displayFormat, { locale })}`;
+  return `${from}${RANGE_SEPARATOR}${format(selected.to, displayFormat, { locale })}`;
 }
 
 export function getSingleDefaultMonth({
@@ -162,4 +172,82 @@ export function getShouldCloseRangeOnSelect({
   }
 
   return Boolean(nextSelected?.from && nextSelected?.to);
+}
+
+// ── 글자 → 값 (직접 입력)
+//
+// `formatDisplayValue` 의 역방향이다. **이 함수를 넘긴 모드만 타이핑이 열린다**
+// (`DatepickerBase` 의 `parseDisplayValue`). 파싱 실패는 `undefined` 로 알리고,
+// 그때 입력값은 그대로 두었다가 blur 에서 마지막 유효값으로 되돌아간다.
+//
+// `isDateAllowed` 는 base 가 준다 — 달력이 막아 둔 날짜(`dayPickerProps.disabled`)와
+// 이동할 수 없는 구간(`startMonth`~`endMonth`) 밖을 타이핑으로 넣지 못하게 한다.
+
+type DatepickerParseOptions = {
+  text: string;
+  displayFormat: string;
+  locale: Locale;
+  isDateAllowed: (date: Date) => boolean;
+  /**
+   * 타이핑이 끝난 시점(blur)의 판정인지.
+   *
+   * 치는 도중에는 절반만 읽혀도 값으로 인정해야 달력이 따라오지만,
+   * 다 치고 났는데 절반이면 값이 아니다. 범위가 이 둘을 구분한다.
+   */
+  isFinal?: boolean;
+};
+
+function parseDateText({
+  text,
+  displayFormat,
+  locale,
+  isDateAllowed,
+}: DatepickerParseOptions) {
+  const trimmed = text.trim();
+
+  if (!trimmed) return undefined;
+
+  // date-fns 의 `parse` 는 이미 엄격하다 — 2026.02.31 · 2026.13.01 · 뒤에 붙은
+  // 군더더기를 전부 Invalid Date 로 돌려준다. 자릿수는 너그러워서
+  // `2026.9.5` 도 받는다(blur 에서 `2026.09.05` 로 정규화된다).
+  const parsed = parse(trimmed, displayFormat, new Date(), { locale });
+
+  if (!isValid(parsed) || !isDateAllowed(parsed)) return undefined;
+
+  return parsed;
+}
+
+export function parseSingleDateValue(options: DatepickerParseOptions) {
+  return parseDateText(options);
+}
+
+export function parseRangeDateValue({
+  text,
+  isFinal = false,
+  ...restOptions
+}: DatepickerParseOptions): DateRange | undefined {
+  const trimmed = text.trim();
+
+  if (!trimmed) return undefined;
+
+  const parts = trimmed.split(RANGE_SEPARATOR_PATTERN);
+
+  if (parts.length > 2) return undefined;
+
+  const from = parseDateText({ ...restOptions, text: parts[0] ?? "" });
+
+  if (!from) return undefined;
+
+  const toText = parts[1]?.trim() ?? "";
+
+  // 아직 뒤를 치는 중이면 시작일만으로도 값으로 인정한다 —
+  // 달력에서 시작일만 고른 상태와 같다.
+  // 다 치고도 뒤가 비어 있으면 기간이 아니므로 되돌린다.
+  if (!toText) return isFinal ? undefined : { from };
+
+  const to = parseDateText({ ...restOptions, text: toText });
+
+  if (!to || to < from) return undefined;
+
+  return { from, to };
 }
