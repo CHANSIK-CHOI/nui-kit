@@ -46,10 +46,10 @@
 
 | 이전 | 이후 |
 | --- | --- |
-| `--nui-button-min-height` | `--nui-button-lg-height` `-md-height` `-sm-height` |
-| `--nui-button-padding-x` | `--nui-button-lg-padding-x` `-md-padding-x` `-sm-padding-x` |
-| `--nui-button-radius` (round 겸용) | `--nui-button-radius` · `--nui-button-round-radius` |
-| `--nui-popup-width` | `--nui-popup-lg-width` `-md-width` `-sm-width` |
+| `--nui-button-min-height` | `--nui-button--lg-height` `-md-height` `-sm-height` |
+| `--nui-button-padding-x` | `--nui-button--lg-padding-x` `-md-padding-x` `-sm-padding-x` |
+| `--nui-button--radius` (round 겸용) | `--nui-button--radius` · `--nui-button--round-radius` |
+| `--nui-popup-width` | `--nui-popup--lg-width` `-md-width` `-sm-width` |
 
 이름 규칙은 `--nui-{컴포넌트}-{옵션?}-{요소?}-{속성}` 입니다 — "버튼의 lg 옵션의 높이".
 
@@ -67,8 +67,8 @@
 
 **선 두께 변수 8개를 새로 엽니다**
 
-`--nui-button-border-width` · `-popup-` · `-textfield-` · `-textarea-` · `-select-` ·
-`-accordion-` · `-datepicker-` · `--nui-selector-border-width`(Checkbox·Radio·Switch 공용).
+`--nui-button--border-width` · `-popup-` · `-textfield-` · `-textarea-` · `-select-` ·
+`-accordion-` · `-datepicker-` · `--nui-selector--border-width`(Checkbox·Radio·Switch 공용).
 
 한 컴포넌트 안의 테두리 두께는 **투명한 테두리까지 포함해** 하나로 묶었습니다.
 선택 시에만 색이 생기는 자리를 빼놓으면, 두께를 2px 로 바꿨을 때 그 자리만 1px 로 남아

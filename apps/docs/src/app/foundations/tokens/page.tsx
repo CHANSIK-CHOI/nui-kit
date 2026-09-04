@@ -22,7 +22,7 @@ const GROUPS: [string, string][] = [
   ["shadow", "그림자"],
   ["focus", "포커스"],
   ["motion", "모션"],
-  ["etc", "투명도 · 배율"],
+  ["etc", "배율"],
   ["z-index", "쌓임 순서"],
 ];
 

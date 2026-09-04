@@ -61,7 +61,7 @@
     }
 
     &[disabled] {
-      opacity: var(#{v("opacity-icon-disabled")});
+      color: var(#{v("control-icon-disabled")});
       cursor: not-allowed;
     }
   }

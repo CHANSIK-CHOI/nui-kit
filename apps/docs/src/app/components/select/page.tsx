@@ -13,8 +13,8 @@ export default function SelectPage() {
         named={["Select", "MultiSelect"]}
         subpath="select"
       >
-        목록에서 고르는 컨트롤이다. 내부는 <code>react-select</code> 이지만
-        값은 옵션 객체가 아니라 원시값으로 주고받는다. 여러 개를 고르려면{" "}
+        목록에서 고르는 컨트롤이다. 내부는 <code>react-select</code> 이지만 값은
+        옵션 객체가 아니라 원시값으로 주고받는다. 여러 개를 고르려면{" "}
         <code>MultiSelect</code> 를 쓴다.
       </GuideHeader>
 

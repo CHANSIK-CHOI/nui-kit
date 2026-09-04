@@ -3,6 +3,9 @@ import { Sidebar } from "@/components/Sidebar";
 import { PopupProvider } from "@/components/PopupProvider";
 import { ThemeToggle, THEME_STORAGE_KEY } from "@/components/ThemeToggle";
 
+// 문서 사이트 글꼴 — Pretendard 가변 글꼴, 유니코드 범위별 동적 서브셋.
+// 라이브러리는 글꼴을 배포하지 않는다(`font-family-base: inherit`). 사이트가 소비자 역할로 싣는다.
+import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 // 라이브러리 전체 스타일 (토큰 포함). reset 은 포함되지 않는다.
 import "@chansikchoi/next-ui/styles/index.css";
 // 문서 사이트 자체 스타일

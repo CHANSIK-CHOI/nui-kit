@@ -4,11 +4,11 @@
 // Button / IconButton / ButtonLink / ButtonGroup
 //
 // 공개 커스터마이징 훅 (덮어써도 안전)
-//   크기    : --nui-button-lg-height   / -md-height   / -sm-height
-//             --nui-button-lg-padding-x / -md-padding-x / -sm-padding-x
-//             --nui-button-min-width
-//   모양    : --nui-button-radius      / --nui-button-round-radius
-//   선      : --nui-button-border-width
+//   크기    : --nui-button--lg-height   / -md-height   / -sm-height
+//             --nui-button--lg-padding-x / -md-padding-x / -sm-padding-x
+//             --nui-button--min-width
+//   모양    : --nui-button--radius      / --nui-button--round-radius
+//   선      : --nui-button--border-width
 //
 // ⚠️ 색 훅은 두지 않는다 (tokens.md §1-2).
 //   배경과 글자는 짝이다. 소비자가 배경만 바꾸면 대비가 깨지는데 **눈에 보이지 않는다**
@@ -27,9 +27,9 @@
   #{cls("button")} {
     #{iv("button-main")}: var(#{v("action-neutral")});
     #{iv("button-fg")}: var(#{v("action-neutral-fg")});
-    #{iv("button-shadow")}: var(#{v("shadow-1")});
-    #{iv("button-shadow-hover")}: var(#{v("shadow-2")});
-    #{iv("button-shadow-active")}: var(#{v("shadow-press")});
+    // hover · pressed 는 같은 색조의 다음 단계다 (KRDS 95~96쪽 · A2). 그림자·떠오름은 쓰지 않는다.
+    #{iv("button-main-hover")}: var(#{v("action-neutral-hover")});
+    #{iv("button-main-active")}: var(#{v("action-neutral-active")});
 
     // UA 기본 스타일 무력화 (전역 reset 미배포 대응 — 이 셀렉터 안에서만 적용)
     appearance: none;
@@ -41,20 +41,17 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-width: #{hook("button-min-width", 7.5rem)}; // 120px
+    min-width: #{hook("button--min-width", 7.5rem)}; // 120px
     // 기본은 md(48px). 위아래로 lg·sm 이 있는 형태가 표준이다.
-    min-height: #{hook("button-md-height", var(#{v("size-control-xl")}))};
-    padding: 0 #{hook("button-md-padding-x", var(#{v("space-6")}))};
+    min-height: #{hook("button--md-height", var(#{v("size-control-xl")}))};
+    padding: 0 #{hook("button--md-padding-x", var(#{v("space-6")}))};
     overflow-wrap: initial;
     background: var(#{iv("button-main")});
-    border: #{hook("button-border-width", var(#{v("border-width-1")}))} solid
+    border: #{hook("button--border-width", var(#{v("border-width-1")}))} solid
       var(#{iv("button-main")});
-    border-radius: #{hook("button-radius", var(#{v("radius-1")}))};
-    box-shadow: var(#{iv("button-shadow")});
+    border-radius: #{hook("button--radius", var(#{v("radius-1_5")}))};
 
-    @include motion-press(
-      (background-color, border-color, color, box-shadow, opacity)
-    );
+    @include motion-press((background-color, border-color, color));
 
     // 테두리 없이 누르는 것은 outline 하나로 표시한다. 링을 겹치지 않는다 —
     // design-system.md §4-1.
@@ -65,13 +62,14 @@
 
     @include hoverable {
       &:not([disabled]):not([aria-busy="true"]):hover {
-        box-shadow: var(#{iv("button-shadow-hover")});
-        transform: translateY(-1px);
+        background-color: var(#{iv("button-main-hover")});
+        border-color: var(#{iv("button-main-hover")});
       }
     }
 
     &:not([disabled]):not([aria-busy="true"]):active {
-      box-shadow: var(#{iv("button-shadow-active")});
+      background-color: var(#{iv("button-main-active")});
+      border-color: var(#{iv("button-main-active")});
       // 전면 버튼이라 가장 덜 줄인다 — design-system.md §6-3
       transform: scale(var(#{v("scale-98")}));
     }
@@ -86,7 +84,7 @@
       color: var(#{iv("button-fg")});
       text-align: center;
 
-      @include typo(4, "semi-bold");
+      @include typo(4, "bold");
     }
 
     &__icon {
@@ -100,13 +98,13 @@
     // 옵션 이름은 값의 크기 순서를 따른다 — lg · md(기본) · sm.
     // lg 와 md 는 지금 같은 여백(24px)이지만 이름을 나눈다. 나중에 따로 조정할 수 있어야 한다.
     &--large {
-      min-height: #{hook("button-lg-height", var(#{v("size-field")}))};
-      padding: 0 #{hook("button-lg-padding-x", var(#{v("space-6")}))};
+      min-height: #{hook("button--lg-height", var(#{v("size-field")}))};
+      padding: 0 #{hook("button--lg-padding-x", var(#{v("space-6")}))};
     }
 
     &--small {
-      min-height: #{hook("button-sm-height", var(#{v("size-control-md")}))};
-      padding: 0 #{hook("button-sm-padding-x", var(#{v("space-4")}))};
+      min-height: #{hook("button--sm-height", var(#{v("size-control-lg")}))};
+      padding: 0 #{hook("button--sm-padding-x", var(#{v("space-4")}))};
     }
 
     &--small &__icon {
@@ -115,12 +113,12 @@
     }
 
     &--small &__wrap {
-      @include typo(3, "semi-bold");
+      @include typo(3, "bold");
     }
 
     // ── shape
     &--round {
-      border-radius: #{hook("button-round-radius", var(#{v("radius-full")}))};
+      border-radius: #{hook("button--round-radius", var(#{v("radius-full")}))};
     }
 
     // ── color
@@ -128,12 +126,24 @@
     &--primary {
       #{iv("button-main")}: var(#{v("action-primary")});
       #{iv("button-fg")}: var(#{v("action-primary-fg")});
+      #{iv("button-main-hover")}: var(#{v("action-primary-hover")});
+      #{iv("button-main-active")}: var(#{v("action-primary-active")});
+    }
+
+    // 보조 액션 — 덜 중요한 버튼. KRDS 의 secondary (A1)
+    &--secondary {
+      #{iv("button-main")}: var(#{v("action-secondary")});
+      #{iv("button-fg")}: var(#{v("action-secondary-fg")});
+      #{iv("button-main-hover")}: var(#{v("action-secondary-hover")});
+      #{iv("button-main-active")}: var(#{v("action-secondary-active")});
     }
 
     // 되돌릴 수 없는 액션 — 삭제 · 탈퇴 · 결제 취소
     &--danger {
       #{iv("button-main")}: var(#{v("action-danger")});
       #{iv("button-fg")}: var(#{v("action-danger-fg")});
+      #{iv("button-main-hover")}: var(#{v("action-danger-hover")});
+      #{iv("button-main-active")}: var(#{v("action-danger-active")});
     }
 
     // 주의가 필요한 액션 — 확인 후 진행
@@ -142,14 +152,13 @@
       // 노랑 배경에 흰 글자는 AA 에 크게 미달한다. 노랑을 어둡게 하면
       // 갈색이 되어 "주의"의 의미를 잃으므로, 배경을 밝게 두고 글자를 어둡게 한다.
       #{iv("button-fg")}: var(#{v("action-warning-fg")});
+      #{iv("button-main-hover")}: var(#{v("action-warning-hover")});
+      #{iv("button-main-active")}: var(#{v("action-warning-active")});
     }
 
     // ── variant
     &--line {
       #{iv("button-fg")}: var(#{iv("button-main")});
-      #{iv("button-shadow")}: none;
-      #{iv("button-shadow-hover")}: none;
-      #{iv("button-shadow-active")}: none;
 
       background-color: transparent;
       border-color: var(#{iv("button-main")});
@@ -157,9 +166,6 @@
 
     &--text {
       #{iv("button-fg")}: var(#{iv("button-main")});
-      #{iv("button-shadow")}: none;
-      #{iv("button-shadow-hover")}: none;
-      #{iv("button-shadow-active")}: none;
 
       display: flex;
       width: 100%;
@@ -185,7 +191,6 @@
       #{iv("button-main")}: var(#{v("action-bg-disabled")});
       #{iv("button-fg")}: var(#{v("action-fg-disabled")});
 
-      box-shadow: none;
       // 비활성은 색으로만 표현한다. `action-bg-disabled` 와 `action-fg-disabled` 는
       // 이미 그 조합에서 대비를 맞춰 고른 값이라, opacity 를 덧칠하면 그 계산이 깨진다.
       // 당근 SEED 도 비활성에 opacity 축을 두지 않고 전용 색만 쓴다.
@@ -197,23 +202,30 @@
       }
     }
 
+    // line 은 면이 생기는 방식(알파 회색)이라 KRDS secondary 0-5-10 과 같은 성격이다 — 유지.
+    // text 는 글자색이 다음 단계로 간다. 투명도는 쓰지 않는다 (KRDS 101쪽 · A3).
     @include hoverable {
       &--line:not([disabled]):not([aria-busy="true"]):hover {
         background-color: var(#{v("action-bg-hover")});
+        border-color: var(#{iv("button-main")});
       }
 
       &--text:not([disabled]):not([aria-busy="true"]):hover {
-        opacity: var(#{v("opacity-hover")});
-        transform: none;
+        background-color: transparent;
+        border-color: transparent;
+        #{iv("button-fg")}: var(#{iv("button-main-hover")});
       }
     }
 
     &--line:not([disabled]):not([aria-busy="true"]):active {
       background-color: var(#{v("action-bg-active")});
+      border-color: var(#{iv("button-main")});
     }
 
     &--text:not([disabled]):not([aria-busy="true"]):active {
-      opacity: var(#{v("opacity-pressed")});
+      background-color: transparent;
+      border-color: transparent;
+      #{iv("button-fg")}: var(#{iv("button-main-active")});
       transform: none;
     }
   }
@@ -234,9 +246,10 @@
       height: var(#{v("size-field")});
     }
 
+    // small 은 40 — KRDS 버튼 계단(64/48/40)의 막내. 36 은 터치 44 에 너무 멀었다 (D1).
     &#{cls("button")}--small {
-      width: var(#{v("size-control-md")});
-      height: var(#{v("size-control-md")});
+      width: var(#{v("size-control-lg")});
+      height: var(#{v("size-control-lg")});
     }
   }
 

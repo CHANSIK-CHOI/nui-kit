@@ -8,9 +8,9 @@
 // size:    --small / (regular=기본) / --large
 //
 // 공개 훅
-//   크기 : --nui-popup-lg-width / -md-width / -sm-width
-//   모양 : --nui-popup-radius
-//   선   : --nui-popup-border-width
+//   크기 : --nui-popup--lg-width / -md-width / -sm-width
+//   모양 : --nui-popup--radius
+//   선   : --nui-popup--border-width
 //
 // ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 글자는 짝이라
 //    배경만 바꾸면 대비가 보이지 않게 깨진다. 한 팝업만 바꿀 때는 className 을 쓴다.
@@ -49,13 +49,13 @@
     &__panel {
       display: flex;
       flex-direction: column;
-      width: #{hook("popup-md-width", min(100%, 30rem))};
+      width: #{hook("popup--md-width", min(100%, 30rem))};
       max-height: min(calc(100dvh - 2.5rem), 45rem);
       overflow: hidden;
       background: var(#{v("layer-floating")});
-      border: #{hook("popup-border-width", var(#{v("border-width-1")}))} solid
+      border: #{hook("popup--border-width", var(#{v("border-width-1")}))} solid
         var(#{v("border-form")});
-      border-radius: #{hook("popup-radius", var(#{v("radius-6")}))};
+      border-radius: #{hook("popup--radius", var(#{v("radius-3")}))};
       box-shadow: var(#{v("shadow-3")});
       pointer-events: auto;
       transform-origin: center;
@@ -104,7 +104,7 @@
       background: transparent;
       // 보이지 않는 테두리에도 두께 훅을 적용한다.
       // 안 하면 소비자가 두께를 2px 로 바꿨을 때 여기만 1px 로 남아 hover 시 요소가 밀린다.
-      border: #{hook("popup-border-width", var(#{v("border-width-1")}))} solid
+      border: #{hook("popup--border-width", var(#{v("border-width-1")}))} solid
         transparent;
       border-radius: var(#{v("radius-full")});
 
@@ -153,7 +153,7 @@
       color: var(#{v("text-info")});
       // 콘텐츠 위에 얹는 은은한 면 — 그라디언트는 쓰지 않는다 (design-system.md §2-5)
       background: var(#{v("surface-neutral-soft")});
-      border: #{hook("popup-border-width", var(#{v("border-width-1")}))} solid
+      border: #{hook("popup--border-width", var(#{v("border-width-1")}))} solid
         var(#{v("border-section")});
       border-radius: var(#{v("radius-full")});
       box-shadow: var(#{v("shadow-inset-soft")});
@@ -178,11 +178,11 @@
 
     // ── 크기
     &--small &__panel {
-      width: #{hook("popup-sm-width", min(100%, 22.5rem))};
+      width: #{hook("popup--sm-width", min(100%, 22.5rem))};
     }
 
     &--large &__panel {
-      width: #{hook("popup-lg-width", min(100%, 40rem))};
+      width: #{hook("popup--lg-width", min(100%, 40rem))};
     }
 
     // ── variant: bottom sheet
@@ -194,7 +194,7 @@
     &--bottom-sheet &__panel {
       width: 100%;
       max-height: min(88dvh, 45rem);
-      border-radius: var(#{v("radius-6")}) var(#{v("radius-6")}) 0 0;
+      border-radius: var(#{v("radius-3")}) var(#{v("radius-3")}) 0 0;
     }
 
     // ── variant: full

@@ -32,10 +32,7 @@ export type RHFCheckedInputManagedProps =
  *    (막았다 여는 것은 breaking 이 아니다. 반대는 breaking 이다).
  */
 export type RHFSelectedInputManagedProps =
-  | "name"
-  | "selected"
-  | "onBlur"
-  | "onSelectedChange";
+  "name" | "selected" | "onBlur" | "onSelectedChange";
 
 /** 값형 입력에서 RHF 가 소유하는 prop 들 */
 export type RHFValueInputManagedProps =

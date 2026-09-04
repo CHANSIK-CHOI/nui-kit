@@ -210,11 +210,6 @@ export default function MotionPage() {
       </p>
       <TokenTable group="etc" only="scale-" swatch={false} />
 
-      <p>
-        투명도로 상태를 표현하는 값(<code>opacity-*</code>)은{" "}
-        <Link href="/foundations/state">상태</Link> 문서에 있다.
-      </p>
-
       <h2>전체 토큰</h2>
       <TokenTable group="motion" swatch={false} />
     </>

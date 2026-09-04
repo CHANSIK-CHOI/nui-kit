@@ -47,8 +47,8 @@ export default function FieldPage() {
 
       <h2>기본</h2>
       <p>
-        라벨을 누르면 컨트롤에 포커스가 간다. <code>id</code> 는 Field 가
-        만들어 라벨과 컨트롤에 같이 넣는다.
+        라벨을 누르면 컨트롤에 포커스가 간다. <code>id</code> 는 Field 가 만들어
+        라벨과 컨트롤에 같이 넣는다.
       </p>
       <CaseGrid
         columns={2}
@@ -100,8 +100,8 @@ export default function FieldPage() {
       <h2>방향과 정렬</h2>
       <p>
         <code>direction</code> 이 <code>column</code> 이면 라벨이 위,{" "}
-        <code>row</code> 면 옆이다. <code>align</code> 은 <code>row</code> 일
-        때 세로 정렬을 정한다.
+        <code>row</code> 면 옆이다. <code>align</code> 은 <code>row</code> 일 때
+        세로 정렬을 정한다.
       </p>
       <CaseMatrix
         rows={DIRECTIONS}

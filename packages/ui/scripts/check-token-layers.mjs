@@ -97,26 +97,35 @@ const HOOK_PROPS = [
 
 /**
  * 크기·모양 옵션. **컴포넌트 이름 바로 뒤**에 온다 —
- * `button-lg-height` 처럼 옵션별로 묶여야 소비자가 "lg 버튼을 통째로" 찾을 수 있다.
+ * `button--lg-height` 처럼 옵션별로 묶여야 소비자가 "lg 버튼을 통째로" 찾을 수 있다.
  */
 const HOOK_OPTIONS = new Set(["lg", "md", "sm", "round"]);
 
-/** 훅 이름이 `{컴포넌트}-{옵션?}-{요소?}-{속성}` 을 지키는지. 문제가 없으면 null */
+/**
+ * 훅 이름이 `{컴포넌트}--{옵션?}-{요소?}-{속성}` 을 지키는지. 문제가 없으면 null.
+ *
+ * 컴포넌트 이름 뒤에 **대시 두 개**를 둔다 — KRDS 디자인 토큰 표기(가이드 214쪽)다.
+ * `--nui-button--md-height` 를 읽으면 "button 의 md 옵션의 height" 로 끊긴다.
+ * 소비자가 `button--` 로 검색하면 버튼 훅만 모인다.
+ */
 function checkHookName(name) {
-  const prop = HOOK_PROPS.find((p) => name === p || name.endsWith(`-${p}`));
+  const sep = name.indexOf("--");
+  if (sep <= 0 || name.indexOf("--", sep + 2) !== -1) {
+    return "컴포넌트 이름 뒤에 대시 두 개가 정확히 한 번 와야 한다 (`button--md-height`)";
+  }
+  const rest = name.slice(sep + 2);
+  const prop = HOOK_PROPS.find((p) => rest === p || rest.endsWith(`-${p}`));
   if (!prop) {
     return `속성으로 끝나지 않는다 — 허용: ${HOOK_PROPS.join(" · ")}`;
   }
 
-  const parts = name
-    .slice(0, name.length - prop.length)
+  const parts = rest
+    .slice(0, rest.length - prop.length)
     .split("-")
     .filter(Boolean);
 
-  if (parts.length === 0) return "컴포넌트 이름이 없다";
-
   const optionAt = parts.findIndex((p) => HOOK_OPTIONS.has(p));
-  if (optionAt > 1) {
+  if (optionAt > 0) {
     return `옵션 '${parts[optionAt]}' 은 컴포넌트 이름 바로 뒤에 와야 한다`;
   }
   return null;
@@ -128,6 +137,17 @@ function checkHookName(name) {
  * 이행 중이기 때문이다. 목록이 비면 `_seed.scss` 의 alias 를 지울 수 있다.
  */
 const DEPRECATED = {
+  // 둥근 정도 최대 12 (KRDS C1)
+  "radius-4": "radius-2_5",
+  "radius-6": "radius-3",
+  // 굵기 두 단계 (KRDS B1, 2026-09-04)
+  "font-weight-medium": "font-weight-regular",
+  "font-weight-semi-bold": "font-weight-bold",
+  // 상태를 투명도로 표현하지 않는다 (KRDS A3)
+  "opacity-icon-disabled": "control-icon-disabled",
+  "opacity-icon-readonly": "control-text-muted",
+  "opacity-hover": "action-*-hover",
+  "opacity-pressed": "action-*-active",
   "space-2xs": "space-1",
   "space-xs": "space-2",
   "space-sm": "space-3",
@@ -216,7 +236,7 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
     }
   }
 
-  // 3) 공개 훅 — 색은 열지 않는다 · 이름은 {컴포넌트}-{옵션}-{속성}
+  // 3) 공개 훅 — 색은 열지 않는다 · 이름은 {컴포넌트}--{옵션?}-{속성}
   for (const m of css.matchAll(/hook\(\s*"([a-z0-9-]+)"/g)) {
     const name = m[1];
 

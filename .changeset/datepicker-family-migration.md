@@ -36,7 +36,7 @@ import { Datepicker, DateRangePicker } from "@chansikchoi/next-ui";
 
 **공개 CSS 변수**
 `--nui-datepicker-dropdown-bg` / `-dropdown-radius` /
-`--nui-datepicker-day-size` / `-day-button-size` / `-day-radius`
+`--nui-datepicker--day-size` / `-day-button-size` / `-day-radius`
 
 **`react-day-picker` 의 기본 CSS 는 불러오지 않습니다.** 이 컴포넌트는 라이브러리의
 `classNames` 를 통째로 `nui-daypicker__*` 로 갈아끼운 뒤 우리 CSS 로 그립니다.

@@ -28,6 +28,7 @@ body {
 
 body {
   font-family:
+    "Pretendard Variable",
     "Pretendard",
     -apple-system,
     BlinkMacSystemFont,
@@ -81,7 +82,7 @@ body {
 
 .doc-nav-title {
   font-size: var(--nui-font-size-1);
-  font-weight: var(--nui-font-weight-semi-bold);
+  font-weight: var(--nui-font-weight-bold);
   color: var(--nui-text-secondary);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -97,7 +98,7 @@ body {
   margin: 0 0 2px;
   padding: 0 8px;
   font-size: var(--nui-font-size-1);
-  font-weight: var(--nui-font-weight-medium);
+  font-weight: var(--nui-font-weight-regular);
   color: var(--nui-text-disabled);
 }
 
@@ -118,7 +119,7 @@ body {
 .doc-nav-link[aria-current="page"] {
   background: var(--nui-color-brand-3);
   color: var(--nui-color-brand-11);
-  font-weight: var(--nui-font-weight-medium);
+  font-weight: var(--nui-font-weight-bold);
 }
 
 .doc-main {
@@ -204,7 +205,7 @@ body {
 
 .doc-table thead th {
   background: var(--doc-bg-subtle);
-  font-weight: var(--nui-font-weight-semi-bold);
+  font-weight: var(--nui-font-weight-bold);
   font-size: var(--nui-font-size-1);
   color: var(--nui-text-secondary);
 }
@@ -391,7 +392,7 @@ body {
 
 .doc-theme-toggle__label {
   font-size: var(--nui-font-size-1);
-  font-weight: var(--nui-font-weight-medium);
+  font-weight: var(--nui-font-weight-regular);
   color: var(--nui-text-secondary);
   letter-spacing: 0;
   cursor: pointer;
@@ -624,7 +625,11 @@ body {
       linear-gradient(45deg, transparent 75%, rgb(128 128 128 / 22%) 75%),
       linear-gradient(-45deg, transparent 75%, rgb(128 128 128 / 22%) 75%);
     background-size: 10px 10px;
-    background-position: 0 0, 0 5px, 5px -5px, -5px 0;
+    background-position:
+      0 0,
+      0 5px,
+      5px -5px,
+      -5px 0;
   }
 
   [data-theme="dark"] & .preset-swatch {

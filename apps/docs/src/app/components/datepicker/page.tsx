@@ -93,7 +93,7 @@ export default function DatepickerPage() {
         <li>
           날짜 셀과 이전/다음 버튼은 누르는 범위가 44px 이다. 날짜 버튼은 36px,
           화살표는 32px 로 보이고 히트만 넓혔다. 셀 크기는{" "}
-          <code>--nui-datepicker-day-size</code> 로 바꿀 수 있다
+          <code>--nui-datepicker--day-size</code> 로 바꿀 수 있다
         </li>
       </ul>
 

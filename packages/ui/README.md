@@ -103,13 +103,13 @@ import "@chansikchoi/next-ui/styles/preflight.css";
 ### 치수·모양·선 두께는 컴포넌트별로 엽니다
 
 바꾸면 결과가 바로 보이고 짝이 없는 값들입니다. 이름은
-`--nui-{컴포넌트}-{옵션?}-{요소?}-{속성}` 규칙을 따릅니다.
+`--nui-{컴포넌트}--{옵션?}-{요소?}-{속성}` 규칙을 따릅니다. 컴포넌트 이름 뒤에 대시가 두 개입니다.
 
 ```css
 :root {
-  --nui-button-lg-height: 3.75rem; /* 버튼 · large 옵션 · 높이 */
-  --nui-button-radius: 0;
-  --nui-button-border-width: 2px;
+  --nui-button--lg-height: 3.75rem; /* 버튼 · large 옵션 · 높이 */
+  --nui-button--radius: 0;
+  --nui-button--border-width: 2px;
 }
 ```
 
@@ -124,9 +124,9 @@ import "@chansikchoi/next-ui/styles/preflight.css";
 | Accordion | `-gap` · `-radius` · `-border-width` |
 | Toast | `-width` · `-radius` |
 | Tooltip | `-max-width` · `-radius` |
-| Checkbox · Radio · Switch | `--nui-selector-size` · `--nui-selector-border-width` · `--nui-switch-width` `--nui-switch-height` |
+| Checkbox · Radio · Switch | `--nui-selector--size` · `--nui-selector--border-width` · `--nui-switch--width` `--nui-switch--height` |
 
-크기 옵션이 있는 것은 옵션별로 이름이 나뉩니다. `--nui-button-md-height` 하나만 두면
+크기 옵션이 있는 것은 옵션별로 이름이 나뉩니다. `--nui-button--md-height` 하나만 두면
 `:root` 에 값을 넣는 순간 large·medium·small 이 전부 같은 높이가 되어 크기 variant 가
 죽기 때문입니다.
 
@@ -314,7 +314,7 @@ const OPTIONS = [
 emotion 쪽에서 걷어내** CSS 가 책임지게 합니다.
 
 - 치수·모양은 위 커스터마이징 절의 CSS 변수로 조정합니다
-  (`--nui-select-height` / `-radius` / `-border-width`). 색은 `className` 으로 씁니다
+  (`--nui-select--height` / `-radius` / `-border-width`). 색은 `className` 으로 씁니다
 - `styles` prop 을 직접 넘기면 그 정리된 값 위에 얹히므로 의도대로 덧칠됩니다
 - 다만 **메뉴 최대 높이는 CSS 가 아니라 `maxMenuHeight` prop** 으로 조정합니다.
   `react-select` 이 메뉴 배치를 계산할 때 이 값을 참조하므로, CSS 로 덮으면

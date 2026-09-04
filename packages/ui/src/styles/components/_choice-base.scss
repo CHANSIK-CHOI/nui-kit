@@ -35,11 +35,15 @@
       // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
       appearance: none;
 
+      // 누르는 범위는 44 — 컨트롤(24)보다 크다. 투명한 input 자체를 가운데 정렬로 키운다.
+      // `hit-area` 믹스인(::before)을 못 쓰는 이유: 클릭은 input 에 닿아야 값이 바뀐다.
+      // KRDS 550 · 580쪽 "양식이 작으니 레이블로 상호작용을 확장" + WCAG 44 권장 (D2).
       position: absolute;
-      inset: 0;
+      top: calc(50% - var(#{v("size-control-option")}) / 2);
+      left: calc(50% - var(#{v("size-control-option")}) / 2);
       z-index: 1;
-      width: 100%;
-      height: 100%;
+      width: var(#{v("size-control-option")});
+      height: var(#{v("size-control-option")});
       margin: 0;
       opacity: 0;
       cursor: inherit;
@@ -62,7 +66,7 @@
       background-color: var(#{v("control-bg")});
       // 세 컨트롤이 이 __control 골격을 함께 쓴다. selector-size 와 같은 이유로
       // 두께도 하나로 묶는다 — 컴포넌트별로 쪼개면 같은 골격이 서로 다른 두께가 된다.
-      border: #{hook("selector-border-width", var(#{v("border-width-1")}))}
+      border: #{hook("selector--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border")});
 
       @include motion((border-color, background-color, box-shadow, color));
@@ -101,7 +105,7 @@
   // 사각/원형 선택자는 같은 치수를 쓴다 (Switch 는 자체 치수).
   #{cls("checkbox")},
   #{cls("radio")} {
-    width: #{hook("selector-size", var(#{v("size-selector")}))};
-    height: #{hook("selector-size", var(#{v("size-selector")}))};
+    width: #{hook("selector--size", var(#{v("size-selector")}))};
+    height: #{hook("selector--size", var(#{v("size-selector")}))};
   }
 }

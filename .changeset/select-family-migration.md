@@ -37,7 +37,7 @@ const OPTIONS = [
 `--nui-z-portal-menu`(1031 — portal 로 body 에 붙는 드롭다운·달력. 팝업 1030 위)
 
 **공개 CSS 변수**
-`--nui-select-height` / `--nui-select-radius` / `--nui-select-border-color` /
+`--nui-select--height` / `--nui-select--radius` / `--nui-select-border-color` /
 `--nui-select-bg`
 
 **`react-select` 은 dependency 입니다** — 따로 설치하지 않습니다. 소비자 프로젝트가

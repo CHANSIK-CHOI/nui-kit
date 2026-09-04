@@ -4,11 +4,11 @@ export const metadata = { title: "타이포그래피" };
 
 /** 크기·행간·자간이 같은 번호로 묶인다. 값은 tokens.md §3-3 과 같은 출처다. */
 const SCALE: { n: number; px: number; lh: string; ls: string }[] = [
-  { n: 1, px: 12, lh: "1.5", ls: "0.08em" },
-  { n: 3, px: 14, lh: "1.5", ls: "-0.01em" },
-  { n: 4, px: 16, lh: "1.5", ls: "-0.02em" },
-  { n: 5, px: 18, lh: "1.44", ls: "-0.03em" },
-  { n: 6, px: 20, lh: "1.4", ls: "-0.04em" },
+  { n: 1, px: 13, lh: "1.5", ls: "0" },
+  { n: 3, px: 14, lh: "1.5", ls: "0" },
+  { n: 4, px: 16, lh: "1.5", ls: "0" },
+  { n: 5, px: 18, lh: "1.5", ls: "0" },
+  { n: 6, px: 20, lh: "1.5", ls: "0" },
 ];
 
 /** 아홉 조합이 전부다 — design-system.md §5 와 같은 출처다. */
@@ -22,7 +22,7 @@ const ROLES: [string, string, string, string][] = [
   [
     "액션 라벨",
     "4",
-    "semi-bold",
+    "bold",
     "Button(text 버튼 포함) · Accordion 헤더 · Datepicker 년월",
   ],
   [
@@ -34,18 +34,13 @@ const ROLES: [string, string, string, string][] = [
   [
     "라벨 · 값 강조",
     "3",
-    "medium",
+    "regular",
     "Field 라벨 · Datepicker 날짜 · Select 태그 · Toast 메시지",
   ],
-  [
-    "액션 라벨 (small)",
-    "3",
-    "semi-bold",
-    "Button small · Datepicker 월 드롭다운",
-  ],
+  ["액션 라벨 (small)", "3", "bold", "Button small · Datepicker 월 드롭다운"],
   ["캡션 · 설명 · 메시지", "1", "regular", "Field 설명 · Message · 에러 문구"],
-  ["그룹 라벨", "1", "medium", "Select 그룹 헤딩"],
-  ["요일 · 소제목", "1", "semi-bold", "Datepicker 요일"],
+  ["그룹 라벨", "1", "regular", "Select 그룹 헤딩"],
+  ["요일 · 소제목", "1", "bold", "Datepicker 요일"],
   ["제목", "6", "bold", "Popup 제목"],
 ];
 
@@ -58,6 +53,22 @@ export default function TypographyPage() {
         <code>font-size-4</code> 를 쓰면 <code>line-height-4</code> 와{" "}
         <code>letter-spacing-4</code> 가 짝이다. 셋을 따로 고르지 않는다.
       </p>
+
+      <h2>글꼴</h2>
+      <p>
+        라이브러리는 글꼴을 싣지 않는다. <code>--nui-font-family-base</code> 가{" "}
+        <code>inherit</code> 라 컴포넌트는 소비자 페이지의 글꼴을 그대로 따른다.
+        이 문서 사이트는 소비자 역할로 <strong>Pretendard</strong>(가변 글꼴,
+        유니코드 범위별 동적 서브셋)를 싣고 있다. 고딕 계열이고 굵기 하나의
+        파일로 400~700 을 전부 낸다.
+      </p>
+      <pre className="doc-code">
+        <code>{`npm i pretendard
+// app/layout.tsx
+import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+// 전역 CSS
+body { font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; }`}</code>
+      </pre>
 
       <h2>스케일</h2>
       <div className="doc-example">
@@ -154,7 +165,12 @@ export default function TypographyPage() {
         </table>
       </div>
 
-      <h2>굵기는 네 단계다</h2>
+      <h2>굵기는 두 단계다</h2>
+      <p>
+        regular(400)와 bold(700)만 쓴다. 정부 가이드라인(KRDS)의 표준형 서체
+        규격이 두 굵기이고, 굵기가 셋 이상이면 위계가 흐려진다. 라벨 · 날짜 ·
+        태그는 regular, 버튼 · 제목 · 요일은 bold 다.
+      </p>
       <div className="doc-example">
         <div
           className="doc-example__preview doc-example__row"
@@ -162,8 +178,6 @@ export default function TypographyPage() {
         >
           {[
             ["regular", 400],
-            ["medium", 500],
-            ["semi-bold", 600],
             ["bold", 700],
           ].map(([name, w]) => (
             <div key={name as string} style={{ textAlign: "center" }}>
@@ -181,7 +195,9 @@ export default function TypographyPage() {
             </div>
           ))}
         </div>
-        <p className="doc-example__caption">800(extra-bold)은 두지 않는다.</p>
+        <p className="doc-example__caption">
+          500 · 600 · 800 은 두지 않는다. 강조가 필요하면 bold 다.
+        </p>
       </div>
 
       <h2>전체 토큰</h2>

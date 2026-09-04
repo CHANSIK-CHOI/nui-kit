@@ -162,7 +162,7 @@ export default function AccessibilityPage() {
               </td>
               <td className="doc-wrap">
                 격자라 셀이 히트의 상한이다. 셀을 44px 로 두고 버튼의 히트가
-                셀을 채운다. <code>--nui-datepicker-day-size</code> 로 줄일 수
+                셀을 채운다. <code>--nui-datepicker--day-size</code> 로 줄일 수
                 있다
               </td>
             </tr>
@@ -184,10 +184,9 @@ export default function AccessibilityPage() {
 
       <div className="doc-note doc-note--warn">
         <strong>선택 컨트롤은 예외가 필요하다.</strong> Checkbox 와 Radio 는
-        22px, Switch 는 46×26 이라 컨트롤 자체가 44px 보다 작다. 라벨을 포함한
-        클릭 영역이 44px 을 채우고, 라벨이 <code>&lt;label&gt;</code> 로 연결돼
-        있으면 자동으로 확보된다. 라벨 없이 단독으로 쓴다면 히트 영역을 직접
-        넓힌다.
+        24px, Switch 는 40×24 라 컨트롤 자체가 44px 보다 작다. 그래서 보이지
+        않는 input 을 44×44 로 키워 두었다. 라벨 없이 단독으로 써도 누르는
+        범위는 44 다.
       </div>
 
       <h2>포커스</h2>

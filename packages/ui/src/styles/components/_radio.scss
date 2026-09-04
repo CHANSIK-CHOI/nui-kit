@@ -8,7 +8,7 @@
 // 공통 골격은 `_choice-base.scss`, 그룹 배치는 `_choice-group.scss` 가 담당한다.
 // 여기에는 라디오 고유의 표시부만 둔다.
 //
-// 공개 훅: --nui-selector-size (Checkbox 와 공유)
+// 공개 훅: --nui-selector--size (Checkbox 와 공유)
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("radio")} {

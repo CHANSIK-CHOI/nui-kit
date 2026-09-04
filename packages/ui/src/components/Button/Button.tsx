@@ -16,7 +16,9 @@ const block = px("button");
 // 소비자는 small 을 보고 "가장 작은 것"이라고 읽는다.
 export type ButtonSize = "large" | "medium" | "small";
 // 색이 아니라 역할이 이름이다 — "이 버튼은 삭제인가"만 물으면 된다.
-export type ButtonColor = "neutral" | "primary" | "danger" | "warning";
+// secondary 는 KRDS 의 보조 색(2026-09-04, A1) — 덜 중요한 액션.
+export type ButtonColor =
+  "neutral" | "primary" | "secondary" | "danger" | "warning";
 export type ButtonVariant = "solid" | "line" | "text";
 export type ButtonShape = "round" | "square";
 

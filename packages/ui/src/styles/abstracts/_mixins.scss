@@ -3,7 +3,7 @@
 @use "prefix" as *;
 
 // 타이포 토큰 적용. font-size 는 토큰 자체가 반응형이므로 미디어쿼리가 필요 없다.
-// $weight 는 토큰 키("semi-bold"), $line-height / $letter-spacing 은 원시값으로 덮어쓴다.
+// $weight 는 토큰 키("regular" | "bold" 둘뿐 — KRDS B1), $line-height / $letter-spacing 은 원시값으로 덮어쓴다.
 // $scale 은 숫자 스케일이다 (1 · 3 · 4 · 6 · 8) — tokens.md §3-3.
 // 크기·행간·자간이 같은 번호로 묶이므로, 번호만 정하면 나머지가 따라온다.
 @mixin typo(

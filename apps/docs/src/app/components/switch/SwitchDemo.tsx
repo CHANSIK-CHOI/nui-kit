@@ -27,15 +27,15 @@ export function SwitchDemo() {
       </Example>
 
       <h2>커스터마이징</h2>
-      <Example caption="--nui-switch-width / --nui-switch-height">
+      <Example caption="--nui-switch--width / --nui-switch--height">
         <div
           style={
             {
               display: "flex",
               gap: 12,
               alignItems: "center",
-              "--nui-switch-width": "3.5rem",
-              "--nui-switch-height": "2rem",
+              "--nui-switch--width": "3.5rem",
+              "--nui-switch--height": "2rem",
             } as React.CSSProperties
           }
         >

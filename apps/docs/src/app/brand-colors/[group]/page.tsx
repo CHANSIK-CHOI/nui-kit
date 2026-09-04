@@ -55,9 +55,10 @@ export default async function GroupPage({
 
       <div className="doc-note">
         <p>
-          <strong>대부분은 고른 색이 9번에 그대로 들어간다.</strong> 다만 너무 밝은
-          색은 어둡게 낮춘다 — <strong>9번은 버튼처럼 색으로 꽉 찬 면의 배경</strong>이라,
-          밝으면 그 위에 흰 글자도 검은 글자도 읽히지 않기 때문이다.
+          <strong>대부분은 고른 색이 9번에 그대로 들어간다.</strong> 다만 너무
+          밝은 색은 어둡게 낮춘다 —{" "}
+          <strong>9번은 버튼처럼 색으로 꽉 찬 면의 배경</strong>이라, 밝으면 그
+          위에 흰 글자도 검은 글자도 읽히지 않기 때문이다.
         </p>
         <p>
           낮춘 경우에는 카드에 <em>밝아서 …로 낮춤</em> 이라고 적어뒀다.{" "}
@@ -77,7 +78,11 @@ export default async function GroupPage({
         ) : (
           <span />
         )}
-        {next ? <Link href={`/brand-colors/${next.slug}`}>{next.name} →</Link> : <span />}
+        {next ? (
+          <Link href={`/brand-colors/${next.slug}`}>{next.name} →</Link>
+        ) : (
+          <span />
+        )}
       </nav>
 
       <p className="preset-jump">

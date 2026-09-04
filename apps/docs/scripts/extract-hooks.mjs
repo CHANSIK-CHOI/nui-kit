@@ -93,16 +93,17 @@ function readArgument(text, from) {
   return text.slice(from, i - 1);
 }
 
-/** 훅 이름을 {컴포넌트}-{옵션?}-{요소?}-{속성} 으로 쪼갠다 */
+/** 훅 이름을 {컴포넌트}--{옵션?}-{요소?}-{속성} 으로 쪼갠다. 컴포넌트 뒤는 대시 두 개다 (KRDS 214쪽) */
 function parse(name) {
-  const prop = PROPS.find((p) => name === p || name.endsWith(`-${p}`));
-  if (!prop) return { prop: name, option: null };
+  const rest = name.includes("--") ? name.slice(name.indexOf("--") + 2) : name;
+  const prop = PROPS.find((p) => rest === p || rest.endsWith(`-${p}`));
+  if (!prop) return { prop: rest, option: null };
 
-  const parts = name
-    .slice(0, name.length - prop.length)
+  const parts = rest
+    .slice(0, rest.length - prop.length)
     .split("-")
     .filter(Boolean);
-  const option = parts[1] && OPTION_LABEL[parts[1]] ? parts[1] : null;
+  const option = parts[0] && OPTION_LABEL[parts[0]] ? parts[0] : null;
   return { prop, option };
 }
 

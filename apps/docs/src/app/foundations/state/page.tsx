@@ -313,13 +313,14 @@ export default function StatePage() {
 
       <h2>색이 아닌 상태 표현</h2>
       <p>
-        투명도로 표현하는 자리는 넷뿐이다. 입력 컨트롤 안 아이콘의
-        disabled·readonly, text 버튼의 hover·active. 그 밖의 비활성은 전부
-        색으로만 표현한다. 비활성 글자는 대비 요구에서 빠지지만{" "}
+        투명도로 표현하는 자리는 없다. 비활성 아이콘은{" "}
+        <code>control-icon-disabled</code>, 버튼의 hover·pressed 는 같은 색조의
+        다음 단계(<code>action-*-hover</code> · <code>-active</code>)다. 정부
+        가이드라인(KRDS)이 비활성에 투명도를 쓰지 말라고 해서 맞췄다. 비활성
+        글자는 대비 요구에서 빠지지만{" "}
         <strong>2.0:1 아래로는 내려가지 않는다</strong> — 회색이 배경에 녹으면
         &quot;비활성&quot;이 아니라 &quot;없음&quot;으로 읽힌다.
       </p>
-      <TokenTable group="etc" only="opacity-" swatch={false} />
     </>
   );
 }

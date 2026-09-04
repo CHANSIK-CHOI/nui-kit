@@ -16,7 +16,7 @@
 //   `getResolvedSelectStyles()` 가 emotion 쪽에서 걷어내고, 여기서 책임진다.
 //   두 파일은 함께 움직인다 — 한쪽만 고치면 조용히 깨진다.
 //
-// 공개 훅: --nui-select-height / -radius / -border-width
+// 공개 훅: --nui-select--height / -radius / -border-width
 // ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 테두리·글자는 짝이라
 //    한쪽만 바꾸면 대비가 보이지 않게 깨진다. 하나만 바꿀 때는 className 을 쓴다.
 // 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
@@ -32,11 +32,11 @@
     // ── control (emotion 이 min-height / transition / cursor / justify-content /
     //    flex-wrap 을 넘겨준 자리)
     &__control {
-      min-height: #{hook("select-height", var(#{v("size-field")}))};
+      min-height: #{hook("select--height", var(#{v("size-field")}))};
       background-color: var(#{v("control-bg")});
-      border: #{hook("select-border-width", var(#{v("border-width-1")}))} solid
+      border: #{hook("select--border-width", var(#{v("border-width-1")}))} solid
         var(#{v("control-border")});
-      border-radius: #{hook("select-radius", var(#{v("radius-2")}))};
+      border-radius: #{hook("select--radius", var(#{v("radius-1_5")}))};
       cursor: pointer;
 
       @include motion(
@@ -146,7 +146,7 @@
       padding: var(#{v("space-2")});
       // 메뉴는 컨트롤이 아니라 떠 있는 컨테이너다 — design-system.md §2-5-1.
       // 라이트에선 control-bg 와 같은 값이지만 다크에서 한 단계 밝아진다.
-      border: #{hook("select-border-width", var(#{v("border-width-1")}))} solid
+      border: #{hook("select--border-width", var(#{v("border-width-1")}))} solid
         var(#{v("border-form")});
       border-radius: var(#{v("radius-3")});
       background-color: var(#{v("layer-floating")});
@@ -171,7 +171,7 @@
       color: var(#{v("text-secondary")});
       text-transform: none;
 
-      @include typo(1, "medium");
+      @include typo(1, "regular");
     }
 
     // ── option (emotion 이 display / cursor 를 넘겨준 자리)
@@ -180,7 +180,7 @@
       align-items: center;
       min-height: var(#{v("size-control-option")});
       padding: 0 var(#{v("space-3")});
-      border-radius: var(#{v("radius-2")});
+      border-radius: var(#{v("radius-1_5")});
       color: var(#{v("text-primary")});
       cursor: pointer;
 
@@ -209,7 +209,7 @@
       background-color: var(#{v("control-accent-soft")});
       // inset 으로 테두리를 흉내낸 자리다. 소비자 눈에는 같은 선이므로 같은 훅을 쓴다.
       box-shadow: inset 0 0 0
-        #{hook("select-border-width", var(#{v("border-width-1")}))}
+        #{hook("select--border-width", var(#{v("border-width-1")}))}
         var(#{v("control-accent")});
     }
 
@@ -231,7 +231,7 @@
       padding: var(#{v("space-2")}) var(#{v("space-1")}) var(#{v("space-2")})
         var(#{v("space-3")});
 
-      @include typo(3, "medium");
+      @include typo(3, "regular");
     }
 
     &__multi-value__remove {
@@ -328,7 +328,7 @@
 
     &#{state("disabled")} &__clear-indicator,
     &#{state("disabled")} &__dropdown-indicator {
-      opacity: var(#{v("opacity-icon-disabled")});
+      color: var(#{v("control-icon-disabled")});
     }
 
     // 입력 컨트롤 안의 값 표시라 §2-1 을 따른다. 배경도 함께 바꾼다.
@@ -376,9 +376,9 @@
       color: var(#{v("control-text-muted")});
     }
 
+    // readonly 아이콘은 투명도를 덧칠하지 않는다 — 색은 위의 control-text-muted 가 맡는다 (A3)
     &#{state("readonly")}:not(#{state("disabled")}) &__clear-indicator,
     &#{state("readonly")}:not(#{state("disabled")}) &__dropdown-indicator {
-      opacity: var(#{v("opacity-icon-readonly")});
       cursor: default;
     }
   }

@@ -15,11 +15,7 @@ export const metadata = { title: "Textfield" };
 export default function TextfieldPage() {
   return (
     <>
-      <GuideHeader
-        title="Textfield"
-        named={["Textfield"]}
-        subpath="textfield"
-      >
+      <GuideHeader title="Textfield" named={["Textfield"]} subpath="textfield">
         한 줄 입력이다. 값은 <code>value</code> 와 <code>onChange</code> 로
         소유한다. <code>defaultValue</code> 는 타입에서 제외되어 있다.
       </GuideHeader>
@@ -154,8 +150,8 @@ const { control } = useForm<{ email: string }>();
       <h2>커스터마이징</h2>
       <p>
         색은 컴포넌트별로 열지 않는다. 한 곳만 바꾸려면 <code>className</code>{" "}
-        을, 화면 전체를 바꾸려면{" "}
-        <Link href="/brand-colors">브랜드 프리셋</Link>을 쓴다.
+        을, 화면 전체를 바꾸려면 <Link href="/brand-colors">브랜드 프리셋</Link>
+        을 쓴다.
       </p>
       <HookTable group="textfield" />
 

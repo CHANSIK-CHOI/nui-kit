@@ -60,7 +60,9 @@ function splitThemes(scss) {
   const darkAt = scss.indexOf("@mixin dark-scheme");
   const lightAt = scss.indexOf("@layer nui.tokens");
   if (darkAt < 0 || lightAt < 0) {
-    throw new Error("_seed.scss 에서 테마 블록을 찾지 못했다 — 파일 구조가 바뀌었나?");
+    throw new Error(
+      "_seed.scss 에서 테마 블록을 찾지 못했다 — 파일 구조가 바뀌었나?",
+    );
   }
   return { dark: scss.slice(darkAt, lightAt), light: scss.slice(lightAt) };
 }
@@ -91,7 +93,7 @@ function compare(themes, result) {
     const step = LAYER_DEFAULT_STEP[theme];
     const bgOriginal = grab(themes[theme], "gray").get(String(step));
     const bgMade = result[theme].gray[step];
-    for (const group of ["brand", "gray"]) {
+    for (const group of ["brand", "secondary", "gray"]) {
       const src = grab(themes[theme], group);
       const made = result[theme][group];
       for (const step of STEPS) {
@@ -111,7 +113,10 @@ function compare(themes, result) {
           want,
           got,
           // 화면에 나오는 것끼리 비교한다 — 각자의 배경 위에 얹는다.
-          dE: deltaE(compositeOver(want, bgOriginal), compositeOver(got, bgMade)),
+          dE: deltaE(
+            compositeOver(want, bgOriginal),
+            compositeOver(got, bgMade),
+          ),
           composited: true,
         });
       }
@@ -129,7 +134,9 @@ function report(title, rows) {
     `   ${title}: ${rows.length}개 · 평균 ΔE ${avg.toFixed(3)} · 최대 ${max.dE.toFixed(3)} (${max.id})`,
   );
   for (const r of bad.slice(0, 15)) {
-    console.log(`     ✗ ${r.id}  ${r.want} → ${r.got}  ΔE ${r.dE.toFixed(2)} (기준 ${limit(r)})`);
+    console.log(
+      `     ✗ ${r.id}  ${r.want} → ${r.got}  ΔE ${r.dE.toFixed(2)} (기준 ${limit(r)})`,
+    );
   }
   if (bad.length > 15) console.log(`     … 그리고 ${bad.length - 15}건 더`);
   return bad.length;
@@ -145,35 +152,49 @@ if (isMain) {
   let failed = 0;
 
   // ── 관문 2: 기본 브랜드 색으로 68개를 만들어 원본과 대조한다
-  console.log(`\n── 관문 2 · 재현 — ${ACCENT} 로 만든 색이 원본과 같아 보이나`);
+  console.log(
+    `\n── 관문 2 · 재현 — ${ACCENT} 로 만든 색(보조 포함)이 원본과 같아 보이나`,
+  );
   const made = generate(ACCENT);
   failed += report("생성 결과", compare(themes, made));
   for (const theme of ["light", "dark"]) {
     const t = made[theme];
     const bad = t.belowStandard;
     console.log(
-      `     ${theme.padEnd(5)} 9번 글자색 ${t.contrast} (${t.contrastRatio}:1)` +
+      `     ${theme.padEnd(5)} 9번 글자색 ${t.contrast} (${t.contrastRatio}:1) · 보조 ${t.secondaryContrast} (${t.secondaryContrastRatio}:1)` +
         `${bad ? ` ✗ 기준 ${SOLID_TEXT}:1 미달` : ""}`,
     );
     if (bad) failed++;
   }
 
   // ── 관문 3: 프리셋 전부를 돌린다
-  console.log(`\n── 관문 3 · 전수 — 프리셋 ${presets.length}색이 전부 안전한가`);
+  console.log(
+    `\n── 관문 3 · 전수 — 프리셋 ${presets.length}색이 전부 안전한가`,
+  );
   const problems = [];
   for (const p of presets) {
     const r = generate(p.hex);
     for (const theme of ["light", "dark"]) {
       const t = r[theme];
-      if (t.belowStandard) {
-        problems.push(`${p.n}. ${p.name} (${theme}) 9번 글자 대비 ${t.contrastRatio}:1`);
+      if (t.contrastRatio < SOLID_TEXT) {
+        problems.push(
+          `${p.n}. ${p.name} (${theme}) 9번 글자 대비 ${t.contrastRatio}:1`,
+        );
+      }
+      if (t.secondaryContrastRatio < SOLID_TEXT) {
+        problems.push(
+          `${p.n}. ${p.name} (${theme}) 보조 9번 글자 대비 ${t.secondaryContrastRatio}:1`,
+        );
       }
       // 본문 글자(11·12번)는 여전히 AA 다. 9번만 완화했다.
       //
       // ⚠️ 배경은 **2번**이다. Radix 가 11번에 대해 보장하는 조건이 "1·2번 배경 위"이고,
       //    우리 `layer-default` 도 gray-2 다. 순수 흰색으로 재면 실제보다 낮게 나온다.
       // 11번은 저대비 글자라 기준이 4.0, 12번은 고대비라 AA 다.
-      for (const [step, min] of [[11, MUTED_TEXT], [12, AA]]) {
+      for (const [step, min] of [
+        [11, MUTED_TEXT],
+        [12, AA],
+      ]) {
         const onBg = contrast(t.brand[step], t.gray[2]);
         if (onBg < min) {
           problems.push(
@@ -181,17 +202,25 @@ if (isMain) {
           );
         }
       }
-      for (const [group, colors] of [["brand", t.brand], ["gray", t.gray]]) {
+      for (const [group, colors] of [
+        ["brand", t.brand],
+        ["secondary", t.secondary],
+        ["gray", t.gray],
+      ]) {
         for (const [step, hex] of Object.entries(colors)) {
           const c = hexToOklch(hex);
-          if (!inGamut(c)) problems.push(`${p.n}. ${p.name} ${theme}/${group}-${step} 화면 밖`);
+          if (!inGamut(c))
+            problems.push(
+              `${p.n}. ${p.name} ${theme}/${group}-${step} 화면 밖`,
+            );
         }
       }
     }
   }
   console.log(`   대비 미달 · 화면 밖 색: ${problems.length}건`);
   for (const x of problems.slice(0, 15)) console.log(`     ✗ ${x}`);
-  if (problems.length > 15) console.log(`     … 그리고 ${problems.length - 15}건 더`);
+  if (problems.length > 15)
+    console.log(`     … 그리고 ${problems.length - 15}건 더`);
   failed += problems.length;
 
   console.log(

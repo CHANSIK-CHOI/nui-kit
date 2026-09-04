@@ -9,12 +9,15 @@
   #{cls("checkbox-group")},
   #{cls("radio-group")} {
     display: flex;
-    gap: var(#{v("space-component-gap")});
+    // 선택 항목 사이는 세로 16 · 가로 24 — KRDS 라디오·체크박스(529 · 543쪽, D4).
+    // 12 는 KRDS 가 "미준수 사례"로 든 간격이었다.
+    gap: var(#{v("space-4")});
 
     &--row {
       flex-direction: row;
       flex-wrap: wrap;
       align-items: center;
+      gap: var(#{v("space-4")}) var(#{v("space-6")});
 
       // Field 는 기본이 width:100% 라 그대로 두면 가로 배치가 무의미해진다
       // (각 항목이 한 줄을 차지해 세로로 쌓인다).

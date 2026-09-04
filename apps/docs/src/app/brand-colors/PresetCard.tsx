@@ -10,6 +10,10 @@ export type Preset = {
   merged: number;
   isDefault: boolean;
   brand: Pair[];
+  secondary: Pair[];
+  secondarySolid: Pair;
+  secondaryContrast: Pair;
+  secondaryRatio: { l: number; d: number };
   gray: Pair[];
   brandAlpha: Pair[];
   grayAlpha: Pair[];
@@ -22,7 +26,15 @@ export type Preset = {
  * 스와치 한 칸. 라이트·다크 두 색을 CSS 변수로 넘기고 CSS 가 갈아끼운다.
  * 두 벌을 다 그리면 엘리먼트가 두 배가 되고, 그만큼 페이지가 무거워진다.
  */
-function Swatch({ c, label, marked }: { c: Pair; label: string; marked?: boolean }) {
+function Swatch({
+  c,
+  label,
+  marked,
+}: {
+  c: Pair;
+  label: string;
+  marked?: boolean;
+}) {
   return (
     <i
       className={marked ? "preset-swatch preset-swatch--mark" : "preset-swatch"}
@@ -51,7 +63,12 @@ function Scale({
   return (
     <div className="preset-scale">
       {colors.map((c, i) => (
-        <Swatch key={i} c={c} label={String(labels[i])} marked={labels[i] === mark} />
+        <Swatch
+          key={i}
+          c={c}
+          label={String(labels[i])}
+          marked={labels[i] === mark}
+        />
       ))}
     </div>
   );
@@ -81,6 +98,14 @@ export function PresetCard({ p }: { p: Preset }) {
 
       {/* 실제로 나오는 색은 9번 자리다 — 테두리로 표시한다 */}
       <Scale colors={p.brand} labels={data.steps} mark={9} />
+      <p className="preset-label">
+        보조 색{" "}
+        <span>
+          같은 색조에서 채도를 절반으로. 덜 중요한 버튼과 구분용 면. 글자 대비{" "}
+          {p.secondaryRatio.l}:1 · 다크 {p.secondaryRatio.d}:1
+        </span>
+      </p>
+      <Scale colors={p.secondary} labels={data.steps} mark={9} />
 
       <pre className="preset-cmd">
         <code>npm run color:generate -- --preset {p.n}</code>
@@ -98,8 +123,14 @@ export function PresetCard({ p }: { p: Preset }) {
             반투명 <span>포커스 링과 구분선에 쓴다</span>
           </p>
           <div className="preset-alpha-row">
-            <Scale colors={p.brandAlpha} labels={data.alpha.brand.map((s) => `a${s}`)} />
-            <Scale colors={p.grayAlpha} labels={data.alpha.gray.map((s) => `a${s}`)} />
+            <Scale
+              colors={p.brandAlpha}
+              labels={data.alpha.brand.map((s) => `a${s}`)}
+            />
+            <Scale
+              colors={p.grayAlpha}
+              labels={data.alpha.gray.map((s) => `a${s}`)}
+            />
           </div>
 
           <p className="preset-label">

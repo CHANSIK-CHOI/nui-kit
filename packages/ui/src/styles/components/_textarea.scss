@@ -3,7 +3,7 @@
 
 // ─────────────────────────────────────────────────────────────
 // Textarea
-// 공개 훅: --nui-textarea-min-height / -radius / -border-width
+// 공개 훅: --nui-textarea--min-height / -radius / -border-width
 // ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 테두리·글자는 짝이라
 //    한쪽만 바꾸면 대비가 보이지 않게 깨진다. 한 개만 바꿀 때는 className 을 쓴다.
 // 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
@@ -15,9 +15,9 @@
     &__wrap {
       position: relative;
       background-color: var(#{v("control-bg")});
-      border: #{hook("textarea-border-width", var(#{v("border-width-1")}))}
+      border: #{hook("textarea--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border")});
-      border-radius: #{hook("textarea-radius", var(#{v("radius-2")}))};
+      border-radius: #{hook("textarea--radius", var(#{v("radius-1_5")}))};
 
       @include motion(
         (border-color, background-color, box-shadow, border-width),
@@ -36,7 +36,7 @@
       display: block;
       width: 100%;
       min-height: #{hook(
-          "textarea-min-height",
+          "textarea--min-height",
           calc(var(#{v("size-field")}) * 2)
         )};
       padding: var(#{v("space-4")});

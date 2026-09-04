@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * 브랜드 색 하나 → 화면에 쓸 색 68개.
+ * 브랜드 색 하나 → 화면에 쓸 색 102개 (brand 16 · secondary 16 · gray 17 · 글자색 2, 두 테마).
+ * secondary 는 KRDS 준수(2026-09-04, A1)로 더했다 — 아래 SECONDARY_REF.
  * 계획: `plan/03-color-engine.html` 6장.
  *
  * ★ 2026-09-02 — 우리가 만든 곡선 대신 **Radix 공식 생성기**를 쓴다.
@@ -62,9 +63,52 @@ const GRAY_REF = {
 export const grayRefFor = (accentHex, theme) =>
   oklchToHex({ ...GRAY_REF[theme], H: hexToOklch(accentHex).H });
 
+/**
+ * 보조 색(secondary)을 만드는 규칙 — KRDS 색 체계(가이드 80~83쪽)의 두 번째 주요 색이다.
+ *
+ * KRDS 의 primary→secondary 관계를 재 보니 **같은 색조에서 채도를 0.57 배로 낮추고
+ * 기준 단계를 한 단계 어둡게** 둔 색이었다(`research/krds/pencil-colors.md`).
+ * 그 관계를 그대로 쓴다. 소비자는 여전히 프리셋 하나만 고른다.
+ *
+ * 밝기 이동은 테마마다 다르다 — 라이트는 어둡게(−6) 해서 흰 글자 7:1(AAA 급),
+ * 다크는 밝게(+4) 해서 어두운 배경 위 4.1:1 을 확보한다. KRDS 도 다크에서 secondary 를
+ * 밝은 쪽으로 옮긴다(82쪽). 색조는 브랜드 것을 유지한다 — 회색과 같은 원칙(`C-01`).
+ * 185색 전부에서 9번 글자 대비 3:1 미달이 0건인 값이다.
+ */
+const SECONDARY_REF = {
+  light: { dL: -6, C: 0.57 },
+  dark: { dL: 4, C: 0.57 },
+};
+export const secondaryRefFor = (accentHex, theme) => {
+  const o = hexToOklch(accentHex);
+  const { dL, C } = SECONDARY_REF[theme];
+  return oklchToHex({ L: o.L + dL, C: o.C * C, H: o.H });
+};
+
 /** 우리가 쓰는 단계. Radix 는 12단계와 alpha 12단계를 전부 준다. */
 export const STEPS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-export const ALPHA_STEPS = { brand: [4, 5, 6, 7], gray: [3, 4, 5, 6, 7] };
+export const ALPHA_STEPS = {
+  brand: [4, 5, 6, 7],
+  secondary: [4, 5, 6, 7],
+  gray: [3, 4, 5, 6, 7],
+};
+
+/** 9번 배경 위 글자색을 다시 고른다 — Radix 는 흰 글자를 선호해 밝은 색에서도 흰색을 준다. */
+function pickContrast(scale, radixContrast, theme) {
+  const darkText = theme === "light" ? scale[12] : scale[1];
+  let text = radixContrast;
+  let ratio = contrast(scale[9], text);
+  if (ratio < SOLID_TEXT) {
+    for (const alt of [darkText, "#ffffff", "#000000"]) {
+      const altRatio = contrast(scale[9], alt);
+      if (altRatio > ratio) {
+        text = alt;
+        ratio = altRatio;
+      }
+    }
+  }
+  return { text, ratio };
+}
 
 /** 한 테마의 색. */
 export function generateTheme(accentHex, theme) {
@@ -83,36 +127,33 @@ export function generateTheme(accentHex, theme) {
   };
 
   const brand = pick(r.accentScale, r.accentScaleAlpha, ALPHA_STEPS.brand);
+  const { text, ratio } = pickContrast(brand, r.accentContrast, theme);
 
-  // 9번 배경 위의 글자색.
-  //
-  // Radix 는 흰 글자를 선호해서 밝은 색에서도 흰색을 고른다 — `#ee778a` 에
-  // 흰 글자(2.75)를 줬는데 검은 글자면 7.64 였다. 그래서 우리가 다시 잰다.
-  // 기준은 3:1(`SOLID_TEXT`) 이다. 이유는 contrast.mjs 주석에 있다.
-  //
-  // ⚠️ 어두운 후보는 테마마다 다른 자리에 있다. 라이트는 12번이 가장 어둡고,
-  //    다크는 1번이 가장 어둡다(스케일이 뒤집힌다). 한쪽으로 고정하면
-  //    다크에서 밝은 색을 밝은 배경에 얹게 된다.
-  const darkText = theme === "light" ? brand[12] : brand[1];
-  let text = r.accentContrast;
-  let ratio = contrast(brand[9], text);
-  if (ratio < SOLID_TEXT) {
-    for (const alt of [darkText, "#ffffff", "#000000"]) {
-      const altRatio = contrast(brand[9], alt);
-      if (altRatio > ratio) {
-        text = alt;
-        ratio = altRatio;
-      }
-    }
-  }
+  // 보조 색 — 같은 생성기에 파생한 참조색을 넣는다. 회색·배경은 브랜드와 같은 것을 써서
+  // 반투명 단계가 같은 배경에서 역산되게 한다.
+  const rs = generateRadixColors({
+    appearance: theme,
+    accent: secondaryRefFor(accentHex, theme),
+    gray: grayRefFor(accentHex, theme),
+    background: BACKGROUND[theme],
+  });
+  const secondary = pick(
+    rs.accentScale,
+    rs.accentScaleAlpha,
+    ALPHA_STEPS.secondary,
+  );
+  const sec = pickContrast(secondary, rs.accentContrast, theme);
 
   return {
     brand,
+    secondary,
     gray: pick(r.grayScale, r.grayScaleAlpha, ALPHA_STEPS.gray),
     contrast: text,
     contrastRatio: Number(ratio.toFixed(2)),
+    secondaryContrast: sec.text,
+    secondaryContrastRatio: Number(sec.ratio.toFixed(2)),
     // 기준 미달이면 알린다 — 프리셋 목록에서 걸러내는 근거가 된다.
-    belowStandard: ratio < SOLID_TEXT,
+    belowStandard: ratio < SOLID_TEXT || sec.ratio < SOLID_TEXT,
     background: r.background,
   };
 }
@@ -133,14 +174,19 @@ function declarations(theme, indent) {
   const pad = " ".repeat(indent);
   for (const [group, colors] of [
     ["brand", theme.brand],
+    ["secondary", theme.secondary],
     ["gray", theme.gray],
   ]) {
-    for (const s of STEPS) lines.push(`${pad}${PREFIX}color-${group}-${s}: ${colors[s]};`);
+    for (const s of STEPS)
+      lines.push(`${pad}${PREFIX}color-${group}-${s}: ${colors[s]};`);
     for (const s of ALPHA_STEPS[group]) {
       lines.push(`${pad}${PREFIX}color-${group}-a${s}: ${colors[`a${s}`]};`);
     }
   }
   lines.push(`${pad}${PREFIX}color-brand-contrast: ${theme.contrast};`);
+  lines.push(
+    `${pad}${PREFIX}color-secondary-contrast: ${theme.secondaryContrast};`,
+  );
   return lines.join("\n");
 }
 
@@ -152,7 +198,9 @@ export function toCss(result, meta = {}) {
   const head = [
     "/*",
     " * @chansikchoi/next-ui — 브랜드 색 테마",
-    meta.preset ? ` * 프리셋 ${meta.preset.n}. ${meta.preset.name} (${meta.preset.hex})` : null,
+    meta.preset
+      ? ` * 프리셋 ${meta.preset.n}. ${meta.preset.name} (${meta.preset.hex})`
+      : null,
     ` * 브랜드 색 ${result.accent}`,
     " *",
     " * Radix 공식 생성기(radix-theme-generator)로 만든 자동 생성 파일이다.",
@@ -197,7 +245,9 @@ if (isMain) {
     const n = Number(arg("preset"));
     preset = presets.find((p) => p.n === n);
     if (!preset) {
-      console.error(`✗ 프리셋 ${n} 번이 없다. 1~${presets.length} 중에서 고른다.`);
+      console.error(
+        `✗ 프리셋 ${n} 번이 없다. 1~${presets.length} 중에서 고른다.`,
+      );
       process.exit(1);
     }
     accent = preset.hex;
@@ -212,11 +262,14 @@ if (isMain) {
   const out = arg("out") ?? join(HERE, "nui-theme.css");
   writeFileSync(out, toCss(result, { preset }), "utf8");
 
-  console.log(`✅ 색 68개 생성 — ${accent}${preset ? ` (프리셋 ${preset.n}. ${preset.name})` : ""}`);
+  console.log(
+    `✅ 색 102개 생성 — ${accent}${preset ? ` (프리셋 ${preset.n}. ${preset.name})` : ""}`,
+  );
   for (const theme of ["light", "dark"]) {
     const t = result[theme];
     console.log(
       `   ${theme.padEnd(5)} 9번 ${t.brand[9]} · 글자 ${t.contrast} (${t.contrastRatio}:1)` +
+        ` · 보조 ${t.secondary[9]} · 글자 ${t.secondaryContrast} (${t.secondaryContrastRatio}:1)` +
         `${t.belowStandard ? " ⚠️ 기준 미달" : ""} · 회색 ${t.gray[9]}`,
     );
   }

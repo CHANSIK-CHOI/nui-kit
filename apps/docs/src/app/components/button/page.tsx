@@ -21,12 +21,18 @@ import {
 export const metadata = { title: "Button" };
 
 /** 축은 소스 타입과 같은 순서로 둔다 — packages/ui/src/components/Button/Button.tsx */
-const COLORS = ["neutral", "primary", "danger", "warning"] as const;
+const COLORS = [
+  "neutral",
+  "primary",
+  "secondary",
+  "danger",
+  "warning",
+] as const;
 const VARIANTS = ["solid", "line", "text"] as const;
 const SIZES = [
   ["large", "56px"],
   ["medium", "48px"],
-  ["small", "36px"],
+  ["small", "40px"],
 ] as const;
 
 export default function ButtonPage() {
@@ -56,13 +62,15 @@ export default function ButtonPage() {
       <h2>색과 변형</h2>
       <p>
         색이 아니라 <strong>역할</strong>이 이름이다. 화면의 주 행동에는{" "}
-        <code>primary</code>, 되돌릴 수 없는 삭제나 탈퇴에는 <code>danger</code>
-        , 확인이 필요한 진행에는 <code>warning</code> 을 쓴다.
+        <code>primary</code>, 그보다 덜 중요한 행동에는 <code>secondary</code>,
+        되돌릴 수 없는 삭제나 탈퇴에는 <code>danger</code>, 확인이 필요한
+        진행에는 <code>warning</code> 을 쓴다. 손을 올리면 한 단계, 누르면 두
+        단계 진해진다.
       </p>
       <CaseMatrix
         rows={VARIANTS}
         cols={COLORS}
-        caption="variant × color 12조합"
+        caption="variant × color 15조합"
         code={`<Button variant="line" color="danger">삭제</Button>`}
         render={(variant, color) => (
           <div style={{ minWidth: 108 }}>
@@ -314,8 +322,8 @@ export default function ButtonPage() {
           className="doc-example__row"
           style={
             {
-              "--nui-button-lg-height": "4rem",
-              "--nui-button-radius": "999px",
+              "--nui-button--lg-height": "4rem",
+              "--nui-button--radius": "999px",
             } as React.CSSProperties
           }
         >

@@ -14,8 +14,8 @@ export default function HomePage() {
         <code>npm install @chansikchoi/next-ui</code>
       </pre>
       <p>
-        peer dependency 는 <code>react</code> 와 <code>react-dom</code> 둘뿐이다.{" "}
-        <code>next</code> 는 <code>ButtonLink</code>,{" "}
+        peer dependency 는 <code>react</code> 와 <code>react-dom</code>{" "}
+        둘뿐이다. <code>next</code> 는 <code>ButtonLink</code>,{" "}
         <code>react-hook-form</code> 은 RHF 래퍼에서만 쓰이며 둘 다{" "}
         <code>optional</code> 로 선언되어 있다.
       </p>
@@ -68,13 +68,12 @@ export default function Page() {
           있는 자리
         </li>
         <li>
-          <Link href="/components">Components</Link> — 컴포넌트별 예제와 props 표
+          <Link href="/components">Components</Link> — 컴포넌트별 예제와 props
+          표
         </li>
       </ul>
 
-      <p className="doc-note">
-        props 표와 토큰 표는 코드에서 자동 생성한다.
-      </p>
+      <p className="doc-note">props 표와 토큰 표는 코드에서 자동 생성한다.</p>
     </>
   );
 }

@@ -16,10 +16,12 @@
  */
 
 /** sRGB 감마 → 선형. 화면 밝기 값을 실제 빛의 양으로 되돌린다. */
-const toLinear = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+const toLinear = (c) =>
+  c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 
 /** 선형 → sRGB 감마. */
-const toGamma = (c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
+const toGamma = (c) =>
+  c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
 
 const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
 
@@ -78,14 +80,19 @@ export function hexToOklch(hex) {
   const lab = linearToOklab({ r: toLinear(r), g: toLinear(g), b: toLinear(b) });
   const C = Math.hypot(lab.a, lab.b);
   // 무채색은 각도가 정의되지 않는다. 0 으로 고정해 왕복이 안정되게 한다.
-  const H = C < 1e-9 ? 0 : ((Math.atan2(lab.b, lab.a) * 180) / Math.PI + 360) % 360;
+  const H =
+    C < 1e-9 ? 0 : ((Math.atan2(lab.b, lab.a) * 180) / Math.PI + 360) % 360;
   return { L: lab.L * 100, C, H, alpha };
 }
 
 /** OKLCH → 선형 RGB (범위 검사 없음). */
 function oklchToLinear({ L, C, H }) {
   const rad = (H * Math.PI) / 180;
-  return oklabToLinear({ L: L / 100, a: C * Math.cos(rad), b: C * Math.sin(rad) });
+  return oklabToLinear({
+    L: L / 100,
+    a: C * Math.cos(rad),
+    b: C * Math.sin(rad),
+  });
 }
 
 /** 이 색이 sRGB 화면에 나올 수 있나. 반올림 오차만큼 여유를 둔다. */
@@ -93,7 +100,12 @@ export function inGamut({ L, C, H }) {
   const { r, g, b } = oklchToLinear({ L, C, H });
   const eps = 1e-6;
   return (
-    r >= -eps && r <= 1 + eps && g >= -eps && g <= 1 + eps && b >= -eps && b <= 1 + eps
+    r >= -eps &&
+    r <= 1 + eps &&
+    g >= -eps &&
+    g <= 1 + eps &&
+    b >= -eps &&
+    b <= 1 + eps
   );
 }
 

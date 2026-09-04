@@ -6,13 +6,10 @@ export const metadata = { title: "Accordion" };
 export default function AccordionPage() {
   return (
     <>
-      <GuideHeader
-        title="Accordion"
-        named={["Accordion"]}
-        subpath="accordion"
-      >
+      <GuideHeader title="Accordion" named={["Accordion"]} subpath="accordion">
         접었다 펴는 목록이다. 항목은 <code>index</code> 로 식별하고{" "}
-        <code>Head</code> 와 <code>Panel</code> 이 같은 index 를 공유해 연결된다.
+        <code>Head</code> 와 <code>Panel</code> 이 같은 index 를 공유해
+        연결된다.
       </GuideHeader>
 
       <pre className="doc-code">

@@ -19,8 +19,8 @@
 //   따라서 이 파일에는 `.rdp-*` 셀렉터도 `--rdp-*` 변수도 없다.
 //   두 파일은 함께 움직인다 — 매핑을 바꾸면 여기 셀렉터도 바뀐다.
 //
-// 공개 훅: --nui-datepicker-dropdown-radius / -border-width
-//          --nui-datepicker-day-size / -day-button-size / -day-radius
+// 공개 훅: --nui-datepicker--dropdown-radius / -border-width
+//          --nui-datepicker--day-size / -day-button-size / -day-radius
 // ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 글자는 짝이다.
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
@@ -37,10 +37,10 @@
       min-width: 19.5rem;
       padding: var(#{v("space-4")});
       // 떠 있는 컨테이너의 외곽선 — design-system.md §2-5-1
-      border: #{hook("datepicker-border-width", var(#{v("border-width-1")}))}
+      border: #{hook("datepicker--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("border-form")});
       border-radius: #{hook(
-          "datepicker-dropdown-radius",
+          "datepicker--dropdown-radius",
           var(#{v("radius-3")})
         )};
       background-color: var(#{v("layer-floating")});
@@ -53,16 +53,16 @@
     // 날짜 셀은 격자로 붙어 있어 히트 영역의 상한이 셀 크기다. 그래서 셀이 터치 하한
     // 44 다 — a11y.md §8. 보이는 날짜 버튼(36)은 아래 `day-button-size` 가 따로 갖는다.
     #{iv("daypicker-day-size")}: #{hook(
-        "datepicker-day-size",
+        "datepicker--day-size",
         var(#{v("size-control-option")})
       )};
     #{iv("daypicker-day-button-size")}: #{hook(
-        "datepicker-day-button-size",
+        "datepicker--day-button-size",
         var(#{v("size-control-md")})
       )};
     #{iv("daypicker-day-radius")}: #{hook(
-        "datepicker-day-radius",
-        var(#{v("radius-2")})
+        "datepicker--day-radius",
+        var(#{v("radius-1_5")})
       )};
 
     color: var(#{v("control-text")});
@@ -95,7 +95,7 @@
     }
 
     &__caption-label {
-      @include typo(4, "semi-bold");
+      @include typo(4, "bold");
     }
 
     &__dropdowns {
@@ -128,9 +128,9 @@
       min-width: 5.5rem;
       min-height: var(#{v("size-control-md")});
       padding: 0 var(#{v("space-3")});
-      border: #{hook("datepicker-border-width", var(#{v("border-width-1")}))}
+      border: #{hook("datepicker--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border")});
-      border-radius: var(#{v("radius-2")});
+      border-radius: var(#{v("radius-1_5")});
       background-color: var(#{v("control-bg")});
       color: var(#{v("control-text")});
 
@@ -154,7 +154,7 @@
 
     &__dropdown:focus-visible + &__caption-label {
       outline: none;
-      border-radius: var(#{v("radius-2")});
+      border-radius: var(#{v("radius-1_5")});
       box-shadow: var(#{v("focus-ring-sm")});
     }
 
@@ -165,7 +165,7 @@
       gap: var(#{v("space-2")});
       width: 100%;
 
-      @include typo(3, "semi-bold");
+      @include typo(3, "bold");
     }
 
     // ── 이전/다음 달 네비게이션
@@ -258,7 +258,7 @@
       color: var(#{v("text-secondary")});
       text-align: center;
 
-      @include typo(1, "semi-bold");
+      @include typo(1, "bold");
     }
 
     &__day {
@@ -282,7 +282,7 @@
       margin: 0 auto;
       // 보이지 않는 테두리에도 두께 훅을 적용한다 — 안 하면 소비자가 두께를 바꿨을 때
       // 이 자리만 1px 로 남아 날짜를 선택하는 순간 셀이 밀린다.
-      border: #{hook("datepicker-border-width", var(#{v("border-width-1")}))}
+      border: #{hook("datepicker--border-width", var(#{v("border-width-1")}))}
         solid transparent;
       border-radius: var(#{iv("daypicker-day-radius")});
       background: transparent;
@@ -291,7 +291,7 @@
       // 누를 수 있는 것은 셀(44) 전체다. 보이는 버튼은 36 그대로 — a11y.md §8
       @include hit-area(var(#{iv("daypicker-day-size")}));
       @include motion((background-color, border-color, color), "3");
-      @include typo(3, "medium");
+      @include typo(3, "regular");
     }
 
     @include hoverable {

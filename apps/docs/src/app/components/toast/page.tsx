@@ -1,4 +1,10 @@
-import { GuideHeader, Case, CaseGrid, HookTable, PropsTable } from "@/components/guide";
+import {
+  GuideHeader,
+  Case,
+  CaseGrid,
+  HookTable,
+  PropsTable,
+} from "@/components/guide";
 import { ToastDemo } from "./ToastDemo";
 
 export const metadata = { title: "Toast" };
@@ -49,8 +55,8 @@ toast.open({ message: "저장되었습니다." });`}</code>
 
       <h2>커스터마이징</h2>
       <p>
-        색은 컴포넌트별로 열지 않는다. 배경만 바꾸면 글자가 따라오지 않아
-        대비가 깨진다. <code>className</code> 으로 배경과 글자를 함께 지정한다.
+        색은 컴포넌트별로 열지 않는다. 배경만 바꾸면 글자가 따라오지 않아 대비가
+        깨진다. <code>className</code> 으로 배경과 글자를 함께 지정한다.
       </p>
       <p>
         Toast 는 <code>border</code> 를 쓰지 않으므로 두께 변수도 없다 — 안 쓰는

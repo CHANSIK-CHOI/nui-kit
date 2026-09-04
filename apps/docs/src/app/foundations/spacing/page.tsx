@@ -131,7 +131,7 @@ export default function SpacingPage() {
               <td>
                 <strong>48px</strong>
               </td>
-              <td>36px</td>
+              <td>40px</td>
             </tr>
             <tr>
               <th scope="row">Popup</th>
@@ -146,7 +146,7 @@ export default function SpacingPage() {
       </div>
       <p>
         크기별 값은 단계마다 이름이 따로 있는 변수로 연다.{" "}
-        <code>--nui-button-lg-height</code> · <code>-md-height</code> ·{" "}
+        <code>--nui-button--lg-height</code> · <code>-md-height</code> ·{" "}
         <code>-sm-height</code> 가 그렇다. 하나로 두면 값을 넣는 순간 세 단계가
         전부 같아진다. 자세한 것은{" "}
         <Link href="/foundations/customizing">커스터마이징</Link> 문서에 있다.
@@ -163,7 +163,7 @@ export default function SpacingPage() {
         <Link href="/foundations/accessibility">접근성</Link> 문서에 있다.
         <br />
         <br />
-        자기 치수를 갖는 선택 컨트롤(Checkbox · Radio 22px, Switch 46×26)은
+        자기 치수를 갖는 선택 컨트롤(Checkbox · Radio 24px, Switch 40×24)은
         컨트롤 자체가 44px 보다 작다. 라벨을 포함한 클릭 영역이 44px 을 채우고,
         라벨이 <code>&lt;label&gt;</code> 로 연결돼 있으면 자동으로 확보된다.
       </div>

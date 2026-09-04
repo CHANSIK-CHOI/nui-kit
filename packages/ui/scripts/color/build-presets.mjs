@@ -20,7 +20,16 @@ import { generate } from "./generate.mjs";
 import { contrast, AA, MUTED_TEXT } from "./contrast.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const SOURCE = join(HERE, "..", "..", "..", "..", "research", "figma-palettes", "palettes.json");
+const SOURCE = join(
+  HERE,
+  "..",
+  "..",
+  "..",
+  "..",
+  "research",
+  "figma-palettes",
+  "palettes.json",
+);
 const OUT = join(HERE, "..", "..", "presets.json");
 
 /**
@@ -106,7 +115,9 @@ export function buildPresets(source, defaultAccent) {
   for (const row of safe) {
     row.solid = generate(row.hex).light.brand[9];
     const twin =
-      MIN_DELTA_E > 0 ? kept.find((k) => deltaE(k.solid, row.solid) < MIN_DELTA_E) : null;
+      MIN_DELTA_E > 0
+        ? kept.find((k) => deltaE(k.solid, row.solid) < MIN_DELTA_E)
+        : null;
     if (!twin) {
       kept.push({ ...row, alias: [] });
       continue;
@@ -154,11 +165,18 @@ const isMain = fileURLToPath(import.meta.url) === process.argv[1];
 
 if (isMain) {
   const source = JSON.parse(readFileSync(SOURCE, "utf8"));
-  const { kept, grayish, merged, unsafe, uniqueCount } = buildPresets(source, "#01796f");
+  const { kept, grayish, merged, unsafe, uniqueCount } = buildPresets(
+    source,
+    "#01796f",
+  );
 
   const payload = {
     "//": "Figma 400색에서 자동 생성. 손으로 고치지 말 것 — npm run color:presets 로 다시 만든다.",
-    source: { name: source.source, collected: source.collected, total: source.count * source.swatchesPerPalette },
+    source: {
+      name: source.source,
+      collected: source.collected,
+      total: source.count * source.swatchesPerPalette,
+    },
     rule:
       MIN_DELTA_E > 0
         ? `선명함(OKLCH C) ${MIN_CHROMA} 이상만 남기고, 결과가 ΔE ${MIN_DELTA_E} 안으로 겹치는 색은 하나로 합쳤다.`
@@ -181,9 +199,7 @@ if (isMain) {
     `   원본 ${payload.source.total} → 같은 hex 제거 ${uniqueCount} → 선명함 미달 ${grayish.length} 제외` +
       ` → 대비 미달 ${unsafe.length} 제외 → 결과 중복 ${merged.length} 병합`,
   );
-  console.log(
-    `   기본 브랜드 색(${def.hex})은 ${def.n}번`,
-  );
+  console.log(`   기본 브랜드 색(${def.hex})은 ${def.n}번`);
 
   // 색깔이 어디에 몰려 있는지 — 파랑·보라가 적다는 사실을 매번 눈에 띄게 한다.
   const buckets = new Map();
@@ -191,11 +207,26 @@ if (isMain) {
     const k = Math.floor(row.h / 30) * 30;
     buckets.set(k, (buckets.get(k) ?? 0) + 1);
   }
-  const NAMES = ["빨강","주황","노랑","연두","초록","청록","하늘","파랑","남색","보라","자주","분홍"];
+  const NAMES = [
+    "빨강",
+    "주황",
+    "노랑",
+    "연두",
+    "초록",
+    "청록",
+    "하늘",
+    "파랑",
+    "남색",
+    "보라",
+    "자주",
+    "분홍",
+  ];
   console.log("\n   색깔 분포");
   for (let k = 0; k < 360; k += 30) {
     const n = buckets.get(k) ?? 0;
-    console.log(`     ${String(k).padStart(3)}~${String(k + 30).padStart(3)}°  ${NAMES[k / 30].padEnd(3)} ${"█".repeat(Math.round(n / 2)).padEnd(28)} ${n}`);
+    console.log(
+      `     ${String(k).padStart(3)}~${String(k + 30).padStart(3)}°  ${NAMES[k / 30].padEnd(3)} ${"█".repeat(Math.round(n / 2)).padEnd(28)} ${n}`,
+    );
   }
   console.log(`\n   → ${OUT.split("/").slice(-2).join("/")}`);
 }

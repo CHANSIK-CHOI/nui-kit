@@ -22,7 +22,11 @@ export default function BrandColorsPage() {
       <h2>색깔로 고른다</h2>
       <div className="preset-groups">
         {data.groups.map((g) => (
-          <Link key={g.slug} href={`/brand-colors/${g.slug}`} className="preset-group">
+          <Link
+            key={g.slug}
+            href={`/brand-colors/${g.slug}`}
+            className="preset-group"
+          >
             <span
               className="preset-group-chip"
               style={{ ["--c" as string]: g.sample ?? "#888" }}
@@ -56,9 +60,9 @@ import "./nui-theme.css";`}</code>
 
       <div className="doc-note doc-note--warn">
         <p>
-          <strong>색을 바꾸는 방법은 이것 하나다.</strong> <code>:root</code> 에서 색
-          변수를 직접 덮어쓰는 방식은 지원하지 않는다. 배경만 바뀌고 글자색은 남아
-          대비가 조용히 깨진다. 한 컴포넌트만 바꿔야 하면{" "}
+          <strong>색을 바꾸는 방법은 이것 하나다.</strong> <code>:root</code>{" "}
+          에서 색 변수를 직접 덮어쓰는 방식은 지원하지 않는다. 배경만 바뀌고
+          글자색은 남아 대비가 조용히 깨진다. 한 컴포넌트만 바꿔야 하면{" "}
           <Link href="/foundations/customizing">
             <code>className</code>
           </Link>{" "}
@@ -68,8 +72,8 @@ import "./nui-theme.css";`}</code>
 
       <h2>보는 테마를 따라간다</h2>
       <p>
-        색깔 페이지의 스와치는 지금 보고 있는 테마를 따른다. 오른쪽 위에서 테마를
-        바꾸면 같은 프리셋의 다크 색으로 바뀐다.
+        색깔 페이지의 스와치는 지금 보고 있는 테마를 따른다. 오른쪽 위에서
+        테마를 바꾸면 같은 프리셋의 다크 색으로 바뀐다.
       </p>
 
       <h2>목록에 없는 색을 쓰고 싶다면</h2>

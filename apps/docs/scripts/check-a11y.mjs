@@ -10,6 +10,8 @@
  *    토큰을 바꾸면 대비가 깨질 수 있는데 어떤 정적 검사에도 걸리지 않는다.
  *    다크는 OS 설정만으로 자동 적용되므로 라이트와 같은 정본이다 (tokens.md §4-1-1).
  *    비활성은 AA 에서 빠지지만 하한 2.0:1 을 둔다 (design-system.md §2).
+ * 2-b. 글자가 아닌 것의 대비 3:1(테두리 · 트랙 · 포커스)과 버튼 hover·pressed 의 글자 대비 —
+ *    토큰 계산값으로 두 테마에서 잰다 (KRDS A4 · A5).
  * 3. 터치 영역 — 누를 수 있는 것의 히트 영역 실측 (a11y.md §8)
  *    박스가 아니라 `elementFromPoint` 로 실제 눌리는 범위를 잰다.
  *    24px 미만은 실패, 44px 미만은 경고. 이유가 적힌 예외는 통과.
@@ -231,6 +233,123 @@ for (const theme of ["light", "dark"]) {
   await ctx.close();
 }
 
+// ── 2-b) 글자가 아닌 것의 대비 · 상태 색 — 토큰 값으로 잰다 (KRDS A4 · A5)
+//
+// 입력 테두리 · 스위치 트랙 · 포커스 표시는 배경과 3:1 (WCAG 1.4.11 · 2.4.11, KRDS 695 · 578 · 519쪽).
+// 버튼 hover · pressed 는 같은 색조의 다음 단계라 글자 대비를 다시 재야 한다 (KRDS 95~96쪽).
+// 토큰의 계산값을 `getComputedStyle` 로 읽어 두 테마에서 잰다 — 상태를 실제로 만들 필요가 없다.
+console.log("\n■ 비텍스트 대비 · 상태 색 (라이트 · 다크)");
+
+/** [라벨, 앞색 토큰, 뒷색 토큰, 최소비율] */
+const TOKEN_PAIRS = [
+  ["입력 테두리", "control-border", "control-bg", 3],
+  ["입력 테두리 hover", "control-border-hover", "control-bg", 3],
+  ["스위치 꺼짐 트랙", "control-track", "layer-default", 3],
+  ["체크박스 테두리", "control-border", "layer-default", 3],
+  ["포커스 표시", "focus-color", "layer-default", 3],
+  ["비활성 아이콘 (하한)", "control-icon-disabled", "control-bg-disabled", 2],
+  [
+    "neutral 글자 · hover 배경",
+    "action-neutral-fg",
+    "action-neutral-hover",
+    4.5,
+  ],
+  [
+    "neutral 글자 · pressed 배경",
+    "action-neutral-fg",
+    "action-neutral-active",
+    4.5,
+  ],
+  ["primary 글자 · hover 배경", "action-primary-fg", "action-primary-hover", 3],
+  [
+    "primary 글자 · pressed 배경",
+    "action-primary-fg",
+    "action-primary-active",
+    3,
+  ],
+  ["secondary 글자 · 배경", "action-secondary-fg", "action-secondary", 3],
+  [
+    "secondary 글자 · hover 배경",
+    "action-secondary-fg",
+    "action-secondary-hover",
+    3,
+  ],
+  [
+    "secondary 글자 · pressed 배경",
+    "action-secondary-fg",
+    "action-secondary-active",
+    3,
+  ],
+  ["danger 글자 · hover 배경", "action-danger-fg", "action-danger-hover", 3],
+  ["danger 글자 · pressed 배경", "action-danger-fg", "action-danger-active", 3],
+  [
+    "warning 글자 · hover 배경",
+    "action-warning-fg",
+    "action-warning-hover",
+    4.5,
+  ],
+  [
+    "warning 글자 · pressed 배경",
+    "action-warning-fg",
+    "action-warning-active",
+    4.5,
+  ],
+];
+
+for (const theme of ["light", "dark"]) {
+  const ctx = await browser.newContext({
+    viewport: VIEWPORT,
+    colorScheme: theme,
+  });
+  const page = await ctx.newPage();
+  await page.goto(BASE + "/components/button", { waitUntil: "networkidle" });
+  const stamped = await page.evaluate(
+    () => document.documentElement.dataset.theme,
+  );
+  if (stamped !== theme) {
+    bad(`비텍스트 대비: 테마가 ${theme} 이어야 하는데 ${stamped} 다`);
+    await ctx.close();
+    continue;
+  }
+  // color-mix() 는 계산값이 `oklab(...)` 문자열로 나와 숫자만 뽑으면 틀린다.
+  // 캔버스에 실제로 칠하고 픽셀을 읽어 sRGB 로 받는다.
+  const resolved = await page.evaluate((pairs) => {
+    const probe = document.createElement("div");
+    document.body.appendChild(probe);
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const read = (token) => {
+      probe.style.backgroundColor = `var(--nui-${token})`;
+      ctx.clearRect(0, 0, 1, 1);
+      ctx.fillStyle = getComputedStyle(probe).backgroundColor;
+      ctx.fillRect(0, 0, 1, 1);
+      const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+      return a === 0 ? "" : `rgb(${r}, ${g}, ${b})`;
+    };
+    const out = pairs.map(([label, fg, bg, min]) => [
+      label,
+      read(fg),
+      read(bg),
+      min,
+    ]);
+    probe.remove();
+    return out;
+  }, TOKEN_PAIRS);
+  for (const [label, fg, bg, min] of resolved) {
+    const f = parse(fg);
+    const b = parse(bg);
+    if (f.length < 3 || b.length < 3) {
+      bad(`${theme} ${label}: 토큰을 읽지 못했다 (${fg} / ${bg})`);
+      continue;
+    }
+    const r = ratio(f, b);
+    const line = `${theme} ${label} ${r.toFixed(2)}:1`;
+    r >= min ? ok(line) : bad(`${line} — 기준 ${min}:1 미달 (${fg} on ${bg})`);
+  }
+  await ctx.close();
+}
+
 // ── 3) 터치 영역
 console.log(
   "\n■ 터치 영역 (24px 미만 실패 · 44px 미만 경고 · 예외는 이유와 함께 통과)",
@@ -295,6 +414,16 @@ const TOUCH_TARGETS = [
       page.getByRole("button", { name: "프로필 팝업" }).first().click(),
   ],
   ["Accordion 헤더", "/components/accordion", ".nui-accordion__button"],
+  // 선택 컨트롤은 투명 input 을 44 로 키워 누르는 범위를 확보한다 (KRDS D2)
+  ["Checkbox", "/components/checkbox", ".nui-checkbox__input"],
+  [
+    "Radio",
+    "/components/radio",
+    ".nui-radio__input",
+    null,
+    "세로 묶음의 간격이 16 이라 이웃 input(44)과 4px 겹친다. 겹친 곳은 가까운 쪽이 받으므로 상한이 40 이다. 24 하한은 넘는다",
+  ],
+  ["Switch", "/components/switch", ".nui-switch__input"],
 ];
 
 {

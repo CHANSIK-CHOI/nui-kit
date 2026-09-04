@@ -30,7 +30,7 @@
     &__label {
       color: var(#{v("text-primary")});
 
-      @include typo(3, "medium");
+      @include typo(3, "regular");
     }
 
     label#{cls("field")}__label {

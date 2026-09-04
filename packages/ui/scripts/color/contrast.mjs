@@ -48,7 +48,8 @@ export const SOLID_TEXT = 3;
  */
 export const MUTED_TEXT = 4.0;
 
-const toLinear = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+const toLinear = (c) =>
+  c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 
 /**
  * WCAG 상대 휘도. OKLCH 의 L 과 다른 값이다 —
@@ -85,7 +86,10 @@ export function contrastOn(fgHex, overHex, bgHex) {
  * 노랑 배경이 정확히 이 분기를 탄다 — 어둡게 만들면 갈색이 되어 "주의"의
  * 의미를 잃으므로, 배경을 밝게 두고 글자를 어둡게 하는 쪽을 택한다.
  */
-export function pickTextColor(bgHex, { light = "#ffffff", dark = "#000000" } = {}) {
+export function pickTextColor(
+  bgHex,
+  { light = "#ffffff", dark = "#000000" } = {},
+) {
   const onLight = contrast(bgHex, light);
   const onDark = contrast(bgHex, dark);
   if (onLight >= AA) return { color: light, ratio: onLight, which: "light" };

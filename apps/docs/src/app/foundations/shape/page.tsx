@@ -64,7 +64,7 @@ export default function ShapePage() {
           다르다.
         </strong>{" "}
         둘 다 &quot;완전히 둥근&quot;처럼 보이지만 <code>50%</code> 는 가로세로
-        비율을 따라간다. Switch 트랙(46×26)에 쓰면 타원이 된다. 정사각형이
+        비율을 따라간다. Switch 트랙(40×24)에 쓰면 타원이 된다. 정사각형이
         아니면 <code>radius-full</code> 을 쓴다.
       </div>
 

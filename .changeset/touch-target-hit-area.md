@@ -10,7 +10,7 @@
 - **날짜 셀이 40 → 44px 이 됩니다.** 날짜 셀은 격자로 붙어 있어 누르는 범위의 상한이 셀
   크기입니다. 날짜 버튼은 36px 그대로이고 날짜 사이 여백만 4 → 8px 로 넓어집니다.
   달력 팝업은 가로 28px, 여섯 주 달은 세로 24px 커집니다.
-  `--nui-datepicker-day-size` 의 기본값이 `--nui-size-control-lg` 에서
+  `--nui-datepicker--day-size` 의 기본값이 `--nui-size-control-lg` 에서
   `--nui-size-control-option` 으로 바뀐 것이라, 예전 크기가 필요하면 훅으로 되돌릴 수
   있습니다.
 - **이전/다음 화살표 사이가 4 → 12px 이 됩니다.** 두 버튼의 누르는 범위가 겹치지 않기
@@ -18,7 +18,7 @@
 
 ```css
 :root {
-  --nui-datepicker-day-size: var(--nui-size-control-lg); /* 예전 40px */
+  --nui-datepicker--day-size: var(--nui-size-control-lg); /* 예전 40px */
 }
 ```
 
