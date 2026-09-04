@@ -9,6 +9,7 @@ import {
 } from "react";
 import { px } from "../../internal/prefix.js";
 import { SpinnerIcon } from "../Icon/index.js";
+import useLoadingStatus from "./useLoadingStatus.js";
 
 const block = px("button");
 
@@ -99,20 +100,12 @@ export function getButtonContentElement({
   icon,
   children,
   isLoading = false,
-  loadingLabel,
-  loadingLabelId,
-}: Pick<ButtonBaseProps, "icon" | "children"> &
-  ButtonLoadingProps & { loadingLabelId?: string }) {
+}: Pick<ButtonBaseProps, "icon" | "children"> & ButtonLoadingProps) {
   const slot = isLoading ? <SpinnerIcon /> : icon;
   return (
     <span className={`${block}__wrap`}>
       {slot ? <span className={`${block}__icon`}>{slot}</span> : null}
       {children}
-      {isLoading && loadingLabel ? (
-        <span id={loadingLabelId} className={px("sr-only")} aria-hidden="true">
-          {loadingLabel}
-        </span>
-      ) : null}
     </span>
   );
 }
@@ -158,28 +151,37 @@ export default function Button({
   ...rest
 }: ButtonProps) {
   const loadingLabelId = useId();
+  const loadingStatus = useLoadingStatus({
+    isLoading,
+    loadingLabel,
+    loadingLabelId,
+  });
+
   return (
-    <button
-      type="button"
-      {...rest}
-      onClick={getLoadingGuardedClick(isLoading, onClick)}
-      // 소비자가 직접 준 aria-busy 는 로딩이 아닐 때 그대로 둔다
-      aria-busy={isLoading ? true : ariaBusy}
-      aria-describedby={getLoadingDescribedBy(
-        isLoading,
-        loadingLabel,
-        loadingLabelId,
-        ariaDescribedBy,
-      )}
-      className={getButtonClassName({ className, size, color, variant, shape })}
-    >
-      {getButtonContentElement({
-        icon,
-        children,
-        isLoading,
-        loadingLabel,
-        loadingLabelId,
-      })}
-    </button>
+    <>
+      <button
+        type="button"
+        {...rest}
+        onClick={getLoadingGuardedClick(isLoading, onClick)}
+        // 소비자가 직접 준 aria-busy 는 로딩이 아닐 때 그대로 둔다
+        aria-busy={isLoading ? true : ariaBusy}
+        aria-describedby={getLoadingDescribedBy(
+          isLoading,
+          loadingLabel,
+          loadingLabelId,
+          ariaDescribedBy,
+        )}
+        className={getButtonClassName({
+          className,
+          size,
+          color,
+          variant,
+          shape,
+        })}
+      >
+        {getButtonContentElement({ icon, children, isLoading })}
+      </button>
+      {loadingStatus}
+    </>
   );
 }

@@ -10,6 +10,7 @@ import {
   getLoadingGuardedClick,
   type ButtonProps,
 } from "./Button.js";
+import useLoadingStatus from "./useLoadingStatus.js";
 
 const block = px("button");
 
@@ -34,42 +35,42 @@ export default function IconButton({
   ...rest
 }: IconButtonProps) {
   const loadingLabelId = useId();
+  const loadingStatus = useLoadingStatus({
+    isLoading,
+    loadingLabel,
+    loadingLabelId,
+  });
+
   return (
-    <button
-      type="button"
-      {...rest}
-      onClick={getLoadingGuardedClick(isLoading, onClick)}
-      aria-busy={isLoading ? true : ariaBusy}
-      // `aria-label` 이 이름을 통째로 대체하므로 안내는 설명으로 붙인다 (Button.tsx 참조)
-      aria-describedby={getLoadingDescribedBy(
-        isLoading,
-        loadingLabel,
-        loadingLabelId,
-        ariaDescribedBy,
-      )}
-      className={getButtonClassName({
-        className: cn(className, `${block}--icon`),
-        size,
-        color,
-        variant,
-        shape,
-      })}
-    >
-      <span className={`${block}__wrap`}>
-        {/* 로딩 중에는 아이콘 자리에 스피너. 정사각은 그대로다 */}
-        <span className={`${block}__icon`}>
-          {isLoading ? <SpinnerIcon /> : children}
-        </span>
-        {isLoading && loadingLabel ? (
-          <span
-            id={loadingLabelId}
-            className={px("sr-only")}
-            aria-hidden="true"
-          >
-            {loadingLabel}
+    <>
+      <button
+        type="button"
+        {...rest}
+        onClick={getLoadingGuardedClick(isLoading, onClick)}
+        aria-busy={isLoading ? true : ariaBusy}
+        // `aria-label` 이 이름을 통째로 대체하므로 안내는 설명으로 붙인다 (Button.tsx 참조)
+        aria-describedby={getLoadingDescribedBy(
+          isLoading,
+          loadingLabel,
+          loadingLabelId,
+          ariaDescribedBy,
+        )}
+        className={getButtonClassName({
+          className: cn(className, `${block}--icon`),
+          size,
+          color,
+          variant,
+          shape,
+        })}
+      >
+        <span className={`${block}__wrap`}>
+          {/* 로딩 중에는 아이콘 자리에 스피너. 정사각은 그대로다 */}
+          <span className={`${block}__icon`}>
+            {isLoading ? <SpinnerIcon /> : children}
           </span>
-        ) : null}
-      </span>
-    </button>
+        </span>
+      </button>
+      {loadingStatus}
+    </>
   );
 }

@@ -153,6 +153,16 @@ export default function ButtonPage() {
         중&quot;)이 붙는다. 색은 바뀌지 않고 포커스도 남는다 — disabled 가
         아니다.
       </p>
+      <div className="doc-note">
+        <strong>포커스가 버튼에 없어도 들린다.</strong> 문구는 화면 밖 공용{" "}
+        <code>role=&quot;status&quot;</code> 영역에 놓여, 폼에서 Enter 로 제출해
+        포커스가 입력창에 있을 때도 로딩 시작이 읽힌다. 버튼 <em>안</em> 의 live
+        영역은 보조기술이 이름 변경으로 처리해 무시하기 때문이다.
+        <br />
+        <strong>완료는 알리지 않는다.</strong> 버튼은 결과를 모른다 —{" "}
+        <code>isLoading</code> 이 내려간 것이 성공인지 실패인지 알 수 없다.
+        결과는 <code>Toast</code> 나 에러 메시지로 알린다.
+      </div>
       <CaseGrid
         columns={3}
         caption="isLoading — 세 변형, 아이콘 유무"
