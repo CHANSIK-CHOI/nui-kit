@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { px } from "../../internal/prefix.js";
+import { PORTAL_ROOT_ATTRIBUTE } from "../../internal/portal.js";
 import Alert from "./Alert.js";
 import Confirm from "./Confirm.js";
 import { usePopupStore } from "./popup.store.js";
@@ -42,6 +43,8 @@ export default function PopupHost({ children }: PopupHostProps) {
       createdByUs = true;
     }
 
+    // 다른 호스트가 배경을 inert 처리할 때 건너뛰게 한다
+    root.setAttribute(PORTAL_ROOT_ATTRIBUTE, "");
     setPortalRoot(root);
 
     return () => {

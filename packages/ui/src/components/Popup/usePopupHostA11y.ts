@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { px, pv } from "../../internal/prefix.js";
+import { PORTAL_ROOT_ATTRIBUTE } from "../../internal/portal.js";
 
 const PREVENT_SCROLL_CLASS = px("is-prevent-scroll");
 const SCROLL_LOCK_TOP_VAR = pv("scroll-lock-top");
@@ -50,6 +51,11 @@ export default function usePopupHostA11y({
           if (!(child instanceof HTMLElement)) continue;
           // portal 컨테이너 자신과 그 조상은 건드리지 않는다
           if (root && (child === root || child.contains(root))) continue;
+          // ⚠️ 우리 다른 portal 컨테이너(토스트·툴팁)도 건드리지 않는다.
+          //    이것이 없으면 팝업 안에서 띄운 토스트가 **보이는데 눌리지 않고
+          //    스크린리더에도 안 읽힌다** — z 는 팝업보다 위(1031)인데 inert 라서다.
+          //    design-system.md §10 「팝업 안에서 띄워도 팝업 위」 계약과 어긋난다.
+          if (child.hasAttribute(PORTAL_ROOT_ATTRIBUTE)) continue;
           // 이미 남이 inert 처리한 요소는 우리 책임이 아니다
           if (child.hasAttribute("inert")) continue;
 
