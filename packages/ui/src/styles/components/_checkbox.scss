@@ -9,6 +9,10 @@
 // 여기에는 체크박스 고유의 표시부만 둔다.
 //
 // 공개 훅: --nui-selector--size (Radio 와 공유)
+//
+// 중간(indeterminate) 상태는 `.nui-is-*` 클래스가 아니라 네이티브 `:indeterminate`
+// 의사 클래스로 그린다 — DOM 프로퍼티가 진실이고, 사용자가 클릭해 브라우저가
+// 프로퍼티를 내리는 순간까지 CSS 가 정확히 따라간다 (KRDS [체크박스 5]).
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("checkbox")} {
@@ -20,19 +24,24 @@
     &__indicator {
       width: var(#{v("size-dot-xs")});
       height: var(#{v("size-dot-md")});
-      border-right: 0.125rem solid currentColor;
-      border-bottom: 0.125rem solid currentColor;
+      border-right: var(#{v("border-width-2")}) solid currentColor;
+      border-bottom: var(#{v("border-width-2")}) solid currentColor;
       transform: rotate(45deg) scale(0.6);
       transform-origin: center;
     }
 
-    &__input:checked + #{cls("checkbox")}__control {
+    // 채움은 선택과 중간이 같다.
+    &__input:checked + #{cls("checkbox")}__control,
+    &__input:indeterminate + #{cls("checkbox")}__control {
       background-color: var(#{v("control-accent")});
       border-color: var(#{v("control-accent")});
     }
 
     &#{state("error")}:not(#{state("disabled")})
       #{cls("checkbox")}__input:checked
+      + #{cls("checkbox")}__control,
+    &#{state("error")}:not(#{state("disabled")})
+      #{cls("checkbox")}__input:indeterminate
       + #{cls("checkbox")}__control {
       background-color: var(#{v("control-accent-error")});
       border-color: var(#{v("control-accent-error")});
@@ -40,6 +49,9 @@
 
     &#{state("disabled")}
       #{cls("checkbox")}__input:checked
+      + #{cls("checkbox")}__control,
+    &#{state("disabled")}
+      #{cls("checkbox")}__input:indeterminate
       + #{cls("checkbox")}__control {
       background-color: var(#{v("control-selection-disabled")});
       border-color: var(#{v("control-selection-disabled")});
@@ -50,6 +62,18 @@
       #{cls("checkbox")}__indicator {
       opacity: 1;
       transform: rotate(45deg) scale(1);
+    }
+
+    // 같은 요소를 가로 한 줄로 갈아끼운다. 회전을 풀고 아래 변만 남긴다.
+    // ⚠️ 선택 규칙보다 **뒤에** 둔다 — 둘 다 참이면 네이티브처럼 대시가 이긴다.
+    &__input:indeterminate
+      + #{cls("checkbox")}__control
+      #{cls("checkbox")}__indicator {
+      width: var(#{v("size-dot-md")});
+      height: 0;
+      border-right: 0;
+      opacity: 1;
+      transform: none;
     }
   }
 }

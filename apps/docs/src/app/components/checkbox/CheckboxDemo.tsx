@@ -13,6 +13,11 @@ const OPTIONS = [
 export function CheckboxDemo() {
   const [checked, setChecked] = useState<string[]>(["email"]);
 
+  const toggleAll = () =>
+    setChecked((prev) =>
+      prev.length === OPTIONS.length ? [] : OPTIONS.map((o) => o.value),
+    );
+
   const toggle = (value: string) =>
     setChecked((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
@@ -28,6 +33,49 @@ export function CheckboxDemo() {
             onChange={() => toggle("email")}
           />
           <Field.Label>이메일 수신 동의</Field.Label>
+        </Field>
+      </Example>
+
+      <h2>전체 선택 — 중간 상태</h2>
+      <p>
+        하위 항목이 <strong>일부만</strong> 선택됐을 때 쓴다.{" "}
+        <code>indeterminate</code> 를 주면 대시(−)로 그리고, 스크린리더에는{" "}
+        <code>aria-checked=&quot;mixed&quot;</code> 로 읽힌다.{" "}
+        <code>CheckboxGroup</code> 이 대신 계산해 주지는 않는다 — 값은 소비자가
+        소유한다.
+      </p>
+      <Example
+        row={false}
+        caption="일부만 고르면 대시, 전부 고르면 체크"
+        code={`<Checkbox
+  checked={checked.length === OPTIONS.length}
+  indeterminate={checked.length > 0 && checked.length < OPTIONS.length}
+  onChange={toggleAll}
+/>`}
+      >
+        <Field>
+          <Field direction="row" align="center">
+            <Checkbox
+              checked={checked.length === OPTIONS.length}
+              indeterminate={
+                checked.length > 0 && checked.length < OPTIONS.length
+              }
+              onChange={toggleAll}
+            />
+            <Field.Label>전체 선택</Field.Label>
+          </Field>
+          <CheckboxGroup name="channel-all">
+            {OPTIONS.map((option) => (
+              <Field key={option.value} direction="row" align="center">
+                <Checkbox
+                  value={option.value}
+                  checked={checked.includes(option.value)}
+                  onChange={() => toggle(option.value)}
+                />
+                <Field.Label>{option.label}</Field.Label>
+              </Field>
+            ))}
+          </CheckboxGroup>
         </Field>
       </Example>
 
