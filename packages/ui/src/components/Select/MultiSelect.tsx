@@ -10,7 +10,9 @@ import type {
 } from "react-select";
 import ReactSelect from "react-select";
 import { getMergedAriaIds, useFieldContext } from "../Field/Field.context.js";
-import SelectAriaContext from "./Select.context.js";
+import SelectAriaContext, {
+  DEFAULT_REMOVE_BUTTON_LABEL,
+} from "./Select.context.js";
 import SelectBase, { SELECT_BLOCK } from "./SelectBase.js";
 import {
   createAriaValueContainer,
@@ -27,6 +29,11 @@ import type {
 
 export type MultiSelectProps = SelectSharedProps<true> & {
   value?: MultiSelectValue;
+  /**
+   * 칩의 삭제 버튼 접근 이름 (KRDS 가이드 566쪽 02). 기본값 `"{라벨} 옵션 삭제"`.
+   * 문자열이 아니라 함수인 이유는 라벨을 끼워 넣는 자리가 언어마다 다르기 때문이다.
+   */
+  removeButtonLabel?: (optionLabel: string) => string;
   onChange?: (
     nextValue: MultiSelectValue,
     selectedOption: MultiValue<SelectOption>,
@@ -70,6 +77,7 @@ const MultiSelect: ForwardRefExoticComponent<
       styles,
       isSearchable = false,
       isClearable = false,
+      removeButtonLabel = DEFAULT_REMOVE_BUTTON_LABEL,
       // 라벨·안내 문구에는 마침표를 붙이지 않는다 (SEED writing 규칙과 같다)
       noOptionsMessage = () => "선택 가능한 항목이 없습니다",
       // 메뉴 최대 높이는 react-select 이 소유한다 (배치 계산이 이 값을 참조하므로
@@ -126,8 +134,12 @@ const MultiSelect: ForwardRefExoticComponent<
       [styles],
     );
     const ariaContextValue = useMemo(
-      () => ({ describedBy: resolvedAriaDescribedBy, readOnly }),
-      [resolvedAriaDescribedBy, readOnly],
+      () => ({
+        describedBy: resolvedAriaDescribedBy,
+        readOnly,
+        getRemoveButtonLabel: removeButtonLabel,
+      }),
+      [resolvedAriaDescribedBy, readOnly, removeButtonLabel],
     );
 
     const handleChange = (

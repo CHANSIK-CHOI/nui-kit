@@ -234,7 +234,16 @@
       @include typo(3, "regular");
     }
 
+    // react-select 의 `div role="button"` 대신 우리 `<button>` 이다 —
+    // Tab 초점 · 초점 표시 · 접근 이름을 위해 요소 자체를 바꿨다 (KRDS 566·568쪽).
     &__multi-value__remove {
+      // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
+      appearance: none;
+      margin: 0;
+      background: none;
+      border: 0;
+      font-family: var(#{v("font-family-base")});
+
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -244,11 +253,26 @@
       cursor: pointer;
 
       @include motion((color, background-color), "3");
+
+      // 테두리 없이 누르는 것 — outline (design-system.md §4-1).
+      // ⚠️ offset 을 **안쪽**으로 준다. 칩 안에 라벨과 붙어 있어 바깥으로 띄우면
+      //    링이 왼쪽 라벨 글자를 덮는다. Accordion 헤더와 같은 예외다.
+      &:focus-visible {
+        outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
+        outline-offset: calc(-1 * var(#{v("focus-width")}));
+        border-radius: var(#{v("radius-1")});
+      }
+
+      &:disabled {
+        color: var(#{v("action-fg-disabled")});
+        cursor: not-allowed;
+      }
     }
 
     &__multi-value__remove svg {
-      width: var(#{v("size-icon-md")});
-      height: var(#{v("size-icon-md")});
+      // KRDS 아이콘 최소 크기 16 (가이드 164쪽)
+      width: var(#{v("size-icon-lg")});
+      height: var(#{v("size-icon-lg")});
     }
 
     &__menu-notice {

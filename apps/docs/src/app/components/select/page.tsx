@@ -118,6 +118,20 @@ const SELECT_COMPONENTS = { Option: CustomOption };
           <code>readOnly</code> 는 포커스는 받되 메뉴를 열지 않는다.{" "}
           <code>disabled</code> 는 포커스 자체를 받지 않는다
         </li>
+        <li>
+          <strong>MultiSelect 칩의 × 는 Tab 으로 닿는 버튼이다.</strong> 칩이
+          여럿이면 앞에서부터 하나씩 잡히고, 그다음이 입력창이다.{" "}
+          <kbd>Enter</kbd> 와 <kbd>Space</kbd> 로 지운다. 지우고 나면 포커스가{" "}
+          <strong>이전 칩</strong>으로, 없으면 입력창으로 간다
+        </li>
+        <li>
+          칩 × 의 접근 이름은 기본 &quot;서울 옵션 삭제&quot; 이고{" "}
+          <code>removeButtonLabel</code> 로 바꾼다. 라벨을 끼워 넣는 자리가
+          언어마다 달라서 문자열이 아니라 함수를 받는다
+          <pre className="doc-code" style={{ marginTop: 10, marginBottom: 0 }}>
+            <code>{`<MultiSelect removeButtonLabel={(label) => \`Remove \${label}\`} />`}</code>
+          </pre>
+        </li>
       </ul>
 
       <h2>API</h2>

@@ -394,6 +394,13 @@ const TOUCH_TARGETS = [
     INPUT_AUX_REASON,
   ],
   [
+    "MultiSelect 칩 삭제",
+    "/components/select",
+    ".nui-select__multi-value__remove",
+    null,
+    "칩이 서로 붙어 있어 44 를 채우면 이웃 칩의 히트를 삼킨다. 입력 안 보조 버튼과 같은 이유로 하한 24 를 쓴다",
+  ],
+  [
     "Datepicker 이전/다음",
     "/components/datepicker",
     ".nui-daypicker__button-next",

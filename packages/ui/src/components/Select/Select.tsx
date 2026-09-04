@@ -10,7 +10,9 @@ import type {
 } from "react-select";
 import ReactSelect from "react-select";
 import { getMergedAriaIds, useFieldContext } from "../Field/Field.context.js";
-import SelectAriaContext from "./Select.context.js";
+import SelectAriaContext, {
+  DEFAULT_REMOVE_BUTTON_LABEL,
+} from "./Select.context.js";
 import SelectBase, { SELECT_BLOCK } from "./SelectBase.js";
 import {
   createAriaValueContainer,
@@ -123,8 +125,13 @@ const Select: ForwardRefExoticComponent<
       () => getResolvedSelectStyles<false>(styles),
       [styles],
     );
+    // 단일 Select 에는 칩이 없다. context 모양을 맞추려고 기본값만 넣는다.
     const ariaContextValue = useMemo(
-      () => ({ describedBy: resolvedAriaDescribedBy, readOnly }),
+      () => ({
+        describedBy: resolvedAriaDescribedBy,
+        readOnly,
+        getRemoveButtonLabel: DEFAULT_REMOVE_BUTTON_LABEL,
+      }),
       [resolvedAriaDescribedBy, readOnly],
     );
 
