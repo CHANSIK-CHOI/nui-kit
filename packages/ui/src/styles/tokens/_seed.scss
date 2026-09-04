@@ -690,10 +690,12 @@
     #{v("easing-pressed")}: cubic-bezier(0, 0, 0.15, 1);
 
     // ── z-index (오버레이 계층 단일 출처)
-    #{v("z-tooltip")}: 20;
+    #{v("z-tooltip")}: 20; // 제자리 툴팁 — 자기 부모 안에서만
     #{v("z-overlay-layer")}: 1030;
     #{v("z-portal-menu")}: 1031; // portal 로 body 에 붙는 드롭다운·달력 — 팝업(1030) 안에서도 보여야 한다
     #{v("z-toast")}: 1031; // 팝업보다 위 — 팝업 안에서 띄운 토스트도 보여야 한다
+    // portal 로 나간 툴팁 — 지금 가리키고 있는 것의 설명이라 무엇에도 가리지 않는다
+    #{v("z-tooltip-portal")}: 1032;
   }
 
   @media (prefers-color-scheme: dark) {

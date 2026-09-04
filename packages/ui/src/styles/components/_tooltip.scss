@@ -3,8 +3,12 @@
 // ─────────────────────────────────────────────────────────────
 // Tooltip
 //
-// 트리거를 감싸는 relative 컨테이너 안에서 absolute 로 띄운다 (portal 아님).
+// 트리거를 감싸는 relative 컨테이너 안에서 absolute 로 띄운다.
 // placement 는 prop 값(카멜)을 kebab 클래스로 옮겨 쓴다 — top-center 등.
+//
+// `hasPortal` 이면 말풍선이 body 로 나가고, portal 래퍼가 **트리거의 rect 를 그대로
+// 입는다**(`--portal`). 그래서 아래 placement·화살표 규칙이 두 경우에 똑같이 맞는다 —
+// 좌표 계산을 CSS 로도 JS 로도 두 벌 만들지 않는다.
 //
 // 공개 훅: --nui-tooltip--max-width / -radius
 // ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 글자는 짝이다.
@@ -30,6 +34,20 @@
       z-index: var(#{v("z-tooltip")});
       width: max-content;
       max-width: #{hook("tooltip--max-width", min(17.5rem, calc(100vw - 2rem)))};
+    }
+
+    // ── portal 래퍼 — 트리거의 유령 상자
+    //
+    // 크기·좌표는 JS 가 인라인으로 넣는다. 여기서는 성격만 바꾼다.
+    &--portal {
+      position: fixed;
+      display: block;
+      max-width: none;
+      // 화면 위를 덮는 상자가 아래 콘텐츠의 클릭을 먹지 않게 한다.
+      // 툴팁은 대화형 요소를 담지 않는다 (KRDS 가이드 649쪽).
+      pointer-events: none;
+      // 지금 가리키고 있는 것의 설명이라 무엇에도 가리지 않는다 — design-system.md §10
+      z-index: var(#{v("z-tooltip-portal")});
     }
 
     &__bubble {

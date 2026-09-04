@@ -7,7 +7,8 @@ export default function TooltipPage() {
   return (
     <>
       <GuideHeader title="Tooltip" named={["Tooltip"]} subpath="tooltip">
-        요소에 붙는 짧은 설명이다. 트리거 옆에 붙으므로 portal 을 쓰지 않는다.
+        요소에 붙는 짧은 설명이다. 기본은 트리거 옆에 붙고,{" "}
+        <code>hasPortal</code> 로 <code>body</code> 로 내보낼 수 있다.
       </GuideHeader>
 
       <pre className="doc-code">
@@ -31,6 +32,11 @@ export default function TooltipPage() {
         </li>
         <li>ESC 로 닫힌다</li>
         <li>
+          <strong>터치에서는 탭으로 열고 닫는다</strong> (KRDS 가이드 659 ·
+          662쪽). 바깥을 탭해도 닫힌다. 탭은 트리거의 원래 동작을 막지 않으므로
+          아이콘 버튼이면 버튼도 함께 눌린다
+        </li>
+        <li>
           버블은 <code>role=&quot;tooltip&quot;</code> 이다
         </li>
       </ul>
@@ -42,8 +48,13 @@ export default function TooltipPage() {
       </div>
 
       <div className="doc-note">
-        portal 이 아니라 트리거 옆에 <code>absolute</code> 로 붙는다. 조상에{" "}
-        <code>overflow: hidden</code> 이 있으면 잘릴 수 있다.
+        기본은 트리거 옆 <code>absolute</code> 라 조상에{" "}
+        <code>overflow: hidden</code> 이 있으면 잘린다. <code>hasPortal</code> 을
+        켜면 <code>body</code> 로 나가 잘리지 않고, 스크롤·리사이즈를 따라간다.{" "}
+        <strong>
+          잘림만 없앤다 — 뷰포트 밖으로 밀리는 것은 그대로다.
+        </strong>{" "}
+        화면 가장자리에서는 <code>placement</code> 를 골라야 한다.
       </div>
 
       <h2>커스터마이징</h2>

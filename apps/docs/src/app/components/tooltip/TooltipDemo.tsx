@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Button,
   IconButton,
+  LayerPopup,
   Tooltip,
   type TooltipPlacement,
 } from "@chansikchoi/next-ui";
@@ -21,6 +22,7 @@ const PLACEMENTS: TooltipPlacement[] = [
 
 export function TooltipDemo() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   return (
     <>
@@ -48,6 +50,97 @@ export function TooltipDemo() {
             긴 설명 보기
           </span>
         </Tooltip>
+      </Example>
+
+      <h2>잘리는 부모에서 — hasPortal</h2>
+      <p>
+        말풍선은 트리거 옆 <code>absolute</code> 라{" "}
+        <code>overflow: hidden</code> 인 조상에서 잘린다.{" "}
+        <code>hasPortal</code> 을 켜면 <code>body</code> 로 내보내고 스크롤과 창
+        크기 변화를 따라간다.
+      </p>
+      <Example
+        row={false}
+        caption="같은 상자 안 — 왼쪽은 잘리고 오른쪽은 안 잘린다"
+        code={`<Tooltip content="설명" hasPortal>…</Tooltip>`}
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: 24,
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            padding: 12,
+            width: "100%",
+            maxWidth: 420,
+            border: "1px dashed var(--nui-border-form)",
+            borderRadius: "var(--nui-radius-2)",
+          }}
+        >
+          <Tooltip content="이 말풍선은 상자에 잘린다">
+            <Button size="small">기본</Button>
+          </Tooltip>
+          <Tooltip content="이 말풍선은 상자를 벗어난다" hasPortal>
+            <Button size="small">hasPortal</Button>
+          </Tooltip>
+        </div>
+      </Example>
+
+      <Example
+        row={false}
+        caption="팝업 안 — 아래 줄은 defaultOpen 이다. 왼쪽은 패널에 잘려 아무것도 안 보이고, 오른쪽은 패널 밖으로 나온다"
+        code={`<LayerPopup …>
+  <Tooltip content="설명" hasPortal>…</Tooltip>
+</LayerPopup>`}
+      >
+        <Button onClick={() => setIsPopupOpen(true)}>팝업 열기</Button>
+        <LayerPopup
+          open={isPopupOpen}
+          onRequestClose={() => setIsPopupOpen(false)}
+          isTopmost
+          title="툴팁이 있는 팝업"
+        >
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: 32 }}
+          >
+            <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+              <Tooltip content="팝업 패널에 잘린다" placement="bottomCenter">
+                <Button size="small">기본</Button>
+              </Tooltip>
+              <Tooltip
+                content="팝업 위로 떠오른다"
+                placement="bottomCenter"
+                hasPortal
+              >
+                <Button size="small">hasPortal</Button>
+              </Tooltip>
+            </div>
+
+            {/* 열린 채로 두어 hover 없이도 잘림 차이가 보이게 한다 */}
+            <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+              <Tooltip
+                content="열린 채 — 패널 아래가 잘린다"
+                placement="bottomCenter"
+                defaultOpen
+              >
+                <Button size="small" variant="line">
+                  기본 · defaultOpen
+                </Button>
+              </Tooltip>
+              <Tooltip
+                content="열린 채 — 패널 밖으로 나온다"
+                placement="bottomCenter"
+                defaultOpen
+                hasPortal
+              >
+                <Button size="small" variant="line">
+                  hasPortal · defaultOpen
+                </Button>
+              </Tooltip>
+            </div>
+          </div>
+        </LayerPopup>
       </Example>
 
       <h2>위치</h2>

@@ -5,15 +5,21 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   cloneElement,
   isValidElement,
+  useCallback,
+  useEffect,
   useId,
   useRef,
   useState,
+  type CSSProperties,
   type FocusEventHandler,
   type KeyboardEventHandler,
   type MouseEventHandler,
+  type PointerEventHandler,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { px } from "../../internal/prefix.js";
+import { PORTAL_ROOT_ATTRIBUTE } from "../../internal/portal.js";
 import {
   motionTransition,
   reduceMotion,
@@ -21,6 +27,7 @@ import {
 } from "../../internal/motion.js";
 
 const block = px("tooltip");
+const TOOLTIP_ROOT_ID = px("tooltip-root");
 
 export type TooltipPlacement =
   | "topCenter"
@@ -44,6 +51,14 @@ type TooltipChildProps = {
   "aria-describedby"?: string;
 };
 
+/** portal 래퍼에 입히는 트리거의 화면 좌표 */
+type TriggerRect = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
+
 export type TooltipProps = {
   children: ReactNode;
   content: ReactNode;
@@ -54,6 +69,14 @@ export type TooltipProps = {
   defaultOpen?: boolean;
   onOpenChange?: (nextOpen: boolean) => void;
   disabled?: boolean;
+  /**
+   * 말풍선을 `body` 로 내보낸다. `overflow: hidden` 조상(팝업 패널 등)에서
+   * 잘리지 않게 하려면 켠다. 기본값은 `false` — 제자리 배치가 기본이다.
+   *
+   * ⚠️ 잘림만 없앤다. 뷰포트 밖으로 밀리는 것은 그대로이므로
+   *    가장자리에서는 `placement` 를 소비자가 골라야 한다.
+   */
+  hasPortal?: boolean;
 };
 
 function getTooltipAnimationOffset(placement: TooltipPlacement) {
@@ -73,8 +96,10 @@ function getMergedAriaDescribedBy({
 }
 
 /**
- * 트리거를 감싸 hover / focus 시 설명을 띄운다. portal 이 아니라
- * 트리거 옆에 absolute 로 붙으므로, 잘리는 조상(overflow: hidden)이 없어야 한다.
+ * 트리거를 감싸 hover / focus / 터치 탭으로 설명을 띄운다.
+ *
+ * 기본은 트리거 옆 `absolute` 배치라 잘리는 조상(`overflow: hidden`)이 없어야 한다.
+ * `hasPortal` 을 켜면 `body` 로 내보내고 스크롤·리사이즈를 따라간다.
  *
  * 열려 있는 동안 트리거에 `aria-describedby` 를 연결한다 —
  * 마우스가 없는 사용자도 내용을 들을 수 있도록.
@@ -88,6 +113,7 @@ export default function Tooltip({
   defaultOpen = false,
   onOpenChange,
   disabled = false,
+  hasPortal = false,
 }: TooltipProps) {
   // framer-motion 은 CSS duration 토큰의 1ms 무력화를 읽지 않는다 (design-system.md §6).
   const shouldReduceMotion = useReducedMotion();
@@ -95,6 +121,11 @@ export default function Tooltip({
   const tooltipId = useId();
   const [isTooltipOpen, setIsTooltipOpen] = useState(defaultOpen);
   const prevDisabledRef = useRef(disabled);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  // 직전 입력이 마우스였는지. 터치 기기가 흉내 내는 mouseenter 를 가려낸다.
+  const lastPointerTypeRef = useRef<string>("mouse");
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+  const [triggerRect, setTriggerRect] = useState<TriggerRect | null>(null);
 
   // disabled 로 바뀌는 순간 열려 있던 툴팁을 닫는다 (렌더 중 상태 조정)
   if (!prevDisabledRef.current && disabled && isTooltipOpen) {
@@ -106,21 +137,145 @@ export default function Tooltip({
   const resolvedOpen = disabled ? false : isControlled ? open : isTooltipOpen;
   const animationOffset = getTooltipAnimationOffset(placement);
 
-  const setTooltipOpenState = (nextOpen: boolean) => {
-    if (!isControlled) {
-      setIsTooltipOpen(nextOpen);
+  const setTooltipOpenState = useCallback(
+    (nextOpen: boolean) => {
+      if (!isControlled) {
+        setIsTooltipOpen(nextOpen);
+      }
+
+      onOpenChange?.(nextOpen);
+    },
+    [isControlled, onOpenChange],
+  );
+
+  // ── portal 컨테이너
+  //
+  // ⚠️ 마운트 이후에 잡는다. 렌더 중에 document 를 읽으면 서버 출력과 어긋나
+  //    하이드레이션 불일치가 난다 (PopupHost·ToastHost 와 같은 규칙).
+  useEffect(() => {
+    if (!hasPortal) return;
+
+    let root = document.getElementById(TOOLTIP_ROOT_ID);
+    let createdByUs = false;
+
+    if (!root) {
+      root = document.createElement("div");
+      root.id = TOOLTIP_ROOT_ID;
+      document.body.appendChild(root);
+      createdByUs = true;
     }
 
-    onOpenChange?.(nextOpen);
+    // 팝업이 배경을 inert 처리할 때 이 컨테이너는 건너뛰게 한다.
+    // 소비자가 미리 심어둔 컨테이너에도 우리가 보장한다.
+    root.setAttribute(PORTAL_ROOT_ATTRIBUTE, "");
+    setPortalRoot(root);
+
+    return () => {
+      if (createdByUs && root && root.childElementCount === 0) {
+        root.remove();
+      }
+    };
+  }, [hasPortal]);
+
+  // ── 트리거 좌표 추적
+  //
+  // portal 래퍼에 **트리거의 rect 를 그대로 입힌다.** 그러면 placement·화살표
+  // CSS 규칙이 제자리 배치일 때와 똑같이 맞는다 — 좌표 계산을 다시 만들지 않는다.
+  const updateTriggerRect = useCallback(() => {
+    const triggerElement = rootRef.current;
+    if (!triggerElement) return;
+
+    const { top, left, width, height } = triggerElement.getBoundingClientRect();
+
+    setTriggerRect((prev) =>
+      prev &&
+      prev.top === top &&
+      prev.left === left &&
+      prev.width === width &&
+      prev.height === height
+        ? prev
+        : { top, left, width, height },
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!hasPortal || !resolvedOpen) return;
+
+    updateTriggerRect();
+
+    let frame = 0;
+    const scheduleUpdate = () => {
+      if (frame) return;
+
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        updateTriggerRect();
+      });
+    };
+
+    // scroll 은 버블하지 않는다 — 캡처로 받아야 **조상 어디의 스크롤이든** 잡힌다
+    window.addEventListener("scroll", scheduleUpdate, true);
+    window.addEventListener("resize", scheduleUpdate);
+
+    const observer = new ResizeObserver(scheduleUpdate);
+    if (rootRef.current) observer.observe(rootRef.current);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate, true);
+      window.removeEventListener("resize", scheduleUpdate);
+      observer.disconnect();
+    };
+  }, [hasPortal, resolvedOpen, updateTriggerRect]);
+
+  // ── 바깥 탭으로 닫기
+  //
+  // 마우스에게도 붙지만 트리거에 hover 한 채로 바깥을 누를 수는 없으므로
+  // 실질적으로 터치에서만 동작한다 — 조건 분기를 하나 줄인다.
+  useEffect(() => {
+    if (!resolvedOpen) return;
+
+    const handleDocumentPointerDown = (event: PointerEvent) => {
+      if (rootRef.current?.contains(event.target as Node)) return;
+
+      setTooltipOpenState(false);
+    };
+
+    document.addEventListener("pointerdown", handleDocumentPointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleDocumentPointerDown);
+    };
+  }, [resolvedOpen, setTooltipOpenState]);
+
+  // ⚠️ 마우스는 `pointerdown` 없이 hover 만 한다. 종류를 `pointerdown` 에서만
+  //    기억하면 태블릿에서 한 번 터치한 뒤로 마우스 hover 가 영영 무시된다.
+  const handlePointerEnter: PointerEventHandler<HTMLDivElement> = (event) => {
+    lastPointerTypeRef.current = event.pointerType;
   };
 
+  // 터치·펜은 탭으로 토글한다 (KRDS 가이드 659 · 662쪽 Click).
+  // `preventDefault` 는 하지 않는다 — 탭이 트리거 버튼도 눌러야 한다.
+  const handlePointerDown: PointerEventHandler<HTMLDivElement> = (event) => {
+    lastPointerTypeRef.current = event.pointerType;
+
+    if (disabled || event.pointerType === "mouse") return;
+
+    setTooltipOpenState(!resolvedOpen);
+  };
+
+  // ⚠️ 터치 기기는 탭 뒤에 mouseenter·mouseleave 를 흉내 내서 발생시킨다.
+  //    가드가 없으면 두 번째 탭에서 닫자마자 가짜 mouseenter 가 다시 열어
+  //    "닫히지 않는 툴팁" 이 된다 (styles.md §9 의 hoverable 과 같은 문제).
   const handleMouseEnter: MouseEventHandler<HTMLDivElement> = () => {
-    if (disabled) return;
+    if (disabled || lastPointerTypeRef.current !== "mouse") return;
 
     setTooltipOpenState(true);
   };
 
   const handleMouseLeave: MouseEventHandler<HTMLDivElement> = () => {
+    if (lastPointerTypeRef.current !== "mouse") return;
+
     setTooltipOpenState(false);
   };
 
@@ -153,14 +308,69 @@ export default function Tooltip({
       })
     : children;
 
+  const placementClass = `${block}--${PLACEMENT_CLASS[placement]}`;
+
+  const panel = (
+    // 퇴장이 끝나면 좌표를 버린다 — portal 래퍼까지 함께 언마운트되어
+    // 닫힌 툴팁마다 빈 fixed div 가 body 에 쌓이지 않는다.
+    <AnimatePresence initial={false} onExitComplete={() => setTriggerRect(null)}>
+      {resolvedOpen ? (
+        <motion.div
+          key="tooltip-panel"
+          className={`${block}__panel`}
+          initial={reduceMotion(
+            { opacity: 0, y: animationOffset, scale: 0.98 },
+            shouldReduceMotion,
+          )}
+          animate={reduceMotion(
+            { opacity: 1, y: 0, scale: 1 },
+            shouldReduceMotion,
+          )}
+          exit={{
+            ...reduceMotion(
+              { opacity: 0, y: animationOffset, scale: 0.98 },
+              shouldReduceMotion,
+            ),
+            transition: reduceMotionTransition(
+              motionTransition.popoverExit,
+              shouldReduceMotion,
+            ),
+          }}
+          transition={reduceMotionTransition(
+            motionTransition.popover,
+            shouldReduceMotion,
+          )}
+        >
+          <div id={tooltipId} role="tooltip" className={`${block}__bubble`}>
+            <div className={`${block}__content`}>{content}</div>
+            <span className={`${block}__arrow`} aria-hidden="true" />
+          </div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+  );
+
+  const isPortalActive = hasPortal && Boolean(portalRoot);
+  const portalWrapperStyle: CSSProperties | undefined = triggerRect
+    ? {
+        top: triggerRect.top,
+        left: triggerRect.left,
+        width: triggerRect.width,
+        height: triggerRect.height,
+      }
+    : undefined;
+
   return (
     <div
+      ref={rootRef}
       className={cn(
         block,
-        `${block}--${PLACEMENT_CLASS[placement]}`,
+        placementClass,
         disabled && px("is-disabled"),
         className,
       )}
+      onPointerEnter={handlePointerEnter}
+      onPointerDown={handlePointerDown}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onFocus={handleFocus}
@@ -169,41 +379,19 @@ export default function Tooltip({
     >
       <div className={`${block}__trigger`}>{resolvedChildren}</div>
 
-      <AnimatePresence initial={false}>
-        {resolvedOpen ? (
-          <motion.div
-            key="tooltip-panel"
-            className={`${block}__panel`}
-            initial={reduceMotion(
-              { opacity: 0, y: animationOffset, scale: 0.98 },
-              shouldReduceMotion,
-            )}
-            animate={reduceMotion(
-              { opacity: 1, y: 0, scale: 1 },
-              shouldReduceMotion,
-            )}
-            exit={{
-              ...reduceMotion(
-                { opacity: 0, y: animationOffset, scale: 0.98 },
-                shouldReduceMotion,
-              ),
-              transition: reduceMotionTransition(
-                motionTransition.popoverExit,
-                shouldReduceMotion,
-              ),
-            }}
-            transition={reduceMotionTransition(
-              motionTransition.popover,
-              shouldReduceMotion,
-            )}
-          >
-            <div id={tooltipId} role="tooltip" className={`${block}__bubble`}>
-              <div className={`${block}__content`}>{content}</div>
-              <span className={`${block}__arrow`} aria-hidden="true" />
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {isPortalActive ? null : panel}
+
+      {isPortalActive && portalRoot && triggerRect
+        ? createPortal(
+            <div
+              className={cn(block, placementClass, `${block}--portal`)}
+              style={portalWrapperStyle}
+            >
+              {panel}
+            </div>,
+            portalRoot,
+          )
+        : null}
     </div>
   );
 }
