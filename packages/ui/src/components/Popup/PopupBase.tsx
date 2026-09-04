@@ -109,6 +109,20 @@ export default function PopupBase({
     onRequestClose?.();
   };
 
+  const closeButton = hasCloseButton ? (
+    <button
+      type="button"
+      className={`${block}__close`}
+      aria-label={closeButtonLabel}
+      onClick={handleCloseButtonClick}
+    >
+      <CloseIcon width={20} height={20} />
+    </button>
+  ) : null;
+
+  // 닫기 버튼은 DOM 의 가장 마지막에 둔다 (KRDS 가이드 397쪽 02).
+  // 첫 포커스가 본문·푸터로 가고, 시각 위치는 CSS 가 우상단에 고정한다.
+  // head 는 제목이 없어도 렌더한다 — 닫기 버튼이 앉을 자리를 비워 두는 몫이다.
   const headerContent = hasHeader ? (
     <div
       className={cn(`${block}__head`, {
@@ -121,17 +135,6 @@ export default function PopupBase({
             {title}
           </span>
         </div>
-      ) : null}
-
-      {hasCloseButton ? (
-        <button
-          type="button"
-          className={`${block}__close`}
-          aria-label={closeButtonLabel}
-          onClick={handleCloseButtonClick}
-        >
-          <CloseIcon width={20} height={20} />
-        </button>
       ) : null}
     </div>
   ) : null;
@@ -146,6 +149,7 @@ export default function PopupBase({
             `${block}--${VARIANT_CLASS[variant]}`,
             size !== "regular" && `${block}--${size}`,
             contentAlign === "center" && `${block}--align-center`,
+            hasCloseButton && `${block}--has-close`,
             !hasHeader && `${block}--no-header`,
             !footer && `${block}--no-footer`,
             className,
@@ -212,6 +216,8 @@ export default function PopupBase({
                   {footer}
                 </div>
               ) : null}
+
+              {closeButton}
             </motion.section>
           </div>
         </motion.div>

@@ -160,6 +160,11 @@ export function Providers({ children }) {
         <li>
           열리면 패널 안 첫 포커스 요소로 이동하고, 닫히면 원래 위치로 복원한다
         </li>
+        <li>
+          닫기 버튼은 마크업의 <strong>가장 마지막</strong>에 있다. 그래서 첫
+          포커스가 본문·푸터로 가고, 닫기는 Tab 을 끝까지 눌렀을 때 잡힌다.
+          보이는 자리는 그대로 오른쪽 위다
+        </li>
         <li>Tab 이 패널 밖으로 나가지 않는다 (포커스 트랩)</li>
         <li>
           열려 있는 동안 배경은 <code>inert</code> + <code>aria-hidden</code> 이

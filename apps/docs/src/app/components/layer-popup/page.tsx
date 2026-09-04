@@ -96,7 +96,8 @@ export default function LayerPopupPage() {
         </li>
         <li>
           닫기 버튼의 접근 이름은 <code>closeButtonLabel</code>
-          (기본 &quot;팝업 닫기&quot;)이고, 40px 로 보이지만 44px 을 누른다
+          (기본 &quot;팝업 닫기&quot;)이고, 40px 로 보이지만 44px 을 누른다.
+          마크업에서는 패널의 마지막 요소라 첫 포커스는 본문·푸터로 간다
         </li>
         <li>
           본문 정렬 <code>contentAlign</code> 의 기본은 <code>left</code> 다. 긴

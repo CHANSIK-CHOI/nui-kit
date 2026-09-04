@@ -47,6 +47,8 @@
     }
 
     &__panel {
+      // 닫기 버튼(absolute)의 기준
+      position: relative;
       display: flex;
       flex-direction: column;
       width: #{hook("popup--md-width", min(100%, 30rem))};
@@ -62,17 +64,27 @@
       will-change: transform, opacity;
     }
 
+    // 닫기 버튼은 DOM 의 마지막으로 나갔다 (KRDS 397쪽 02). 제목만 남는다 —
+    // `--no-title` 은 제목 없이 닫기 버튼 자리만 잡아 두는 빈 헤더다.
     &__head {
       display: flex;
       flex-shrink: 0;
       align-items: flex-start;
-      justify-content: space-between;
-      gap: var(#{v("space-4")});
       padding: var(#{v("space-panel-card")}) var(#{v("space-panel-card")}) 0;
     }
 
-    &__head--no-title {
-      justify-content: flex-end;
+    // 닫기 버튼이 헤더 밖에 있으므로 제목이 그 밑으로 파고들지 않게 자리를 비운다.
+    // 가로 24(여백) + 40(버튼) + 16(간격) — 버튼이 헤더 안에 있던 때와 같은 폭이다.
+    // 세로도 같은 높이(여백 24 + 버튼 40)를 지켜야 본문이 버튼 밑으로 올라오지 않는다.
+    // ⚠️ box-sizing 이 border-box 라 min-height 에 위 여백을 함께 넣는다.
+    &--has-close &__head {
+      min-height: calc(
+        var(#{v("space-panel-card")}) + var(#{v("size-control-lg")})
+      );
+      padding-right: calc(
+        var(#{v("space-panel-card")}) + var(#{v("size-control-lg")}) +
+          var(#{v("space-4")})
+      );
     }
 
     &__header-content {
@@ -111,6 +123,14 @@
       // 보이는 것은 40 이지만 누를 수 있는 것은 44 — a11y.md §8
       @include hit-area;
       @include motion-press((background-color, border-color, color));
+
+      // ⚠️ `hit-area` 가 position: relative 를 깔므로 반드시 그 뒤에서 덮는다.
+      // DOM 은 패널의 마지막이고 자리만 우상단으로 되돌린다.
+      position: absolute;
+      top: var(#{v("space-panel-card")});
+      right: var(#{v("space-panel-card")});
+      // 스크롤되는 본문 위
+      z-index: 1;
 
       &:focus-visible {
         outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
@@ -215,6 +235,23 @@
       padding: calc(var(#{v("space-panel-card")}) + env(safe-area-inset-top))
         calc(var(#{v("space-panel-card")}) + env(safe-area-inset-right)) 0
         calc(var(#{v("space-panel-card")}) + env(safe-area-inset-left));
+    }
+
+    // 닫기 버튼도 헤더와 같은 기준으로 안쪽에 들인다
+    &--full &__close {
+      top: calc(var(#{v("space-panel-card")}) + env(safe-area-inset-top));
+      right: calc(var(#{v("space-panel-card")}) + env(safe-area-inset-right));
+    }
+
+    &--full#{cls("popup")}--has-close &__head {
+      min-height: calc(
+        var(#{v("space-panel-card")}) + env(safe-area-inset-top) +
+          var(#{v("size-control-lg")})
+      );
+      padding-right: calc(
+        var(#{v("space-panel-card")}) + env(safe-area-inset-right) +
+          var(#{v("size-control-lg")}) + var(#{v("space-4")})
+      );
     }
 
     &--full &__body {
