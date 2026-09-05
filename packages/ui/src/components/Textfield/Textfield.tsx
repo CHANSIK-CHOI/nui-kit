@@ -23,7 +23,13 @@ type TextfieldBaseProps = {
   className?: string;
   placeholder?: string;
   type?: TextfieldInputType;
-  value?: InputHTMLAttributes<HTMLInputElement>["value"];
+  /**
+   * 입력값. 네이티브 타입(`string | number | readonly string[]`)에서
+   * **배열을 뺐다** — React 가 `<select multiple>` 때문에 넣은 갈래라 한 줄 입력에는
+   * 쓸 일이 없고, 넘기면 `'' + value` 로 합쳐져 쉼표가 값에 섞인다.
+   * `number` 는 남긴다 — `type="number"` 를 지원하기 때문이다.
+   */
+  value?: string | number;
   readOnly?: boolean;
   isTextInputBlocked?: boolean;
   disabled?: boolean;

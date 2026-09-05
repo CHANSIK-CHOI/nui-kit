@@ -20,7 +20,15 @@ type TextareaBaseProps = {
   id?: string;
   className?: string;
   placeholder?: string;
-  value?: TextareaHTMLAttributes<HTMLTextAreaElement>["value"];
+  /**
+   * 여러 줄 텍스트. 네이티브 타입(`string | number | readonly string[]`)에서
+   * **`string` 으로 좁혔다** — 배열은 React 가 `<select multiple>` 때문에 넣은 갈래라
+   * textarea 에는 쓸 일이 없고, 넘기면 `'' + value` 로 합쳐져 쉼표가 값에 섞인다.
+   * 글자 수 카운터도 그 쉼표를 함께 센다.
+   *
+   * 여는 것은 non-breaking 이므로 필요해지면 그때 넓힌다 (tokens.md §1-4).
+   */
+  value?: string;
   readOnly?: boolean;
   disabled?: boolean;
   infoMessage?: string;
@@ -90,8 +98,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const [uncontrolledLength, setUncontrolledLength] = useState(0);
     // 세는 단위는 브라우저의 `maxlength` 와 같은 UTF-16 코드 단위다 —
     // 다르게 세면 카운터가 100 인데 더 쳐지거나 99 인데 안 쳐진다.
-    const valueLength =
-      value != null ? String(value).length : uncontrolledLength;
+    const valueLength = value != null ? value.length : uncontrolledLength;
     const isOverLimit = hasCounter && valueLength > maxLength;
 
     const resolvedAriaDescribedBy = getMergedAriaIds(
