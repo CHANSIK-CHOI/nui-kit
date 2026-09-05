@@ -26,22 +26,5 @@ packages/ui/styles/
 .playwright-mcp/
 coverage/
 
-# Claude Code — 외부에 노출하지 않는다
-.claude/
-CLAUDE.md
-.mcp.json
-.mcp.json.bak
-# 루트 scripts/ 는 Context7 캐시 점검 등 Claude 자동화 전용이다.
-# 패키지 안의 scripts/(빌드·검증)는 배포·빌드에 필요하므로 여기 넣지 않는다.
-scripts/*
-
-# 로컬 참조용 — 배포물이 아니다
-# plan      디자인 시스템 계획서 (HTML)
-# research  외부 디자인 시스템 조사 자료
-# design    pen.dev 캔버스와 내보낸 이미지
-plan/
-research/
-design/
-
 # 색 엔진 산출물 — 생성기가 만든다 (npm run color:generate)
 packages/ui/scripts/color/nui-theme.css

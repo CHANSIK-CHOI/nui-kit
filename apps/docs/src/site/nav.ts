@@ -11,7 +11,7 @@ export type NavSection = {
  * 사이드바 네비게이션 단일 출처. 페이지를 추가하면 여기에 등록한다.
  * `verify:console` 이 이 파일의 `href` 를 뽑아 검사 대상을 만든다.
  *
- * Components 의 묶음은 CLAUDE.md 의 계열 표와 같다 —
+ * Components 의 묶음은 라이브러리 README 의 컴포넌트 표와 같다 —
  * Button · Form · Popup · Feedback · Disclosure.
  */
 export const NAV: NavSection[] = [

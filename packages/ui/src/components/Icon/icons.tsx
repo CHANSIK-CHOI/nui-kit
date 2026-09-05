@@ -23,7 +23,7 @@ import type { IconBaseProps } from "./Icon.js";
  *
  * lucide 는 `title`·`aria-*`·`role` 이 하나라도 있으면 자기 `aria-hidden` 을 빼고,
  * `role="img"` 는 붙이지 않는다 — 그래서 여기서 붙인다
- * (.claude/references/lucide-icons-lucide/react-props-accessibility.md).
+ * (lucide 공식 문서 · React → Accessibility).
  *
  * 크기는 CSS 가 정한다. `.nui-icon { width: 100%; height: 100% }` 가 lucide 의
  * `width="24"` 속성을 이기므로 자리(버튼 박스)가 곧 크기다 — design-system.md §5-2.

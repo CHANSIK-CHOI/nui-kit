@@ -6,10 +6,10 @@
 // 값을 "선언"만 하고 어떤 셀렉터에도 스타일을 "적용"하지 않는다.
 // 따라서 :root 에 두어도 소비자 프로젝트 렌더링에 영향이 없다.
 //
-// 체계의 정본은 `.claude/rules/tokens.md` 다.
+// 체계는 셋으로 요약된다.
 //   계층      Primitive → Semantic → Component(공개 훅/내부 배선)
 //   이름      등간격 스케일은 숫자(space-4), 불규칙 실측값은 역할(size-control-md)
-//   고르는 법 `.claude/rules/design-system.md` 의 매트릭스
+//   고르는 법 상태×속성 매트릭스 — check-token-layers.mjs 가 검사한다
 //
 // ⚠️ rem 기준 (원본 대비)
 //   원본 프로젝트는 `html { font-size: 10px }` 를 깔고 1.6rem = 16px 로 썼다.

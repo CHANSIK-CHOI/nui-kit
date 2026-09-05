@@ -22,7 +22,7 @@ const BY_ORIENTATION = {
  * react-day-picker 의 이전/다음·드롭다운 화살표를 lucide 로 바꾼다.
  *
  * react-day-picker 는 `orientation` 하나로 네 방향을 구분한다
- * (.claude/references/gpbl-react-day-picker/custom-chevron-component.md).
+ * (react-day-picker 공식 문서 · Custom Components → Chevron).
  * 클래스는 react-day-picker 가 `classNames.chevron` 으로 넘겨주므로 그대로 붙이고,
  * 크기는 `_datepicker.scss` 의 `__chevron` 이 정한다. 접근 이름은 버튼이 갖는다.
  */

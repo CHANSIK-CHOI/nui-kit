@@ -180,7 +180,7 @@ export default function DatepickerBase<
   DatepickerBaseInternalProps) {
   // framer-motion 은 `prefers-reduced-motion` 을 자동으로 따르지 않는다
   // (`MotionConfig.reducedMotion` 기본값이 "never"). CSS duration 토큰의 1ms
-  // 무력화도 framer-motion 이 읽지 않으므로 여기서 직접 처리한다 (rules/a11y.md §6).
+  // 무력화도 framer-motion 이 읽지 않으므로 여기서 직접 처리한다 (a11y.md §6).
   const shouldReduceMotion = useReducedMotion();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const inputElementRef = useRef<HTMLInputElement | null>(null);
@@ -302,7 +302,7 @@ export default function DatepickerBase<
    *
    * `shouldRestoreFocus` — 닫을 때 포커스를 입력창으로 되돌릴지.
    * 팝업이 언마운트되면 그 안에 있던 포커스가 `document.body` 로 떨어져
-   * 이후 Tab 이 문서 처음부터 다시 시작한다 (rules/a11y.md §5).
+   * 이후 Tab 이 문서 처음부터 다시 시작한다 (a11y.md §5).
    * 단 **바깥을 클릭해 닫는 경우는 제외한다** — 사용자가 옮긴 포커스를 빼앗게 된다.
    */
   const setIsCalendarOpenState = useCallback(

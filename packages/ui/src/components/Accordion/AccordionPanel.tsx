@@ -56,7 +56,7 @@ export default function AccordionPanel({
   const buttonId = `${accordionId}-button-${index}`;
 
   // 모션 감소 환경에서만 트랜지션을 덮는다. 그 외에는 variant 가 갖는다
-  // (나타남과 사라짐은 대칭이 아니다 — rules/design-system.md §6-2).
+  // (나타남과 사라짐은 대칭이 아니다 — design-system.md §6-2).
   const reducedTransition = shouldReduceMotion ? { duration: 0 } : undefined;
 
   // 높이를 애니메이션하는 동안 내용이 밖으로 새지 않게 잘라낸다.

@@ -6,8 +6,8 @@ const nextConfig = {
   // MDX 를 페이지로 인식시킨다 (Foundations 산문 문서용)
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   transpilePackages: ["@chansikchoi/next-ui"],
-  // Next 가 AGENTS.md / CLAUDE.md 를 자동 생성하지 않도록 끈다.
-  // 이 저장소는 .claude/ 에 자체 규칙 체계를 둔다.
+  // Next 16 의 에이전트 규칙 파일(AGENTS.md) 자동 생성을 끈다 —
+  // 저장소에 우리가 만들지 않은 파일이 생기지 않게 한다.
   agentRules: false,
 };
 

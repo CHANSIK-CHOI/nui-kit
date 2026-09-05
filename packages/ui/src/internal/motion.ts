@@ -120,7 +120,7 @@ export const motionTransition = {
  * ⚠️ framer-motion 은 CSS 의 `--nui-duration-*` 무력화(1ms)를 읽지 않는다.
  *    `MotionConfig.reducedMotion` 기본값도 `"never"` 다. 그래서 `motion.*` 에
  *    `y`·`scale` 을 직접 주는 컴포넌트는 이 헬퍼로 걸러야 한다
- *    (rules/design-system.md §6 · rules/a11y.md §6).
+ *    (design-system.md §6 · a11y.md §6).
  *
  * ```tsx
  * const shouldReduceMotion = useReducedMotion();

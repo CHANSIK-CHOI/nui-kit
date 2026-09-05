@@ -33,7 +33,6 @@ next-ui-system/
 | `npm run typecheck` | 전 워크스페이스 타입 검사 |
 | `npm run format` | Prettier 포맷 |
 | `npm run verify:pkg` | 배포 정합성 검증 (CSS 격리 + publint + attw) |
-| `npm run refs:check` | Context7 로컬 문서 캐시 신선도 (TTL 7일) |
 | `npm run changeset` | 변경 큐 적재 |
 | `npm run release` | 빌드 → 검증 → npm 배포 |
 
@@ -51,7 +50,7 @@ next-ui-system/
 | 0 | 모노레포 스캐폴딩 + 툴체인 + MCP | ✅ 완료 |
 | 1 | 스타일 시스템 재정비 (프리픽스 / @layer / 토큰 확정) | ✅ 완료 |
 | 2 | 컴포넌트 이전 + 패키징 (파일럿: Button / Field / Textfield) | ✅ 완료 |
-| 3 | `.claude/` 자동화 (rules / commands / agents / hooks) | ✅ 완료 |
+| 3 | 품질 게이트 자동화 (CSS 격리 · 토큰 규율 · 콘솔 · 접근성 검사 스크립트) | ✅ 완료 |
 | 4 | 문서 사이트 (Foundations + Components + props/토큰 자동생성) | ✅ 완료 |
 | 5 | 나머지 컴포넌트 이전 → npm 최초 배포 | ⬜ |
 

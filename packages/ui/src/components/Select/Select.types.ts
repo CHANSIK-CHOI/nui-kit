@@ -28,7 +28,7 @@ export type MultiSelectValue = SelectOptionValue[];
  *
  * 아래 셋은 **타입은 통과하는데 동작만 조용히 없거나 어긋나서** 걷어낸다.
  * - `defaultValue` — 우리는 항상 `value` 를 넘기므로 react-select 이 무시한다.
- *   controlled 전용 계약이다 (rules/components.md §5 — uncontrolled 진입 차단).
+ *   controlled 전용 계약이다 (components.md §5 — uncontrolled 진입 차단).
  * - `getOptionValue` — 바꿔도 `getResolvedSingleValue`/`getResolvedMultiValue` 는
  *   여전히 `option.value` 로 매칭해, 선택은 되는데 화면에서 사라진다.
  *   `SelectOption` 이 `value` 를 필수로 못박은 이상 교체 대상이 아니다.

@@ -112,7 +112,7 @@ if (problems.length > 0) {
   console.error("❌ CSS 격리 검사 실패\n");
   for (const p of problems) console.error("  - " + p);
   console.error(
-    `\n총 ${problems.length}건. .claude/rules/styles.md 를 참조할 것.`,
+    `\n총 ${problems.length}건. 격리 원칙 — 클래스는 nui- 프리픽스 · CSS 는 @layer nui.* 안 · 전역 셀렉터 금지.`,
   );
   process.exit(1);
 }

@@ -94,7 +94,7 @@ for (const [label, url, open, panel] of [
 }
 
 // 1-b) 로딩 스피너 — 회전 duration 이 스케일 밖(1s 고정)이라 1ms 무력화를 타지 않는다.
-//      `animation: none` 으로 직접 멈춰야 한다 (a11y.md §6 · specs/Button.md §7).
+//      `animation: none` 으로 직접 멈춰야 한다 (a11y.md §6 · Button.md spec §7).
 {
   const ctx = await browser.newContext({
     reducedMotion: "reduce",

@@ -47,7 +47,7 @@ export type ButtonBaseProps = {
  *
  * disabled 와 별개다 — disabled 는 "조건이 맞으면 된다", loading 은 "지금 처리 중".
  * 네이티브 `disabled` 를 쓰지 않는다. 포커스가 날아가 스크린리더가 위치를 잃기 때문이다.
- * 대신 클릭을 직접 막고 `aria-busy` 로 상태를 전한다 (specs/Button.md §5 · §6).
+ * 대신 클릭을 직접 막고 `aria-busy` 로 상태를 전한다 (Button.md spec §5 · §6).
  */
 export type ButtonLoadingProps = {
   /** 요청 처리 중. 스피너를 보이고 클릭을 무시하며 `aria-busy` 를 붙인다 */

@@ -6,7 +6,7 @@
 //
 // react-select 은 `unstyled` + `classNamePrefix="nui-select"` 로 구동한다.
 // 따라서 아래 클래스는 전부 react-select 이 생성하는 `nui-select__*` 이며
-// 서드파티 클래스(`css-*`)를 전역에서 덮지 않는다 (rules/styles.md §8).
+// 서드파티 클래스(`css-*`)를 전역에서 덮지 않는다 (styles.md §8).
 //
 // ⚠️ emotion 과의 캐스케이드
 //   `unstyled` 여도 react-select 은 일부 속성(control 의 min-height·transition,
@@ -292,7 +292,7 @@
     //    붙여 상세도가 같지만, Select 의 포커스는 react-select 이 element 에 붙이는
     //    `--is-focused` 클래스라 블록 `:hover` 쪽이 항상 1 높다. 그대로 두면 마우스로
     //    연 Select 가 "초록 포커스 글로우 + 회색 hover 테두리" 로 렌더된다.
-    //    (rules/styles.md §7 — 상태 우선순위를 상세도·소스 순서에 의존하지 않는다)
+    //    (styles.md §7 — 상태 우선순위를 상세도·소스 순서에 의존하지 않는다)
     @include hoverable {
       &:not(#{state("disabled")}):not(#{state("readonly")}):hover
         &__control:not(#{cls("select")}__control--is-focused) {
@@ -333,7 +333,7 @@
       transform: scale(var(#{v("scale-94")}));
     }
 
-    // ── 상태 우선순위: disabled > error > readonly (rules/styles.md §7)
+    // ── 상태 우선순위: disabled > error > readonly (styles.md §7)
     //    상세도가 같으므로 :not() 으로 명시한다. 소스 순서에 의존하지 않는다.
 
     // ── disabled

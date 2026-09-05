@@ -17,7 +17,7 @@ const DAYPICKER_BLOCK = px("daypicker");
 /**
  * react-day-picker 의 기본 클래스(`.rdp-*`)를 **전부** 우리 클래스로 갈아끼운다.
  *
- * 왜 덮어쓰지 않고 갈아끼우는가 (rules/styles.md §8)
+ * 왜 덮어쓰지 않고 갈아끼우는가 (styles.md §8)
  *   `.rdp-day` 를 우리 스코프 안에서 덮는 방법도 있지만, 그러면 우리 CSS 에
  *   `.nui-` 로 시작하지 않는 셀렉터가 남아 `verify:css` 가 막는다. 소비자가 같은
  *   라이브러리를 쓸 때 클래스 이름이 겹치는 것도 피하고 싶다.

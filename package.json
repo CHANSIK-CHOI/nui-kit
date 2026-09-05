@@ -22,7 +22,6 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build:ui && npm run verify:pkg && changeset publish",
-    "refs:check": "node scripts/check-refs.mjs",
     "verify:console": "npm run verify:console -w docs",
     "verify:select-rhf": "npm run verify:select-rhf -w docs",
     "verify:datepicker": "npm run verify:datepicker -w docs",

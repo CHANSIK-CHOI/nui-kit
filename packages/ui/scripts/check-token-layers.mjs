@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * 토큰 계층과 역할군 규율을 **소스(SCSS)** 에서 검사한다.
- * 규칙 본문은 `.claude/rules/design-system.md`.
+ * 규칙은 아래 검사 항목의 주석이 갖는다.
  *
  * 왜 필요한가 — 계열별 이식을 마친 뒤 측정했더니 hover 배경에 세 가지 토큰이,
  * 포커스 링에 세 가지 크기가 기준 없이 섞여 있었다. 토큰은 충분했지만 선택
@@ -313,7 +313,7 @@ if (warnings.length > 0) {
     `\n⚠️  구 토큰 이름 ${warnings.length}건 (파일 ${byFile.size}개) — 컴포넌트 반영 단계에서 정리한다.`,
   );
   console.warn(
-    "   대응표는 이 스크립트의 DEPRECATED 맵이다 (.claude/rules/tokens.md §6)\n",
+    "   대응표는 이 스크립트의 DEPRECATED 맵이다\n",
   );
   for (const [file, n] of [...byFile].sort((a, b) => b[1] - a[1])) {
     console.warn(`   ${String(n).padStart(3)}건  ${file}`);

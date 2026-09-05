@@ -54,13 +54,13 @@ const MENU_PORTAL_Z_INDEX = `var(${pv("z-portal-menu")})`;
  *
  * emotion 이 주입하는 `css-*` 클래스는 레이어 밖(unlayered)이라
  * `@layer nui.components` 안에 있는 우리 규칙을 상세도와 무관하게 항상 이긴다.
- * (rules/styles.md §2 — 그 성질 덕분에 소비자가 우리를 덮을 수 있는 것이고,
+ * (styles.md §2 — 그 성질 덕분에 소비자가 우리를 덮을 수 있는 것이고,
  *  같은 이유로 서드파티 emotion 도 우리를 덮는다.)
  *
  * 그래서 충돌하는 속성만 emotion 쪽에서 걷어내 CSS 로 넘긴다.
  * 여기서 지우지 않으면 다음이 조용히 깨진다:
  *   - control  `minHeight: 38px`  → `--nui-size-field`(56px) 무시
- *   - control  `transition: 'all 100ms'` → 모션 토큰 우회 (rules/a11y.md §6)
+ *   - control  `transition: 'all 100ms'` → 모션 토큰 우회 (a11y.md §6)
  *   - option   `display: 'block'` / `cursor: 'default'` → 옵션 정렬·커서 깨짐
  *   - option   `fontSize: 'inherit'` → 타이포 토큰 대신 **소비자 body 글꼴**을
  *              따라가, 메뉴와 컨트롤의 글자 크기가 어긋난다
@@ -166,7 +166,7 @@ export function getResolvedMultiValue(
  *    (`renderInput()` — 값이 없으면 `${id}-placeholder`, 최초 포커스면
  *     `${id}-live-region`, 그 외에는 아예 붙이지 않는다.) selectProps 로 넘긴
  *    `aria-describedby` 는 읽지도 않는다. 그대로 두면 우리 에러·설명 메시지가
- *    스크린리더에 연결되지 않는다 (rules/a11y.md §2·§3).
+ *    스크린리더에 연결되지 않는다 (a11y.md §2·§3).
  *
  * ⚠️ `components.Input` 을 교체하는 것으로는 부족하다. `isSearchable` 이 false 면
  *    (이 컴포넌트의 **기본값**이다) react-select 은 `Input` 대신 교체 불가능한

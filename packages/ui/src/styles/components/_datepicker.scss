@@ -12,7 +12,7 @@
 // 우리 `__dropdown` 은 "캘린더 팝업" 이라 한 블록에 두면 이름이 충돌한다.
 // 달력은 그 자체로 독립된 블록이므로 분리하는 편이 BEM 상으로도 맞다.
 //
-// ⚠️ 서드파티 클래스를 덮지 않는다 (rules/styles.md §8)
+// ⚠️ 서드파티 클래스를 덮지 않는다 (styles.md §8)
 //   react-day-picker 의 기본 CSS(`react-day-picker/style.css`)를 배포하지 않고,
 //   `classNames` prop 으로 `.rdp-*` 를 통째로 `nui-daypicker__*` 로 갈아끼운다
 //   (`Datepicker.utils.ts` 의 `DAYPICKER_CLASS_NAMES`).
@@ -365,7 +365,7 @@
 
     // range 중간 날짜에는 `selected` 와 `range-middle` 이 **함께** 붙는다.
     // 두 규칙은 상세도가 같아 소스 순서로 승부가 갈리므로 `:not()` 으로 명시한다
-    // (rules/styles.md §7 — 순서를 바꾸면 기간 중간이 통째로 진해진다).
+    // (styles.md §7 — 순서를 바꾸면 기간 중간이 통째로 진해진다).
     &__selected:not(#{cls("daypicker")}__range-middle) &__day-button,
     &__range-start &__day-button,
     &__range-end &__day-button {

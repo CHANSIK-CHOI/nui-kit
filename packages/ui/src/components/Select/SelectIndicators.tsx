@@ -31,7 +31,7 @@ const REMOVE_BUTTON_SELECTOR = `.${SELECT_BLOCK}__multi-value__remove`;
  * react-select 가 계속 소유한다. 크기는 `_select.scss` 가 정한다.
  *
  * ⚠️ 렌더 밖에서 선언한다 — 렌더 안에서 만들면 매 렌더 remount 된다
- *    (.claude/references/websites-react-select/components-replacement.md).
+ *    (react-select 공식 문서 · Components → Replacing components).
  */
 export function NuiDropdownIndicator<IsMulti extends boolean>(
   props: DropdownIndicatorProps<SelectOption, IsMulti, GroupBase<SelectOption>>,
