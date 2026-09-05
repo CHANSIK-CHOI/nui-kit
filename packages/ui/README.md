@@ -3,8 +3,6 @@
 Next.js **App Router 전용** React UI 컴포넌트 라이브러리.
 모든 컴포넌트는 클라이언트 컴포넌트(`"use client"`)로 배포된다.
 
-> 🚧 개발 중 (v0.0.0). 아직 npm 에 배포되지 않았습니다.
-
 ## 설치
 
 ```bash
@@ -418,7 +416,7 @@ import { Datepicker, DateRangePicker } from "@nui-kit/react";
   읽을 수 없는 글자나 절반만 친 기간은 입력창을 벗어나는 순간 **치기 전 값으로**
   되돌아갑니다. 달력으로 고를 수 없는 날짜(`disabled` · `startMonth`~`endMonth` 밖)는
   쳐서도 넣을 수 없습니다. 예전처럼 달력으로만 받으려면 `isTextInputBlocked` 를 줍니다
-- `DateMultiplePicker` 는 아직 읽기 전용입니다 — 날짜 목록의 구분자 규칙이 따로 필요합니다
+- `DateMultiplePicker` 는 달력으로만 고릅니다 — 여러 날짜를 한 칸에 쳐 넣는 구분자 규칙을 두지 않았습니다
 - `DateRangePicker` 는 시작·종료가 모두 정해지기 전까지 `undefined` 를 넘깁니다
 - `dayPickerProps` 로 `react-day-picker` 설정을 그대로 전달합니다
 
