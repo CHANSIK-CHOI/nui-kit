@@ -165,7 +165,7 @@ export default function DatepickerBase<
   hasPortal = false,
   inputRef,
   className,
-  placeholder = "날짜를 선택해주세요",
+  placeholder,
   readOnly = false,
   isTextInputBlocked = false,
   disabled = false,

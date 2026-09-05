@@ -65,6 +65,7 @@ export function SelectDemo() {
           options={CITIES}
           value={city}
           onChange={(next) => setCity(next)}
+          placeholder="지역을 고르세요"
         />
         <p style={{ marginTop: 12 }}>
           현재 값: <code>{JSON.stringify(city)}</code>
@@ -86,6 +87,7 @@ export function SelectDemo() {
           options={CITIES}
           value={searchable}
           onChange={(next) => setSearchable(next)}
+          placeholder="검색해보세요"
           isSearchable
           isClearable
         />
@@ -102,6 +104,7 @@ export function SelectDemo() {
           options={GROUPED}
           value={grouped}
           onChange={(next) => setGrouped(next)}
+          placeholder="지역을 고르세요"
         />
       </Example>
 
@@ -120,6 +123,7 @@ export function SelectDemo() {
           options={CITIES}
           value={cities}
           onChange={(next) => setCities(next)}
+          placeholder="여러 곳을 고를 수 있어요"
           isSearchable
           isClearable
         />
@@ -160,6 +164,7 @@ export function SelectDemo() {
         <Select
           options={CITIES}
           value={null}
+          placeholder="지역을 고르세요"
           errorMessage="지역을 선택해주세요."
         />
       </Example>
@@ -167,6 +172,7 @@ export function SelectDemo() {
         <Select
           options={CITIES}
           value={null}
+          placeholder="지역을 고르세요"
           infoMessage="배송 가능 지역만 표시됩니다."
         />
       </Example>
@@ -185,6 +191,7 @@ export function SelectDemo() {
             options={CITIES}
             value={fieldCity}
             onChange={(next) => setFieldCity(next)}
+            placeholder="거주 지역"
             isSearchable
           />
         </Field>

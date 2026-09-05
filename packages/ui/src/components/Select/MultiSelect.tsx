@@ -68,7 +68,7 @@ const MultiSelect: ForwardRefExoticComponent<
       name,
       value = [],
       options,
-      placeholder = "항목을 선택해주세요",
+      placeholder,
       disabled = false,
       readOnly = false,
       isError = false,
@@ -190,7 +190,7 @@ const MultiSelect: ForwardRefExoticComponent<
             name={name}
             value={resolvedValue}
             options={options}
-            placeholder={placeholder}
+            placeholder={placeholder ?? ""}
             isDisabled={disabled}
             isSearchable={!readOnly && !disabled && isSearchable}
             isClearable={!readOnly && !disabled && isClearable}

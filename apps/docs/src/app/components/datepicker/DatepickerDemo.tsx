@@ -34,7 +34,12 @@ export function DatepickerDemo() {
         code={`<Datepicker selected={date} onSelectedChange={setDate} />`}
         overflow
       >
-        <Datepicker selected={date} onSelectedChange={setDate} isClearable />
+        <Datepicker
+          selected={date}
+          onSelectedChange={setDate}
+          placeholder="예약일을 고르세요"
+          isClearable
+        />
         <p style={{ marginTop: 12 }}>
           현재 값:{" "}
           <code>{date ? date.toLocaleDateString("ko-KR") : "없음"}</code>
@@ -56,6 +61,7 @@ export function DatepickerDemo() {
         <DateRangePicker
           selected={range}
           onSelectedChange={setRange}
+          placeholder="숙박 기간"
           isClearable
         />
         <p style={{ marginTop: 12 }}>
@@ -84,6 +90,7 @@ export function DatepickerDemo() {
         <DateMultiplePicker
           selected={dates}
           onSelectedChange={setDates}
+          placeholder="참석 가능한 날"
           isClearable
         />
         <p style={{ marginTop: 12 }}>
@@ -105,6 +112,7 @@ export function DatepickerDemo() {
         <Datepicker
           selected={limited}
           onSelectedChange={setLimited}
+          placeholder="오늘 이후"
           dayPickerProps={{ disabled: { before: TODAY } }}
         />
       </Example>
@@ -130,7 +138,7 @@ export function DatepickerDemo() {
         caption="errorMessage — 아이콘과 텍스트를 함께 표시하고 aria-describedby 로 연결한다"
         overflow
       >
-        <Datepicker errorMessage="날짜를 선택해주세요." />
+        <Datepicker placeholder="방문일" errorMessage="날짜를 선택해주세요." />
       </Example>
 
       <h2>잘리는 상자 안에서 — hasPortal</h2>
@@ -190,6 +198,7 @@ export function DatepickerDemo() {
           <Datepicker
             selected={fieldDate}
             onSelectedChange={setFieldDate}
+            placeholder="예약 희망일"
             isClearable
           />
         </Field>

@@ -52,6 +52,7 @@ export function RHFDatepickerDemo() {
               control={control}
               name="visitDate"
               rules={{ required: "방문일을 선택해주세요." }}
+              placeholder="방문일"
               isClearable
             />
           </Field>
@@ -70,6 +71,7 @@ export function RHFDatepickerDemo() {
                     Boolean(value?.from && value?.to) ||
                     "기간을 모두 선택해주세요.",
                 }}
+                placeholder="숙박 기간"
                 isClearable
               />
             </Field>
@@ -88,6 +90,7 @@ export function RHFDatepickerDemo() {
                   validate: (value: Date[] | undefined) =>
                     (value?.length ?? 0) > 0 || "하루 이상 선택해주세요.",
                 }}
+                placeholder="추가 방문일"
                 isClearable
               />
             </Field>

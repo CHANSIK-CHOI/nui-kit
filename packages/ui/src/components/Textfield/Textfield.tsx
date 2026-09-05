@@ -61,7 +61,7 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
       children,
       id,
       className,
-      placeholder = "내용을 입력해주세요",
+      placeholder,
       value,
       readOnly = false,
       isTextInputBlocked = false,

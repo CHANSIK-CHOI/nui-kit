@@ -62,7 +62,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     {
       id,
       className,
-      placeholder = "내용을 입력해주세요",
+      placeholder,
       value,
       rows = 4,
       readOnly = false,

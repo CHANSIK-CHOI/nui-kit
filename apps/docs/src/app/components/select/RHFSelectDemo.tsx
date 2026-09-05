@@ -57,6 +57,7 @@ export function RHFSelectDemo() {
               name="city"
               rules={{ required: "지역을 선택해주세요." }}
               options={CITIES}
+              placeholder="거주 지역"
               isSearchable
               isClearable
             />
@@ -74,6 +75,7 @@ export function RHFSelectDemo() {
                     value.length > 0 || "최소 한 곳을 선택해주세요.",
                 }}
                 options={CITIES}
+                placeholder="관심 지역"
                 isSearchable
               />
             </Field>
