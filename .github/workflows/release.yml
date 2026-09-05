@@ -40,10 +40,15 @@ jobs:
 
       - run: npm ci
 
-      # 로컬 품질 게이트와 같은 것을 CI 에서 한 번 더 돈다.
-      # verify:pkg = verify:css + verify:tokens + publint --strict + attw
-      - run: npm run typecheck
+      # ⚠️ **배포되는 패키지만** 검사한다. `npm run typecheck` (전 워크스페이스)를
+      #    쓰면 apps/docs 까지 도는데, 그것은 배포 대상이 아니고(private·changeset
+      #    ignore) `dist/` 와 `src/generated/*.json` 을 먼저 만들어야 통과한다 —
+      #    문서 사이트 문제로 라이브러리 배포가 막히는 것은 잘못된 결합이다.
+      #    문서 사이트 검증은 별도 CI 의 몫이다.
+      - run: npm run typecheck -w @nui-kit/react
       - run: npm run build:ui
+      # verify:pkg = verify:css + verify:tokens + publint --strict + attw
+      # attw 는 빌드된 dist 를 보므로 build:ui 뒤여야 한다
       - run: npm run verify:pkg
 
       # 무엇이 배포되는지 로그에 남긴다 — files 필드가 어긋나면 여기서 드러난다
