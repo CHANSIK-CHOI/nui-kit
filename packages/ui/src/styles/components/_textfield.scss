@@ -90,7 +90,9 @@
       }
     }
 
-    &:not(#{state("disabled")}):not(#{state("readonly")}):focus-within &__wrap {
+    // readonly 도 포커스를 받는다 — 링을 그린다 (design-system.md §3-2).
+    // 배경은 뒤의 readonly 규칙이 그대로 남긴다. `disabled` 만 제외한다.
+    &:not(#{state("disabled")}):focus-within &__wrap {
       border-color: var(#{v("focus-color")});
       border-width: var(#{v("focus-width")});
       box-shadow: var(#{v("focus-ring")});
@@ -154,10 +156,7 @@
       }
     }
 
-    &#{state("error")}:not(#{state("disabled")}):not(
-        #{state("readonly")}
-      ):focus-within
-      &__wrap {
+    &#{state("error")}:not(#{state("disabled")}):focus-within &__wrap {
       border-color: var(#{v("control-border-error")});
       box-shadow: var(#{v("focus-ring-error")});
     }

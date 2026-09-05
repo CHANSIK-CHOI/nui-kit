@@ -3,7 +3,13 @@
 // ─────────────────────────────────────────────────────────────
 // Field / Field.Item / Field.Grid / Field.Label / Field.Description
 //
-// 공개 훅: --nui-field-grid-columns (기본 2)
+// 공개 훅: 없다.
+//
+// ⚠️ `--nui-field-grid-columns` 는 훅이 아니라 **배선 값**이다. `Field.Grid` 가
+//    `columns` prop 을 인라인 style 로 심으므로 소비자가 CSS 로 덮을 수 없고
+//    (인라인이 이긴다), `hook()` 이 아니라 `v()` 로 만들어 추출기도 세지 않는다.
+//    그래서 훅 이름 규칙(대시 두 개)의 대상이 아니다 — Popup 의
+//    `--nui-scroll-lock-top` 과 같은 성격이다.
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("field")} {
