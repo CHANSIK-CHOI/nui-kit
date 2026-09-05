@@ -12,7 +12,6 @@ import {
   useState,
   type CSSProperties,
   type FocusEventHandler,
-  type KeyboardEventHandler,
   type MouseEventHandler,
   type PointerEventHandler,
   type ReactNode,
@@ -258,10 +257,22 @@ export default function Tooltip({
       setTooltipOpenState(false);
     };
 
+    // ⚠️ `Escape` 는 **문서에** 단다. 루트의 `onKeyDown` 에만 두면 마우스 hover 로
+    //    연 툴팁은 포커스가 다른 곳에 있어 키가 닿지 않는다 — WCAG 1.4.13 의
+    //    Dismissible(포인터를 치우지 않고 닫을 수단)에 걸린다.
+    //    `Datepicker` 의 달력도 같은 방식이다.
+    const handleDocumentKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setTooltipOpenState(false);
+      }
+    };
+
     document.addEventListener("pointerdown", handleDocumentPointerDown);
+    document.addEventListener("keydown", handleDocumentKeyDown);
 
     return () => {
       document.removeEventListener("pointerdown", handleDocumentPointerDown);
+      document.removeEventListener("keydown", handleDocumentKeyDown);
     };
   }, [resolvedOpen, setTooltipOpenState]);
 
@@ -308,12 +319,6 @@ export default function Tooltip({
       return;
 
     setTooltipOpenState(false);
-  };
-
-  const handleKeyDown: KeyboardEventHandler<HTMLDivElement> = (event) => {
-    if (event.key === "Escape") {
-      setTooltipOpenState(false);
-    }
   };
 
   const resolvedChildren = isValidElement<TooltipChildProps>(children)
@@ -401,7 +406,6 @@ export default function Tooltip({
       onMouseLeave={handleMouseLeave}
       onFocus={handleFocus}
       onBlur={handleBlur}
-      onKeyDown={handleKeyDown}
     >
       <div className={`${block}__trigger`}>{resolvedChildren}</div>
 
