@@ -29,6 +29,11 @@ import {
 const block = px("tooltip");
 const TOOLTIP_ROOT_ID = px("tooltip-root");
 
+// portal 컨테이너 하나를 모든 툴팁이 공유한다. 몇 개가 쓰고 있는지 세어 두고
+// 마지막 하나가 사라질 때만 지운다 (아래 effect 참조).
+let portalRootRefCount = 0;
+let portalRootCreatedByUs = false;
+
 export type TooltipPlacement =
   | "topCenter"
   | "topLeft"
@@ -156,23 +161,35 @@ export default function Tooltip({
     if (!hasPortal) return;
 
     let root = document.getElementById(TOOLTIP_ROOT_ID);
-    let createdByUs = false;
 
     if (!root) {
       root = document.createElement("div");
       root.id = TOOLTIP_ROOT_ID;
       document.body.appendChild(root);
-      createdByUs = true;
+      portalRootCreatedByUs = true;
     }
 
     // 팝업이 배경을 inert 처리할 때 이 컨테이너는 건너뛰게 한다.
     // 소비자가 미리 심어둔 컨테이너에도 우리가 보장한다.
     root.setAttribute(PORTAL_ROOT_ATTRIBUTE, "");
+    portalRootRefCount += 1;
     setPortalRoot(root);
 
     return () => {
-      if (createdByUs && root && root.childElementCount === 0) {
+      portalRootRefCount -= 1;
+
+      // ⚠️ **쓰는 인스턴스가 하나도 없을 때만** 지운다.
+      //    "내가 만들었고 지금 비어 있으면" 으로 판단하면, 컨테이너를 만든 툴팁이
+      //    먼저 언마운트되는 순간 남은 툴팁의 `portalRoot` 가 문서에서 떨어져 나간
+      //    노드를 가리켜 이후로 아무것도 보이지 않는다.
+      if (
+        portalRootRefCount === 0 &&
+        portalRootCreatedByUs &&
+        root &&
+        root.childElementCount === 0
+      ) {
         root.remove();
+        portalRootCreatedByUs = false;
       }
     };
   }, [hasPortal]);
@@ -310,10 +327,20 @@ export default function Tooltip({
 
   const placementClass = `${block}--${PLACEMENT_CLASS[placement]}`;
 
+  const isPortalActive = hasPortal && Boolean(portalRoot);
+
   const panel = (
     // 퇴장이 끝나면 좌표를 버린다 — portal 래퍼까지 함께 언마운트되어
     // 닫힌 툴팁마다 빈 fixed div 가 body 에 쌓이지 않는다.
-    <AnimatePresence initial={false} onExitComplete={() => setTriggerRect(null)}>
+    //
+    // ⚠️ `initial` 이 portal 여부를 따른다. 제자리 모드는 `AnimatePresence` 가 상주하므로
+    //    `false` 로 최초 렌더의 등장을 막지만, portal 모드는 좌표를 버리는 순간 래퍼째
+    //    언마운트돼 **열 때마다 새로 마운트**된다. 거기서 `false` 를 주면 그 차단이 매번
+    //    걸려 등장 모션이 아예 사라진다(실측: opacity 가 첫 프레임부터 1).
+    <AnimatePresence
+      initial={isPortalActive}
+      onExitComplete={() => setTriggerRect(null)}
+    >
       {resolvedOpen ? (
         <motion.div
           key="tooltip-panel"
@@ -350,7 +377,6 @@ export default function Tooltip({
     </AnimatePresence>
   );
 
-  const isPortalActive = hasPortal && Boolean(portalRoot);
   const portalWrapperStyle: CSSProperties | undefined = triggerRect
     ? {
         top: triggerRect.top,

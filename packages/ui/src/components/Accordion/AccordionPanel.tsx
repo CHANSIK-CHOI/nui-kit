@@ -77,6 +77,10 @@ export default function AccordionPanel({
         role="region"
         aria-labelledby={buttonId}
         aria-hidden={!isItemOpen}
+        // ⚠️ `aria-hidden` 만으로는 부족하다. 닫힌 패널 안의 버튼·입력이 **Tab 에 그대로
+        //    잡히고**, "aria-hidden 인데 포커스 가능한 자손"은 전형적인 접근성 위반이다.
+        //    `pointer-events: none` 은 마우스만 막는다. `inert` 가 키보드까지 막는다.
+        inert={!isItemOpen}
         className={cn(`${block}__panel`, className)}
         variants={panelVariants}
         transition={reducedTransition}

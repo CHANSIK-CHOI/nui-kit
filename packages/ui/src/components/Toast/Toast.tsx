@@ -39,17 +39,26 @@ export default function Toast({
     hasOpenedRef.current = false;
   }, [open]);
 
+  // ⚠️ 콜백을 ref 로 받아 타이머 effect 의 의존성에서 뺀다.
+  //    `ToastHost` 는 렌더마다 새 `onRequestClose` 를 만들므로, 의존성에 두면
+  //    **다른 토스트가 열리고 닫힐 때마다 남아 있던 토스트의 시간이 처음부터 다시 간다.**
+  const onRequestCloseRef = useRef(onRequestClose);
+
+  useEffect(() => {
+    onRequestCloseRef.current = onRequestClose;
+  });
+
   useEffect(() => {
     if (!open || duration <= 0) return;
 
     const timeoutId = window.setTimeout(() => {
-      onRequestClose?.();
+      onRequestCloseRef.current?.();
     }, duration);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [duration, onRequestClose, open]);
+  }, [duration, open]);
 
   const handleAnimationComplete = () => {
     if (!open || hasOpenedRef.current) return;
