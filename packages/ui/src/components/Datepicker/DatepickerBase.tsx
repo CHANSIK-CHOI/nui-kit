@@ -23,7 +23,9 @@ import {
   type DayPickerProps,
   type OnSelectHandler,
 } from "react-day-picker";
+import { createPortal } from "react-dom";
 import { px } from "../../internal/prefix.js";
+import { PORTAL_ROOT_ATTRIBUTE } from "../../internal/portal.js";
 import { DaypickerChevron } from "./DaypickerChevron.js";
 import { motionTransition } from "../../internal/motion.js";
 import Textfield, { type TextfieldProps } from "../Textfield/Textfield.js";
@@ -37,6 +39,13 @@ import {
 const block = px("datepicker");
 const daypickerBlock = px("daypicker");
 const CURRENT_YEAR = new Date().getFullYear();
+const DATEPICKER_ROOT_ID = px("datepicker-root");
+
+// portal 컨테이너 하나를 모든 달력이 공유한다. 몇 개가 쓰고 있는지 세어 두고
+// 마지막 하나가 사라질 때만 지운다 — 만든 인스턴스가 먼저 언마운트되면 남은 쪽이
+// 문서에서 떨어져 나간 노드를 가리키기 때문이다 (Tooltip 과 같은 함정).
+let portalRootRefCount = 0;
+let portalRootCreatedByUs = false;
 
 export type DatepickerMode = "single" | "multiple" | "range";
 
@@ -119,6 +128,14 @@ export type DatepickerBaseProps<
   shouldCloseOnSelect?: boolean;
   defaultIsCalendarOpen?: boolean;
   dropdownClassName?: string;
+  /**
+   * 달력을 `body` 로 내보내 **잘리는 조상을 탈출한다.**
+   *
+   * 기본 배치는 제자리(`absolute`)라 조상에 `overflow: hidden` 이 있으면 달력이
+   * 잘려 날짜를 고를 수 없다. 카드·팝업 안에 넣을 때 켠다.
+   * `Tooltip`·`Select` 의 같은 이름 prop 과 한 규칙이다.
+   */
+  hasPortal?: boolean;
   inputRef?: Ref<HTMLInputElement>;
 };
 
@@ -145,6 +162,7 @@ export default function DatepickerBase<
   defaultIsCalendarOpen = false,
   onCalendarOpenChange,
   dropdownClassName,
+  hasPortal = false,
   inputRef,
   className,
   placeholder = "날짜를 선택해주세요",
@@ -172,6 +190,14 @@ export default function DatepickerBase<
   const isSelfInitiatedFocusRef = useRef(false);
   const calendarDropdownId = useId();
   const [isCalendarOpen, setIsCalendarOpen] = useState(defaultIsCalendarOpen);
+  // portal 배치용 — 컨테이너와 입력창 좌표
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+  const [anchorRect, setAnchorRect] = useState<{
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  } | null>(null);
   // 타이핑 중인 글자. `null` 이면 표시값을 `selected` 에서 계산한다.
   const [draftText, setDraftText] = useState<string | null>(null);
   // 타이핑을 시작하기 직전의 값. 다 치고 났는데 읽을 수 없으면 여기로 되돌린다.
@@ -530,11 +556,167 @@ export default function DatepickerBase<
     };
   }, [isCalendarOpen, setIsCalendarOpenState]);
 
+  // ── portal 컨테이너 (Tooltip·ToastHost 와 같은 규칙)
+  //
+  // ⚠️ 마운트 이후에 잡는다. 렌더 중 document 를 읽으면 하이드레이션이 어긋난다.
+  useEffect(() => {
+    if (!hasPortal) return;
+
+    let root = document.getElementById(DATEPICKER_ROOT_ID);
+
+    if (!root) {
+      root = document.createElement("div");
+      root.id = DATEPICKER_ROOT_ID;
+      document.body.appendChild(root);
+      portalRootCreatedByUs = true;
+    }
+
+    // 팝업이 배경을 inert 처리할 때 건너뛰게 한다 (design-system.md §10-1)
+    root.setAttribute(PORTAL_ROOT_ATTRIBUTE, "");
+    portalRootRefCount += 1;
+    setPortalRoot(root);
+
+    return () => {
+      portalRootRefCount -= 1;
+
+      if (
+        portalRootRefCount === 0 &&
+        portalRootCreatedByUs &&
+        root &&
+        root.childElementCount === 0
+      ) {
+        root.remove();
+        portalRootCreatedByUs = false;
+      }
+    };
+  }, [hasPortal]);
+
+  // ── 입력창 좌표 추적
+  //
+  // 래퍼에 입력창의 rect 를 그대로 입히면 `top: calc(100% + …)` 같은 배치 규칙이
+  // 제자리일 때와 똑같이 맞는다. 좌표 계산을 CSS 와 JS 두 벌로 만들지 않는다.
+  useEffect(() => {
+    if (!hasPortal || !isCalendarOpen) {
+      setAnchorRect(null);
+      return;
+    }
+
+    let frameId = 0;
+
+    const measure = () => {
+      const element = rootRef.current;
+      if (!element) return;
+
+      const { top, left, width, height } = element.getBoundingClientRect();
+
+      setAnchorRect((prev) =>
+        prev &&
+        prev.top === top &&
+        prev.left === left &&
+        prev.width === width &&
+        prev.height === height
+          ? prev
+          : { top, left, width, height },
+      );
+    };
+
+    const scheduleMeasure = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        measure();
+      });
+    };
+
+    measure();
+
+    // `scroll` 은 버블하지 않는다. 캡처로 받아야 조상 어디의 스크롤이든 잡힌다.
+    window.addEventListener("scroll", scheduleMeasure, true);
+    window.addEventListener("resize", scheduleMeasure);
+
+    const observer = new ResizeObserver(scheduleMeasure);
+    if (rootRef.current) observer.observe(rootRef.current);
+
+    return () => {
+      if (frameId) window.cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", scheduleMeasure, true);
+      window.removeEventListener("resize", scheduleMeasure);
+      observer.disconnect();
+    };
+  }, [hasPortal, isCalendarOpen]);
+
   useEffect(() => {
     if ((disabled || readOnly) && isCalendarOpen) {
       setIsCalendarOpenState(false);
     }
   }, [disabled, readOnly, isCalendarOpen, setIsCalendarOpenState]);
+
+  const isPortalActive = hasPortal && Boolean(portalRoot);
+
+  const calendarPanel = (
+    <AnimatePresence initial={false}>
+      {isCalendarOpen && !disabled && (
+        <motion.div
+          id={calendarDropdownId}
+          className={cn(`${block}__dropdown`, dropdownClassName)}
+          initial={
+            shouldReduceMotion
+              ? { opacity: 0 }
+              : { opacity: 0, y: -8, scale: 0.98 }
+          }
+          animate={
+            shouldReduceMotion
+              ? { opacity: 1 }
+              : { opacity: 1, y: 0, scale: 1 }
+          }
+          exit={
+            shouldReduceMotion
+              ? { opacity: 0 }
+              : {
+                  opacity: 0,
+                  y: -8,
+                  scale: 0.98,
+                  transition: motionTransition.popoverExit,
+                }
+          }
+          transition={
+            shouldReduceMotion ? { duration: 0 } : motionTransition.popover
+          }
+          role="dialog"
+          aria-label={calendarLabel}
+        >
+          <DayPicker
+            {...dayPickerProps}
+            mode={mode}
+            required={dayPickerProps?.required}
+            selected={selected as never}
+            onSelect={handleDayPickerSelect as never}
+            modifiers={resolvedModifiers}
+            modifiersClassNames={resolvedModifiersClassNames}
+            classNames={resolvedClassNames}
+            components={{
+              Chevron: DaypickerChevron,
+              ...dayPickerProps?.components,
+            }}
+            labels={resolvedLabels}
+            month={resolvedMonth}
+            onMonthChange={(nextMonth) => {
+              setMonth(nextMonth);
+              dayPickerProps?.onMonthChange?.(nextMonth);
+            }}
+            startMonth={resolvedStartMonth}
+            endMonth={resolvedEndMonth}
+            disabled={isDayPickerDisabled}
+            showOutsideDays={dayPickerProps?.showOutsideDays ?? true}
+            captionLayout={resolvedCaptionLayout}
+            navLayout={dayPickerProps?.navLayout ?? "after"}
+            locale={resolvedLocale}
+            className={cn(daypickerBlock, dayPickerProps?.className)}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   return (
     <div ref={rootRef} className={block}>
@@ -573,68 +755,24 @@ export default function DatepickerBase<
         />
       </Textfield>
 
-      <AnimatePresence initial={false}>
-        {isCalendarOpen && !disabled && (
-          <motion.div
-            id={calendarDropdownId}
-            className={cn(`${block}__dropdown`, dropdownClassName)}
-            initial={
-              shouldReduceMotion
-                ? { opacity: 0 }
-                : { opacity: 0, y: -8, scale: 0.98 }
-            }
-            animate={
-              shouldReduceMotion
-                ? { opacity: 1 }
-                : { opacity: 1, y: 0, scale: 1 }
-            }
-            exit={
-              shouldReduceMotion
-                ? { opacity: 0 }
-                : {
-                    opacity: 0,
-                    y: -8,
-                    scale: 0.98,
-                    transition: motionTransition.popoverExit,
-                  }
-            }
-            transition={
-              shouldReduceMotion ? { duration: 0 } : motionTransition.popover
-            }
-            role="dialog"
-            aria-label={calendarLabel}
-          >
-            <DayPicker
-              {...dayPickerProps}
-              mode={mode}
-              required={dayPickerProps?.required}
-              selected={selected as never}
-              onSelect={handleDayPickerSelect as never}
-              modifiers={resolvedModifiers}
-              modifiersClassNames={resolvedModifiersClassNames}
-              classNames={resolvedClassNames}
-              components={{
-                Chevron: DaypickerChevron,
-                ...dayPickerProps?.components,
+      {isPortalActive ? null : calendarPanel}
+
+      {isPortalActive && portalRoot && anchorRect
+        ? createPortal(
+            <div
+              className={cn(block, `${block}__portal`)}
+              style={{
+                top: anchorRect.top,
+                left: anchorRect.left,
+                width: anchorRect.width,
+                height: anchorRect.height,
               }}
-              labels={resolvedLabels}
-              month={resolvedMonth}
-              onMonthChange={(nextMonth) => {
-                setMonth(nextMonth);
-                dayPickerProps?.onMonthChange?.(nextMonth);
-              }}
-              startMonth={resolvedStartMonth}
-              endMonth={resolvedEndMonth}
-              disabled={isDayPickerDisabled}
-              showOutsideDays={dayPickerProps?.showOutsideDays ?? true}
-              captionLayout={resolvedCaptionLayout}
-              navLayout={dayPickerProps?.navLayout ?? "after"}
-              locale={resolvedLocale}
-              className={cn(daypickerBlock, dayPickerProps?.className)}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+            >
+              {calendarPanel}
+            </div>,
+            portalRoot,
+          )
+        : null}
     </div>
   );
 }

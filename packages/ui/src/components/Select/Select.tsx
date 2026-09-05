@@ -20,8 +20,10 @@ import {
   getResolvedSelectComponents,
   getResolvedSelectStyles,
   getResolvedSingleValue,
+  toSelectChangeMeta,
 } from "./Select.utils.js";
 import type {
+  SelectChangeMeta,
   SelectOption,
   SelectOptionValue,
   SelectSharedProps,
@@ -34,8 +36,8 @@ export type SelectProps = SelectSharedProps<false> & {
   value?: SingleSelectValue;
   onChange?: (
     nextValue: SingleSelectValue,
-    selectedOption: SingleValue<SelectOption>,
-    actionMeta: ActionMeta<SelectOption>,
+    selectedOption: SelectOption | null,
+    meta: SelectChangeMeta,
   ) => void;
 };
 
@@ -71,6 +73,7 @@ const Select: ForwardRefExoticComponent<
       styles,
       isSearchable = false,
       isClearable = false,
+      hasPortal = false,
       // 라벨·안내 문구에는 마침표를 붙이지 않는다 (SEED writing 규칙과 같다)
       noOptionsMessage = () => "선택 가능한 항목이 없습니다",
       // 메뉴 최대 높이는 react-select 이 소유한다 (배치 계산이 이 값을 참조하므로
@@ -143,7 +146,11 @@ const Select: ForwardRefExoticComponent<
         return;
       }
 
-      onChange?.(nextOption?.value ?? null, nextOption, actionMeta);
+      onChange?.(
+        nextOption?.value ?? null,
+        nextOption ?? null,
+        toSelectChangeMeta(actionMeta),
+      );
     };
 
     return (
@@ -187,6 +194,14 @@ const Select: ForwardRefExoticComponent<
             noOptionsMessage={noOptionsMessage}
             maxMenuHeight={maxMenuHeight}
             menuPosition={menuPosition}
+            // 잘리는 조상을 탈출한다. 소비자가 직접 준 값이 우리 기본을 이긴다.
+            // z 는 `getResolvedSelectStyles` 가 `z-portal-menu` 로 올린다.
+            menuPortalTarget={
+              rest.menuPortalTarget ??
+              (hasPortal && typeof document !== "undefined"
+                ? document.body
+                : undefined)
+            }
             aria-invalid={ariaInvalid ?? (resolvedIsError || undefined)}
             aria-errormessage={
               resolvedIsError && errorMessage ? generatedMessageId : undefined

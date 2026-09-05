@@ -68,10 +68,47 @@ export type SelectSharedProps<IsMulti extends boolean> = Omit<
   isError?: boolean;
   infoMessage?: string;
   errorMessage?: string;
+  /**
+   * 메뉴를 `body` 로 내보내 **잘리는 조상을 탈출한다.**
+   *
+   * 기본 배치는 제자리(`absolute`)라 조상에 `overflow: hidden` 이 있으면 메뉴가
+   * 잘려 값을 고를 수 없다. 카드·팝업 안에 넣을 때 켠다.
+   * `Tooltip` 의 같은 이름 prop 과 한 규칙이다.
+   *
+   * ⚠️ 소비자가 `menuPortalTarget` 을 직접 주면 그쪽이 이긴다.
+   */
+  hasPortal?: boolean;
   components?: SelectComponentsConfig<
     SelectOption,
     IsMulti,
     GroupBase<SelectOption>
   >;
   styles?: StylesConfig<SelectOption, IsMulti, GroupBase<SelectOption>>;
+};
+
+/**
+ * 값이 바뀐 **까닭**. `onChange` 의 마지막 인자다.
+ *
+ * ⚠️ react-select 의 `ActionMeta` 를 그대로 노출하지 않고 우리 타입으로 감싼다.
+ *    그 타입은 `react-select` 에서만 나오는데 우리는 그것을 재수출하지 않으므로
+ *    (dependency 라 pnpm 같은 엄격한 설치에서는 소비자 `node_modules` 루트에 없다)
+ *    **소비자가 인자에 타입을 붙일 방법이 없었다.** 라이브러리를 갈아끼우면 공개
+ *    시그니처가 통째로 깨지는 문제도 함께 사라진다 — Select 의 계약은 원시값 API 로
+ *    라이브러리를 **감추는** 것이다(`Datepicker` 는 반대로 드러내는 것이 계약이라
+ *    `dayPickerProps` 와 함께 타입을 재수출한다).
+ */
+export type SelectChangeAction =
+  | "select-option"
+  | "deselect-option"
+  | "remove-value"
+  | "pop-value"
+  | "clear";
+
+export type SelectChangeMeta = {
+  /** 무엇을 해서 값이 바뀌었나 */
+  action: SelectChangeAction;
+  /** 방금 고르거나 지운 값 하나. `clear` 에는 없다 */
+  option?: SelectOptionValue;
+  /** `clear` 로 한꺼번에 지워진 값들 */
+  removedValues?: SelectOptionValue[];
 };

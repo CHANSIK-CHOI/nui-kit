@@ -8,7 +8,7 @@ import {
   Field,
 } from "@chansikchoi/next-ui";
 import type { DateRange } from "react-day-picker";
-import { Example } from "@/components/guide";
+import { Case, CaseGrid, Example } from "@/components/guide";
 
 const TODAY = new Date();
 
@@ -17,6 +17,8 @@ export function DatepickerDemo() {
   const [range, setRange] = useState<DateRange | undefined>();
   const [dates, setDates] = useState<Date[] | undefined>();
   const [fieldDate, setFieldDate] = useState<Date | undefined>();
+  const [clipDate, setClipDate] = useState<Date | undefined>();
+  const [portalDate, setPortalDate] = useState<Date | undefined>();
   const [limited, setLimited] = useState<Date | undefined>();
 
   return (
@@ -130,6 +132,55 @@ export function DatepickerDemo() {
       >
         <Datepicker errorMessage="날짜를 선택해주세요." />
       </Example>
+
+      <h2>잘리는 상자 안에서 — hasPortal</h2>
+      <p>
+        달력은 기본적으로 <strong>제자리에 뜬다.</strong> 조상에{" "}
+        <code>overflow: hidden</code> 이 있으면 잘려서 날짜를 고를 수 없다. 카드나
+        팝업 안에 넣을 때 <code>hasPortal</code> 을 켜면 달력이{" "}
+        <code>body</code> 로 나가 잘리지 않는다. <code>Tooltip</code> ·{" "}
+        <code>Select</code> 의 같은 이름 prop 과 한 규칙이다.
+      </p>
+      <CaseGrid
+        columns={2}
+        code={`<Datepicker hasPortal />   // 잘리는 상자 안에서`}
+      >
+        <Case label="기본" note="상자에 잘린다">
+          <div
+            style={{
+              overflow: "hidden",
+              height: 130,
+              padding: 12,
+              border: "1px solid var(--nui-border-form)",
+              borderRadius: 8,
+            }}
+          >
+            <Datepicker
+              selected={clipDate}
+              onSelectedChange={setClipDate}
+              placeholder="달력이 잘린다"
+            />
+          </div>
+        </Case>
+        <Case label="hasPortal" note="상자를 벗어난다">
+          <div
+            style={{
+              overflow: "hidden",
+              height: 130,
+              padding: 12,
+              border: "1px solid var(--nui-border-form)",
+              borderRadius: 8,
+            }}
+          >
+            <Datepicker
+              hasPortal
+              selected={portalDate}
+              onSelectedChange={setPortalDate}
+              placeholder="잘리지 않는다"
+            />
+          </div>
+        </Case>
+      </CaseGrid>
 
       <h2>Field 와 함께</h2>
       <Example row={false} overflow>

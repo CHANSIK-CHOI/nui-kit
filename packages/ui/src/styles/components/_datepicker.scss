@@ -28,6 +28,19 @@
     position: relative;
     width: 100%;
 
+    // portal 래퍼 — `hasPortal` 일 때만. body 아래에서 **입력창의 rect 를 그대로 입은
+    // 유령 상자**다. 그래야 아래 `top: calc(100% + …)` 규칙이 제자리 배치와 똑같이 맞는다
+    // (Tooltip 과 같은 방식). 아래 콘텐츠의 클릭을 먹지 않게 통과시키고 팝업만 되살린다.
+    &__portal {
+      position: fixed;
+      z-index: var(#{v("z-portal-menu")});
+      pointer-events: none;
+    }
+
+    &__portal &__dropdown {
+      pointer-events: auto;
+    }
+
     // 캘린더 팝업
     &__dropdown {
       position: absolute;
