@@ -35,11 +35,7 @@ export default function AccordionHead({
   return (
     <div
       {...rest}
-      className={cn(
-        `${block}__head`,
-        className,
-        hasToggleButton && `${block}__head--with-button`,
-      )}
+      className={cn(`${block}__head`, className)}
     >
       <div id={titleId} className={`${block}__title-box`}>
         {children ? <div className={`${block}__title`}>{children}</div> : null}
