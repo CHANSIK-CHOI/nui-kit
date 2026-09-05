@@ -16,9 +16,25 @@ const block = px("button");
 
 export type IconButtonVariant = "solid" | "line";
 
-export type IconButtonProps = Omit<ButtonProps, "icon" | "variant"> & {
+/**
+ * 접근 이름을 **타입으로 강제한다.**
+ *
+ * `IconButton` 은 `children` 이 아이콘이라 **글자에서 이름이 생길 길이 없다.**
+ * 예외가 없는 자리라 누락되면 스크린리더가 "버튼" 이라고만 읽는다 (a11y.md §4).
+ *
+ * ⚠️ `aria-label` 만 필수로 두면 `aria-labelledby` 로 이름을 주는 정상 사용이 막힌다.
+ *    유니온이라야 두 경로를 다 열면서 **누락만** 잡는다.
+ */
+type IconButtonAccessibleName =
+  | { "aria-label": string; "aria-labelledby"?: never }
+  | { "aria-labelledby": string; "aria-label"?: never };
+
+export type IconButtonProps = Omit<
+  ButtonProps,
+  "icon" | "variant" | "aria-label" | "aria-labelledby"
+> & {
   variant?: IconButtonVariant;
-};
+} & IconButtonAccessibleName;
 
 export default function IconButton({
   children,
