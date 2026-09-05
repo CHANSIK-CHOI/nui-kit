@@ -140,13 +140,15 @@ export function Providers({ children }) {
         포커스 트랩을 처리한다. 명령형은 <code>PopupHost</code> 가{" "}
         <code>isTopmost</code> 를 넣어 주고, 선언형은 소비자가 넘긴다.
       </p>
-      <div className="doc-note doc-note--warn">
+      <div className="doc-note">
         <strong>
-          선언형으로 쓸 때 <code>isTopmost</code> 를 빠뜨리면 ESC 도 포커스
-          트랩도 동작하지 않는다.
+          기본값이 <code>true</code> 라 선언형에서 그냥 렌더해도 ESC 와 포커스
+          트랩이 동작한다.
         </strong>{" "}
-        기본값이 <code>false</code> 라 팝업이 자기가 맨 위가 아니라고 여긴다.
-        팝업을 하나만 띄운다면 <code>isTopmost</code> 를 그대로 넘긴다.
+        선언형으로 팝업 <strong>둘을 겹쳐</strong> 띄울 때만 아래쪽에{" "}
+        <code>isTopmost=&#123;false&#125;</code> 를 넘긴다. 그러지 않으면 ESC
+        한 번에 둘 다 닫힌다. 명령형은 <code>PopupHost</code> 가 알아서 넣으므로
+        신경 쓸 것이 없다.
       </div>
 
       <h2>접근성 — 다섯 종류가 공유한다</h2>

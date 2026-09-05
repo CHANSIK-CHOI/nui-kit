@@ -79,7 +79,14 @@ export default function PopupBase({
   onRequestClose,
   onClickClose,
   onExited,
-  isTopmost = false,
+  // 기본값은 `true` 다 — 스택을 아는 것은 `PopupHost` 뿐이고 그쪽은 열린 팝업마다
+  // 값을 **항상 명시적으로** 넘긴다(`PopupHost.tsx`). 남는 자리는 소비자가 팝업을
+  // 직접 렌더하는 선언형이고 거기서는 답이 사실상 언제나 `true` 다.
+  //
+  // ⚠️ `false` 를 기본으로 두면 최초 포커스 이동·포커스 트랩·ESC 셋이 **조용히**
+  //    죽는다(`usePopupPanelA11y`). 화면은 멀쩡하고 마우스도 멀쩡해서 키보드
+  //    사용자만 겪는다 — 소비자가 알아챌 수 없는 종류의 기본값이다 (a11y.md §5).
+  isTopmost = true,
 }: PopupBaseProps) {
   // framer-motion 은 CSS duration 토큰의 1ms 무력화를 읽지 않는다 (design-system.md §6).
   const shouldReduceMotion = useReducedMotion();
