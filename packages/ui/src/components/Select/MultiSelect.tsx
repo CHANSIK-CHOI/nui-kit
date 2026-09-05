@@ -15,6 +15,12 @@ import SelectAriaContext, {
 } from "./Select.context.js";
 import SelectBase, { SELECT_BLOCK } from "./SelectBase.js";
 import {
+  createSelectAriaLiveMessages,
+  DEFAULT_NO_OPTIONS_MESSAGE,
+  selectLoadingMessage,
+  selectScreenReaderStatus,
+} from "./Select.locale.js"
+import {
   createAriaValueContainer,
   getReadOnlyGuardedProps,
   getResolvedMultiValue,
@@ -42,6 +48,10 @@ export type MultiSelectProps = SelectSharedProps<true> & {
     meta: SelectChangeMeta,
   ) => void;
 };
+
+// react-select 이 소유한 스크린리더 문자열의 한국어 기본값 (Select.locale.ts).
+// 모듈 스코프에 한 번만 만든다 — 매 렌더 새 객체를 넘기면 불필요하게 다시 그린다.
+const ARIA_LIVE_MESSAGES = createSelectAriaLiveMessages<true>();
 
 type MultiSelectRefInstance = SelectInstance<
   SelectOption,
@@ -82,7 +92,7 @@ const MultiSelect: ForwardRefExoticComponent<
       hasPortal = false,
       removeButtonLabel = DEFAULT_REMOVE_BUTTON_LABEL,
       // 라벨·안내 문구에는 마침표를 붙이지 않는다 (SEED writing 규칙과 같다)
-      noOptionsMessage = () => "선택 가능한 항목이 없습니다",
+      noOptionsMessage = DEFAULT_NO_OPTIONS_MESSAGE,
       // 메뉴 최대 높이는 react-select 이 소유한다 (배치 계산이 이 값을 참조하므로
       // CSS 의 max-height 로 덮지 않는다). 기본값만 우리 치수에 맞춘다.
       maxMenuHeight = 240,
@@ -199,6 +209,13 @@ const MultiSelect: ForwardRefExoticComponent<
             components={resolvedComponents}
             styles={resolvedStyles}
             noOptionsMessage={noOptionsMessage}
+            // 스크린리더 전용 문자열도 한국어 기본값을 채운다 (a11y.md §9).
+            // 소비자가 준 값이 우리 기본을 이긴다.
+            ariaLiveMessages={rest.ariaLiveMessages ?? ARIA_LIVE_MESSAGES}
+            screenReaderStatus={
+              rest.screenReaderStatus ?? selectScreenReaderStatus
+            }
+            loadingMessage={rest.loadingMessage ?? selectLoadingMessage}
             maxMenuHeight={maxMenuHeight}
             menuPosition={menuPosition}
             // 잘리는 조상을 탈출한다. 소비자가 직접 준 값이 우리 기본을 이긴다.
