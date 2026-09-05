@@ -16,8 +16,8 @@ type UsePopupHostA11yParams = {
 /**
  * 팝업이 떠 있는 동안의 문서 전체 처리: 배경 스크롤 잠금 + 배경 inert.
  *
- * ⚠️ 원본은 Pages Router 의 `#__next` 를 찾아 inert 처리했다.
- *    App Router 에는 그런 요소가 없다. 프레임워크에 의존하지 않도록
+ * ⚠️ 특정 루트 요소(`#__next` 같은 것)를 찾아 inert 처리하지 않는다.
+ *    App Router 에는 그런 고정 요소가 없다. 프레임워크에 의존하지 않도록
  *    **body 의 직계 자식 중 portal 컨테이너를 제외한 전부**를 inert 처리한다.
  *    (Next 의 dev 오버레이 등 스크립트성 요소는 inert 되어도 무해하다)
  */

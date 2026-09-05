@@ -43,7 +43,7 @@ type PopupInstanceProps = Pick<
 //    PopupHost 는 등록된 컴포넌트에 isTopmost 를 넘기는데, 셸이 이를 받지 못하면
 //    PopupBase 의 기본값 false 가 그대로 쓰이고 usePopupPanelA11y 가 전부
 //    early-return 한다 — 즉 ESC 로 닫히지도, 포커스가 갇히지도 않는다.
-//    (원본 프로젝트에 있던 결함이다)
+//    화면도 마우스도 멀쩡해서 키보드 사용자만 겪는다.
 type PopupSharedShellProps = Omit<PopupBaseProps, "variant" | "size">;
 type PopupSizedShellProps = PopupSharedShellProps &
   Pick<PopupBaseProps, "size">;
