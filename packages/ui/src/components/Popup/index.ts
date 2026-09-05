@@ -1,4 +1,7 @@
-export { default as PopupBase } from "./PopupBase.js";
+// ⚠️ `PopupBase` 는 내보내지 않는다. 다섯 셸(Alert · Confirm · LayerPopup ·
+//    BottomSheet · FullPopup)이 소비자가 쓰는 것이고, 공통 골격은 내부 구현이다.
+//    공개하면 `PopupVariant` 에 값을 하나 더하는 것도 공개 API 변경이 된다
+//    (`DatepickerBase` · `SelectBase` 와 같은 규칙).
 export { default as Alert } from "./Alert.js";
 export { default as Confirm } from "./Confirm.js";
 export { default as LayerPopup } from "./LayerPopup.js";
@@ -33,7 +36,6 @@ export type {
   LayerPopupComponentProps,
   LayerPopupOptions,
   LayerPopupProps,
-  PopupBaseProps,
   PopupContentAlign,
   PopupRuntimeProps,
   PopupSize,
