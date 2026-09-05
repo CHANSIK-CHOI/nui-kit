@@ -5,7 +5,7 @@ const nextConfig = {
   reactStrictMode: true,
   // MDX 를 페이지로 인식시킨다 (Foundations 산문 문서용)
   pageExtensions: ["ts", "tsx", "md", "mdx"],
-  transpilePackages: ["@chansikchoi/next-ui"],
+  transpilePackages: ["@nui-kit/react"],
   // Next 16 의 에이전트 규칙 파일(AGENTS.md) 자동 생성을 끈다 —
   // 저장소에 우리가 만들지 않은 파일이 생기지 않게 한다.
   agentRules: false,

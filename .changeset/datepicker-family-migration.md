@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `Datepicker` · `DateRangePicker` · `DateMultiplePicker` 를 추가했습니다.
@@ -7,7 +7,7 @@
 입력 필드와 캘린더를 묶은 날짜 선택 컨트롤입니다. 값은 `Date` 객체로 주고받습니다.
 
 ```tsx
-import { Datepicker, DateRangePicker } from "@chansikchoi/next-ui";
+import { Datepicker, DateRangePicker } from "@nui-kit/react";
 
 <Datepicker selected={date} onSelectedChange={setDate} />;
 <DateRangePicker selected={range} onSelectedChange={setRange} />;

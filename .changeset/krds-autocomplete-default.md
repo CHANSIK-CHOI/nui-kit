@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 **입력 필드의 자동 완성을 더 이상 기본으로 끄지 않습니다.** `Textfield` 와 `Textarea` 가

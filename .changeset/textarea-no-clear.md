@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 **BREAKING** — `Textarea` 에서 지우기 버튼을 뺍니다. `isClearable` · `onClear` prop 이

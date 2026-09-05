@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `Button` · `IconButton` 의 **로딩 시작이 포커스 밖에서도 들립니다.** KRDS 가이드 595쪽 02 —

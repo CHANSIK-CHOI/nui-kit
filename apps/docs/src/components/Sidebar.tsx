@@ -21,8 +21,8 @@ export function Sidebar() {
   return (
     <aside className="doc-sidebar">
       <Link href="/" className="doc-brand">
-        Next UI System
-        <small>@chansikchoi/next-ui</small>
+        nui-kit
+        <small>@nui-kit/react</small>
       </Link>
 
       <nav aria-label="문서 목차">

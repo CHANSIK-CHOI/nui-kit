@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 모션 값을 한 벌로 맞추고 duration 스케일을 8단계로 늘렸습니다.

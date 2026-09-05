@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Checkbox, CheckboxGroup, Field } from "@chansikchoi/next-ui";
+import { Checkbox, CheckboxGroup, Field } from "@nui-kit/react";
 import { Example } from "@/components/guide";
 
 const OPTIONS = [

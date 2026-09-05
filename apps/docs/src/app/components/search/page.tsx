@@ -1,5 +1,5 @@
-import { Field, FieldLabel } from "@chansikchoi/next-ui";
-import { Search } from "@chansikchoi/next-ui/textfield";
+import { Field, FieldLabel } from "@nui-kit/react";
+import { Search } from "@nui-kit/react/textfield";
 import { GuideHeader, InputStateCases, PropsTable } from "@/components/guide";
 import { SearchDemo } from "./SearchDemo";
 import { RHFSearchDemo } from "./RHFSearchDemo";

@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 공개 CSS 변수(훅) 이름을 KRDS 디자인 토큰 표기로 바꿨습니다. **컴포넌트 이름 뒤에

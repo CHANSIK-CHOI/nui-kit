@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@chansikchoi/next-ui";
-import { useConfirm } from "@chansikchoi/next-ui/popup";
+import { Button } from "@nui-kit/react";
+import { useConfirm } from "@nui-kit/react/popup";
 import { Example } from "@/components/guide";
 
 export function ConfirmDemo() {

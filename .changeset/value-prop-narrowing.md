@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `Textfield` · `Textarea` 의 `value` 타입을 실제로 쓰는 값으로 좁혔습니다.

@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 브랜드 색을 바꾸는 방법이 생겼습니다. **준비된 185색 중 하나를 고르면 화면 전체가 그 색에
@@ -10,7 +10,7 @@ npm run color:generate -- --preset 42
 ```
 
 ```css
-@import "@chansikchoi/next-ui/styles/index.css";
+@import "@nui-kit/react/styles/index.css";
 @import "./nui-theme.css";   /* 생성된 파일. 라이브러리 CSS 뒤에 */
 ```
 

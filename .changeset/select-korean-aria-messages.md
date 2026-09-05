@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `Select` · `MultiSelect` 의 스크린리더 안내가 한국어로 나옵니다.

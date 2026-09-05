@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `Checkbox` 에 중간 상태가 생겼습니다. 하위 항목이 일부만 선택된 "전체 선택" 체크박스에

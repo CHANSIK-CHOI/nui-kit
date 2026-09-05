@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 눌림을 토큰으로 통일하고 Button 의 행간·자간·비활성 표현을 바로잡았습니다.

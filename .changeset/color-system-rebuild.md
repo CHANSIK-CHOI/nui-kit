@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 색 체계 전면 교체 — Radix 12단계 스케일, 다크 테마, 역할 기반 액션 이름

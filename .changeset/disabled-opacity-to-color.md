@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 비활성 표현에서 투명도를 걷어내고 색으로만 나타냅니다.

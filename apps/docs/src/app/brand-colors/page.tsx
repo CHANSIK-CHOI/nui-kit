@@ -52,7 +52,7 @@ export default function BrandColorsPage() {
         <li>
           라이브러리 CSS 뒤에 불러온다
           <pre className="doc-code">
-            <code>{`import "@chansikchoi/next-ui/styles/index.css";
+            <code>{`import "@nui-kit/react/styles/index.css";
 import "./nui-theme.css";`}</code>
           </pre>
         </li>

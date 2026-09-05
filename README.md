@@ -1,4 +1,4 @@
-# Next UI System
+# nui-kit
 
 Next.js **App Router 전용** React UI 컴포넌트 시스템.
 라이브러리(npm 배포)와 API 문서 사이트를 하나의 모노레포에서 관리한다.
@@ -6,8 +6,8 @@ Next.js **App Router 전용** React UI 컴포넌트 시스템.
 ## 구조
 
 ```
-next-ui-system/
-├─ packages/ui      @chansikchoi/next-ui  — npm 에 배포되는 컴포넌트 라이브러리
+nui-kit/
+├─ packages/ui      @nui-kit/react  — npm 에 배포되는 컴포넌트 라이브러리
 └─ apps/docs        문서 사이트 (Next.js App Router)
 ```
 

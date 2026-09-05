@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Button, ButtonGroup, Field, Textfield } from "@chansikchoi/next-ui";
+import { Button, ButtonGroup, Field, Textfield } from "@nui-kit/react";
 import { Example } from "@/components/guide";
 
 /**

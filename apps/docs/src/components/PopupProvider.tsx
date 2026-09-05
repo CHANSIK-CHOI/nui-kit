@@ -1,8 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { PopupHost } from "@chansikchoi/next-ui/popup";
-import { ToastHost } from "@chansikchoi/next-ui/toast";
+import { PopupHost } from "@nui-kit/react/popup";
+import { ToastHost } from "@nui-kit/react/toast";
 
 /**
  * PopupHost / ToastHost 는 클라이언트 컴포넌트라 Server Component 인 layout 에서

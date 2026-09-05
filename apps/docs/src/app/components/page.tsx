@@ -187,7 +187,7 @@ export default function ComponentsPage() {
       <p className="doc-lead">
         각 페이지의 API 표는 컴포넌트 타입에서 자동 생성된다 — 코드가 바뀌면
         문서가 따라간다. react-hook-form 래퍼는{" "}
-        <code>@chansikchoi/next-ui/rhf</code> 에 있다.
+        <code>@nui-kit/react/rhf</code> 에 있다.
       </p>
 
       {GROUPS.map((group) => (

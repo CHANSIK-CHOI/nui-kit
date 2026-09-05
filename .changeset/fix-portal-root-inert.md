@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": patch
+"@nui-kit/react": patch
 ---
 
 **팝업 안에서 띄운 토스트가 눌리지 않던 문제를 고칩니다.**

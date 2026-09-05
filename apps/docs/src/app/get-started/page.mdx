@@ -3,7 +3,7 @@ export const metadata = { title: "설치와 사용" };
 # 설치와 사용
 
 ```bash
-npm install @chansikchoi/next-ui
+npm install @nui-kit/react
 ```
 
 peer dependency 는 `react` 와 `react-dom` 이다. `next` 와 `react-hook-form` 은
@@ -14,15 +14,15 @@ optional 이며 각각 `ButtonLink` 와 RHF 래퍼에서만 쓰인다. Node 는 
 CSS 는 JS 에 포함되지 않는다. 직접 import 한다.
 
 ```ts
-import "@chansikchoi/next-ui/styles/index.css";
+import "@nui-kit/react/styles/index.css";
 ```
 
 일부 컴포넌트만 쓴다면 파일을 나눠 가져온다. `tokens.css` 는 나머지 전부가 참조하므로
 반드시 한 번 넣는다. CSS 파일 이름은 서브패스 이름과 같다.
 
 ```ts
-import "@chansikchoi/next-ui/styles/tokens.css";
-import "@chansikchoi/next-ui/styles/button.css";
+import "@nui-kit/react/styles/tokens.css";
+import "@nui-kit/react/styles/button.css";
 ```
 
 ### preflight
@@ -31,20 +31,20 @@ import "@chansikchoi/next-ui/styles/button.css";
 필요하지 않다. reset 이 전혀 없는 프로젝트만 추가한다.
 
 ```ts
-import "@chansikchoi/next-ui/styles/preflight.css";
+import "@nui-kit/react/styles/preflight.css";
 ```
 
 ## 컴포넌트 가져오기
 
 ```tsx
 // 배럴
-import { Button, Field, Textfield } from "@chansikchoi/next-ui";
+import { Button, Field, Textfield } from "@nui-kit/react";
 
 // 서브패스 — 번들 최소화
-import { Button } from "@chansikchoi/next-ui/button";
+import { Button } from "@nui-kit/react/button";
 
 // react-hook-form 래퍼
-import { RHFTextfield } from "@chansikchoi/next-ui/rhf";
+import { RHFTextfield } from "@nui-kit/react/rhf";
 ```
 
 배럴과 서브패스 중 어느 쪽으로 가져와도 React Context 를 공유한다. `Field` 와
@@ -84,7 +84,7 @@ Server Component 가 클라이언트 모듈을 import 하면 React 는 client re
 <Field.Label>이름</Field.Label>
 
 // ✅ named export
-import { FieldLabel } from "@chansikchoi/next-ui";
+import { FieldLabel } from "@nui-kit/react";
 <FieldLabel>이름</FieldLabel>
 ```
 

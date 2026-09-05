@@ -5,8 +5,8 @@ import {
   ButtonGroup,
   ButtonGroupItem,
   ButtonLink,
-} from "@chansikchoi/next-ui";
-import { DelIcon } from "@chansikchoi/next-ui/icon";
+} from "@nui-kit/react";
+import { DelIcon } from "@nui-kit/react/icon";
 import { LoadingDemo } from "./LoadingDemo";
 import {
   GuideHeader,

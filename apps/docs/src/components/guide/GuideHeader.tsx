@@ -31,16 +31,16 @@ export function GuideHeader({
       <h1>{title}</h1>
       <p className="doc-lead">{children}</p>
       <pre className="doc-code">
-        <code>{`import { ${named.join(", ")} } from "@chansikchoi/next-ui";${
+        <code>{`import { ${named.join(", ")} } from "@nui-kit/react";${
           subpath
             ? `
 // 서브패스로 좁힐 때
-import { ${named[0]} } from "@chansikchoi/next-ui/${subpath}";`
+import { ${named[0]} } from "@nui-kit/react/${subpath}";`
             : ""
         }${
           cssName
             ? `
-import "@chansikchoi/next-ui/styles/${cssName}.css";   // 온디맨드일 때`
+import "@nui-kit/react/styles/${cssName}.css";   // 온디맨드일 때`
             : ""
         }`}</code>
       </pre>

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button, Field } from "@chansikchoi/next-ui";
-import { RHFSearch } from "@chansikchoi/next-ui/rhf";
+import { Button, Field } from "@nui-kit/react";
+import { RHFSearch } from "@nui-kit/react/rhf";
 import { Example } from "@/components/guide";
 
 type FormValues = { keyword: string };

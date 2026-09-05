@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 컴포넌트가 여는 CSS 변수(공개 훅)를 재정비했습니다. **BREAKING** 이 포함됩니다.

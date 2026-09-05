@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Field, Textfield } from "@chansikchoi/next-ui";
+import { Button, Field, Textfield } from "@nui-kit/react";
 import {
   LayerPopup,
   useLayerPopup,
   type LayerPopupComponentProps,
-} from "@chansikchoi/next-ui/popup";
+} from "@nui-kit/react/popup";
 import { Example } from "@/components/guide";
 
 /** 명령형으로 등록할 팝업 내용. PopupHost 가 런타임 props 를 주입한다. */

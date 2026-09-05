@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 디자인 토큰 체계 재편 — 숫자 스케일, focus/elevation 분리, layer 축 신설

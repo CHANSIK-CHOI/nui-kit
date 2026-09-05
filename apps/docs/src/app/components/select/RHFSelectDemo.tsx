@@ -1,8 +1,8 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Button, Field, type SelectOption } from "@chansikchoi/next-ui";
-import { RHFMultiSelect, RHFSelect } from "@chansikchoi/next-ui/rhf";
+import { Button, Field, type SelectOption } from "@nui-kit/react";
+import { RHFMultiSelect, RHFSelect } from "@nui-kit/react/rhf";
 import { Example } from "@/components/guide";
 
 const CITIES: SelectOption[] = [
@@ -33,7 +33,7 @@ export function RHFSelectDemo() {
     <>
       <h2>react-hook-form 연동</h2>
       <p>
-        <code>@chansikchoi/next-ui/rhf</code> 의 <code>RHFSelect</code> ·{" "}
+        <code>@nui-kit/react/rhf</code> 의 <code>RHFSelect</code> ·{" "}
         <code>RHFMultiSelect</code> 는 <code>control</code> 만 넘기면 값과
         에러를 스스로 소유한다. <code>value</code> · <code>onChange</code> ·{" "}
         <code>name</code> 은 타입에서 제외되어 있어 중복 소유가 생기지 않는다.

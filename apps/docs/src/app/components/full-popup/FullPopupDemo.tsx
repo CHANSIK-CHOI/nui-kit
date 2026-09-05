@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@chansikchoi/next-ui";
+import { Button } from "@nui-kit/react";
 import {
   FullPopup,
   useFullPopup,
   type FullPopupComponentProps,
-} from "@chansikchoi/next-ui/popup";
+} from "@nui-kit/react/popup";
 import { Example } from "@/components/guide";
 
 /** 명령형으로 등록할 전체 팝업 내용. PopupHost 가 런타임 props 를 주입한다. */

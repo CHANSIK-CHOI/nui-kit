@@ -13,7 +13,7 @@ export default function AccordionPage() {
       </GuideHeader>
 
       <pre className="doc-code">
-        <code>{`import { Accordion } from "@chansikchoi/next-ui";
+        <code>{`import { Accordion } from "@nui-kit/react";
 
 <Accordion type="single">
   <Accordion.Item index={0}>

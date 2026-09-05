@@ -8,7 +8,7 @@ import {
   type MultiSelectValue,
   type SelectOption,
   type SingleSelectValue,
-} from "@chansikchoi/next-ui";
+} from "@nui-kit/react";
 import { Example } from "@/components/guide";
 
 const CITIES: SelectOption[] = [

@@ -1,8 +1,8 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Button, Field } from "@chansikchoi/next-ui";
-import { RHFTextarea } from "@chansikchoi/next-ui/rhf";
+import { Button, Field } from "@nui-kit/react";
+import { RHFTextarea } from "@nui-kit/react/rhf";
 import { Example } from "@/components/guide";
 
 type FormValues = { bio: string };

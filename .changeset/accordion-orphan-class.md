@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": patch
+"@nui-kit/react": patch
 ---
 
 `Accordion` 헤더에서 `nui-accordion__head--with-button` 클래스를 제거했습니다.

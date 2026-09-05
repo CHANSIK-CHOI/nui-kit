@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 Form 계열 컴포넌트 8종을 추가했습니다.
@@ -14,7 +14,7 @@ Form 계열 컴포넌트 8종을 추가했습니다.
 - `Radio` / `RadioGroup` — 단일 선택. 그룹이 `name` 을 전파한다
 - `Switch` — 즉시 적용되는 켬/끔
 
-**react-hook-form 래퍼** (`@chansikchoi/next-ui/rhf`)
+**react-hook-form 래퍼** (`@nui-kit/react/rhf`)
 `RHFTextarea` / `RHFSearch` / `RHFPassword` / `RHFCheckbox` / `RHFRadio` / `RHFSwitch`
 
 **새 서브패스**

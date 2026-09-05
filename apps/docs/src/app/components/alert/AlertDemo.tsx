@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@chansikchoi/next-ui";
-import { useAlert } from "@chansikchoi/next-ui/popup";
+import { Button } from "@nui-kit/react";
+import { useAlert } from "@nui-kit/react/popup";
 import { Example } from "@/components/guide";
 
 export function AlertDemo() {

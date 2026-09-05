@@ -236,7 +236,7 @@ export default function IconPage() {
         아이콘은 <code>lucide-react</code> 다. 24px 격자에 stroke 2 인 line
         아이콘이고, 크기에 비례해 선이 가늘어진다. 컴포넌트가 쓰는 일곱
         개(지우기 · 검색 · 비밀번호 보기/숨기기 · 닫기 · 달력 · 주의)는{" "}
-        <code>@chansikchoi/next-ui/icon</code> 에서 가져온다. Select 의 화살표와
+        <code>@nui-kit/react/icon</code> 에서 가져온다. Select 의 화살표와
         지우기, Datepicker 의 이전/다음, Accordion 의 화살표도 같은 세트다.
       </p>
       <p>

@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 팝업의 `isTopmost` 기본값이 `false` → **`true`** 로 바뀝니다.

@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 모양과 크기를 KRDS(디지털 정부서비스 UI/UX 가이드라인) 형태 · 컴포넌트 규격에 맞췄습니다.

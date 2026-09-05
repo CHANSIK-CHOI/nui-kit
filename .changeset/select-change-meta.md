@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 **⚠️ `Select`·`MultiSelect` 의 `onChange` 세 번째 인자가 우리 타입으로 바뀌었습니다.**

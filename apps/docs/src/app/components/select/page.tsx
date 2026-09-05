@@ -19,7 +19,7 @@ export default function SelectPage() {
       </GuideHeader>
 
       <pre className="doc-code">
-        <code>{`import { Select, MultiSelect } from "@chansikchoi/next-ui";
+        <code>{`import { Select, MultiSelect } from "@nui-kit/react";
 
 const OPTIONS = [
   { label: "서울", value: "seoul" },
@@ -35,7 +35,7 @@ const OPTIONS = [
         <code>onChange</code> 를 소비자가 소유한다. <code>onChange</code> 의 첫
         인자가 원시값이고, 두 번째·세 번째로 react-select 의 옵션 객체와{" "}
         <code>actionMeta</code> 가 함께 온다. react-hook-form 을 쓴다면{" "}
-        <code>@chansikchoi/next-ui/rhf</code> 의 <code>RHFSelect</code> ·{" "}
+        <code>@nui-kit/react/rhf</code> 의 <code>RHFSelect</code> ·{" "}
         <code>RHFMultiSelect</code> 를 쓴다.
       </div>
 

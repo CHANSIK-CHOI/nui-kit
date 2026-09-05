@@ -1,7 +1,7 @@
 "use client";
 
 import { Controller, useForm } from "react-hook-form";
-import { Button, Field, Radio, RadioGroup } from "@chansikchoi/next-ui";
+import { Button, Field, Radio, RadioGroup } from "@nui-kit/react";
 import { Example } from "@/components/guide";
 
 const PLANS = [

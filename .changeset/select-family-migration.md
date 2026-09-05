@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `Select` · `MultiSelect` 를 추가했습니다.
@@ -7,7 +7,7 @@
 **값은 옵션 객체가 아니라 원시값으로 주고받습니다** — 폼 상태에 그대로 넣을 수 있습니다.
 
 ```tsx
-import { Select, MultiSelect } from "@chansikchoi/next-ui";
+import { Select, MultiSelect } from "@nui-kit/react";
 
 const OPTIONS = [
   { label: "서울", value: "seoul" },

@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <>
-      <h1>Next UI System</h1>
+      <h1>nui-kit</h1>
       <p className="doc-lead">
         Next.js App Router 용 React 컴포넌트 라이브러리. 폼, 팝업, 달력, 선택
         컨트롤을 제공한다.
@@ -11,7 +11,7 @@ export default function HomePage() {
 
       <h2>설치</h2>
       <pre className="doc-code">
-        <code>npm install @chansikchoi/next-ui</code>
+        <code>npm install @nui-kit/react</code>
       </pre>
       <p>
         peer dependency 는 <code>react</code> 와 <code>react-dom</code>{" "}
@@ -20,8 +20,8 @@ export default function HomePage() {
         <code>optional</code> 로 선언되어 있다.
       </p>
       <pre className="doc-code">
-        <code>{`import "@chansikchoi/next-ui/styles/index.css";
-import { Button } from "@chansikchoi/next-ui";
+        <code>{`import "@nui-kit/react/styles/index.css";
+import { Button } from "@nui-kit/react";
 
 export default function Page() {
   return <Button color="primary">저장</Button>;

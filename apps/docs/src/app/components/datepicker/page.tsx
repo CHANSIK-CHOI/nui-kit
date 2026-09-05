@@ -19,7 +19,7 @@ export default function DatepickerPage() {
       </GuideHeader>
 
       <pre className="doc-code">
-        <code>{`import { Datepicker, DateRangePicker } from "@chansikchoi/next-ui";
+        <code>{`import { Datepicker, DateRangePicker } from "@nui-kit/react";
 
 <Datepicker selected={date} onSelectedChange={setDate} />
 <DateRangePicker selected={range} onSelectedChange={setRange} />`}</code>
@@ -28,7 +28,7 @@ export default function DatepickerPage() {
       <div className="doc-note">
         <strong>controlled 전용이다.</strong> <code>selected</code> 와{" "}
         <code>onSelectedChange</code> 를 소비자가 소유한다. react-hook-form 을
-        쓴다면 <code>@chansikchoi/next-ui/rhf</code> 의{" "}
+        쓴다면 <code>@nui-kit/react/rhf</code> 의{" "}
         <code>RHFDatepicker</code> 계열을 쓴다.
       </div>
 

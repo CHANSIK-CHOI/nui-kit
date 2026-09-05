@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `MultiSelect` 칩의 삭제 버튼이 **키보드로 닿는 진짜 버튼**이 됐습니다. react-select 기본은

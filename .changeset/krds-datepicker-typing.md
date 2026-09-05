@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 **날짜를 직접 칠 수 있습니다.** `Datepicker` 와 `DateRangePicker` 의 입력창이 더 이상

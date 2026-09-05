@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 디자인 시스템을 SEED 와 다시 대조해 다크 테마 결함과 규칙 이탈을 고칩니다.

@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 타이포 행간과 자간을 스케일 짝 토큰으로 통일했습니다.

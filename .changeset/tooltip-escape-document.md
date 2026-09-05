@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": patch
+"@nui-kit/react": patch
 ---
 
 마우스로 띄운 `Tooltip` 도 `Escape` 로 닫힙니다.

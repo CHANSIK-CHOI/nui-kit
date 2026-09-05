@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `Tooltip` 이 **터치에서 탭으로 열리고 닫힙니다.** KRDS 가이드 659 · 662쪽의 상호작용 표는

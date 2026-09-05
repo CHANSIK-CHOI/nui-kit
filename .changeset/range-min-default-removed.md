@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `DateRangePicker` 로 하루짜리 기간을 만들 수 있습니다.

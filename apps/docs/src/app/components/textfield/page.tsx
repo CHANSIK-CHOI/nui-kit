@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Field, FieldLabel, Textfield } from "@chansikchoi/next-ui";
+import { Field, FieldLabel, Textfield } from "@nui-kit/react";
 import {
   GuideHeader,
   Case,
@@ -145,7 +145,7 @@ export default function TextfieldPage() {
       </p>
       <pre className="doc-code">
         <code>{`import { useForm } from "react-hook-form";
-import { RHFTextfield } from "@chansikchoi/next-ui/rhf";
+import { RHFTextfield } from "@nui-kit/react/rhf";
 
 const { control } = useForm<{ email: string }>();
 

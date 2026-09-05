@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Field, Switch } from "@chansikchoi/next-ui";
+import { Field, Switch } from "@nui-kit/react";
 import { Example } from "@/components/guide";
 
 export function SwitchDemo() {

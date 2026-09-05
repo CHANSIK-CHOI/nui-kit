@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `Datepicker` 계열과 `Select` 계열에 **`hasPortal`** 이 생겼습니다. 켜면 달력·메뉴가

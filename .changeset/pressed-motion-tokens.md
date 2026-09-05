@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 눌림(pressed) 토큰을 세 축으로 완성하고 배율 값을 실측에 맞췄습니다.

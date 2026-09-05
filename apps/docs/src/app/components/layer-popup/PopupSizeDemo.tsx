@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, LayerPopup } from "@chansikchoi/next-ui";
+import { Button, LayerPopup } from "@nui-kit/react";
 import { Case, CaseGrid } from "@/components/guide";
 
 /** PopupSize 는 `Popup.types.ts` 가 정한 셋이다. dialog 형태에만 적용된다. */

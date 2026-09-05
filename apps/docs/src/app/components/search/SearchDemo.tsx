@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Field } from "@chansikchoi/next-ui";
-import { Search } from "@chansikchoi/next-ui/textfield";
+import { Field } from "@nui-kit/react";
+import { Search } from "@nui-kit/react/textfield";
 import { Case, CaseGrid } from "@/components/guide";
 
 /**

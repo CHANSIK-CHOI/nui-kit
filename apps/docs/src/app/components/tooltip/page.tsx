@@ -12,7 +12,7 @@ export default function TooltipPage() {
       </GuideHeader>
 
       <pre className="doc-code">
-        <code>{`import { Tooltip } from "@chansikchoi/next-ui";
+        <code>{`import { Tooltip } from "@nui-kit/react";
 
 <Tooltip content="삭제한 항목은 되돌릴 수 없습니다">
   <IconButton aria-label="삭제"><DelIcon /></IconButton>

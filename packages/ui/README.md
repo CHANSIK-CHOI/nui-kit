@@ -1,4 +1,4 @@
-# @chansikchoi/next-ui
+# @nui-kit/react
 
 Next.js **App Router 전용** React UI 컴포넌트 라이브러리.
 모든 컴포넌트는 클라이언트 컴포넌트(`"use client"`)로 배포된다.
@@ -8,7 +8,7 @@ Next.js **App Router 전용** React UI 컴포넌트 라이브러리.
 ## 설치
 
 ```bash
-npm install @chansikchoi/next-ui
+npm install @nui-kit/react
 ```
 
 `react` / `react-dom` 외에 **추가로 설치할 것은 없습니다.**
@@ -28,14 +28,14 @@ npm install @chansikchoi/next-ui
 ### 전체
 
 ```ts
-import "@chansikchoi/next-ui/styles/index.css";
+import "@nui-kit/react/styles/index.css";
 ```
 
 ### 온디맨드
 
 ```ts
-import "@chansikchoi/next-ui/styles/tokens.css"; // 1회 필수
-import "@chansikchoi/next-ui/styles/button.css";
+import "@nui-kit/react/styles/tokens.css"; // 1회 필수
+import "@nui-kit/react/styles/button.css";
 ```
 
 ### reset (선택)
@@ -43,7 +43,7 @@ import "@chansikchoi/next-ui/styles/button.css";
 기본 배포 CSS 에는 reset 이 **포함되어 있지 않습니다.** 필요할 때만 명시적으로:
 
 ```ts
-import "@chansikchoi/next-ui/styles/preflight.css";
+import "@nui-kit/react/styles/preflight.css";
 ```
 
 ## 소비자 프로젝트에 영향을 주지 않는 이유
@@ -174,7 +174,7 @@ import { Trash2 } from "lucide-react";
 
 ```tsx
 // app/layout.tsx
-import { PopupHost, ToastHost } from "@chansikchoi/next-ui";
+import { PopupHost, ToastHost } from "@nui-kit/react";
 
 export default function RootLayout({
   children,
@@ -202,7 +202,7 @@ export default function RootLayout({
 
 ### react-hook-form 래퍼
 
-`@chansikchoi/next-ui/rhf` 에서 가져옵니다. `control` 만 넘기면 값과 에러를
+`@nui-kit/react/rhf` 에서 가져옵니다. `control` 만 넘기면 값과 에러를
 스스로 소유합니다.
 
 `RHFTextfield` · `RHFSearch` · `RHFPassword` · `RHFTextarea` ·
@@ -212,7 +212,7 @@ export default function RootLayout({
 
 ```tsx
 import { useForm } from "react-hook-form";
-import { RHFTextfield } from "@chansikchoi/next-ui/rhf";
+import { RHFTextfield } from "@nui-kit/react/rhf";
 
 const { control } = useForm<{ name: string }>();
 
@@ -226,14 +226,14 @@ const { control } = useForm<{ name: string }>();
 
 ```tsx
 // 배럴
-import { Button, Field, Textfield } from "@chansikchoi/next-ui";
+import { Button, Field, Textfield } from "@nui-kit/react";
 
 // 컴포넌트별 서브패스 (트리셰이킹)
-import { Button } from "@chansikchoi/next-ui/button";
-import { Textfield } from "@chansikchoi/next-ui/textfield";
+import { Button } from "@nui-kit/react/button";
+import { Textfield } from "@nui-kit/react/textfield";
 
 // react-hook-form 래퍼 (react-hook-form 설치 필요)
-import { RHFTextfield } from "@chansikchoi/next-ui/rhf";
+import { RHFTextfield } from "@nui-kit/react/rhf";
 ```
 
 배럴로 가져오든 서브패스로 가져오든 **같은 React Context 를 공유**하므로
@@ -315,7 +315,7 @@ React 는 client reference 프록시로 치환하는데, **정적 프로퍼티(d
 <Field.Label>이름</Field.Label>
 
 // ✅ Server Component — named export 사용
-import { Field, FieldLabel } from "@chansikchoi/next-ui";
+import { Field, FieldLabel } from "@nui-kit/react";
 <FieldLabel>이름</FieldLabel>
 
 // ✅ Client Component ("use client") — dot notation 사용 가능
@@ -349,7 +349,7 @@ import { Field, FieldLabel } from "@chansikchoi/next-ui";
 값은 옵션 객체가 아니라 **원시값**으로 주고받습니다.
 
 ```tsx
-import { Select, MultiSelect } from "@chansikchoi/next-ui";
+import { Select, MultiSelect } from "@nui-kit/react";
 
 const OPTIONS = [
   { label: "서울", value: "seoul" },
@@ -407,7 +407,7 @@ const SELECT_COMPONENTS = { Option: CustomOption };
 기본 CSS(`react-day-picker/style.css`)도 불러올 필요가 없습니다.**
 
 ```tsx
-import { Datepicker, DateRangePicker } from "@chansikchoi/next-ui";
+import { Datepicker, DateRangePicker } from "@nui-kit/react";
 
 <Datepicker selected={date} onSelectedChange={setDate} />;
 <DateRangePicker selected={range} onSelectedChange={setRange} />;
@@ -433,7 +433,7 @@ import { Datepicker, DateRangePicker } from "@chansikchoi/next-ui";
 `DateRange` 같은 타입과 기본 포맷터는 배럴에서 함께 내보냅니다.
 
 ```tsx
-import { DateRangePicker, type DateRange } from "@chansikchoi/next-ui";
+import { DateRangePicker, type DateRange } from "@nui-kit/react";
 ```
 
 **알려진 제약**

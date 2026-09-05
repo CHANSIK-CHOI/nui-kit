@@ -1,5 +1,5 @@
-import { Field, FieldLabel } from "@chansikchoi/next-ui";
-import { Password } from "@chansikchoi/next-ui/textfield";
+import { Field, FieldLabel } from "@nui-kit/react";
+import { Password } from "@nui-kit/react/textfield";
 import {
   GuideHeader,
   Case,

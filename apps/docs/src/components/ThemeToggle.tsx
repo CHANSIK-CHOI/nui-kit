@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Switch } from "@chansikchoi/next-ui";
+import { Switch } from "@nui-kit/react";
 
 export const THEME_STORAGE_KEY = "nui-docs-theme";
 

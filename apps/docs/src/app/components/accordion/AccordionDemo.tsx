@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Accordion, Button, Field, Textfield } from "@chansikchoi/next-ui";
+import { Accordion, Button, Field, Textfield } from "@nui-kit/react";
 import { Example } from "@/components/guide";
 
 const FAQ = [

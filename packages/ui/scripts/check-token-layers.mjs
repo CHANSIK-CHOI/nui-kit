@@ -319,7 +319,7 @@ if (warnings.length > 0) {
     console.warn(`   ${String(n).padStart(3)}건  ${file}`);
   }
   console.warn(
-    "\n   전체 목록: VERBOSE=1 npm run verify:tokens -w @chansikchoi/next-ui",
+    "\n   전체 목록: VERBOSE=1 npm run verify:tokens -w @nui-kit/react",
   );
   if (process.env.VERBOSE) {
     console.warn("");

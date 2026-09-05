@@ -2,7 +2,7 @@
   "name": "docs",
   "version": "0.0.0",
   "private": true,
-  "description": "@chansikchoi/next-ui API 문서 사이트 (Next.js App Router)",
+  "description": "@nui-kit/react API 문서 사이트 (Next.js App Router)",
   "scripts": {
     "dev": "npm run generate && next dev",
     "build": "npm run generate && next build",
@@ -15,7 +15,7 @@
     "verify:a11y": "node scripts/check-a11y.mjs"
   },
   "dependencies": {
-    "@chansikchoi/next-ui": "*",
+    "@nui-kit/react": "*",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^16.3.2",

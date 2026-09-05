@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 접근성을 보완하고 브랜드 색 대비를 WCAG AA 로 올렸습니다.

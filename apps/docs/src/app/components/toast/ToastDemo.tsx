@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@chansikchoi/next-ui";
-import { useToast } from "@chansikchoi/next-ui/toast";
+import { Button } from "@nui-kit/react";
+import { useToast } from "@nui-kit/react/toast";
 import { Example } from "@/components/guide";
 
 export function ToastDemo() {

@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 색 체계를 KRDS(디지털 정부서비스 UI/UX 가이드라인)에 맞췄습니다. 브랜드 색은 그대로이고

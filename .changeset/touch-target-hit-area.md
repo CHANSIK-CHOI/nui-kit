@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 누르는 범위를 넓혔습니다. 팝업 닫기 버튼과 달력의 이전/다음·날짜 버튼이 보이는 모양은

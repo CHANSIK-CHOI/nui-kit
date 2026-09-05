@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 팝업 닫기 버튼이 마크업의 가장 마지막으로 갔습니다. 보이는 자리는 오른쪽 위 그대로이고,

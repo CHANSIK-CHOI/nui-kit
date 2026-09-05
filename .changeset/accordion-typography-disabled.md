@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 Accordion 의 행간과 비활성 표현을 매트릭스에 맞췄습니다.

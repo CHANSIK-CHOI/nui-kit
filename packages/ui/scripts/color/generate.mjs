@@ -197,7 +197,7 @@ function declarations(theme, indent) {
 export function toCss(result, meta = {}) {
   const head = [
     "/*",
-    " * @chansikchoi/next-ui — 브랜드 색 테마",
+    " * @nui-kit/react — 브랜드 색 테마",
     meta.preset
       ? ` * 프리셋 ${meta.preset.n}. ${meta.preset.name} (${meta.preset.hex})`
       : null,

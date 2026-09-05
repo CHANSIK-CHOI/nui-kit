@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 **⚠️ `IconButton` 에 접근 이름이 필수가 됐습니다.** `aria-label` 이나 `aria-labelledby`

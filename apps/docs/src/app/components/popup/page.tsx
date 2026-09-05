@@ -118,7 +118,7 @@ export default function PopupPage() {
       <pre className="doc-code">
         <code>{`// app/providers.tsx — PopupHost 는 클라이언트 컴포넌트다
 "use client";
-import { PopupHost } from "@chansikchoi/next-ui/popup";
+import { PopupHost } from "@nui-kit/react/popup";
 
 export function Providers({ children }) {
   return <PopupHost>{children}</PopupHost>;

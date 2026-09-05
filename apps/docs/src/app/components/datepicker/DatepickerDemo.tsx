@@ -6,7 +6,7 @@ import {
   DateRangePicker,
   Datepicker,
   Field,
-} from "@chansikchoi/next-ui";
+} from "@nui-kit/react";
 import type { DateRange } from "react-day-picker";
 import { Case, CaseGrid, Example } from "@/components/guide";
 

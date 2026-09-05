@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Field, FieldLabel, Textarea } from "@chansikchoi/next-ui";
+import { Field, FieldLabel, Textarea } from "@nui-kit/react";
 import {
   GuideHeader,
   Case,

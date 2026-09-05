@@ -1,4 +1,4 @@
-import { Switch } from "@chansikchoi/next-ui";
+import { Switch } from "@nui-kit/react";
 import {
   GuideHeader,
   ChoiceStateCases,

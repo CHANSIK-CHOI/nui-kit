@@ -1,4 +1,4 @@
-import { Checkbox } from "@chansikchoi/next-ui";
+import { Checkbox } from "@nui-kit/react";
 import {
   GuideHeader,
   ChoiceStateCases,

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@chansikchoi/next-ui";
+import { Button } from "@nui-kit/react";
 import {
   BottomSheet,
   useBottomSheet,
   type BottomSheetComponentProps,
-} from "@chansikchoi/next-ui/popup";
+} from "@nui-kit/react/popup";
 import { Example } from "@/components/guide";
 
 const OPTIONS = ["링크 복사", "카카오톡", "메시지", "메일"];

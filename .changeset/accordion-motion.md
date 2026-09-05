@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 Accordion 의 접힘/펼침을 높이 애니메이션으로 바꿨습니다.

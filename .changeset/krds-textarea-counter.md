@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 `Textarea` 에 `maxLength` 를 주면 **글자 수 카운터가 영역 아래 오른쪽에 붙습니다.**

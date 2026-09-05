@@ -3,7 +3,7 @@
 //
 // 전역 태그 셀렉터를 사용하므로 소비자 프로젝트 전체에 영향을 준다.
 // 자체 reset 이 없는 프로젝트만 명시적으로 import 한다.
-//   import "@chansikchoi/next-ui/styles/preflight.css";
+//   import "@nui-kit/react/styles/preflight.css";
 //
 // nui.base 레이어 안에 있으므로, 소비자의 레이어 없는 CSS 가 항상 우선한다.
 @use "abstracts/layer";

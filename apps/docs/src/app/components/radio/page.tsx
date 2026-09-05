@@ -1,4 +1,4 @@
-import { Radio } from "@chansikchoi/next-ui";
+import { Radio } from "@nui-kit/react";
 import {
   GuideHeader,
   ChoiceStateCases,

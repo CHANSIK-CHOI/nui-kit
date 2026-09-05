@@ -7,8 +7,8 @@ import {
   LayerPopup,
   Tooltip,
   type TooltipPlacement,
-} from "@chansikchoi/next-ui";
-import { DelIcon } from "@chansikchoi/next-ui/icon";
+} from "@nui-kit/react";
+import { DelIcon } from "@nui-kit/react/icon";
 import { Example } from "@/components/guide";
 
 const PLACEMENTS: TooltipPlacement[] = [

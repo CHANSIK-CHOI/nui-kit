@@ -1,5 +1,5 @@
 ---
-"@chansikchoi/next-ui": minor
+"@nui-kit/react": minor
 ---
 
 타이포그래피를 KRDS(디지털 정부서비스 UI/UX 가이드라인) 서체 규격에 맞췄습니다.

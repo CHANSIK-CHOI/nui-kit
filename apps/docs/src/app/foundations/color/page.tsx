@@ -62,7 +62,7 @@ export default function ColorPage() {
 
       <pre className="doc-code">
         <code>{`/* 1) 화면 전체 */
-import "@chansikchoi/next-ui/styles/index.css";
+import "@nui-kit/react/styles/index.css";
 import "./nui-theme.css";
 
 /* 2) 한 컴포넌트 — !important 는 필요 없다 */

@@ -1,12 +1,12 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Button, Field } from "@chansikchoi/next-ui";
+import { Button, Field } from "@nui-kit/react";
 import {
   RHFDateMultiplePicker,
   RHFDateRangePicker,
   RHFDatepicker,
-} from "@chansikchoi/next-ui/rhf";
+} from "@nui-kit/react/rhf";
 import type { DateRange } from "react-day-picker";
 import { Example } from "@/components/guide";
 
@@ -33,7 +33,7 @@ export function RHFDatepickerDemo() {
     <>
       <h2>react-hook-form 연동</h2>
       <p>
-        <code>@chansikchoi/next-ui/rhf</code> 의 <code>RHFDatepicker</code> ·{" "}
+        <code>@nui-kit/react/rhf</code> 의 <code>RHFDatepicker</code> ·{" "}
         <code>RHFDateRangePicker</code> · <code>RHFDateMultiplePicker</code> 는{" "}
         <code>control</code> 만 넘기면 값과 에러를 스스로 소유한다.{" "}
         <code>selected</code> · <code>name</code> · <code>onBlur</code> 는

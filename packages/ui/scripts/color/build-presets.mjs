@@ -143,7 +143,7 @@ export function buildPresets(source, defaultAccent) {
   const { L, C, H } = hexToOklch(defaultAccent);
   kept.push({
     hex: defaultAccent,
-    name: "Next UI 기본",
+    name: "nui-kit 기본",
     palette: null,
     L: round(L, 2),
     C: round(C, 4),
