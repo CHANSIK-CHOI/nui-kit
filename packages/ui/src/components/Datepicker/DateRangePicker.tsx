@@ -64,7 +64,12 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(
       DateRangePickerProps["dayPickerProps"]
     > = {
       ...dayPickerProps,
-      min: dayPickerProps?.min ?? 1,
+      // `min` 에 기본값을 두지 않는다. 예전에는 `?? 1` 이었는데 react-day-picker 의
+      // `min` 은 **최소 일수로는 `min > 1` 일 때만 검사된다**(`addToRange`) —
+      // `1` 의 유일한 효과는 같은 날을 다시 눌렀을 때 하루 기간을 만드는 대신
+      // **선택을 통째로 비우는 것**이었다. "9월 1일 하루" 를 기간으로 받으려는
+      // 소비자가 우리 문서를 읽어야 알 수 있는 제약이었다.
+      // 최소 일수가 필요하면 `min: 2` 이상을 주면 그때 실제로 검사된다.
       resetOnSelect: dayPickerProps?.resetOnSelect ?? true,
     };
 
