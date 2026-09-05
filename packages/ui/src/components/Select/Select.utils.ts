@@ -10,6 +10,7 @@ import {
   type ReactElement,
 } from "react";
 import type {
+  ActionMeta,
   CSSObjectWithLabel,
   GroupBase,
   OptionsOrGroups,
@@ -28,6 +29,7 @@ import { pv } from "../../internal/prefix.js";
 import SelectAriaContext from "./Select.context.js";
 import type {
   MultiSelectValue,
+  SelectChangeMeta,
   SelectOption,
   SingleSelectValue,
 } from "./Select.types.js";
@@ -331,4 +333,38 @@ export function getResolvedSelectStyles<IsMulti extends boolean>(
     IsMulti,
     GroupBase<SelectOption>
   >;
+}
+
+/**
+ * react-select 의 `ActionMeta` 를 우리 `SelectChangeMeta` 로 옮긴다.
+ *
+ * 경계에서 한 번 변환해 **공개 시그니처에서 라이브러리 타입을 지운다**
+ * (`Select.types.ts` 의 `SelectChangeMeta` 주석 참조).
+ *
+ * `create-option` 은 `react-select/creatable` 전용이라 우리에게는 오지 않는다
+ * (제외 범위). 그래도 타입이 그것을 알 수 없으므로 기본 갈래가 함께 받는다.
+ */
+export function toSelectChangeMeta(
+  actionMeta: ActionMeta<SelectOption>,
+): SelectChangeMeta {
+  switch (actionMeta.action) {
+    case "remove-value":
+    case "pop-value":
+      return {
+        action: actionMeta.action,
+        option: actionMeta.removedValue?.value,
+      };
+
+    case "clear":
+      return {
+        action: "clear",
+        removedValues: actionMeta.removedValues.map((option) => option.value),
+      };
+
+    case "deselect-option":
+      return { action: "deselect-option", option: actionMeta.option?.value };
+
+    default:
+      return { action: "select-option", option: actionMeta.option?.value };
+  }
 }
