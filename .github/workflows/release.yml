@@ -1,0 +1,58 @@
+name: Release
+
+# 태그를 밀면 배포한다. 버전 산정(changeset version)과 태그 생성은 로컬에서 하고,
+# 여기서는 빌드·검증·publish 만 한다 — 무엇이 배포되는지 사람이 먼저 보게 하기 위해서다.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      dist_tag:
+        description: "npm dist-tag (최초 배포는 next 로 하고 스모크 테스트 후 latest 로 승격한다)"
+        type: choice
+        options: ["next", "latest"]
+        default: "next"
+        required: true
+
+permissions:
+  # OIDC 토큰을 만들 권한. provenance 서명과 Trusted Publishing 의 핵심이다.
+  id-token: write
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: release # 승인 게이트를 붙이고 싶으면 GitHub 쪽에서 이 환경에 reviewer 를 건다
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          # ⚠️ registry-url 이 있어야 ~/.npmrc 가 생성되고 인증이 붙는다. 빼면 401 이다.
+          registry-url: "https://registry.npmjs.org"
+          # 릴리스 빌드에는 캐시를 쓰지 않는다 — 재현성이 우선이다
+          cache: ""
+
+      - run: npm ci
+
+      # 로컬 품질 게이트와 같은 것을 CI 에서 한 번 더 돈다.
+      # verify:pkg = verify:css + verify:tokens + publint --strict + attw
+      - run: npm run typecheck
+      - run: npm run build:ui
+      - run: npm run verify:pkg
+
+      # 무엇이 배포되는지 로그에 남긴다 — files 필드가 어긋나면 여기서 드러난다
+      - run: npm pack -w @nui-kit/react --dry-run
+
+      - name: Publish
+        # provenance 는 packages/ui/package.json 의 publishConfig 가 켠다.
+        # NODE_AUTH_TOKEN 이 있으면 토큰으로, 없으면 OIDC(Trusted Publishing)로 인증한다 —
+        # 최초 배포 후 npm 쪽에 Trusted Publisher 를 등록하고 이 시크릿을 지우면 자동으로 넘어간다.
+        run: npm publish -w @nui-kit/react --tag "${{ inputs.dist_tag || 'next' }}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
