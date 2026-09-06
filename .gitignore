@@ -8,6 +8,9 @@ dist/
 out/
 packages/ui/styles/
 
+# vercel
+.vercel/
+
 # typescript
 *.tsbuildinfo
 
