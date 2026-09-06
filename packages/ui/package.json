@@ -7,7 +7,7 @@
     "url": "git+https://github.com/CHANSIK-CHOI/nui-kit.git",
     "directory": "packages/ui"
   },
-  "homepage": "https://github.com/CHANSIK-CHOI/nui-kit#readme",
+  "homepage": "https://nui-kit-docs.vercel.app",
   "bugs": {
     "url": "https://github.com/CHANSIK-CHOI/nui-kit/issues"
   },
