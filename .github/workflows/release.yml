@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
     inputs:
       dist_tag:
-        description: "npm dist-tag (최초 배포는 next 로 하고 스모크 테스트 후 latest 로 승격한다)"
+        description: "npm dist-tag — 프리릴리즈를 낼 때만 next 를 고른다"
         type: choice
-        options: ["next", "latest"]
-        default: "next"
+        options: ["latest", "next"]
+        default: "latest"
         required: true
 
 permissions:
@@ -58,6 +58,12 @@ jobs:
         # provenance 는 packages/ui/package.json 의 publishConfig 가 켠다.
         # NODE_AUTH_TOKEN 이 있으면 토큰으로, 없으면 OIDC(Trusted Publishing)로 인증한다 —
         # 최초 배포 후 npm 쪽에 Trusted Publisher 를 등록하고 이 시크릿을 지우면 자동으로 넘어간다.
-        run: npm publish -w @nui-kit/react --tag "${{ inputs.dist_tag || 'next' }}"
+        #
+        # ⚠️ 태그 push 는 **정식 릴리스**이므로 기본값이 `latest` 다. v0.1.1 이 `next` 로
+        #    나가 latest 가 0.1.0 에 남는 일이 있었다 — 기본값이 next 였기 때문이다.
+        #    되돌리려면 `npm dist-tag` 가 필요한데 **패스키 2FA 에서는 OTP 코드가 없어
+        #    CLI 로 못 고치고 웹에서 옮겨야 한다.** 기본값을 바로잡아 그 상황을 막는다.
+        #    프리릴리즈는 workflow_dispatch 에서 `next` 를 골라 명시한다.
+        run: npm publish -w @nui-kit/react --tag "${{ inputs.dist_tag || 'latest' }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
