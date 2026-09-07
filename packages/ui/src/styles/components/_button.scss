@@ -30,6 +30,16 @@
     // hover · pressed 는 같은 색조의 다음 단계다 (KRDS 95~96쪽 · A2). 그림자·떠오름은 쓰지 않는다.
     #{iv("button-main-hover")}: var(#{v("action-neutral-hover")});
     #{iv("button-main-active")}: var(#{v("action-neutral-active")});
+    // 면이 없는 line·text 의 글자. `button-main` 은 채워진 배경 자리(Radix 9단계)라
+    // 배경 없이 글자로 쓰면 대비가 무너진다 — 다크의 primary·secondary·danger 와
+    // 라이트의 warning 이 실제로 AA 미달이었다 (design-system.md §2-4).
+    #{iv("button-fg-line")}: var(#{v("action-neutral-fg-line")});
+    // 면이 깔린 동안의 글자 — 같은 색조의 다음 단계(11 → 12)
+    #{iv("button-fg-line-strong")}: var(#{v("action-neutral-fg-line-strong")});
+    // line 의 테두리는 **글자와 같은 색**이다. 원래 그랬고(둘 다 채움색), 글자만 옮기면
+    // 한 버튼 안에서 두 색이 갈린다. 테두리도 배경 없이 표면 위에 놓이므로 같은 문제를 겪는다
+    // — 다크에서 채움색 테두리가 hover 배경 위에서 2.47 까지 내려갔다.
+    #{iv("button-line-border")}: var(#{iv("button-fg-line")});
 
     // UA 기본 스타일 무력화 (전역 reset 미배포 대응 — 이 셀렉터 안에서만 적용)
     appearance: none;
@@ -128,6 +138,8 @@
       #{iv("button-fg")}: var(#{v("action-primary-fg")});
       #{iv("button-main-hover")}: var(#{v("action-primary-hover")});
       #{iv("button-main-active")}: var(#{v("action-primary-active")});
+      #{iv("button-fg-line")}: var(#{v("action-primary-fg-line")});
+      #{iv("button-fg-line-strong")}: var(#{v("action-primary-fg-line-strong")});
     }
 
     // 보조 액션 — 덜 중요한 버튼. KRDS 의 secondary (A1)
@@ -136,6 +148,8 @@
       #{iv("button-fg")}: var(#{v("action-secondary-fg")});
       #{iv("button-main-hover")}: var(#{v("action-secondary-hover")});
       #{iv("button-main-active")}: var(#{v("action-secondary-active")});
+      #{iv("button-fg-line")}: var(#{v("action-secondary-fg-line")});
+      #{iv("button-fg-line-strong")}: var(#{v("action-secondary-fg-line-strong")});
     }
 
     // 되돌릴 수 없는 액션 — 삭제 · 탈퇴 · 결제 취소
@@ -144,6 +158,8 @@
       #{iv("button-fg")}: var(#{v("action-danger-fg")});
       #{iv("button-main-hover")}: var(#{v("action-danger-hover")});
       #{iv("button-main-active")}: var(#{v("action-danger-active")});
+      #{iv("button-fg-line")}: var(#{v("action-danger-fg-line")});
+      #{iv("button-fg-line-strong")}: var(#{v("action-danger-fg-line-strong")});
     }
 
     // 주의가 필요한 액션 — 확인 후 진행
@@ -154,18 +170,21 @@
       #{iv("button-fg")}: var(#{v("action-warning-fg")});
       #{iv("button-main-hover")}: var(#{v("action-warning-hover")});
       #{iv("button-main-active")}: var(#{v("action-warning-active")});
+      // 노랑은 11단계도 라이트 4.41 로 AA 문턱을 못 넘어 12 를 쓴다.
+      #{iv("button-fg-line")}: var(#{v("action-warning-fg-line")});
+      #{iv("button-fg-line-strong")}: var(#{v("action-warning-fg-line-strong")});
     }
 
     // ── variant
     &--line {
-      #{iv("button-fg")}: var(#{iv("button-main")});
+      #{iv("button-fg")}: var(#{iv("button-fg-line")});
 
       background-color: transparent;
-      border-color: var(#{iv("button-main")});
+      border-color: var(#{iv("button-line-border")});
     }
 
     &--text {
-      #{iv("button-fg")}: var(#{iv("button-main")});
+      #{iv("button-fg")}: var(#{iv("button-fg-line")});
 
       display: flex;
       width: 100%;
@@ -198,6 +217,7 @@
 
       &#{cls("button")}--line {
         #{iv("button-main")}: var(#{v("action-border-disabled")});
+        #{iv("button-line-border")}: var(#{v("action-border-disabled")});
         #{iv("button-fg")}: var(#{v("action-fg-line-disabled")});
       }
     }
@@ -207,25 +227,29 @@
     @include hoverable {
       &--line:not([disabled]):not([aria-busy="true"]):hover {
         background-color: var(#{v("action-bg-hover")});
-        border-color: var(#{iv("button-main")});
+        border-color: var(#{iv("button-fg-line-strong")});
+        #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
       }
 
+      // 글자색을 다음 단계로 옮기면 다크에서 오히려 나빠진다(brand 10단계가 2.70).
+      // line 과 같이 **배경만** 반응한다 — 면 전체가 반응하는 부류다 (design-system.md §2-3).
       &--text:not([disabled]):not([aria-busy="true"]):hover {
-        background-color: transparent;
+        background-color: var(#{v("action-bg-hover")});
         border-color: transparent;
-        #{iv("button-fg")}: var(#{iv("button-main-hover")});
+        #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
       }
     }
 
     &--line:not([disabled]):not([aria-busy="true"]):active {
       background-color: var(#{v("action-bg-active")});
-      border-color: var(#{iv("button-main")});
+      border-color: var(#{iv("button-fg-line-strong")});
+      #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
     }
 
     &--text:not([disabled]):not([aria-busy="true"]):active {
-      background-color: transparent;
+      background-color: var(#{v("action-bg-active")});
       border-color: transparent;
-      #{iv("button-fg")}: var(#{iv("button-main-active")});
+      #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
       transform: none;
     }
   }
