@@ -379,7 +379,11 @@
     // ── control state (입력 컨트롤 공통 배선)
     #{v("control-text")}: var(#{v("color-gray-12")});
     #{v("control-text-muted")}: var(#{v("color-gray-11")});
-    #{v("control-text-placeholder")}: var(#{v("color-gray-10")});
+    // placeholder 도 글자다 — AA 4.5 를 지킨다 (06 D14). gray-10 은 라이트 3.77 ·
+    // 다크 4.22 로 미달이었고, 11 이 두 테마에서 4.5 를 넘는 첫 단계다(5.87 · 8.53).
+    // `control-text-muted`(readonly)와 지금 값이 같지만 역할이 달라 이름을 나눈다
+    // — 입력값(gray-12)보다 연해야 "아직 안 쓴 자리"로 읽힌다 (tokens.md §5-1).
+    #{v("control-text-placeholder")}: var(#{v("color-gray-11")});
     #{v("control-text-disabled")}: var(#{v("text-disabled")});
     #{v("control-text-error")}: var(#{v("color-danger-11")});
     #{v("control-icon")}: var(#{v("color-gray-10")});
