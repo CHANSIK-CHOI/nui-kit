@@ -1,7 +1,14 @@
 import type { ReactNode } from "react";
 
 export type ToastTone = "default" | "success" | "error";
-export type ToastStatus = "open" | "closing";
+/**
+ * 토스트는 **한 번에 하나만** 보인다 (TO2 · SEED Snackbar).
+ *
+ *   queued   차례를 기다린다. 아직 화면에 없다
+ *   open     보이는 중. 큐의 맨 앞 하나뿐이다
+ *   closing  나가는 모션 중. 아직 DOM 에 있다
+ */
+export type ToastStatus = "queued" | "open" | "closing";
 
 /**
  * 토스트의 액션 하나. 라벨은 **행동 동사**다 — "되돌리기" · "목록보기"

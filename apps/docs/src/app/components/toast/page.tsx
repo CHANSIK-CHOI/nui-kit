@@ -54,6 +54,10 @@ toast.open({ message: "저장되었습니다." });`}</code>
           토스트 레이어는 <code>pointer-events: none</code> 이라 뒤 화면 조작을
           막지 않는다. 카드 자체만 클릭을 받는다
         </li>
+        <li>
+          <strong>한 번에 하나만 그린다.</strong> 라이브 리전이 여럿이면 낭독이
+          겹친다. 기다리는 것은 DOM 에 없다
+        </li>
       </ul>
 
       <div className="doc-note doc-note--warn">

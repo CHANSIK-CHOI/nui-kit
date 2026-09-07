@@ -58,7 +58,13 @@ export default function ToastHost({ children }: ToastHostProps) {
       {portalRoot
         ? createPortal(
             <div className={STACK_CLASS}>
-              {items.map((item) => {
+              {/*
+                한 번에 하나만 그린다 (TO2). 차례를 기다리는 것은 store 에만 있고
+                DOM 에 없다 — 라이브 리전이 여러 개면 낭독이 겹치고, 쌓인 카드가
+                화면 아래를 덮는다. 맨 앞이 빠지면 store 가 다음 것을 open 으로
+                올리고 그때 처음 렌더된다.
+              */}
+              {items.slice(0, 1).map((item) => {
                 const { onCloseComplete, ...toastProps } = item.props;
 
                 return (

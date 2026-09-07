@@ -145,14 +145,20 @@ export function ToastDemo() {
         </div>
       </Example>
 
-      <h2>여러 개 쌓기</h2>
+      <h2>한 번에 하나</h2>
       <p>
-        토스트는 스택으로 쌓이고 아래에서 위로 정렬된다. <code>closeAll()</code>{" "}
-        로 한 번에 닫을 수 있다.
+        토스트는 <strong>화면에 하나만</strong> 보인다. 여러 개를 띄우면 차례를
+        기다렸다가 앞의 것이 사라진 뒤에 올라온다. 쌓이지 않으므로 화면 아래가
+        덮이지 않고, 낭독도 겹치지 않는다.
       </p>
+      <div className="doc-note doc-note--warn">
+        <code>duration: 0</code> 인 토스트는 스스로 사라지지 않으므로{" "}
+        <strong>뒤의 것이 계속 기다린다.</strong> 자동으로 닫히지 않게 할 때는{" "}
+        <code>closable</code> 을 함께 켜거나 직접 닫아 준다.
+      </div>
       <Example
         row={false}
-        caption="스택 동작"
+        caption="큐 동작 — 셋을 한 번에 띄워도 하나씩 나온다"
         code={`// ToastHost 를 앱 최상단에 한 번 놓는다\n<ToastHost>{children}</ToastHost>`}
       >
         <div
@@ -167,12 +173,12 @@ export function ToastDemo() {
             size="medium"
             variant="line"
             onClick={() => {
-              toast.open({ message: "첫 번째 알림", duration: 8000 });
-              toast.open({ message: "두 번째 알림", duration: 8000 });
+              toast.open({ message: "첫 번째 알림", duration: 2500 });
+              toast.open({ message: "두 번째 알림", duration: 2500 });
               toast.open({
                 message: "세 번째 알림",
                 tone: "error",
-                duration: 8000,
+                duration: 2500,
               });
             }}
           >
