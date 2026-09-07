@@ -14,6 +14,8 @@
  *    토큰 계산값으로 두 테마에서 잰다 (KRDS A4 · A5).
  * 2-c. 버튼 **조합 전수** — variant(solid·line·text) × color(다섯) × 상태(기본·비활성).
  *    예전에는 셋만 재고 있었고, 실제로 나온 위반 둘이 그 목록 밖이었다 (06 D10).
+ * 2-e. line · text 의 hover · active 글자 — 2-b 의 hover 항목은 solid 만 잰다.
+ *    면이 없는 것은 **실제로 마우스를 올리고 눌러서** 잰다.
  * 2-d. placeholder — `::placeholder` 는 의사요소라 요소 순회에 안 잡힌다. placeholder 도 글자다.
  * 3. 터치 영역 — 누를 수 있는 것의 히트 영역 실측 (a11y.md §8)
  *    박스가 아니라 `elementFromPoint` 로 실제 눌리는 범위를 잰다.
@@ -508,6 +510,145 @@ for (const theme of ["light", "dark"]) {
       b >= borderMin ? ok(bLine) : bad(`${bLine} — 기준 ${borderMin}:1 미달`);
     }
   }
+  await ctx.close();
+}
+
+// ── 2-e) 면이 없는 액션(line · text)의 hover · active 글자 (2026-09-07)
+//
+// 2-b 의 hover · pressed 항목은 **solid 만** 잰다(채움색 위 글자). line · text 는 배경이
+// 없어서 그 쌍으로 잴 수 없는데, 예전에는 hover 에서 글자색이 다음 단계로 옮겨 가고 있었다
+// — 다크에서 오히려 나빠지는 방향이었다(brand 9단계 3.33 → 10단계 2.70).
+//
+// 토큰 계산으로 흉내내지 않고 **실제로 마우스를 올리고 눌러서** 잰다. 그래야 나중에
+// 누가 hover 규칙을 되돌려도 검사가 잡는다.
+console.log("\n■ line · text 의 hover · active 글자 (라이트 · 다크)");
+
+const HOVER_VARIANTS = [
+  ["line", "nui-button--line"],
+  ["text", "nui-button--text"],
+];
+
+/** 페이지에 탐침 도구를 심는다. 배경은 데모 표면과 같은 색으로 직접 칠한다. */
+const INSTALL_PROBE = () => {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 1;
+  const cx = canvas.getContext("2d", { willReadFrequently: true });
+  const flatten = (layers) => {
+    cx.clearRect(0, 0, 1, 1);
+    cx.fillStyle = "#fff";
+    cx.fillRect(0, 0, 1, 1);
+    for (const layer of layers) {
+      if (!layer || /rgba\(0, 0, 0, 0\)|transparent/.test(layer)) continue;
+      cx.fillStyle = layer;
+      cx.fillRect(0, 0, 1, 1);
+    }
+    const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
+    return [r, g, b];
+  };
+  // 데모 버튼이 실제로 놓인 표면
+  let cur = document.querySelector(".nui-button")?.parentElement;
+  let surface = "rgb(255, 255, 255)";
+  while (cur) {
+    const value = getComputedStyle(cur).backgroundColor;
+    if (value && !/rgba\(0, 0, 0, 0\)|transparent/.test(value)) {
+      surface = value;
+      break;
+    }
+    cur = cur.parentElement;
+  }
+  const host = document.createElement("div");
+  host.id = "nui-a11y-probe";
+  host.style.cssText = `position:fixed;left:24px;top:24px;z-index:99999;padding:8px;width:180px;background:${surface}`;
+  document.body.appendChild(host);
+  window.__nuiProbe = { flatten, surface, host };
+};
+
+const MOUNT_PROBE = (className) => {
+  const { host } = window.__nuiProbe;
+  host.textContent = "";
+  const el = document.createElement("button");
+  el.type = "button";
+  el.className = className;
+  const wrap = document.createElement("span");
+  wrap.className = "nui-button__wrap";
+  wrap.textContent = "확인";
+  el.appendChild(wrap);
+  host.appendChild(el);
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+};
+
+const READ_PROBE = () => {
+  const { flatten, surface, host } = window.__nuiProbe;
+  const el = host.firstElementChild;
+  const cs = getComputedStyle(el);
+  const filled = !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor);
+  const bg = flatten([surface, cs.backgroundColor]);
+  const wrap = el.querySelector(".nui-button__wrap");
+  const fg = flatten([
+    `rgb(${bg[0]}, ${bg[1]}, ${bg[2]})`,
+    getComputedStyle(wrap).color,
+  ]);
+  // 테두리는 면 위가 아니라 뒤 표면 위에 놓인다 — hover 배경은 알파라 그 아래로 비친다
+  const width = parseFloat(cs.borderTopWidth) || 0;
+  const border =
+    width > 0
+      ? flatten([surface, cs.backgroundColor, cs.borderTopColor])
+      : null;
+  return { fg, bg, border, filled };
+};
+
+for (const theme of ["light", "dark"]) {
+  const ctx = await browser.newContext({
+    viewport: VIEWPORT,
+    colorScheme: theme,
+  });
+  const page = await ctx.newPage();
+  await page.goto(BASE + "/components/button", { waitUntil: "networkidle" });
+  const stamped = await page.evaluate(
+    () => document.documentElement.dataset.theme,
+  );
+  if (stamped !== theme) {
+    bad(`line·text hover: 테마가 ${theme} 이어야 하는데 ${stamped} 다`);
+    await ctx.close();
+    continue;
+  }
+  await page.evaluate(INSTALL_PROBE);
+
+  for (const [color, colorClass] of BUTTON_COLORS) {
+    for (const [variant, variantClass] of HOVER_VARIANTS) {
+      const className = ["nui-button", colorClass, variantClass]
+        .filter(Boolean)
+        .join(" ");
+      const { x, y } = await page.evaluate(MOUNT_PROBE, className);
+      await page.mouse.move(x, y);
+      // 색 전환이 duration-3(150ms)이다. 끝난 뒤에 잰다.
+      await page.waitForTimeout(250);
+      const hover = await page.evaluate(READ_PROBE);
+      await page.mouse.down();
+      await page.waitForTimeout(250);
+      const active = await page.evaluate(READ_PROBE);
+      await page.mouse.up();
+
+      for (const [state, m] of [
+        ["hover", hover],
+        ["active", active],
+      ]) {
+        const r = ratio(m.fg, m.bg);
+        const line = `${theme} ${variant}/${color} ${state} 글자 ${r.toFixed(2)}:1`;
+        r >= 4.5 ? ok(line) : bad(`${line} — 기준 4.5:1 미달`);
+
+        if (m.border) {
+          const b = ratio(m.border, m.bg);
+          const bLine = `${theme} ${variant}/${color} ${state} 테두리 ${b.toFixed(2)}:1`;
+          b >= 3.0 ? ok(bLine) : bad(`${bLine} — 기준 3:1 미달`);
+        }
+      }
+    }
+  }
+  await page.evaluate(() =>
+    document.getElementById("nui-a11y-probe")?.remove(),
+  );
   await ctx.close();
 }
 
