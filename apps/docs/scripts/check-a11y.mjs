@@ -12,9 +12,9 @@
  *    비활성은 AA 에서 빠지지만 하한 2.0:1 을 둔다 (design-system.md §2).
  * 2-b. 글자가 아닌 것의 대비 3:1(테두리 · 트랙 · 포커스)과 버튼 hover·pressed 의 글자 대비 —
  *    토큰 계산값으로 두 테마에서 잰다 (KRDS A4 · A5).
- * 2-c. 버튼 **조합 전수** — variant(solid·line·text) × color(다섯) × 상태(기본·비활성).
+ * 2-c. 버튼 **조합 전수** — variant(solid·soft·line·text) × color(넷) × 상태(기본·비활성).
  *    예전에는 셋만 재고 있었고, 실제로 나온 위반 둘이 그 목록 밖이었다 (06 D10).
- * 2-e. line · text 의 hover · active 글자 — 2-b 의 hover 항목은 solid 만 잰다.
+ * 2-e. soft · line · text 의 hover · active 글자 — 2-b 의 hover 항목은 solid 만 잰다.
  *    면이 없는 것은 **실제로 마우스를 올리고 눌러서** 잰다.
  * 2-d. placeholder — `::placeholder` 는 의사요소라 요소 순회에 안 잡힌다. placeholder 도 글자다.
  * 3. 터치 영역 — 누를 수 있는 것의 히트 영역 실측 (a11y.md §8)
@@ -385,7 +385,7 @@ for (const theme of ["light", "dark"]) {
   await ctx.close();
 }
 
-// ── 2-c) 버튼 조합 전수 — variant 3 × color 5 × 상태 2, 두 테마 (06 D10)
+// ── 2-c) 버튼 조합 전수 — variant 4 × color 4 × 상태 2, 두 테마 (06 D10)
 //
 // 예전에는 기본·primary·비활성 **셋만** 재고 있었다. D9(warning line·text 글자 1.5) ·
 // D12(비활성 line 테두리 1.38)는 전부 그 목록 **밖**에서 났다.
@@ -403,6 +403,9 @@ const BUTTON_COLORS = [
 ];
 const BUTTON_VARIANTS = [
   ["solid", ""],
+  // soft 는 2026-09-07 에 늘었다(prototype B1). 목록에 안 더하면 새 variant 가
+  // 검사 밖으로 빠진다 — 이 절이 존재하는 이유가 정확히 그것이다.
+  ["soft", "nui-button--soft"],
   ["line", "nui-button--line"],
   ["text", "nui-button--text"],
 ];
@@ -531,9 +534,12 @@ for (const theme of ["light", "dark"]) {
 //
 // 토큰 계산으로 흉내내지 않고 **실제로 마우스를 올리고 눌러서** 잰다. 그래야 나중에
 // 누가 hover 규칙을 되돌려도 검사가 잡는다.
-console.log("\n■ line · text 의 hover · active 글자 (라이트 · 다크)");
+console.log("\n■ soft · line · text 의 hover · active 글자 (라이트 · 다크)");
 
 const HOVER_VARIANTS = [
+  // soft 도 hover · active 에서 같은 색조의 다음 단계로 간다(3 → 4 → 5). 면이 있으니
+  // 2-c 로도 잡히지만, 움직이는 값은 실제로 올려 보고 눌러 봐야 안다.
+  ["soft", "nui-button--soft"],
   ["line", "nui-button--line"],
   ["text", "nui-button--text"],
 ];
@@ -648,7 +654,9 @@ for (const theme of ["light", "dark"]) {
         const line = `${theme} ${variant}/${color} ${state} 글자 ${r.toFixed(2)}:1`;
         r >= 4.5 ? ok(line) : bad(`${line} — 기준 4.5:1 미달`);
 
-        if (m.border) {
+        // 면이 있는 것(soft)은 테두리색이 곧 배경색이라 재봐야 1:1 이다 —
+        // 2-c 가 쓰는 규칙과 같다. 재는 대상은 면이 없는 line 의 테두리다.
+        if (m.border && !m.filled) {
           const b = ratio(m.border, m.bg);
           const bLine = `${theme} ${variant}/${color} ${state} 테두리 ${b.toFixed(2)}:1`;
           b >= 3.0 ? ok(bLine) : bad(`${bLine} — 기준 3:1 미달`);

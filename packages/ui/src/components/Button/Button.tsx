@@ -23,7 +23,12 @@ export type ButtonSize = "large" | "medium" | "small";
 //    대비를 맞추면 갈색이 되어 "주의"를 잃는다 — variant 축을 못 채운다. 되돌릴 수 없는
 //    행동은 `danger`, 확인이 필요하면 `Confirm` 이 그 자리다.
 export type ButtonColor = "neutral" | "primary" | "secondary" | "danger";
-export type ButtonVariant = "solid" | "line" | "text";
+// 위계 넷 — 채움의 진하기로 나눈다 (design-system.md §2-4-1)
+//   solid  High     한 화면에 하나. 눌러야 하는 것
+//   soft   Medium   두 번째 행동. 채워져 있지만 조용하다 (2026-09-07 추가)
+//   line   Low      반복되는 자리. 테두리는 중립, 색은 글자에만
+//   text   Lowest   목록 안·문장 안
+export type ButtonVariant = "solid" | "soft" | "line" | "text";
 export type ButtonShape = "round" | "square";
 
 export type ButtonDesignProps =

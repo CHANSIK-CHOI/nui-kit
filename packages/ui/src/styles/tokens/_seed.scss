@@ -529,6 +529,19 @@
     #{v("action-bg-active")}: var(#{v("color-gray-a5")});
     #{v("action-bg-disabled")}: var(#{v("color-gray-3")});
     #{v("action-fg-disabled")}: var(#{v("color-gray-9")});
+    // line 버튼의 테두리 ★ (2026-09-07 · prototype B1)
+    // 역할색이 아니라 **중립**이다 — 선은 등장 빈도로 정해지고(§2-6), line 버튼은
+    // 목록마다 반복된다. 색은 글자와 아이콘에만 남는다.
+    //
+    // ⚠️ `control-border-*` 를 쓰지 않는다. 그건 **입력 컨트롤 본체** 전용이다
+    //    (design-system.md §2-5-1). 값이 같아도 역할이 다르면 이름을 나눈다 (§5-1).
+    //
+    // 세 단계인 이유 — 안쪽 면이 hover·active 에서 어두워지는데(`action-bg-*` 알파)
+    // 테두리가 제자리면 대비가 깎인다. 실측으로 gray-10 이 active 에서 **2.87** 까지
+    // 내려갔다(기준 3.0). 면이 한 단계 갈 때 선도 한 단계 간다.
+    #{v("action-border")}: var(#{v("color-gray-9")});
+    #{v("action-border-hover")}: var(#{v("color-gray-10")});
+    #{v("action-border-active")}: var(#{v("color-gray-11")});
     // 비활성 line 버튼의 테두리. gray-6 은 라이트 1.38 · 다크 1.57 로 사실상 안 보였다 (06 D12).
     #{v("action-border-disabled")}: var(#{v("color-gray-9")});
 
@@ -560,6 +573,32 @@
     #{v("action-secondary-fg-line-strong")}: var(#{v("color-secondary-12")});
     #{v("action-danger-fg-line-strong")}: var(#{v("color-danger-12")});
     #{v("action-fg-line-disabled")}: var(#{v("color-gray-9")});
+
+    // ── 연한 면 (soft) ★ 2026-09-07 · prototype B1
+    // solid 와 line 사이의 한 단계다. 채워져 있지만 조용해서, 같은 화면에 눌러야 할
+    // 것이 둘일 때 두 번째를 맡는다 — solid 는 한 화면에 하나라는 규칙(§2-4-1)을
+    // 어기지 않고 위계를 넷으로 늘린다.
+    //
+    // **면은 Radix 3단계(컴포넌트 배경), 글자는 11단계**다. 그 짝이 라이트 4.5 를
+    // 넘는다 — 실측 primary 4.88 · danger 4.54, 다크 7.87 · 7.47.
+    // hover · active 는 같은 색조의 다음 단계(4 · 5)다 — §2-4 의 원칙 그대로다.
+    //
+    // ⚠️ 글자는 `action-{역할}-fg-line` 을 그대로 쓴다. 여기에 짝 토큰을 따로 만들면
+    //    같은 값이 두 이름을 갖게 되고, 한쪽만 고쳤을 때 조용히 갈린다.
+    #{v("action-neutral-soft")}: var(#{v("color-gray-3")});
+    #{v("action-primary-soft")}: var(#{v("color-brand-3")});
+    #{v("action-secondary-soft")}: var(#{v("color-secondary-3")});
+    #{v("action-danger-soft")}: var(#{v("color-danger-3")});
+
+    #{v("action-neutral-soft-hover")}: var(#{v("color-gray-4")});
+    #{v("action-primary-soft-hover")}: var(#{v("color-brand-4")});
+    #{v("action-secondary-soft-hover")}: var(#{v("color-secondary-4")});
+    #{v("action-danger-soft-hover")}: var(#{v("color-danger-4")});
+
+    #{v("action-neutral-soft-active")}: var(#{v("color-gray-5")});
+    #{v("action-primary-soft-active")}: var(#{v("color-brand-5")});
+    #{v("action-secondary-soft-active")}: var(#{v("color-secondary-5")});
+    #{v("action-danger-soft-active")}: var(#{v("color-danger-5")});
 
     // ── semantic / focus — 포커스 표시도 배경과 3:1 이상 (WCAG 2.4.11). Radix 8단계는 라이트에서
     //    2.3:1 이라 미달이었다. 9단계는 라이트 5.2 · 다크 3.6 이다 (A4).

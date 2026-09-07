@@ -36,10 +36,25 @@
     #{iv("button-fg-line")}: var(#{v("action-neutral-fg-line")});
     // 면이 깔린 동안의 글자 — 같은 색조의 다음 단계(11 → 12)
     #{iv("button-fg-line-strong")}: var(#{v("action-neutral-fg-line-strong")});
-    // line 의 테두리는 **글자와 같은 색**이다. 원래 그랬고(둘 다 채움색), 글자만 옮기면
-    // 한 버튼 안에서 두 색이 갈린다. 테두리도 배경 없이 표면 위에 놓이므로 같은 문제를 겪는다
-    // — 다크에서 채움색 테두리가 hover 배경 위에서 2.47 까지 내려갔다.
-    #{iv("button-line-border")}: var(#{iv("button-fg-line")});
+    // line 의 테두리는 **역할색이 아니라 중립 회색**이다 (2026-09-07 · prototype B1).
+    // 근거는 선 색 규칙이다 — 선은 "한 화면에 몇 번 나오나"로 정해지고, 많이 나올수록
+    // 연하다 (design-system.md §2-6). line 버튼은 목록 행마다 반복되는 자리라 그 축의
+    // 위쪽이고, 색 테두리가 세 번 반복되면 화면이 줄무늬가 된다.
+    //
+    // 색은 **글자와 아이콘에만** 남는다 — 삭제 버튼은 여전히 빨간 글자다. 되돌릴 수
+    // 없는 확인은 애초에 solid danger 나 Confirm 이 맡는다 (§2-4-1).
+    //
+    // 누르는 것의 선이라 형태선(border-form)이 아니라 `action-border` 다 —
+    // 배경과 3:1 이 필요하다 (WCAG 1.4.11 · 실측 3.30). `control-border-*` 는
+    // 입력 컨트롤 본체 전용이라 쓰지 않는다 (design-system.md §2-5-1).
+    #{iv("button-line-border")}: var(#{v("action-border")});
+    #{iv("button-line-border-hover")}: var(#{v("action-border-hover")});
+    #{iv("button-line-border-active")}: var(#{v("action-border-active")});
+
+    // soft — 채워져 있지만 조용한 한 단계. 면은 Radix 3, 글자는 11 이다
+    #{iv("button-soft")}: var(#{v("action-neutral-soft")});
+    #{iv("button-soft-hover")}: var(#{v("action-neutral-soft-hover")});
+    #{iv("button-soft-active")}: var(#{v("action-neutral-soft-active")});
 
     // UA 기본 스타일 무력화 (전역 reset 미배포 대응 — 이 셀렉터 안에서만 적용)
     appearance: none;
@@ -140,6 +155,9 @@
       #{iv("button-main-active")}: var(#{v("action-primary-active")});
       #{iv("button-fg-line")}: var(#{v("action-primary-fg-line")});
       #{iv("button-fg-line-strong")}: var(#{v("action-primary-fg-line-strong")});
+      #{iv("button-soft")}: var(#{v("action-primary-soft")});
+      #{iv("button-soft-hover")}: var(#{v("action-primary-soft-hover")});
+      #{iv("button-soft-active")}: var(#{v("action-primary-soft-active")});
     }
 
     // 보조 액션 — 덜 중요한 버튼. KRDS 의 secondary (A1)
@@ -150,6 +168,9 @@
       #{iv("button-main-active")}: var(#{v("action-secondary-active")});
       #{iv("button-fg-line")}: var(#{v("action-secondary-fg-line")});
       #{iv("button-fg-line-strong")}: var(#{v("action-secondary-fg-line-strong")});
+      #{iv("button-soft")}: var(#{v("action-secondary-soft")});
+      #{iv("button-soft-hover")}: var(#{v("action-secondary-soft-hover")});
+      #{iv("button-soft-active")}: var(#{v("action-secondary-soft-active")});
     }
 
     // 되돌릴 수 없는 액션 — 삭제 · 탈퇴 · 결제 취소
@@ -160,9 +181,23 @@
       #{iv("button-main-active")}: var(#{v("action-danger-active")});
       #{iv("button-fg-line")}: var(#{v("action-danger-fg-line")});
       #{iv("button-fg-line-strong")}: var(#{v("action-danger-fg-line-strong")});
+      #{iv("button-soft")}: var(#{v("action-danger-soft")});
+      #{iv("button-soft-hover")}: var(#{v("action-danger-soft-hover")});
+      #{iv("button-soft-active")}: var(#{v("action-danger-soft-active")});
     }
 
     // ── variant
+    // 위계는 넷이다 — solid(High) · soft(Medium) · line(Low) · text(Lowest).
+    // soft 는 "눌러야 할 것이 둘일 때 두 번째"의 자리다. solid 를 한 화면에 둘 놓지
+    // 않고도 두 번째 행동을 채워진 면으로 보여준다 (design-system.md §2-4-1).
+    &--soft {
+      #{iv("button-main")}: var(#{iv("button-soft")});
+      #{iv("button-main-hover")}: var(#{iv("button-soft-hover")});
+      #{iv("button-main-active")}: var(#{iv("button-soft-active")});
+      // 연한 면 위의 글자는 채움색(9)이 아니라 저대비 본문(11)이다 — §2-4-0 과 같은 이유
+      #{iv("button-fg")}: var(#{iv("button-fg-line")});
+    }
+
     &--line {
       #{iv("button-fg")}: var(#{iv("button-fg-line")});
 
@@ -214,7 +249,15 @@
     @include hoverable {
       &--line:not([disabled]):not([aria-busy="true"]):hover {
         background-color: var(#{v("action-bg-hover")});
-        border-color: var(#{iv("button-fg-line-strong")});
+        // 테두리는 중립의 다음 단계로 간다. 글자만 역할색의 다음 단계다
+        border-color: var(#{iv("button-line-border-hover")});
+        #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
+      }
+
+      // soft 는 면이 있고 그 면이 한 단계 어두워진다(3 → 4). 글자가 11 에 머물면
+      // 라이트에서 AA 를 놓친다 — 실측 danger hover 4.09 · active 3.70.
+      // §2-4-0 과 같은 처방이다: 면이 깔린 동안의 글자는 12단계.
+      &--soft:not([disabled]):not([aria-busy="true"]):hover {
         #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
       }
 
@@ -229,7 +272,12 @@
 
     &--line:not([disabled]):not([aria-busy="true"]):active {
       background-color: var(#{v("action-bg-active")});
-      border-color: var(#{iv("button-fg-line-strong")});
+      // 안쪽 면이 한 단계 더 어두워지므로 선도 한 단계 더 간다 — 안 그러면 2.87 이다
+      border-color: var(#{iv("button-line-border-active")});
+      #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
+    }
+
+    &--soft:not([disabled]):not([aria-busy="true"]):active {
       #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
     }
 
