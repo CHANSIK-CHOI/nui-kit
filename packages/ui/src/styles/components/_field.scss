@@ -94,6 +94,11 @@
       flex-wrap: wrap;
       width: 100%;
       gap: var(#{v("space-component-gap")});
+      // ⚠️ 줄이 늘어나지 않게 한다. `__grid` 는 CSS grid 라 자식이 **행 높이로 늘어나는데**,
+      // 여기가 wrap 이라 남는 높이만큼 줄 사이가 벌어진다. 설명이 있는 칸과 없는 칸을
+      // 나란히 두면 라벨이 7px · 입력이 22px 어긋났다 (2026-09-07 실측).
+      // 문서 사이트에 설명이 섞인 grid 데모가 없어서 드러난 적이 없었다.
+      align-content: flex-start;
 
       &--row {
         flex-direction: row;
