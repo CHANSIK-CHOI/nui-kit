@@ -28,7 +28,7 @@
 //
 // semantic 이름은 그대로 두고 참조하는 primitive 값만 바꾼다.
 // 그래서 컴포넌트 SCSS 는 한 줄도 수정하지 않아도 다크가 적용된다.
-// 예외는 셋 — layer-* · surface-toast-error · 반전 짝 text-on-inverse (아래 주석 참조).
+// 예외는 셋 — layer-*(반전 포함) · surface-toast-error · 반전 짝 text-on-inverse (아래 주석 참조).
 //
 // 적용 순서
 //   1) 소비자가 [data-theme="dark"] 를 지정하면 그것이 이긴다
@@ -166,6 +166,11 @@
   #{v("layer-default")}: var(#{v("color-gray-2")});
   #{v("layer-floating")}: var(#{v("color-gray-3")});
   #{v("surface-toast-error")}: var(#{v("color-danger-3")});
+  // ⚠️ 라이트가 순수 검정(#000)으로 고정되면서 여기 선언이 **필수**가 됐다 (D15).
+  //    예전에는 `layer-inverse: gray-12` 하나로 두고 primitive 가 뒤집히기를 기다렸는데,
+  //    라이트를 고정값으로 바꾸는 순간 다크도 검정이 되어 글자(gray-1, 거의 검정)와 겹친다.
+  //    **테마 한쪽을 고정값으로 바꾸면 반대쪽 선언이 따라와야 한다.**
+  #{v("layer-inverse")}: var(#{v("color-gray-12")});
   // 반전 표면이 밝아졌으므로 그 위 글자는 어두워진다. 실측 1.16:1 → 15.2:1
   #{v("text-on-inverse")}: var(#{v("color-gray-1")});
 }
@@ -349,7 +354,14 @@
     #{v("layer-default")}: var(#{v("color-gray-1")});
     #{v("layer-floating")}: var(#{v("color-gray-1")});
     // 반전 표면 — 토스트·툴팁. 위에 놓는 글자는 text-on-inverse 다.
-    #{v("layer-inverse")}: var(#{v("color-gray-12")});
+    //
+    // ⚠️ **라이트만 순수 검정이다** (2026-09-07 · D15). gray-12 는 브랜드 색조가 살짝 도는
+    //    짙은 회색인데, 반전 표면은 브랜드를 물려받을 이유가 없다 — 화면 위에 잠깐 떠서
+    //    "지금 이건 UI 밖의 알림" 이라고 말하는 면이다. 흰 글자와의 대비도 16.2 → 21 로 오른다.
+    //    프리셋 185색과 무관한 고정값이어도 되고, color:verify 는 primitive 만 대조하므로
+    //    영향이 없다. **다크 블록의 값은 그대로 gray-12 다** — 다크에서 반전은 밝아야 한다
+    //    (tokens.md §4-1-2).
+    #{v("layer-inverse")}: #000;
     #{v("layer-overlay")}: rgb(0 0 0 / 50%);
 
     // ── semantic / surface — layer 가 아니라 콘텐츠 위에 얹는 톤
