@@ -198,6 +198,27 @@ export default function RootLayout({
 나지 않습니다. `<LayerPopup open={...} />` 처럼 선언형으로 직접 렌더할 때는 Host 가
 필요 없지만, 그 경우 배경 스크롤 잠금과 배경 `inert` 도 걸리지 않습니다.
 
+토스트는 **읽는 동안 사라지지 않습니다.** 마우스가 올라가 있거나, 포커스가 안에
+있거나, 다른 탭에 가 있으면 시간이 멈추고 돌아오면 남은 시간부터 다시 갑니다.
+
+```tsx
+const toast = useToast();
+
+toast.open({ message: "저장을 완료했어요", tone: "success" });
+
+// 되돌릴 수 있는 행동에는 액션 하나를 붙입니다. 누르면 실행하고 닫힙니다.
+toast.open({
+  message: "항목을 삭제했어요",
+  action: { label: "되돌리기", onClick: restore },
+});
+
+// 직접 닫게 하려면 닫기 버튼을 켭니다. 기본값은 꺼짐입니다.
+toast.open({ message: "동기화 중입니다", duration: 0, closable: true });
+```
+
+`tone` 은 `"default"` · `"success"` · `"error"` 셋입니다. `success` 와 `error` 에는
+아이콘이 함께 붙어 색만으로 구분하지 않습니다.
+
 ### react-hook-form 래퍼
 
 `@nui-kit/react/rhf` 에서 가져옵니다. `control` 만 넘기면 값과 에러를

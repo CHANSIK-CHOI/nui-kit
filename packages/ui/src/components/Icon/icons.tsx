@@ -4,6 +4,7 @@ import cn from "classnames";
 import {
   Calendar,
   CircleAlert,
+  CircleCheck,
   Eye,
   EyeOff,
   LoaderCircle,
@@ -73,6 +74,12 @@ export const DelIcon = fromLucide(X, "DelIcon");
 
 /** 주의 — Message 의 에러 표시 · Alert · Confirm */
 export const AttentionIcon = fromLucide(CircleAlert, "AttentionIcon");
+
+/**
+ * 완료 — Toast 의 `tone="success"`.
+ * `AttentionIcon`(CircleAlert)과 같은 동그라미 계열이라 나란히 놓아도 결이 맞는다.
+ */
+export const SuccessIcon = fromLucide(CircleCheck, "SuccessIcon");
 
 /** 검색 */
 export const SearchIcon = fromLucide(Search, "SearchIcon");

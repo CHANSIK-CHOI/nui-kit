@@ -179,6 +179,24 @@ const CONTRAST_TARGETS = [
     async (page) =>
       page.getByRole("button", { name: "기본 토스트" }).first().click(),
   ],
+  // ⚠️ tone 마다 잰다. 예전에는 기본 토스트만 재고 있었고, 그 사이 error 가 다크에서
+  //    어두운 배경 + 어두운 글자로 **1.14:1** 이 되어 있었다 (2026-09-07 발견).
+  [
+    "Toast 메시지 (success)",
+    "/components/toast",
+    ".nui-toast--success .nui-toast__message",
+    4.5,
+    async (page) =>
+      page.getByRole("button", { name: "성공 토스트" }).first().click(),
+  ],
+  [
+    "Toast 메시지 (error)",
+    "/components/toast",
+    ".nui-toast--error .nui-toast__message",
+    4.5,
+    async (page) =>
+      page.getByRole("button", { name: "에러 토스트" }).first().click(),
+  ],
 ];
 
 for (const theme of ["light", "dark"]) {
@@ -253,6 +271,11 @@ const TOKEN_PAIRS = [
   ["체크박스 테두리", "control-border", "layer-default", 3],
   ["포커스 표시", "focus-color", "layer-default", 3],
   ["비활성 아이콘 (하한)", "control-icon-disabled", "control-bg-disabled", 2],
+  // 반전 표면 위 — 토스트의 접두 아이콘과 액션 라벨. 채움 단계(9·11)는 여기서 3.9~4.6 이라
+  // 못 쓴다. 3단계가 테마마다 뒤집혀 반전 표면과 언제나 반대다.
+  ["토스트 success 아이콘", "text-success-on-inverse", "layer-inverse", 3],
+  ["토스트 error 아이콘", "text-danger-on-inverse", "layer-inverse", 3],
+  ["토스트 액션 라벨", "text-brand-on-inverse", "layer-inverse", 4.5],
   // 비활성 선도 배경에 녹으면 "없음"으로 읽힌다 — 하한 2.0 (design-system.md §2)
   [
     "비활성 입력 테두리 (하한)",
@@ -785,6 +808,24 @@ const TOUCH_TARGETS = [
       page.getByRole("button", { name: "프로필 팝업" }).first().click(),
   ],
   ["Accordion 헤더", "/components/accordion", ".nui-accordion__button"],
+  [
+    "Toast 액션",
+    "/components/toast",
+    ".nui-toast__action",
+    async (page) =>
+      page.getByRole("button", { name: "액션 있는 토스트" }).first().click(),
+  ],
+  [
+    "Toast 닫기",
+    "/components/toast",
+    ".nui-toast__close",
+    async (page) =>
+      page
+        .getByRole("button", { name: "닫기 버튼 있는 토스트" })
+        .first()
+        .click(),
+    "토스트 안에서 액션 라벨과 8px 로 붙는다. 44 를 채우면 두 히트가 겹쳐 인접 시 상한이 낮아지므로 하한 24 를 쓴다 — 입력 안 보조 버튼과 같은 이유",
+  ],
   // 선택 컨트롤은 투명 input 을 44 로 키워 누르는 범위를 확보한다 (KRDS D2)
   ["Checkbox", "/components/checkbox", ".nui-checkbox__input"],
   [

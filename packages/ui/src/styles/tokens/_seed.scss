@@ -28,7 +28,7 @@
 //
 // semantic 이름은 그대로 두고 참조하는 primitive 값만 바꾼다.
 // 그래서 컴포넌트 SCSS 는 한 줄도 수정하지 않아도 다크가 적용된다.
-// 예외는 셋 — layer-*(반전 포함) · surface-toast-error · 반전 짝 text-on-inverse (아래 주석 참조).
+// 예외는 둘 — layer-*(반전 포함) · 반전 짝 text-on-inverse · text-brand-on-inverse (아래 주석 참조).
 //
 // 적용 순서
 //   1) 소비자가 [data-theme="dark"] 를 지정하면 그것이 이긴다
@@ -165,7 +165,6 @@
   #{v("layer-basement")}: var(#{v("color-gray-1")});
   #{v("layer-default")}: var(#{v("color-gray-2")});
   #{v("layer-floating")}: var(#{v("color-gray-3")});
-  #{v("surface-toast-error")}: var(#{v("color-danger-3")});
   // ⚠️ 라이트가 순수 검정(#000)으로 고정되면서 여기 선언이 **필수**가 됐다 (D15).
   //    예전에는 `layer-inverse: gray-12` 하나로 두고 primitive 가 뒤집히기를 기다렸는데,
   //    라이트를 고정값으로 바꾸는 순간 다크도 검정이 되어 글자(gray-1, 거의 검정)와 겹친다.
@@ -173,6 +172,17 @@
   #{v("layer-inverse")}: var(#{v("color-gray-12")});
   // 반전 표면이 밝아졌으므로 그 위 글자는 어두워진다. 실측 1.16:1 → 15.2:1
   #{v("text-on-inverse")}: var(#{v("color-gray-1")});
+  // 반전 표면 위의 브랜드·상태 글자(토스트 액션 · 접두 아이콘).
+  // 낮은 단계는 테마마다 밝고 어두워지므로 반전 표면과 언제나 반대다.
+  //
+  // **7단계가 색이 보이는 마지막 자리다.** 두 테마의 낮은 쪽으로 재면 —
+  //   3  brand 12.74 · success 12.79 · danger 14.22   (거의 흰색이라 브랜드로 안 읽힌다)
+  //   7  brand  5.55 · success  5.68 · danger  6.97   ← 여기
+  //   8  brand  4.20 · success  4.36                  (AA 미달)
+  // 9·11단계는 라이트에서 3.9~4.0 이라 애초에 쓸 수 없다.
+  #{v("text-brand-on-inverse")}: var(#{v("color-brand-7")});
+  #{v("text-success-on-inverse")}: var(#{v("color-success-7")});
+  #{v("text-danger-on-inverse")}: var(#{v("color-danger-7")});
 }
 
 @layer nui.tokens {
@@ -344,6 +354,11 @@
     //   text-on-inverse  layer-inverse(토스트·툴팁) 위. 다크에서 표면이 밝아지므로 글자는 어두워진다
     //   text-on-accent   control-accent · action 채움 위. 테마와 무관하게 brand-9 라 흰색으로 남는다
     #{v("text-on-inverse")}: var(#{v("color-white")});
+    //   text-*-on-inverse      반전 표면 위의 브랜드·상태 글자 — 토스트 액션 라벨 · 접두 아이콘.
+    //                          7단계가 색이 보이면서 AA 를 넘는 마지막 자리다(위 주석)
+    #{v("text-brand-on-inverse")}: var(#{v("color-brand-7")});
+    #{v("text-success-on-inverse")}: var(#{v("color-success-7")});
+    #{v("text-danger-on-inverse")}: var(#{v("color-danger-7")});
     #{v("text-on-accent")}: var(#{v("color-white")});
 
     // ── semantic / layer (컨테이너 표면) ★
@@ -369,7 +384,6 @@
     // 그라디언트는 두지 않는다 — 고도는 표면색·그림자·선 셋으로 표현한다 (design-system.md §2-5).
     #{v("surface-neutral-soft")}: var(#{v("color-gray-a3")});
     #{v("surface-neutral-subtle")}: var(#{v("color-gray-a4")});
-    #{v("surface-toast-error")}: var(#{v("color-danger-12")});
 
     // ── semantic / border ★
     //

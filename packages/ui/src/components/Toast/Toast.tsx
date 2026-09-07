@@ -2,29 +2,53 @@
 
 import cn from "classnames";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { px } from "../../internal/prefix.js";
 import {
   motionTransition,
   reduceMotion,
   reduceMotionTransition,
 } from "../../internal/motion.js";
-import type { ToastProps } from "./Toast.types.js";
+import { AttentionIcon, CloseIcon, SuccessIcon } from "../Icon/icons.js";
+import type { ToastProps, ToastTone } from "./Toast.types.js";
 
 const block = px("toast");
-const DEFAULT_TOAST_DURATION = 2400;
+
+/**
+ * 기본 4초. SEED Snackbar 값이고, 두 줄까지 읽기에 모자라지 않다.
+ * 긴 문구는 소비자가 `duration` 으로 늘린다.
+ */
+const DEFAULT_TOAST_DURATION = 4000;
+
+const DEFAULT_CLOSE_LABEL = "닫기";
+
+/**
+ * tone 이 아이콘을 정한다. `default` 는 아이콘이 없다 —
+ * "무슨 일이 있었다"에는 붙일 그림이 없다 (SEED Snackbar variant=default).
+ */
+const TONE_ICON: Record<ToastTone, typeof SuccessIcon | null> = {
+  default: null,
+  success: SuccessIcon,
+  error: AttentionIcon,
+};
 
 /**
  * 단일 토스트 카드. 보통 직접 쓰지 않고 `useToast()` 로 띄운다.
  *
  * tone 에 따라 라이브 리전 강도가 달라진다 —
  * error 는 즉시 읽히도록 assertive, 그 외는 polite.
+ *
+ * **읽는 동안은 사라지지 않는다.** 마우스가 올라가 있거나, 포커스가 안에 있거나,
+ * 탭이 숨어 있으면 시간이 멈추고 남은 시간부터 다시 간다 (WCAG 2.2.1).
  */
 export default function Toast({
   className,
   message,
   tone = "default",
   duration = DEFAULT_TOAST_DURATION,
+  closable = false,
+  closeLabel = DEFAULT_CLOSE_LABEL,
+  action,
   open,
   onRequestClose,
   onExited,
@@ -48,17 +72,46 @@ export default function Toast({
     onRequestCloseRef.current = onRequestClose;
   });
 
-  useEffect(() => {
-    if (!open || duration <= 0) return;
+  // ── 멈추는 이유 셋. 하나라도 켜져 있으면 시간이 흐르지 않는다.
+  const [isHovered, setHovered] = useState(false);
+  const [isFocusedWithin, setFocusedWithin] = useState(false);
+  const [isPageHidden, setPageHidden] = useState(false);
+  const isPaused = isHovered || isFocusedWithin || isPageHidden;
 
+  useEffect(() => {
+    const sync = () => setPageHidden(document.visibilityState === "hidden");
+
+    sync();
+    document.addEventListener("visibilitychange", sync);
+
+    return () => {
+      document.removeEventListener("visibilitychange", sync);
+    };
+  }, []);
+
+  // 남은 시간을 들고 있는다. 멈출 때 흘러간 만큼 깎고, 다시 걸 때 그 값으로 건다.
+  const remainingRef = useRef(duration);
+
+  useEffect(() => {
+    remainingRef.current = duration;
+  }, [duration, open]);
+
+  useEffect(() => {
+    if (!open || duration <= 0 || isPaused) return;
+
+    const startedAt = Date.now();
     const timeoutId = window.setTimeout(() => {
       onRequestCloseRef.current?.();
-    }, duration);
+    }, remainingRef.current);
 
     return () => {
       window.clearTimeout(timeoutId);
+      remainingRef.current = Math.max(
+        0,
+        remainingRef.current - (Date.now() - startedAt),
+      );
     };
-  }, [duration, open]);
+  }, [duration, isPaused, open]);
 
   const handleAnimationComplete = () => {
     if (!open || hasOpenedRef.current) return;
@@ -66,6 +119,24 @@ export default function Toast({
     hasOpenedRef.current = true;
     onOpenComplete?.();
   };
+
+  // ⚠️ 마우스에서만 멈춘다. 터치는 `pointerleave` 가 오지 않을 수 있어
+  //    한 번 탭하면 토스트가 영영 남는다. 터치 사용자에게는 액션과 닫기 버튼이 있다.
+  const handlePointerEnter = (event: PointerEvent<HTMLElement>) => {
+    if (event.pointerType === "mouse") setHovered(true);
+  };
+
+  const handlePointerLeave = (event: PointerEvent<HTMLElement>) => {
+    if (event.pointerType === "mouse") setHovered(false);
+  };
+
+  const handleActionClick = () => {
+    action?.onClick();
+    // 액션을 눌렀으면 토스트는 할 일을 마쳤다.
+    onRequestClose?.();
+  };
+
+  const ToneIcon = TONE_ICON[tone];
 
   return (
     <AnimatePresence onExitComplete={onExited}>
@@ -79,6 +150,10 @@ export default function Toast({
             tone !== "default" && `${block}--${tone}`,
             className,
           )}
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}
+          onFocus={() => setFocusedWithin(true)}
+          onBlur={() => setFocusedWithin(false)}
           initial={reduceMotion(
             { opacity: 0, y: 32, scale: 0.98 },
             shouldReduceMotion,
@@ -98,10 +173,33 @@ export default function Toast({
           onAnimationComplete={handleAnimationComplete}
           layout="position"
         >
-          <span className={`${block}__indicator`} aria-hidden="true" />
+          {ToneIcon ? (
+            <span className={`${block}__icon`}>
+              <ToneIcon />
+            </span>
+          ) : null}
           <div className={`${block}__content`}>
             <div className={`${block}__message`}>{message}</div>
           </div>
+          {action ? (
+            <button
+              type="button"
+              className={`${block}__action`}
+              onClick={handleActionClick}
+            >
+              {action.label}
+            </button>
+          ) : null}
+          {closable ? (
+            <button
+              type="button"
+              className={`${block}__close`}
+              onClick={() => onRequestClose?.()}
+              aria-label={closeLabel}
+            >
+              <CloseIcon />
+            </button>
+          ) : null}
         </motion.article>
       ) : null}
     </AnimatePresence>

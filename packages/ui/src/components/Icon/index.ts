@@ -3,6 +3,7 @@ export type { IconBaseProps, IconProps } from "./Icon.js";
 export {
   DelIcon,
   AttentionIcon,
+  SuccessIcon,
   SearchIcon,
   ShowPwIcon,
   HidePwIcon,

@@ -9,18 +9,24 @@ export function ToastDemo() {
 
   return (
     <>
-      <h2>기본</h2>
+      <h2>tone</h2>
+      <p>
+        <code>default</code> 는 &ldquo;무슨 일이 있었다&rdquo;,{" "}
+        <code>success</code> 는 &ldquo;됐다&rdquo;, <code>error</code> 는
+        &ldquo;잘못됐다&rdquo;를 말한다. 색만으로 구분하지 않도록{" "}
+        <code>success</code> 와 <code>error</code> 에는 아이콘이 함께 붙는다.
+      </p>
       <Example
         row={false}
-        caption="기본 지속시간 2400ms"
-        code={`toast.open({ message: "저장되었습니다." });`}
+        caption="기본 지속시간 4000ms"
+        code={`toast.open({ message: "저장을 완료했어요", tone: "success" });`}
       >
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
             gap: 8,
-            maxWidth: 420,
+            maxWidth: 560,
           }}
         >
           <Button
@@ -28,6 +34,18 @@ export function ToastDemo() {
             onClick={() => toast.open({ message: "저장되었습니다." })}
           >
             기본 토스트
+          </Button>
+          <Button
+            size="medium"
+            variant="line"
+            onClick={() =>
+              toast.open({
+                message: "저장을 완료했어요",
+                tone: "success",
+              })
+            }
+          >
+            성공 토스트
           </Button>
           <Button
             size="medium"
@@ -40,6 +58,60 @@ export function ToastDemo() {
             }
           >
             에러 토스트
+          </Button>
+        </div>
+      </Example>
+
+      <h2>읽는 동안은 사라지지 않는다</h2>
+      <p>
+        마우스가 올라가 있거나, 포커스가 안에 있거나, 다른 탭에 가 있으면 시간이
+        멈추고 돌아오면 <strong>남은 시간부터</strong> 다시 간다. 아래 토스트를
+        띄운 뒤 마우스를 올려 두고 기다려 보면 된다.
+      </p>
+      <Example
+        row={false}
+        caption="closable · action"
+        code={`toast.open({
+  message: "항목을 삭제했어요",
+  closable: true,
+  action: { label: "되돌리기", onClick: restore },
+});`}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: 8,
+            maxWidth: 420,
+          }}
+        >
+          <Button
+            size="medium"
+            variant="line"
+            onClick={() =>
+              toast.open({ message: "마우스를 올려 보세요", closable: true })
+            }
+          >
+            닫기 버튼 있는 토스트
+          </Button>
+          <Button
+            size="medium"
+            variant="line"
+            onClick={() =>
+              toast.open({
+                message: "항목을 삭제했어요",
+                action: {
+                  label: "되돌리기",
+                  onClick: () =>
+                    toast.open({
+                      message: "삭제를 되돌렸어요",
+                      tone: "success",
+                    }),
+                },
+              })
+            }
+          >
+            액션 있는 토스트
           </Button>
         </div>
       </Example>

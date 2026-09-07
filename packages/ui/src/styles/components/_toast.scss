@@ -4,6 +4,7 @@
 // Toast
 // 구조: .nui-toast-portal(고정 레이어) > .nui-toast-stack(하단 정렬) > .nui-toast
 // 공개 훅: --nui-toast--width / -radius
+// tone 은 배경이 아니라 아이콘 색만 바꾼다 — 아래 tone 절의 경고 참조.
 // ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 글자는 짝이다.
 //    Toast 는 border 를 쓰지 않으므로 두께 훅도 만들지 않는다 (죽은 토큰이 된다).
 // ─────────────────────────────────────────────────────────────
@@ -43,16 +44,19 @@
     box-shadow: var(#{v("shadow-3")}), var(#{v("shadow-inset-inverse")});
     pointer-events: auto;
 
-    &__indicator {
+    // 반전 표면의 접두 아이콘 — 24px (design-system.md §5-2). default 는 아이콘이 없다.
+    &__icon {
+      display: block;
       flex-shrink: 0;
-      // 표시점은 아이콘이 아니라 점이다 — design-system.md §5-2
-      width: var(#{v("size-dot-md")});
-      height: var(#{v("size-dot-md")});
-      // 첫 줄 글자(14px · 행간 21px)의 세로 중앙에 점을 맞춘다: (21 - 10) / 2 ≈ 5px
-      margin-top: 0.3125rem;
-      background: var(#{v("control-accent-soft")});
-      border-radius: var(#{v("radius-full")});
-      box-shadow: var(#{v("shadow-ring-brand")});
+      width: var(#{v("size-icon-3xl")});
+      height: var(#{v("size-icon-3xl")});
+      // 첫 줄 글자(14px · 행간 21px)의 세로 중앙에 맞춘다: (21 - 24) / 2 ≈ -1.5px
+      margin-top: -0.09375rem;
+
+      #{cls("icon")} {
+        width: 100%;
+        height: 100%;
+      }
     }
 
     &__content {
@@ -72,13 +76,93 @@
       @include typo(3, "regular");
     }
 
-    &--error {
-      background: var(#{v("surface-toast-error")});
+    // ── 액션 하나 (SEED Snackbar actionButton)
+    //    브랜드 색 bold. 반전 표면 위라 `text-brand-on-inverse` 다 — `action-primary`(9단계)는
+    //    검정 위에서 3.97:1 로 미달이다 (tokens.md §4-1-2).
+    &__action {
+      // UA 기본 스타일 무력화 (전역 reset 미배포 대응)
+      appearance: none;
+      margin: 0;
+      background-color: transparent;
+      border: 0;
+      font-family: var(#{v("font-family-base")});
+      cursor: pointer;
 
-      #{cls("toast")}__indicator {
-        background: var(#{v("status-error-soft")});
-        box-shadow: var(#{v("shadow-ring-error")});
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      padding: 0 var(#{v("space-2")});
+      color: var(#{v("text-brand-on-inverse")});
+      white-space: nowrap;
+
+      @include typo(3, "bold");
+      // 보이는 높이는 한 줄이지만 누르는 범위는 44 다 — a11y.md §8
+      @include hit-area;
+      @include motion-press(color);
+
+      &:focus-visible {
+        outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
+        outline-offset: var(#{v("focus-offset")});
+        border-radius: var(#{v("radius-1")});
       }
+    }
+
+    // ── 닫기 버튼 — 입력 안 보조 버튼과 같은 골격(24px 박스 · 4px 여백 · 16px 글리프).
+    //    반전 표면 위라 색만 다르다.
+    &__close {
+      appearance: none;
+      margin: 0;
+      background-color: transparent;
+      border: 0;
+      font-family: var(#{v("font-family-base")});
+      cursor: pointer;
+
+      display: inline-flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: var(#{v("size-icon-3xl")});
+      height: var(#{v("size-icon-3xl")});
+      padding: var(#{v("space-1")});
+      color: var(#{v("text-on-inverse")});
+      border-radius: var(#{v("radius-circle")});
+
+      @include motion-press((color, background-color));
+
+      #{cls("icon")} {
+        width: 100%;
+        height: 100%;
+      }
+
+      &:focus-visible {
+        outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
+        outline-offset: var(#{v("focus-offset")});
+      }
+
+      // 표면 hover 부류 — design-system.md §2-3. 반전 표면이라 흰 알파를 얹는다.
+      @include hoverable {
+        &:hover {
+          background-color: var(#{v("control-bg-hover")});
+        }
+      }
+
+      &:active {
+        background-color: var(#{v("control-bg-active")});
+        transform: scale(var(#{v("scale-94")}));
+      }
+    }
+
+    // ── tone
+    //    ⚠️ **배경을 바꾸지 않는다.** 예전에는 error 가 `surface-toast-error` 로 면을
+    //    통째로 갈아끼웠는데, 다크에서 그 값이 어두운 적갈색이고 글자는 `text-on-inverse`
+    //    (다크에서 거의 검정)라 **대비 1.14:1** 이었다 — 읽을 수 없었다. 표시점도 배경과
+    //    같은 색이라 1.00 이었다. SEED Snackbar 처럼 **아이콘 색만** 바꾼다.
+    &--success #{cls("toast")}__icon {
+      color: var(#{v("text-success-on-inverse")});
+    }
+
+    &--error #{cls("toast")}__icon {
+      color: var(#{v("text-danger-on-inverse")});
     }
   }
 }
