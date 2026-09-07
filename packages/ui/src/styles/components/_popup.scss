@@ -55,8 +55,10 @@
       max-height: min(calc(100dvh - 2.5rem), 45rem);
       overflow: hidden;
       background: var(#{v("layer-floating")});
+      // 떠 있는 것의 가장자리는 반투명 링이다 — 실선과 그림자를 같이 쓰면
+      // 실선이 이겨서 그림자가 안 보인다 (design-system.md §2-5-2).
       border: #{hook("popup--border-width", var(#{v("border-width-1")}))} solid
-        var(#{v("border-form")});
+        var(#{v("border-floating")});
       border-radius: #{hook("popup--radius", var(#{v("radius-3")}))};
       box-shadow: var(#{v("shadow-3")});
       pointer-events: auto;

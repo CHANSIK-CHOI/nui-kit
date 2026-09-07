@@ -41,7 +41,8 @@
     color: var(#{v("text-on-inverse")});
     background: var(#{v("layer-inverse")});
     border-radius: #{hook("toast--radius", var(#{v("radius-2")}))};
-    box-shadow: var(#{v("shadow-3")}), var(#{v("shadow-inset-inverse")});
+    // 위쪽 밝은 1px 은 다크 `shadow-3` 이 갖는다 — 여기서 따로 얹으면 겹친다.
+    box-shadow: var(#{v("shadow-3")});
     pointer-events: auto;
 
     // 반전 표면의 접두 아이콘 — 24px (design-system.md §5-2). default 는 아이콘이 없다.

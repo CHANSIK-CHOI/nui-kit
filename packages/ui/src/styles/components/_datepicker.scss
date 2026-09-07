@@ -50,8 +50,9 @@
       min-width: 19.5rem;
       padding: var(#{v("space-4")});
       // 떠 있는 컨테이너의 외곽선 — design-system.md §2-5-1
+      // 가장자리는 반투명 링 + 두 겹 그림자 — design-system.md §2-5-2
       border: #{hook("datepicker--border-width", var(#{v("border-width-1")}))}
-        solid var(#{v("border-form")});
+        solid var(#{v("border-floating")});
       border-radius: #{hook(
           "datepicker--dropdown-radius",
           var(#{v("radius-3")})

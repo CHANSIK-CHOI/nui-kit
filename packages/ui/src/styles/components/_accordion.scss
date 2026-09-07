@@ -30,7 +30,7 @@
       position: relative;
       overflow: hidden;
 
-      @include motion((border-color, box-shadow, background-color), "3");
+      @include motion((border-color, background-color), "3");
     }
 
     &--box &__item {
@@ -39,12 +39,13 @@
       border: #{hook("accordion--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("border-form")});
       border-radius: #{hook("accordion--radius", var(#{v("radius-2_5")}))};
-      box-shadow: var(#{v("shadow-1")});
+      // ⚠️ 그림자를 두지 않는다. 아코디언 항목은 **놓여 있는 것**이라
+      // 테두리만으로 그린다 — 떠 있는 것(팝업·메뉴·달력)과 층 표현이 다르다
+      // (design-system.md §2-5-2). 펼쳐진 항목은 테두리 색으로 말한다.
     }
 
     &--box &__item#{state("active")} {
       border-color: var(#{v("border-brand")});
-      box-shadow: var(#{v("shadow-2")});
     }
 
     &--line &__item {

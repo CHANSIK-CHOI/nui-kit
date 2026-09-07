@@ -146,8 +146,9 @@
       padding: var(#{v("space-2")});
       // 메뉴는 컨트롤이 아니라 떠 있는 컨테이너다 — design-system.md §2-5-1.
       // 라이트에선 control-bg 와 같은 값이지만 다크에서 한 단계 밝아진다.
+      // 가장자리는 반투명 링 + 두 겹 그림자 — design-system.md §2-5-2
       border: #{hook("select--border-width", var(#{v("border-width-1")}))} solid
-        var(#{v("border-form")});
+        var(#{v("border-floating")});
       border-radius: var(#{v("radius-3")});
       background-color: var(#{v("layer-floating")});
       box-shadow: var(#{v("shadow-2")});
