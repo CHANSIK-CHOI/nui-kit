@@ -12,6 +12,9 @@
  *    비활성은 AA 에서 빠지지만 하한 2.0:1 을 둔다 (design-system.md §2).
  * 2-b. 글자가 아닌 것의 대비 3:1(테두리 · 트랙 · 포커스)과 버튼 hover·pressed 의 글자 대비 —
  *    토큰 계산값으로 두 테마에서 잰다 (KRDS A4 · A5).
+ * 2-c. 버튼 **조합 전수** — variant(solid·line·text) × color(다섯) × 상태(기본·비활성).
+ *    예전에는 셋만 재고 있었고, 실제로 나온 위반 둘이 그 목록 밖이었다 (06 D10).
+ * 2-d. placeholder — `::placeholder` 는 의사요소라 요소 순회에 안 잡힌다. placeholder 도 글자다.
  * 3. 터치 영역 — 누를 수 있는 것의 히트 영역 실측 (a11y.md §8)
  *    박스가 아니라 `elementFromPoint` 로 실제 눌리는 범위를 잰다.
  *    24px 미만은 실패, 44px 미만은 경고. 이유가 적힌 예외는 통과.
@@ -248,6 +251,25 @@ const TOKEN_PAIRS = [
   ["체크박스 테두리", "control-border", "layer-default", 3],
   ["포커스 표시", "focus-color", "layer-default", 3],
   ["비활성 아이콘 (하한)", "control-icon-disabled", "control-bg-disabled", 2],
+  // 비활성 선도 배경에 녹으면 "없음"으로 읽힌다 — 하한 2.0 (design-system.md §2)
+  [
+    "비활성 입력 테두리 (하한)",
+    "control-border-disabled",
+    "control-bg-disabled",
+    2,
+  ],
+  [
+    "비활성 선택 컨트롤 테두리 (하한)",
+    "control-border-disabled",
+    "control-bg-subtle",
+    2,
+  ],
+  [
+    "비활성 선택 컨트롤 채움 (하한)",
+    "control-selection-disabled",
+    "layer-default",
+    2,
+  ],
   [
     "neutral 글자 · hover 배경",
     "action-neutral-fg",
@@ -346,6 +368,220 @@ for (const theme of ["light", "dark"]) {
     const r = ratio(f, b);
     const line = `${theme} ${label} ${r.toFixed(2)}:1`;
     r >= min ? ok(line) : bad(`${line} — 기준 ${min}:1 미달 (${fg} on ${bg})`);
+  }
+  await ctx.close();
+}
+
+// ── 2-c) 버튼 조합 전수 — variant 3 × color 5 × 상태 2, 두 테마 (06 D10)
+//
+// 예전에는 기본·primary·비활성 **셋만** 재고 있었다. D9(warning line·text 글자 1.5) ·
+// D12(비활성 line 테두리 1.38)는 전부 그 목록 **밖**에서 났다.
+// "통과"가 "검사한 것은 통과"가 되면 위반이 검사 밖에 숨는다.
+//
+// 문서 사이트가 30조합을 다 렌더하지는 않으므로, 실제 데모 버튼 **옆에** 같은 표면 위로
+// 탐침을 심어 잰다. 배경이 데모 카드의 것이라 화면에서 보이는 값과 같다.
+console.log("\n■ 버튼 조합 전수 — variant × color × 상태 (라이트 · 다크)");
+
+const BUTTON_COLORS = [
+  ["neutral", ""],
+  ["primary", "nui-button--primary"],
+  ["secondary", "nui-button--secondary"],
+  ["danger", "nui-button--danger"],
+  ["warning", "nui-button--warning"],
+];
+const BUTTON_VARIANTS = [
+  ["solid", ""],
+  ["line", "nui-button--line"],
+  ["text", "nui-button--text"],
+];
+
+/**
+ * 색 계산을 **캔버스에 실제로 칠해서** 한다.
+ *  - `color-mix()` 의 계산값은 `oklab(...)` 문자열이라 숫자만 뽑으면 틀린다
+ *  - 반투명 테두리(알파 토큰)는 뒷배경과 합성해야 눈에 보이는 색이 된다
+ * 둘 다 "배경을 먼저 칠하고 그 위에 덧칠한 뒤 픽셀을 읽는" 방식 하나로 풀린다.
+ */
+const BUTTON_PROBE = ({ colors, variants }) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 1;
+  const cx = canvas.getContext("2d", { willReadFrequently: true });
+  const composite = (bg, fg) => {
+    cx.clearRect(0, 0, 1, 1);
+    cx.fillStyle = "#fff";
+    cx.fillRect(0, 0, 1, 1);
+    cx.fillStyle = bg;
+    cx.fillRect(0, 0, 1, 1);
+    if (fg) {
+      cx.fillStyle = fg;
+      cx.fillRect(0, 0, 1, 1);
+    }
+    const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
+    return [r, g, b];
+  };
+  const opaqueBehind = (node) => {
+    let cur = node.parentElement;
+    while (cur) {
+      const value = getComputedStyle(cur).backgroundColor;
+      if (value && !/rgba\(0, 0, 0, 0\)|transparent/.test(value)) return value;
+      cur = cur.parentElement;
+    }
+    return getComputedStyle(document.documentElement).backgroundColor;
+  };
+
+  // 데모 버튼과 같은 표면 위에 심는다. 없으면 body.
+  const sample = document.querySelector(".nui-button");
+  const host = document.createElement("div");
+  host.style.cssText = "position:absolute;left:-9999px;top:0;width:200px";
+  (sample?.parentElement ?? document.body).appendChild(host);
+
+  const rows = [];
+  for (const [color, colorClass] of colors) {
+    for (const [variant, variantClass] of variants) {
+      for (const disabled of [false, true]) {
+        const el = document.createElement("button");
+        el.type = "button";
+        el.className = ["nui-button", colorClass, variantClass]
+          .filter(Boolean)
+          .join(" ");
+        if (disabled) el.disabled = true;
+        const wrap = document.createElement("span");
+        wrap.className = "nui-button__wrap";
+        wrap.textContent = "확인";
+        el.appendChild(wrap);
+        host.appendChild(el);
+
+        const cs = getComputedStyle(el);
+        const behind = opaqueBehind(el);
+        const own = cs.backgroundColor;
+        const filled = !/rgba\(0, 0, 0, 0\)|transparent/.test(own);
+        // 글자는 자기 배경 위에 — solid 면 버튼 면, line·text 면 뒤 표면
+        const bg = composite(behind, filled ? own : null);
+        const fg = composite(
+          `rgb(${bg[0]}, ${bg[1]}, ${bg[2]})`,
+          getComputedStyle(wrap).color,
+        );
+        // 테두리는 면이 없는 것(line)만 잰다 — solid 는 테두리색이 배경색과 같아
+        // 재봐야 1:1 이고, text 는 테두리가 없다.
+        const width = parseFloat(cs.borderTopWidth) || 0;
+        const border =
+          !filled && width > 0 ? composite(behind, cs.borderTopColor) : null;
+        rows.push({ color, variant, disabled, fg, bg, border });
+        el.remove();
+      }
+    }
+  }
+  host.remove();
+  return rows;
+};
+
+for (const theme of ["light", "dark"]) {
+  const ctx = await browser.newContext({
+    viewport: VIEWPORT,
+    colorScheme: theme,
+  });
+  const page = await ctx.newPage();
+  await page.goto(BASE + "/components/button", { waitUntil: "networkidle" });
+  const stamped = await page.evaluate(
+    () => document.documentElement.dataset.theme,
+  );
+  if (stamped !== theme) {
+    bad(`버튼 조합: 테마가 ${theme} 이어야 하는데 ${stamped} 다`);
+    await ctx.close();
+    continue;
+  }
+  const rows = await page.evaluate(BUTTON_PROBE, {
+    colors: BUTTON_COLORS,
+    variants: BUTTON_VARIANTS,
+  });
+  for (const { color, variant, disabled, fg, bg, border } of rows) {
+    const where = `${theme} ${variant}/${color}${disabled ? " 비활성" : ""}`;
+    // 비활성은 AA 에서 빠지지만 하한 2.0 을 둔다 (design-system.md §2)
+    const textMin = disabled ? 2.0 : 4.5;
+    const t = ratio(fg, bg);
+    const tLine = `${where} 글자 ${t.toFixed(2)}:1`;
+    t >= textMin ? ok(tLine) : bad(`${tLine} — 기준 ${textMin}:1 미달`);
+
+    if (border) {
+      const borderMin = disabled ? 2.0 : 3.0;
+      const b = ratio(border, bg);
+      const bLine = `${where} 테두리 ${b.toFixed(2)}:1`;
+      b >= borderMin ? ok(bLine) : bad(`${bLine} — 기준 ${borderMin}:1 미달`);
+    }
+  }
+  await ctx.close();
+}
+
+// ── 2-d) placeholder — placeholder 도 글자다 (06 D14)
+//
+// `::placeholder` 는 의사요소라 요소 순회로는 안 잡힌다. 그래서 검사 밖에 있었다.
+console.log("\n■ placeholder 대비 (라이트 · 다크)");
+
+/** [라벨, 페이지, 셀렉터, 의사요소인가] */
+const PLACEHOLDER_TARGETS = [
+  ["Textfield", "/components/textfield", ".nui-textfield__input", true],
+  ["Textarea", "/components/textarea", ".nui-textarea__input", true],
+  ["Search", "/components/search", ".nui-textfield__input", true],
+  ["Datepicker", "/components/datepicker", ".nui-textfield__input", true],
+  ["Select", "/components/select", ".nui-select__placeholder", false],
+];
+
+for (const theme of ["light", "dark"]) {
+  const ctx = await browser.newContext({
+    viewport: VIEWPORT,
+    colorScheme: theme,
+  });
+  const page = await ctx.newPage();
+  for (const [label, url, selector, pseudo] of PLACEHOLDER_TARGETS) {
+    await page.goto(BASE + url, { waitUntil: "networkidle" });
+    const el = page.locator(selector).first();
+    const appeared = await el
+      .waitFor({ state: "visible", timeout: 3000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!appeared) {
+      bad(`${theme} ${label} placeholder: 요소를 찾지 못했다 (${selector})`);
+      continue;
+    }
+    const measured = await el.evaluate((node, isPseudo) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 1;
+      const cx = canvas.getContext("2d", { willReadFrequently: true });
+      const composite = (bg, fg) => {
+        cx.clearRect(0, 0, 1, 1);
+        cx.fillStyle = "#fff";
+        cx.fillRect(0, 0, 1, 1);
+        cx.fillStyle = bg;
+        cx.fillRect(0, 0, 1, 1);
+        if (fg) {
+          cx.fillStyle = fg;
+          cx.fillRect(0, 0, 1, 1);
+        }
+        const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
+        return [r, g, b];
+      };
+      let cur = node;
+      let behind = "rgb(255, 255, 255)";
+      while (cur) {
+        const value = getComputedStyle(cur).backgroundColor;
+        if (value && !/rgba\(0, 0, 0, 0\)|transparent/.test(value)) {
+          behind = value;
+          break;
+        }
+        cur = cur.parentElement;
+      }
+      const bg = composite(behind, null);
+      const color = isPseudo
+        ? getComputedStyle(node, "::placeholder").color
+        : getComputedStyle(node).color;
+      return {
+        fg: composite(`rgb(${bg[0]}, ${bg[1]}, ${bg[2]})`, color),
+        bg,
+        raw: color,
+      };
+    }, pseudo);
+    const r = ratio(measured.fg, measured.bg);
+    const line = `${theme} ${label} placeholder ${r.toFixed(2)}:1 (${measured.raw})`;
+    r >= 4.5 ? ok(line) : bad(`${line} — 기준 4.5:1 미달`);
   }
   await ctx.close();
 }
