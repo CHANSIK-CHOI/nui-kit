@@ -306,18 +306,6 @@ const TOKEN_PAIRS = [
   ],
   ["danger 글자 · hover 배경", "action-danger-fg", "action-danger-hover", 3],
   ["danger 글자 · pressed 배경", "action-danger-fg", "action-danger-active", 3],
-  [
-    "warning 글자 · hover 배경",
-    "action-warning-fg",
-    "action-warning-hover",
-    4.5,
-  ],
-  [
-    "warning 글자 · pressed 배경",
-    "action-warning-fg",
-    "action-warning-active",
-    4.5,
-  ],
 ];
 
 for (const theme of ["light", "dark"]) {
@@ -389,7 +377,6 @@ const BUTTON_COLORS = [
   ["primary", "nui-button--primary"],
   ["secondary", "nui-button--secondary"],
   ["danger", "nui-button--danger"],
-  ["warning", "nui-button--warning"],
 ];
 const BUTTON_VARIANTS = [
   ["solid", ""],

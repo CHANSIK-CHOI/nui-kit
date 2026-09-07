@@ -12,7 +12,6 @@ const SCALES: [string, string][] = [
   ],
   ["gray", "무채색 — 브랜드에 맞춰 살짝 초록빛이다"],
   ["danger", "되돌릴 수 없는 액션 · 오류"],
-  ["warning", "주의가 필요한 액션"],
   ["success", "완료 · 확인"],
   ["info", "정보 전달 · 도움말"],
 ];

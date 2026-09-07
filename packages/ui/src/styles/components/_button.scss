@@ -31,8 +31,8 @@
     #{iv("button-main-hover")}: var(#{v("action-neutral-hover")});
     #{iv("button-main-active")}: var(#{v("action-neutral-active")});
     // 면이 없는 line·text 의 글자. `button-main` 은 채워진 배경 자리(Radix 9단계)라
-    // 배경 없이 글자로 쓰면 대비가 무너진다 — 다크의 primary·secondary·danger 와
-    // 라이트의 warning 이 실제로 AA 미달이었다 (design-system.md §2-4).
+    // 배경 없이 글자로 쓰면 대비가 무너진다 — 다크의 primary·secondary·danger 가
+    // 실제로 AA 미달이었다 (design-system.md §2-4-0).
     #{iv("button-fg-line")}: var(#{v("action-neutral-fg-line")});
     // 면이 깔린 동안의 글자 — 같은 색조의 다음 단계(11 → 12)
     #{iv("button-fg-line-strong")}: var(#{v("action-neutral-fg-line-strong")});
@@ -160,19 +160,6 @@
       #{iv("button-main-active")}: var(#{v("action-danger-active")});
       #{iv("button-fg-line")}: var(#{v("action-danger-fg-line")});
       #{iv("button-fg-line-strong")}: var(#{v("action-danger-fg-line-strong")});
-    }
-
-    // 주의가 필요한 액션 — 확인 후 진행
-    &--warning {
-      #{iv("button-main")}: var(#{v("action-warning")});
-      // 노랑 배경에 흰 글자는 AA 에 크게 미달한다. 노랑을 어둡게 하면
-      // 갈색이 되어 "주의"의 의미를 잃으므로, 배경을 밝게 두고 글자를 어둡게 한다.
-      #{iv("button-fg")}: var(#{v("action-warning-fg")});
-      #{iv("button-main-hover")}: var(#{v("action-warning-hover")});
-      #{iv("button-main-active")}: var(#{v("action-warning-active")});
-      // 노랑은 11단계도 라이트 4.41 로 AA 문턱을 못 넘어 12 를 쓴다.
-      #{iv("button-fg-line")}: var(#{v("action-warning-fg-line")});
-      #{iv("button-fg-line-strong")}: var(#{v("action-warning-fg-line-strong")});
     }
 
     // ── variant

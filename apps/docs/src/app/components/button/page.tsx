@@ -21,13 +21,7 @@ import {
 export const metadata = { title: "Button" };
 
 /** 축은 소스 타입과 같은 순서로 둔다 — packages/ui/src/components/Button/Button.tsx */
-const COLORS = [
-  "neutral",
-  "primary",
-  "secondary",
-  "danger",
-  "warning",
-] as const;
+const COLORS = ["neutral", "primary", "secondary", "danger"] as const;
 const VARIANTS = ["solid", "line", "text"] as const;
 const SIZES = [
   ["large", "56px"],
@@ -63,14 +57,19 @@ export default function ButtonPage() {
       <p>
         색이 아니라 <strong>역할</strong>이 이름이다. 화면의 주 행동에는{" "}
         <code>primary</code>, 그보다 덜 중요한 행동에는 <code>secondary</code>,
-        되돌릴 수 없는 삭제나 탈퇴에는 <code>danger</code>, 확인이 필요한
-        진행에는 <code>warning</code> 을 쓴다. 손을 올리면 한 단계, 누르면 두
-        단계 진해진다.
+        되돌릴 수 없는 삭제나 탈퇴에는 <code>danger</code> 를 쓴다. 손을 올리면
+        한 단계, 누르면 두 단계 진해진다.
+      </p>
+      <p>
+        <strong>채워진 버튼은 한 화면에 하나</strong>다. 둘이면 어느 쪽을 눌러야
+        하는지 사라진다. 위계가 셋 필요하면 색이 아니라 채움으로 나눈다 —{" "}
+        <code>solid</code> · <code>line</code> · <code>text</code>. 버튼을 셋
+        이상 나란히 놓지 않는다.
       </p>
       <CaseMatrix
         rows={VARIANTS}
         cols={COLORS}
-        caption="variant × color 15조합"
+        caption="variant × color 12조합"
         code={`<Button variant="line" color="danger">삭제</Button>`}
         render={(variant, color) => (
           <div style={{ minWidth: 108 }}>
@@ -86,8 +85,10 @@ export default function ButtonPage() {
         )}
       />
       <div className="doc-note">
-        <code>warning</code> 만 글자가 어둡다. 노랑 배경에 흰 글자는 대비가 크게
-        미달한다.
+        경고 색 버튼은 두지 않는다. 노랑은 <strong>면이 있어야 하는 색</strong>
+        이라 테두리나 글자로 쓰면 대비를 맞추는 순간 갈색이 되어
+        &ldquo;주의&rdquo; 를 잃는다. 되돌릴 수 없는 행동은 <code>danger</code>,
+        진행 전에 확인을 받아야 하면 <code>Confirm</code> 이 그 자리다.
       </div>
 
       <h2>크기</h2>

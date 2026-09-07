@@ -13,13 +13,16 @@ import useLoadingStatus from "./useLoadingStatus.js";
 
 const block = px("button");
 
-// 기본은 medium(48px). 위아래로 large(56px)·small(36px)이 있는 형태가 표준이고,
+// 기본은 medium(48px). 위아래로 large(56px)·small(40px)이 있는 형태가 표준이고,
 // 소비자는 small 을 보고 "가장 작은 것"이라고 읽는다.
 export type ButtonSize = "large" | "medium" | "small";
 // 색이 아니라 역할이 이름이다 — "이 버튼은 삭제인가"만 물으면 된다.
 // secondary 는 KRDS 의 보조 색(2026-09-04, A1) — 덜 중요한 액션.
-export type ButtonColor =
-  "neutral" | "primary" | "secondary" | "danger" | "warning";
+//
+// ⚠️ `warning` 은 없다(2026-09-07 제거). 노랑은 면이 있어야 하는 색이라 line·text 에서
+//    대비를 맞추면 갈색이 되어 "주의"를 잃는다 — variant 축을 못 채운다. 되돌릴 수 없는
+//    행동은 `danger`, 확인이 필요하면 `Confirm` 이 그 자리다.
+export type ButtonColor = "neutral" | "primary" | "secondary" | "danger";
 export type ButtonVariant = "solid" | "line" | "text";
 export type ButtonShape = "round" | "square";
 
