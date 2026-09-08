@@ -159,13 +159,6 @@ import "@nui-kit/react/styles/presets/42.css";   // 고른 색 하나`}</code>
         </table>
       </div>
 
-      <div className="doc-note doc-note--warn">
-        <strong>컴포넌트별 색 변수는 없다.</strong> 배경만 연하게 바꾸면
-        글자색은 라이브러리 값이 그대로 남는다. 깨진 대비는 저시력 사용자에게만
-        나타나므로 만든 사람은 알아채지 못한다. 색을 바꾸는 길은 프리셋과{" "}
-        <code>className</code> 둘이다.
-      </div>
-
       <h2>이 문서는 큰 것부터 작은 것으로 쌓여 있다</h2>
       <ul>
         <li>

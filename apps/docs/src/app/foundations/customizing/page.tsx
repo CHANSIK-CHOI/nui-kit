@@ -9,7 +9,7 @@ export default function CustomizingPage() {
       <h1>커스터마이징</h1>
       <p className="doc-lead">
         만질 수 있는 자리는 <strong>{HOOK_COUNT}개</strong>다. CSS 변수를
-        덮어쓰면 된다.
+        덮어쓰면 값이 바뀐다.
       </p>
 
       <h2>
@@ -56,22 +56,12 @@ export default function CustomizingPage() {
           <tbody>
             <tr>
               <th scope="row" className="doc-wrap">
-                화면 전체 색
+                색
               </th>
               <td className="doc-wrap">
-                <Link href="/brand-colors">브랜드 프리셋 185색</Link> 에서
-                고른다
+                <Link href="/design-system/color">프리셋 또는 className</Link>
               </td>
-              <td className="doc-wrap">화면 전체</td>
-            </tr>
-            <tr>
-              <th scope="row" className="doc-wrap">
-                한 컴포넌트의 색
-              </th>
-              <td className="doc-wrap">
-                <code>className</code> 으로 지정한다
-              </td>
-              <td className="doc-wrap">그 요소만</td>
+              <td className="doc-wrap">화면 전체 또는 그 요소만</td>
             </tr>
             <tr>
               <th scope="row" className="doc-wrap">
@@ -84,7 +74,7 @@ export default function CustomizingPage() {
         </table>
       </div>
 
-      <h2>이름을 읽는 법</h2>
+      <h2>변수 이름을 읽는 법</h2>
       <p>
         이름은 컴포넌트, 옵션, 요소, 속성 순서로 붙는다. 읽으면 문장이 된다.
       </p>
@@ -130,7 +120,7 @@ export default function CustomizingPage() {
 
       <h2>막아둔 것</h2>
       <p>
-        색 · 포커스 링 두께 · 바깥 여백은 변수로 열지 않았다. 각각의 이유는{" "}
+        색 · 포커스 링 두께 · 바깥 여백은 변수로 열려 있지 않다. 각각의 이유는{" "}
         <Link href="/design-system">디자인 시스템</Link> 의 「바꿀 수 있는 것과
         없는 것」 에 있다.
       </p>

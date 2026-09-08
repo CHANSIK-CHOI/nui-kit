@@ -15,7 +15,7 @@ export default function BrandColorsPage() {
       <div className="doc-note">
         <p>
           고른 색은 9단계 자리에 그대로 들어가고 나머지 11단계가 거기서 나온다.
-          회색은 브랜드의 색깔만 물려받아 거의 무채색으로 둔다.
+          회색은 브랜드의 색깔만 물려받아 거의 무채색으로 남는다.
         </p>
       </div>
 
@@ -60,13 +60,9 @@ import "./nui-theme.css";`}</code>
 
       <div className="doc-note doc-note--warn">
         <p>
-          <strong>색을 바꾸는 방법은 이것 하나다.</strong> <code>:root</code>{" "}
-          에서 색 변수를 직접 덮어쓰는 방식은 지원하지 않는다. 배경만 바뀌고
-          글자색은 남아 대비가 조용히 깨진다. 한 컴포넌트만 바꿔야 하면{" "}
-          <Link href="/foundations/customizing">
-            <code>className</code>
-          </Link>{" "}
-          을 쓴다.
+          <strong>화면 전체의 색을 바꾸는 길은 이것 하나다.</strong> 한
+          컴포넌트만 바꾸려면 <code>className</code> 을 쓴다. 둘뿐인 이유는{" "}
+          <Link href="/design-system/color">색은 고르는 것이다</Link> 에 있다.
         </p>
       </div>
 

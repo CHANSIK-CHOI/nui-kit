@@ -1,4 +1,4 @@
-import { TokenTable } from "@/components/TokenTable";
+import Link from "next/link";
 import tokens from "@/generated/tokens.json";
 
 export const metadata = { title: "디자인 토큰" };
@@ -6,24 +6,29 @@ export const metadata = { title: "디자인 토큰" };
 const DATA = tokens as unknown as Record<string, unknown[]>;
 const total = Object.values(DATA).reduce((n, list) => n + list.length, 0);
 
-/** flat 목록의 표시 순서와 이름. 카테고리 문서의 순서와 맞춘다. */
-const GROUPS: [string, string][] = [
-  ["color", "팔레트"],
-  ["text", "글자색"],
-  ["layer", "면"],
-  ["border", "선"],
-  ["control", "입력 컨트롤"],
-  ["action", "액션"],
-  ["status", "상태 표시"],
-  ["typography", "타이포그래피"],
-  ["space", "간격"],
-  ["size", "크기"],
-  ["radius", "모서리"],
-  ["shadow", "그림자"],
-  ["focus", "포커스"],
-  ["motion", "모션"],
-  ["etc", "배율"],
-  ["z-index", "쌓임 순서"],
+/** 그룹마다 표가 있는 카테고리 문서. 표는 그 문서에만 있다 */
+const GROUPS: [string, string, string, string][] = [
+  ["color", "팔레트", "/foundations/color", "12단계 팔레트 전량"],
+  ["text", "글자색", "/foundations/color", "역할별 색 · 글자"],
+  ["layer", "면", "/foundations/color", "역할별 색 · 면"],
+  ["border", "선", "/foundations/shape", "선 색과 두께"],
+  ["control", "입력 컨트롤", "/foundations/color", "역할별 색 · 입력 컨트롤"],
+  ["action", "액션", "/foundations/color", "역할별 색 · 액션"],
+  ["status", "상태 표시", "/foundations/color", "역할별 색 · 상태 표시"],
+  [
+    "typography",
+    "타이포그래피",
+    "/foundations/typography",
+    "크기 · 행간 · 자간 · 두께",
+  ],
+  ["space", "간격", "/foundations/spacing", "4px 스케일과 의미 간격"],
+  ["size", "크기", "/foundations/spacing", "컨트롤 · 아이콘 · 점"],
+  ["radius", "모서리", "/foundations/shape", "높이 × ⅛"],
+  ["shadow", "그림자", "/foundations/elevation", "떠 있는 것의 두 겹"],
+  ["focus", "포커스", "/foundations/accessibility", "링 셋과 색"],
+  ["motion", "모션", "/foundations/motion", "시간과 곡선"],
+  ["etc", "배율", "/foundations/motion", "눌림 배율 셋"],
+  ["z-index", "쌓임 순서", "/foundations/elevation", "층의 계약"],
 ];
 
 export default function TokensPage() {
@@ -31,8 +36,9 @@ export default function TokensPage() {
     <>
       <h1>디자인 토큰</h1>
       <p className="doc-lead">
-        쓸 수 있는 값 <strong>{total}개</strong>의 전체 목록이다. 카테고리별
-        설명은 각 문서에 있고 여기에는 전량이 모여 있다.
+        쓸 수 있는 값은 <strong>{total}개</strong>다. 이 문서는 이름을 읽는 법과
+        어느 문서에 어떤 값이 있는지를 보여주는 지도다. 표는 카테고리 문서마다
+        하나씩 있다.
       </p>
 
       <h2>이름을 읽는 법</h2>
@@ -99,27 +105,39 @@ export default function TokensPage() {
         역할이다.
       </p>
 
-      <h2>전량 {total}개</h2>
+      <h2>어디에 무엇이 있나</h2>
       <p>
-        이 목록은 <code>packages/ui/src/styles/tokens/_seed.scss</code> 에서
-        자동 생성한다.
+        전부 <code>packages/ui/src/styles/tokens/_seed.scss</code> 에서 자동
+        생성된다. 내부 배선(<code>--nui-_</code>)은 목록에 없다. 그 이유는{" "}
+        <Link href="/foundations/customizing">커스터마이징</Link> 에 있다.
       </p>
-
-      {GROUPS.map(([key, label]) => (
-        <div key={key}>
-          <h3>
-            {label}{" "}
-            <span className="doc-token-name">{DATA[key]?.length ?? 0}개</span>
-          </h3>
-          <TokenTable group={key} />
-        </div>
-      ))}
-
-      <div className="doc-note doc-note--warn">
-        <strong>
-          <code>--nui-_</code> 로 시작하는 변수는 이 목록에 없다.
-        </strong>{" "}
-        공개 API 가 아니고 덮어쓰면 variant 가 깨진다.
+      <div className="doc-table-wrap">
+        <table className="doc-table">
+          <thead>
+            <tr>
+              <th>그룹</th>
+              <th>개수</th>
+              <th>어느 문서</th>
+            </tr>
+          </thead>
+          <tbody>
+            {GROUPS.map(([key, label, href, where]) => (
+              <tr key={key}>
+                <th scope="row" className="doc-wrap">
+                  {label}
+                </th>
+                <td>
+                  <span className="doc-token-name">
+                    {DATA[key]?.length ?? 0}개
+                  </span>
+                </td>
+                <td className="doc-wrap">
+                  <Link href={href}>{where}</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );
