@@ -100,8 +100,13 @@
 // hover 는 hover 가 있는 기기에서만 그린다 — styles.md §9.
 // 터치 기기는 탭한 뒤에 `:hover` 가 남아 버튼이 눌린 채로 보인다.
 // `:focus-visible` 과 `:active` 는 감싸지 않는다 — 키보드와 터치에 둘 다 필요하다.
+//
+// ⚠️ **`pointer: fine` 을 함께 본다** (2026-09-08 · 07 M6). `hover: hover` 만으로는
+//    **스타일러스와 Nintendo Switch·TV 커서** 같은 거친 포인터가 통과한다. 그 기기들은
+//    hover 를 흉내 내지만 정밀하지 않아, 좁은 자리를 스치기만 해도 hover 가 들어온다.
+//    Emil 과 Apple 둘 다 이 형태를 쓴다.
 @mixin hoverable {
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     @content;
   }
 }

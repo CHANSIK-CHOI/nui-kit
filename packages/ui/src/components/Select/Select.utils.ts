@@ -22,6 +22,7 @@ import { components as reactSelectComponents } from "react-select";
 import {
   NuiClearIndicator,
   NuiDropdownIndicator,
+  NuiMenu,
   NuiMultiValueRemove,
 } from "./SelectIndicators.js";
 import { getMergedAriaIds } from "../Field/Field.context.js";
@@ -260,6 +261,8 @@ export function getResolvedSelectComponents<IsMulti extends boolean>(
     DropdownIndicator: NuiDropdownIndicator,
     ClearIndicator: NuiClearIndicator,
     MultiValueRemove: NuiMultiValueRemove,
+    // 메뉴에 등장 모션을 준다 (07 M4). 소비자가 갈아끼울 수 있다 — 기본값이다.
+    Menu: NuiMenu,
     ...components,
     ...overrides,
   };

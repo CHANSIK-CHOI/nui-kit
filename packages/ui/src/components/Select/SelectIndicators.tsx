@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { ChevronDown, X } from "lucide-react";
 import {
   useContext,
@@ -13,8 +14,14 @@ import {
   type ClearIndicatorProps,
   type DropdownIndicatorProps,
   type GroupBase,
+  type MenuProps,
   type MultiValueRemoveProps,
 } from "react-select";
+import {
+  motionTransition,
+  reduceMotion,
+  reduceMotionTransition,
+} from "../../internal/motion.js";
 import SelectAriaContext from "./Select.context.js";
 import { SELECT_BLOCK } from "./SelectBase.js";
 import type { SelectOption } from "./Select.types.js";
@@ -132,5 +139,72 @@ export function NuiMultiValueRemove<IsMulti extends boolean>({
     >
       <X aria-hidden="true" />
     </button>
+  );
+}
+
+/**
+ * 메뉴에 등장 모션을 준다 (2026-09-08 · 07 M4).
+ *
+ * react-select 의 메뉴는 첫 프레임부터 완성된 채로 나타났다. 빈도는 「가끔」이고
+ * 목적은 「급변 방지」라 Emil 의 게이트를 통과한다 (motion.md §1 · §2).
+ *
+ * ⚠️ **래퍼를 감싸는 대신 통째로 바꾼다.** 안쪽에 motion 을 넣으면 링과 그림자를
+ *    가진 메뉴 면이 먼저 튀어나오고 내용만 자라 「패널이 번쩍인 뒤 글이 커지는」
+ *    모양이 된다. 면 자체가 움직여야 한다.
+ *
+ * ⚠️ 클래스는 `cx` 로 **기본 Menu 와 똑같이** 만든다 — `classNamePrefix` 가
+ *    만드는 `nui-select__menu` 가 우리 SCSS 의 유일한 진입점이다.
+ *
+ * ⚠️ **퇴장은 없다.** `AnimatePresence` 가 필요한데 react-select 이 메뉴를
+ *    언마운트하므로 그 경계를 우리가 쥐려면 `menuIsOpen` 을 제어해야 한다 —
+ *    그 길에 remount 회귀가 있어서 `verify:select-rhf` 가 따로 있다. 지금도
+ *    퇴장 모션은 없으므로 잃는 것이 없다. 07 M4 의 남은 절반이다.
+ */
+export function NuiMenu<IsMulti extends boolean>({
+  children,
+  innerRef,
+  innerProps,
+  className,
+  cx,
+  placement,
+}: MenuProps<SelectOption, IsMulti, GroupBase<SelectOption>>) {
+  const shouldReduceMotion = useReducedMotion();
+  // ⚠️ framer 가 애니메이션·드래그 핸들러의 타입을 자기 것으로 덮어쓴다.
+  //    react-select 의 `innerProps` 는 `div` 전체 속성 타입이라 그대로 펼치면
+  //    타입이 부딪힌다. 실제로 오는 것은 `id` · `onMouseDown` 정도다.
+  const {
+    onAnimationStart: _onAnimationStart,
+    onAnimationEnd: _onAnimationEnd,
+    onAnimationIteration: _onAnimationIteration,
+    onDrag: _onDrag,
+    onDragStart: _onDragStart,
+    onDragEnd: _onDragEnd,
+    ...restInnerProps
+  } = innerProps ?? {};
+
+  return (
+    <motion.div
+      {...restInnerProps}
+      ref={innerRef}
+      className={cx({ menu: true }, className)}
+      // 트리거에서 자란다 — 위로 뒤집히면 아래 모서리에서 (motion.md §6)
+      style={{
+        transformOrigin: placement === "top" ? "bottom left" : "top left",
+      }}
+      initial={reduceMotion(
+        { opacity: 0, transform: "translateY(-4px) scale(0.97)" },
+        shouldReduceMotion,
+      )}
+      animate={reduceMotion(
+        { opacity: 1, transform: "translateY(0px) scale(1)" },
+        shouldReduceMotion,
+      )}
+      transition={reduceMotionTransition(
+        motionTransition.popover,
+        shouldReduceMotion,
+      )}
+    >
+      {children}
+    </motion.div>
   );
 }
