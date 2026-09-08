@@ -169,12 +169,12 @@ export default function PopupBase({
             exit={{
               opacity: 0,
               transition: reduceMotionTransition(
-                motionTransition.overlayDialogExit,
+                motionTransition.overlayExit,
                 shouldReduceMotion,
               ),
             }}
             transition={reduceMotionTransition(
-              motionTransition.overlayDialog,
+              motionTransition.overlay,
               shouldReduceMotion,
             )}
             onClick={handleBackdropClick}

@@ -67,12 +67,21 @@ export const motionTransition = {
     ease: motionEase.exit,
   } satisfies Transition,
 
-  // dim — 패널보다 살짝 길게
-  overlayDialog: {
-    duration: motionDuration.d5,
+  // ── dim ★ 팝업 **세 변형이 함께 쓴다** (dialog · bottomSheet · full).
+  //
+  // 딤은 전환이 아니라 **상태 선언**이다 — "뒤는 이제 못 만진다". 그래서 빠르다.
+  // 예전에는 d5(250)이라 패널(300)과 거의 같이 움직였고, 둘이 동시에 움직여 눈이
+  // 갈렸다. 먼저 앉혀 두면 패널 착지만 보게 된다 — motion.md §2 「상태 표시」 ·
+  // §7 「시스템이 답할 때는 즉시」. (2026-09-08 · prototype AL2)
+  //
+  // ⚠️ 이름에 `Dialog` 를 붙이지 않는다. 붙어 있던 시절 실제로 "다이얼로그만
+  //    바뀐다"고 잘못 읽었다 — 시트와 풀팝업도 이 값으로 어두워진다.
+  overlay: {
+    duration: motionDuration.d2,
     ease: motionEase.standard,
   } satisfies Transition,
-  overlayDialogExit: {
+  // 퇴장은 패널과 같이 간다. 딤이 먼저 걷히면 패널이 밝은 배경 위에 잠깐 뜬다.
+  overlayExit: {
     duration: motionDuration.d4,
     ease: motionEase.exit,
   } satisfies Transition,
