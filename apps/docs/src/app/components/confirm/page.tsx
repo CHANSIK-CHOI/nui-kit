@@ -47,7 +47,7 @@ export default function ConfirmPage() {
             </tr>
             <tr>
               <td>
-                <code>confirmText</code> · <code>cancelText</code>
+                <code>confirmLabel</code> · <code>cancelLabel</code>
               </td>
               <td>&quot;확인&quot; · &quot;취소&quot;</td>
               <td className="doc-wrap">

@@ -45,7 +45,7 @@ export default function FullPopupPage() {
               <th scope="row">
                 <code>size</code>
               </th>
-              <td>small · regular · large</td>
+              <td>small · medium · large</td>
               <td>받지 않는다</td>
             </tr>
             <tr>

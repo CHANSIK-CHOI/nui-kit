@@ -65,7 +65,7 @@ export default function PopupBase({
   footerClassName,
   open,
   variant = "dialog",
-  size = "regular",
+  size = "medium",
   contentAlign = "center",
   title,
   icon,
@@ -154,7 +154,7 @@ export default function PopupBase({
           className={cn(
             block,
             `${block}--${VARIANT_CLASS[variant]}`,
-            size !== "regular" && `${block}--${size}`,
+            size !== "medium" && `${block}--${size}`,
             contentAlign === "center" && `${block}--align-center`,
             hasCloseButton && `${block}--has-close`,
             !hasHeader && `${block}--no-header`,
@@ -185,7 +185,7 @@ export default function PopupBase({
               ref={panelRef}
               role="dialog"
               aria-modal="true"
-              aria-label={titleId ? undefined : (dialogLabel ?? "팝업")}
+              aria-label={titleId ? undefined : dialogLabel}
               aria-labelledby={titleId}
               aria-describedby={descriptionId}
               className={cn(`${block}__panel`, panelClassName)}

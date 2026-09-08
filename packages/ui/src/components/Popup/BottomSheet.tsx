@@ -10,7 +10,6 @@ const block = px("bottom-sheet");
 export default function BottomSheet({
   className,
   contentAlign = "left",
-  dialogLabel = "바텀시트 팝업",
   ...props
 }: BottomSheetProps) {
   return (
@@ -19,7 +18,6 @@ export default function BottomSheet({
       variant="bottomSheet"
       size={undefined}
       contentAlign={contentAlign}
-      dialogLabel={dialogLabel}
       className={cn(block, className)}
     />
   );

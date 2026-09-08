@@ -21,10 +21,11 @@ export default function Confirm({
   isTopmost,
   className,
   title,
+  dialogLabel,
   description,
   icon = <AttentionIcon width={28} height={28} />,
-  cancelText = "취소",
-  confirmText = "확인",
+  cancelLabel = "취소",
+  confirmLabel = "확인",
   onCancel,
   onConfirm,
 }: ConfirmProps) {
@@ -32,12 +33,12 @@ export default function Confirm({
     <ButtonGroup className={`${block}__actions`}>
       <ButtonGroupItem>
         <Button type="button" variant="line" size="medium" onClick={onCancel}>
-          {cancelText}
+          {cancelLabel}
         </Button>
       </ButtonGroupItem>
       <ButtonGroupItem>
         <Button type="button" size="medium" onClick={onConfirm}>
-          {confirmText}
+          {confirmLabel}
         </Button>
       </ButtonGroupItem>
     </ButtonGroup>
@@ -51,13 +52,13 @@ export default function Confirm({
       isTopmost={isTopmost}
       className={cn(block, className)}
       title={title}
+      dialogLabel={dialogLabel}
       icon={icon}
       description={description}
       footer={footerContent}
       hasCloseButton={false}
       shouldCloseOnBackdrop={false}
       shouldCloseOnEscape={false}
-      dialogLabel={title ? undefined : "Confirm 팝업"}
       size="small"
     />
   );

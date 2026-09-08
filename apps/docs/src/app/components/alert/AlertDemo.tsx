@@ -38,13 +38,13 @@ export function AlertDemo() {
 
       <h3>버튼 문구와 아이콘</h3>
       <p>
-        <code>confirmText</code> 로 버튼 문구를, <code>icon</code> 으로 상단
+        <code>confirmLabel</code> 로 버튼 문구를, <code>icon</code> 으로 상단
         아이콘을 바꾼다. <code>icon={"{null}"}</code> 이면 아이콘 자리가
         없어진다.
       </p>
       <Example
-        caption="confirmText · icon"
-        code={`alert.open({ title: "…", confirmText: "알겠습니다", icon: null });`}
+        caption="confirmLabel · icon"
+        code={`alert.open({ title: "…", confirmLabel: "알겠습니다", icon: null });`}
       >
         <Button
           size="medium"
@@ -53,7 +53,7 @@ export function AlertDemo() {
             alert.open({
               title: "세션이 만료되었습니다",
               description: "다시 로그인해 주세요.",
-              confirmText: "알겠습니다",
+              confirmLabel: "알겠습니다",
               icon: null,
             })
           }

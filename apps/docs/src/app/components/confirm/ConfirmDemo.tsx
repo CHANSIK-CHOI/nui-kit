@@ -19,7 +19,7 @@ export function ConfirmDemo() {
     <>
       <Example
         caption="useConfirm().open() — 콜백으로 받는다"
-        code={`confirm.open({ title: "삭제할까요?", confirmText: "삭제", onConfirm, onCancel });`}
+        code={`confirm.open({ title: "삭제할까요?", confirmLabel: "삭제", onConfirm, onCancel });`}
       >
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           <Button
@@ -29,7 +29,7 @@ export function ConfirmDemo() {
               confirm.open({
                 title: "삭제할까요?",
                 description: "삭제한 항목은 되돌릴 수 없습니다.",
-                confirmText: "삭제",
+                confirmLabel: "삭제",
                 onConfirm: () => setAnswer("확인을 눌렀습니다"),
                 onCancel: () => setAnswer("취소를 눌렀습니다"),
               })

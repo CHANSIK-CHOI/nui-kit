@@ -5,7 +5,7 @@
 //
 // 구조: .nui-popup > (.nui-popup__dim + .nui-popup__positioner > .nui-popup__panel)
 // variant: --dialog(기본) / --bottom-sheet / --full
-// size:    --small / (regular=기본) / --large
+// size:    --small / (medium=기본) / --large
 //
 // 공개 훅
 //   크기 : --nui-popup--lg-width / -md-width / -sm-width
@@ -17,7 +17,7 @@
 //
 // ⚠️ 너비 훅에 옵션 이름이 붙는 이유:
 //    이름을 하나(--nui-popup-width)만 두면 소비자가 그걸 :root 에 설정한 순간
-//    small/regular/large 세 자리가 전부 같은 폭이 되어 크기 variant 가 죽는다.
+//    small/medium/large 세 자리가 전부 같은 폭이 되어 크기 variant 가 죽는다.
 //
 // ⏸️ 원본은 데스크톱에서 내부 여백을 card → section 으로 키웠으나
 //    브레이크포인트 대응이 보류 상태라 card 값으로 통일했다.

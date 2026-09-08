@@ -7,7 +7,7 @@ import { Case, CaseGrid } from "@/components/guide";
 /** PopupSize 는 `Popup.types.ts` 가 정한 셋이다. dialog 형태에만 적용된다. */
 const SIZES = [
   ["small", "22.5rem"],
-  ["regular", "30rem"],
+  ["medium", "30rem"],
   ["large", "40rem"],
 ] as const;
 

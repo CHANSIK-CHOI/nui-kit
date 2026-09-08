@@ -50,7 +50,7 @@ export default function AlertPage() {
             </tr>
             <tr>
               <td>
-                <code>confirmText</code>
+                <code>confirmLabel</code>
               </td>
               <td>&quot;확인&quot;</td>
               <td className="doc-wrap">버튼 문구</td>

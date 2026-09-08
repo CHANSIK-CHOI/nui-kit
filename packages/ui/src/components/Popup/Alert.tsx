@@ -21,16 +21,17 @@ export default function Alert({
   isTopmost,
   className,
   title,
+  dialogLabel,
   description,
   icon = <AttentionIcon width={28} height={28} />,
-  confirmText = "확인",
+  confirmLabel = "확인",
   onConfirm,
 }: AlertProps) {
   const footerContent = (
     <ButtonGroup className={`${block}__actions`}>
       <ButtonGroupItem>
         <Button type="button" size="medium" onClick={onConfirm}>
-          {confirmText}
+          {confirmLabel}
         </Button>
       </ButtonGroupItem>
     </ButtonGroup>
@@ -44,13 +45,13 @@ export default function Alert({
       isTopmost={isTopmost}
       className={cn(block, className)}
       title={title}
+      dialogLabel={dialogLabel}
       icon={icon}
       description={description}
       footer={footerContent}
       hasCloseButton={false}
       shouldCloseOnBackdrop={false}
       shouldCloseOnEscape={false}
-      dialogLabel={title ? undefined : "Alert 팝업"}
       size="small"
     />
   );
