@@ -16,6 +16,7 @@
  *    예전에는 셋만 재고 있었고, 실제로 나온 위반 둘이 그 목록 밖이었다 (06 D10).
  * 2-e. soft · line · text 의 hover · active 글자 — 2-b 의 hover 항목은 solid 만 잰다.
  * 2-f. 선택 컨트롤 **전수** — tone × 상태 × 테마. 채움과 그 위 표시의 반전 짝.
+ * 2-g. 포커스가 안쪽 내용을 **밀지 않는가** — 두께를 상태로 바꾸면 글자가 흔들린다.
  *    면이 없는 것은 **실제로 마우스를 올리고 눌러서** 잰다.
  * 2-d. placeholder — `::placeholder` 는 의사요소라 요소 순회에 안 잡힌다. placeholder 도 글자다.
  * 3. 터치 영역 — 누를 수 있는 것의 히트 영역 실측 (a11y.md §8)
@@ -668,6 +669,68 @@ for (const theme of ["light", "dark"]) {
   await page.evaluate(() =>
     document.getElementById("nui-a11y-probe")?.remove(),
   );
+  await ctx.close();
+}
+
+// ── 2-g) 포커스가 글자를 밀지 않는다 (2026-09-08 · T2)
+//
+// 입력 컨트롤 셋이 포커스에서 테두리를 1px → 2px 로 굵히고 있었다. `border-box` 라
+// 안쪽이 1px 줄어 **글자가 오른쪽으로 밀렸다** — Tab 으로 훑을 때 칸마다 미세하게
+// 흔들린다. 눈으로는 잘 안 보이고 좌표를 재야 드러난다.
+//
+// 지금은 두께를 상태로 바꾸지 않는다(design-system.md §4-1). 되돌아오면 여기서 잡는다.
+console.log("\n■ 포커스가 글자를 밀지 않는가");
+
+/** [이름, 페이지, 컨트롤 셀렉터, 포커스 대상, 기준선 셀렉터] */
+const SHIFT_TARGETS = [
+  ["Textfield", "/components/textfield", ".nui-textfield__wrap", ".nui-textfield__input"],
+  ["Textarea", "/components/textarea", ".nui-textarea__wrap", ".nui-textarea__input"],
+  ["Search", "/components/search", ".nui-textfield__wrap", ".nui-textfield__input"],
+  ["Select", "/components/select", ".nui-select__control", ".nui-select__control"],
+];
+
+{
+  const ctx = await browser.newContext({ viewport: VIEWPORT, colorScheme: "light" });
+  for (const [label, path, boxSel, focusSel] of SHIFT_TARGETS) {
+    const page = await ctx.newPage();
+    await page.goto(BASE + path, { waitUntil: "networkidle" });
+    const moved = await page.evaluate(
+      async ({ boxSel, focusSel }) => {
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        const box = document.querySelector(boxSel);
+        if (!box) return { missing: true };
+        // 안쪽 내용이 기준이다 — 상자 자체는 어차피 안 움직인다
+        const inner = box.firstElementChild ?? box;
+        const at = () => {
+          const b = box.getBoundingClientRect();
+          const i = inner.getBoundingClientRect();
+          return [+(i.left - b.left).toFixed(2), +(i.top - b.top).toFixed(2)];
+        };
+        const target = document.querySelector(focusSel);
+        target.blur();
+        document.body.focus();
+        await sleep(280);
+        const rest = at();
+        target.focus();
+        await sleep(280);
+        const focused = at();
+        target.blur();
+        return { rest, focused };
+      },
+      { boxSel, focusSel },
+    );
+    if (moved.missing) {
+      bad(`${label} 밀림: ${boxSel} 를 찾지 못했다`);
+    } else {
+      const dx = +(moved.focused[0] - moved.rest[0]).toFixed(2);
+      const dy = +(moved.focused[1] - moved.rest[1]).toFixed(2);
+      const line = `${label} 포커스 밀림 ${dx}, ${dy}`;
+      dx === 0 && dy === 0
+        ? ok(line)
+        : bad(`${line} — 포커스가 안쪽 내용을 움직이면 안 된다`);
+    }
+    await page.close();
+  }
   await ctx.close();
 }
 

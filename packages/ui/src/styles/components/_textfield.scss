@@ -24,7 +24,7 @@
       border-radius: #{hook("textfield--radius", var(#{v("radius-1_5")}))};
 
       @include motion(
-        (border-color, background-color, box-shadow, border-width),
+        (border-color, background-color, box-shadow),
         "3"
       );
     }
@@ -93,8 +93,11 @@
     // readonly 도 포커스를 받는다 — 링을 그린다 (design-system.md §3-2).
     // 배경은 뒤의 readonly 규칙이 그대로 남긴다. `disabled` 만 제외한다.
     &:not(#{state("disabled")}):focus-within &__wrap {
+      // ⚠️ **두께는 바꾸지 않는다.** 포커스는 색과 링이 말한다 (design-system.md §4-1).
+      // 예전에는 여기서 1px → 2px 로 굵혔는데 `border-box` 라 안쪽이 1px 줄어
+      // **글자가 밀렸다**(실측 left 1 → 2). 그리고 라이브러리 안에서 두께를 상태로
+      // 바꾸는 곳이 입력 컨트롤 셋뿐이라 선택 컨트롤·버튼과도 어긋나 있었다.
       border-color: var(#{v("focus-color")});
-      border-width: var(#{v("focus-width")});
       box-shadow: var(#{v("focus-ring")});
     }
 
