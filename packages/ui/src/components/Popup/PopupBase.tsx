@@ -2,7 +2,7 @@
 
 import cn from "classnames";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useId } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { px } from "../../internal/prefix.js";
 import {
   motionTransition,
@@ -116,6 +116,54 @@ export default function PopupBase({
     onRequestClose?.();
   };
 
+  // ── 본문 스크롤 경계선 ★ (2026-09-08 · 08 DL2)
+  //
+  // SEED 는 스크롤이 시작되면 헤더 아래에 경계선을 노출하고(Divider Visibility),
+  // 본문 하단에 Scroll Fog 를 깐다. **Fog 는 그라디언트라 쓰지 않는다** —
+  // 「그라디언트는 쓰지 않는다. 고도는 표면색·그림자·선 셋으로 표현한다」
+  // (design-system.md §2-5). 위아래 **같은 수단(선)** 으로 옮긴다 — 위는
+  // "위로 더 있다", 아래는 "아래로 더 있다"를 말한다.
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [scrollEdges, setScrollEdges] = useState({ top: false, bottom: false });
+
+  const syncScrollEdges = useCallback(() => {
+    const element = bodyRef.current;
+
+    if (!element) return;
+
+    // 1px 여유 — 소수점 확대에서 scrollHeight 가 clientHeight 보다 살짝 커
+    // 스크롤이 없는 본문에도 선이 그려지는 것을 막는다.
+    const top = element.scrollTop > 1;
+    const bottom =
+      element.scrollHeight - element.scrollTop - element.clientHeight > 1;
+
+    setScrollEdges((current) =>
+      current.top === top && current.bottom === bottom
+        ? current
+        : { top, bottom },
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    syncScrollEdges();
+
+    const element = bodyRef.current;
+
+    if (!element || typeof ResizeObserver === "undefined") return;
+
+    // ⚠️ 본문 **자식들**도 함께 관찰한다. 본문 자체는 높이가 고정이라 내용이
+    //    늘어도 크기가 안 바뀐다 — 자식을 안 보면 나중에 채워지는 본문에서
+    //    아래쪽 선이 뜨지 않는다.
+    const observer = new ResizeObserver(syncScrollEdges);
+
+    observer.observe(element);
+    for (const child of element.children) observer.observe(child);
+
+    return () => observer.disconnect();
+  }, [open, syncScrollEdges]);
+
   const closeButton = hasCloseButton ? (
     <button
       type="button"
@@ -206,7 +254,13 @@ export default function PopupBase({
             >
               {headerContent}
 
-              <div className={cn(`${block}__body`, bodyClassName)}>
+              <div
+                ref={bodyRef}
+                className={cn(`${block}__body`, bodyClassName)}
+                data-scrolled-top={scrollEdges.top ? "true" : undefined}
+                data-scrolled-bottom={scrollEdges.bottom ? "true" : undefined}
+                onScroll={syncScrollEdges}
+              >
                 {icon !== null && icon !== undefined ? (
                   <div className={`${block}__icon`}>{icon}</div>
                 ) : null}
