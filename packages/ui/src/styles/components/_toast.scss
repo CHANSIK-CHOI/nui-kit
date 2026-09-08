@@ -86,6 +86,7 @@
       margin: 0;
       background-color: transparent;
       border: 0;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
 
@@ -115,6 +116,7 @@
       margin: 0;
       background-color: transparent;
       border: 0;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
 

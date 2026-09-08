@@ -59,6 +59,7 @@
     // UA 기본 스타일 무력화 (전역 reset 미배포 대응 — 이 셀렉터 안에서만 적용)
     appearance: none;
     margin: 0;
+    font: inherit;
     font-family: var(#{v("font-family-base")});
     cursor: pointer;
 

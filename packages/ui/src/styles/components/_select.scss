@@ -72,6 +72,7 @@
       border: 0;
       border-radius: 0;
       background-color: transparent;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
       color: var(#{v("control-text")});
       caret-color: var(#{v("control-text")});
@@ -243,6 +244,7 @@
       margin: 0;
       background: none;
       border: 0;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
 
       display: inline-flex;

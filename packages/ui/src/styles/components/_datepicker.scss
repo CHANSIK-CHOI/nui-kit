@@ -125,6 +125,7 @@
       margin: 0;
       border: none;
       background: transparent;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
 
       position: absolute;
@@ -204,6 +205,7 @@
       padding: 0;
       border: 0;
       background: transparent;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
 
@@ -285,6 +287,7 @@
       // UA 기본 스타일 무력화
       appearance: none;
       padding: 0;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
 
