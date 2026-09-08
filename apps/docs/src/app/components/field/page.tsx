@@ -5,6 +5,7 @@ import {
   FieldGrid,
   FieldItem,
   Textfield,
+  Checkbox,
 } from "@nui-kit/react";
 import {
   GuideHeader,
@@ -68,6 +69,57 @@ export default function FieldPage() {
             <FieldLabel>이메일</FieldLabel>
             <Textfield placeholder="name@example.com" />
             <FieldDescription>회사 메일 주소를 입력해주세요.</FieldDescription>
+          </Field>
+        </Case>
+      </CaseGrid>
+
+      <h2>필수 · 선택 표시</h2>
+      <p>
+        <code>required</code> 를 주면 라벨 오른쪽에 점이 붙고 컨트롤에{" "}
+        <code>aria-required</code> 가 간다. 점은 <code>aria-hidden</code> 이고
+        뜻은 함께 붙는 화면 낭독 전용 문구가 전한다 — 기호만으로는 스크린리더에
+        아무것도 전해지지 않는다.
+      </p>
+      <p>
+        선택 항목은 <code>optionalLabel</code> 로 문구를 준다.{" "}
+        <strong>기본값이 없어서 주지 않으면 아무것도 그리지 않는다.</strong> 한
+        화면에서 필드의 3분의 2 이상이 필수면 「선택」만 표시하고, 그렇지 않으면
+        필수 표시만 쓴다. <strong>한 폼에서 둘을 섞지 않는다.</strong>
+      </p>
+      <CaseGrid
+        columns={2}
+        code={`<Field required>
+  <FieldLabel>휴대폰 번호</FieldLabel>
+  <Textfield placeholder="010-0000-0000" />
+</Field>
+
+<Field optionalLabel="선택">
+  <FieldLabel>회사</FieldLabel>
+  <Textfield placeholder="회사명" />
+</Field>`}
+      >
+        <Case label="required" note="점 + aria-required">
+          <Field required>
+            <FieldLabel>휴대폰 번호</FieldLabel>
+            <Textfield placeholder="010-0000-0000" />
+          </Field>
+        </Case>
+        <Case label="optionalLabel" note="문구만 · 점은 없다">
+          <Field optionalLabel="선택">
+            <FieldLabel>회사</FieldLabel>
+            <Textfield placeholder="회사명" />
+          </Field>
+        </Case>
+        <Case label="선택 컨트롤에도 간다" note="FieldItem 도 같은 prop 을 받는다">
+          <FieldItem required>
+            <Checkbox />
+            <FieldLabel>이용약관에 동의합니다</FieldLabel>
+          </FieldItem>
+        </Case>
+        <Case label="아무것도 안 주면" note="표시 없음 — 예전 동작 그대로">
+          <Field>
+            <FieldLabel>별명</FieldLabel>
+            <Textfield placeholder="선택 입력" />
           </Field>
         </Case>
       </CaseGrid>

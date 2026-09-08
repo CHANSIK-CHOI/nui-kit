@@ -82,6 +82,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       inputId: fieldContextId,
       describedByIds: fieldDescribedByIds,
       isError: isFieldError,
+      isRequired: isFieldRequired,
     } = useFieldContext();
     const generatedId = useId();
     const generatedMessageId = useId();
@@ -135,6 +136,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             maxLength={maxLength}
             aria-describedby={resolvedAriaDescribedBy}
             aria-invalid={resolvedIsError ? true : undefined}
+            aria-required={isFieldRequired ? true : undefined}
             onChange={handleChange}
           />
         </div>

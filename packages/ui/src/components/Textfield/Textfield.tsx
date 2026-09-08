@@ -81,6 +81,7 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
       inputId: fieldContextId,
       describedByIds: fieldDescribedByIds,
       isError: isFieldError,
+      isRequired: isFieldRequired,
     } = useFieldContext();
     const generatedId = useId();
     const generatedMessageId = useId();
@@ -122,6 +123,7 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
               readOnly={readOnly || isTextInputBlocked}
               aria-describedby={resolvedAriaDescribedBy}
               aria-invalid={resolvedIsError ? true : undefined}
+              aria-required={isFieldRequired ? true : undefined}
             />
           </div>
           <div className={`${block}__actions`}>

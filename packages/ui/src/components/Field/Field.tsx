@@ -34,6 +34,12 @@ export type FieldProps = HTMLAttributes<HTMLDivElement> & {
   infoMessage?: string;
   errorMessage?: string;
   isError?: boolean;
+  /** 필수 입력 — 라벨에 표시가 붙고 컨트롤에 `aria-required` 가 간다 */
+  required?: boolean;
+  /** 필수 표시의 스크린리더 문구. 기본 "필수" */
+  requiredLabel?: string;
+  /** 선택 항목 문구. **주어야만 그린다** — 기본값이 없다 (Field.context.ts) */
+  optionalLabel?: string;
 };
 
 type FieldLabelAsLabel = LabelHTMLAttributes<HTMLLabelElement> & {
@@ -62,16 +68,28 @@ export type FieldItemProps = HTMLAttributes<HTMLDivElement> & {
   infoMessage?: string;
   errorMessage?: string;
   isError?: boolean;
+  /** 필수 입력 — 라벨에 표시가 붙고 컨트롤에 `aria-required` 가 간다 */
+  required?: boolean;
+  /** 필수 표시의 스크린리더 문구. 기본 "필수" */
+  requiredLabel?: string;
+  /** 선택 항목 문구. **주어야만 그린다** — 기본값이 없다 (Field.context.ts) */
+  optionalLabel?: string;
 };
 
 function useFieldScope({
   inputId,
   isError = false,
   errorMessage = "",
+  required = false,
+  requiredLabel = "필수",
+  optionalLabel,
 }: {
   inputId?: string;
   isError?: boolean;
   errorMessage?: string;
+  required?: boolean;
+  requiredLabel?: string;
+  optionalLabel?: string;
 }) {
   const parentFieldContext = useFieldContext();
   const generatedInputId = useId();
@@ -120,6 +138,9 @@ function useFieldScope({
         ...messageIds,
       ],
       isError: resolvedIsError,
+      isRequired: required,
+      requiredLabel,
+      optionalLabel: optionalLabel ?? null,
       registerDescription,
       registerMessage,
     }),
@@ -127,9 +148,12 @@ function useFieldScope({
       descriptionIds,
       generatedLabelId,
       messageIds,
+      optionalLabel,
       parentFieldContext.describedByIds,
       registerDescription,
       registerMessage,
+      required,
+      requiredLabel,
       resolvedInputId,
       resolvedIsError,
     ],
@@ -156,11 +180,21 @@ const FieldRoot = forwardRef<HTMLDivElement, FieldProps>(
       infoMessage = "",
       errorMessage = "",
       isError = false,
+      required = false,
+      requiredLabel,
+      optionalLabel,
       ...rest
     },
     ref,
   ) => {
-    const fieldScope = useFieldScope({ inputId, isError, errorMessage });
+    const fieldScope = useFieldScope({
+      inputId,
+      isError,
+      errorMessage,
+      required,
+      requiredLabel,
+      optionalLabel,
+    });
 
     return (
       <FieldContext.Provider value={fieldScope}>
@@ -197,9 +231,19 @@ export function FieldItem({
   infoMessage = "",
   errorMessage = "",
   isError = false,
+  required = false,
+  requiredLabel,
+  optionalLabel,
   ...rest
 }: FieldItemProps) {
-  const fieldScope = useFieldScope({ inputId, isError, errorMessage });
+  const fieldScope = useFieldScope({
+    inputId,
+    isError,
+    errorMessage,
+    required,
+    requiredLabel,
+    optionalLabel,
+  });
 
   return (
     <FieldContext.Provider value={fieldScope}>
@@ -238,6 +282,35 @@ export function FieldGrid({
   );
 }
 
+/**
+ * 라벨 오른쪽의 필수 · 선택 표시.
+ *
+ * 필수는 **점**(6px · `text-danger`)이고 선택은 **문구**다 — SEED `field.yaml` 의
+ * `indicatorIcon` · `indicatorText` 와 같은 자리다. 기호만으로는 뜻이 전해지지
+ * 않으므로 점에는 sr-only 문구를 붙인다 (KRDS [입력폼 8]).
+ *
+ * **둘은 함께 나오지 않는다.** 한 화면에서 하나만 쓰는 것이 규칙이라
+ * (SEED `field.mdx` · KRDS [입력폼 9]) 필수면 점만, 아니면 문구만 그린다.
+ */
+function FieldRequirement() {
+  const { isRequired, requiredLabel, optionalLabel } = useFieldContext();
+
+  if (isRequired) {
+    return (
+      <>
+        <span className={`${block}__requirement`} aria-hidden="true" />
+        <span className={px("sr-only")}>{requiredLabel}</span>
+      </>
+    );
+  }
+
+  if (optionalLabel) {
+    return <span className={`${block}__optional`}>{optionalLabel}</span>;
+  }
+
+  return null;
+}
+
 export function FieldLabel({
   children,
   className,
@@ -257,6 +330,7 @@ export function FieldLabel({
         className={cn(`${block}__label`, className)}
       >
         {children}
+        <FieldRequirement />
       </span>
     );
   }
@@ -269,6 +343,7 @@ export function FieldLabel({
       className={cn(`${block}__label`, className)}
     >
       {children}
+      <FieldRequirement />
     </label>
   );
 }

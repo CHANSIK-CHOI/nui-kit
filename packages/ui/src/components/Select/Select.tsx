@@ -106,6 +106,7 @@ const Select: ForwardRefExoticComponent<
       inputId: fieldContextId,
       describedByIds: fieldDescribedByIds,
       isError: isFieldError,
+      isRequired: isFieldRequired,
     } = useFieldContext();
     const generatedId = useId();
     const generatedMessageId = useId();
@@ -220,6 +221,7 @@ const Select: ForwardRefExoticComponent<
                 : undefined)
             }
             aria-invalid={ariaInvalid ?? (resolvedIsError || undefined)}
+            aria-required={isFieldRequired || undefined}
             aria-errormessage={
               resolvedIsError && errorMessage ? generatedMessageId : undefined
             }

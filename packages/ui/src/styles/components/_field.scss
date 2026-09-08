@@ -34,9 +34,44 @@
     }
 
     &__label {
+      display: inline-flex;
+      align-items: baseline;
       color: var(#{v("text-primary")});
 
       @include typo(3, "regular");
+    }
+
+    // 필수 표시 — 6px 점. SEED `field.yaml` 의 `indicatorIcon`(size 6 · fg.critical)
+    // 과 같은 자리다. 점은 아이콘이 아니라 표시라 `size-dot-*` 를 쓴다 (tokens.md §3-4).
+    //
+    // ⚠️ 뜻은 점이 아니라 sr-only 문구가 전한다 — 기호만으로는 스크린리더에
+    //    아무것도 전해지지 않는다 (KRDS [입력폼 8]).
+    &__requirement {
+      align-self: center;
+      flex-shrink: 0;
+      width: var(#{v("size-dot-xs")});
+      height: var(#{v("size-dot-xs")});
+      margin-left: var(#{v("space-1")});
+      border-radius: var(#{v("radius-circle")});
+      // 점은 **전경 표시**다 — 글자색 토큰을 `color` 로 받고 `currentColor` 로 칠한다.
+      // `background: var(--nui-text-danger)` 로 쓰면 역할군과 속성이 어긋나
+      // `verify:tokens` 가 잡는다 (tokens.md §4-3). SEED 도 이 자리를
+      // `indicatorIcon` 의 `fg.critical` 로 둔다 — 배경이 아니라 아이콘 색이다.
+      color: var(#{v("text-danger")});
+      background: currentColor;
+    }
+
+    // 선택 표시 — 문구. 라벨보다 한 단계 작고 조용하다.
+    //
+    // SEED 는 라벨 16 에 문구 14 로 **한 단계 아래**를 쓴다. 우리 라벨이 14 이므로
+    // 같은 관계를 지키면 13 이다(`font-size-1`). SEED 의 절대값 14 를 그대로 쓰면
+    // 라벨과 같은 크기가 되어 표시가 라벨만큼 커진다.
+    &__optional {
+      flex-shrink: 0;
+      margin-left: var(#{v("space-1")});
+      color: var(#{v("text-secondary")});
+
+      @include typo(1, "regular");
     }
 
     label#{cls("field")}__label {

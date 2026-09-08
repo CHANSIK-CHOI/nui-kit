@@ -33,8 +33,12 @@ type RadioBaseProps = {
   readOnly?: boolean;
 };
 
+// ⚠️ `children` 을 닫는다. `InputHTMLAttributes` 가 `children` 을 품고 있어
+//    `<Radio>라벨</Radio>` 이 **타입은 통과하고 런타임에 죽었다** —
+//    `{...rest}` 가 그것을 `<input>` 에 넣어 "input is a void element tag" 가 난다.
+//    라벨은 `Field.Label` 이 붙인다 (a11y.md §1).
 export type RadioProps = RadioBaseProps &
-  Omit<InputHTMLAttributes<HTMLInputElement>, "readOnly" | "type">;
+  Omit<InputHTMLAttributes<HTMLInputElement>, "readOnly" | "type" | "children">;
 
 const Radio = forwardRef<HTMLInputElement, RadioProps>(
   (
@@ -58,6 +62,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
       inputId: fieldContextId,
       describedByIds: fieldDescribedByIds,
       isError: isFieldError,
+      isRequired: isFieldRequired,
     } = useFieldContext();
     const groupContext = useRadioGroupContext();
     const generatedId = useId();
@@ -114,6 +119,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
           //    `checked` 를 controlled 로 보고 onChange 누락 경고를 낸다.
           readOnly={resolvedReadOnly}
           aria-describedby={resolvedAriaDescribedBy}
+          aria-required={isFieldRequired ? true : undefined}
           className={`${block}__input`}
           onClick={handleClick}
           onKeyDown={handleKeyDown}
