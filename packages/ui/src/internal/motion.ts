@@ -47,19 +47,33 @@ export const motionTransition = {
     ease: motionEase.exit,
   } satisfies Transition,
 
-  // bottomSheet — 큰 면적, 아래에서 위로
+  // ── bottomSheet ★ 여기만 **스프링**이다 (2026-09-08 · prototype BS1)
+  //
+  // 시트는 **손으로 끌 수 있는 것**이다. Apple 이 `Drawer / sheet` 를 스프링 표에
+  // 이름으로 올려 두고(damping 0.8 · response 0.3), Emil 도 "끊고 되돌릴 수 있는
+  // 것은 스프링"이라고 한다. 값은 motion.md §8 이 되돌아감에 적어 둔 것과 같다 —
+  // **등장과 놓았을 때가 한 물리가 된다.** G1(끌어서 닫기)이 붙는 순간 드러난다.
+  //
+  // `bounce: 0` 인 이유 — 튐은 **던졌을 때만**이다. 버튼으로 여는 등장이 튀면 어색하다.
+  // `visualDuration` 은 "눈에 보이는 시간" 이라 duration 스케일과 같은 뜻으로 읽힌다.
+  //
+  // ⚠️ 예전에는 `d8`(400)이었다. Emil 의 **"UI animations stay under 300ms"** 규칙에
+  //    걸렸고, 그 규칙의 반례가 정확히 400ms 였다. SEED 도 300 이다.
   panelSheet: {
-    duration: motionDuration.d8,
-    ease: motionEase.enterEmphasized,
+    type: "spring",
+    bounce: 0,
+    visualDuration: 0.3,
   } satisfies Transition,
   panelSheetExit: {
     duration: motionDuration.d5,
     ease: motionEase.exit,
   } satisfies Transition,
 
-  // fullPopup — 전체 화면 슬라이드
+  // fullPopup — 전체 화면 슬라이드.
+  // ⚠️ `d7`(350)이었다. 같은 "300ms 아래" 규칙에 걸려 내렸다. 끌 수 없는 것이라
+  //    스프링은 쓰지 않는다 — 스프링은 손으로 만질 수 있는 것의 도구다.
   panelFull: {
-    duration: motionDuration.d7,
+    duration: motionDuration.d6,
     ease: motionEase.enterEmphasized,
   } satisfies Transition,
   panelFullExit: {
