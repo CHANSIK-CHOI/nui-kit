@@ -41,6 +41,21 @@ export type TooltipPlacement =
   | "bottomLeft"
   | "bottomRight";
 
+/**
+ * **마지막으로 툴팁이 닫힌 시각** (07 M3).
+ *
+ * 하나 열린 뒤 이웃으로 옮기면 지연도 모션도 생략한다 — Emil: *"첫 툴팁은
+ * 지연으로 오작동을 막는다. 하나 열린 뒤 이웃은 즉시. 툴바 전체가 빨라 보인다."*
+ *
+ * 모듈 스코프인 이유 — 툴팁 인스턴스끼리는 서로를 모른다. 「직전에 다른 툴팁이
+ * 열려 있었나」는 화면 전체의 사실이라 컴포넌트 밖에 둔다. Context 로 두면
+ * 소비자가 Provider 를 감싸야 하고, 감싸지 않으면 조용히 동작하지 않는다.
+ */
+let lastTooltipClosedAt = 0;
+
+/** 이 시간 안에 이웃이 열리면 즉시 연다 */
+const INSTANT_WINDOW_MS = 300;
+
 /** placement 값(카멜)을 kebab 클래스명으로 옮긴다 */
 const PLACEMENT_CLASS: Record<TooltipPlacement, string> = {
   topCenter: "top-center",
@@ -70,6 +85,20 @@ export type TooltipProps = {
   placement?: TooltipPlacement;
   /** 제어 모드. 주면 열림 상태를 소비자가 소유한다 */
   open?: boolean;
+  /**
+   * hover 로 열 때의 지연 (07 M3). 포커스 · 터치 탭은 **즉시**다.
+   *
+   * pointer 가 스치는 순간 열리면 툴바를 가로지를 때 툴팁이 줄줄이 뜬다
+   * (실측 11ms). 지연이 그 오작동을 막는다.
+   */
+  openDelay?: number;
+  /**
+   * hover 가 떠난 뒤 닫히는 지연.
+   *
+   * 툴팁 위로 마우스를 옮길 시간을 준다 — WCAG 2.1 의 1.4.13 Hoverable 이
+   * 요구하는 것이다. 트리거와 버블 사이에 `space-3`(12px) 간격이 있다.
+   */
+  closeDelay?: number;
   defaultOpen?: boolean;
   onOpenChange?: (nextOpen: boolean) => void;
   disabled?: boolean;
@@ -86,6 +115,28 @@ export type TooltipProps = {
 function getTooltipAnimationOffset(placement: TooltipPlacement) {
   return placement.startsWith("top") ? 6 : -6;
 }
+
+/**
+ * 툴팁이 **자라나는 지점** (2026-09-08 · 07 M2).
+ *
+ * 트리거에서 자란다 — 팝오버 · 드롭다운 · 툴팁 · 메뉴는 자기를 연 것에서 커진다
+ * (motion.md §6). 원점이 없으면 중앙에서 커져 "어디서 나왔는지" 가 사라진다.
+ *
+ * 세로는 트리거 쪽 — 위에 뜨면 아래 모서리, 아래에 뜨면 위 모서리다.
+ * 가로는 **화살표 자리**에 맞춘다. 툴팁은 화살표가 가리키는 점에서 자라는 것이
+ * 자연스럽고, 그 자리는 `_tooltip.scss` 의 화살표 위치와 같다 —
+ * center 는 50%, left·right 는 `space-4`(16px) 다.
+ *
+ * ⚠️ SCSS 에 두지 않는다. `placement` 는 런타임이라 framer 가 inline 으로 쓴다.
+ */
+const PLACEMENT_ORIGIN: Record<TooltipPlacement, string> = {
+  topCenter: "bottom center",
+  topLeft: "bottom 16px",
+  topRight: "bottom calc(100% - 16px)",
+  bottomCenter: "top center",
+  bottomLeft: "top 16px",
+  bottomRight: "top calc(100% - 16px)",
+};
 
 function getMergedAriaDescribedBy({
   currentAriaDescribedBy,
@@ -114,6 +165,8 @@ export default function Tooltip({
   className,
   placement = "topCenter",
   open,
+  openDelay = 400,
+  closeDelay = 100,
   defaultOpen = false,
   onOpenChange,
   disabled = false,
@@ -140,6 +193,7 @@ export default function Tooltip({
   const isControlled = typeof open === "boolean";
   const resolvedOpen = disabled ? false : isControlled ? open : isTooltipOpen;
   const animationOffset = getTooltipAnimationOffset(placement);
+  const transformOrigin = PLACEMENT_ORIGIN[placement];
 
   const setTooltipOpenState = useCallback(
     (nextOpen: boolean) => {
@@ -147,10 +201,68 @@ export default function Tooltip({
         setIsTooltipOpen(nextOpen);
       }
 
+      // 닫힌 시각을 남긴다 — 이웃 툴팁이 즉시 열릴지를 이것으로 판단한다.
+      if (!nextOpen) {
+        lastTooltipClosedAt = Date.now();
+      }
+
       onOpenChange?.(nextOpen);
     },
     [isControlled, onOpenChange],
   );
+
+  // ── hover 지연 (07 M3)
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 이웃에서 옮겨 왔는가 — 지연도 모션도 생략한다.
+  const [isInstant, setIsInstant] = useState(false);
+
+  const clearHoverTimer = useCallback(() => {
+    if (hoverTimerRef.current !== null) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  }, []);
+
+  // 언마운트에서 타이머를 반드시 끊는다 — 안 끊으면 사라진 컴포넌트의 상태를
+  // 건드려 개발 모드에서 경고가 난다.
+  useEffect(() => clearHoverTimer, [clearHoverTimer]);
+
+  /** hover 로 연다 — 첫 툴팁은 지연, 이웃은 즉시 */
+  const openByHover = useCallback(() => {
+    clearHoverTimer();
+
+    const isFromNeighbor =
+      Date.now() - lastTooltipClosedAt < INSTANT_WINDOW_MS;
+
+    if (isFromNeighbor || openDelay <= 0) {
+      setIsInstant(isFromNeighbor);
+      setTooltipOpenState(true);
+
+      return;
+    }
+
+    setIsInstant(false);
+    hoverTimerRef.current = setTimeout(() => {
+      hoverTimerRef.current = null;
+      setTooltipOpenState(true);
+    }, openDelay);
+  }, [clearHoverTimer, openDelay, setTooltipOpenState]);
+
+  /** hover 가 떠나 닫는다 — 툴팁 위로 옮길 시간을 준다 (WCAG 1.4.13) */
+  const closeByHover = useCallback(() => {
+    clearHoverTimer();
+
+    if (closeDelay <= 0) {
+      setTooltipOpenState(false);
+
+      return;
+    }
+
+    hoverTimerRef.current = setTimeout(() => {
+      hoverTimerRef.current = null;
+      setTooltipOpenState(false);
+    }, closeDelay);
+  }, [clearHoverTimer, closeDelay, setTooltipOpenState]);
 
   // ── portal 컨테이너
   //
@@ -289,6 +401,9 @@ export default function Tooltip({
 
     if (disabled || event.pointerType === "mouse") return;
 
+    // 터치 탭도 즉시다 — 손가락이 이미 그 자리에 있다.
+    clearHoverTimer();
+    setIsInstant(true);
     setTooltipOpenState(!resolvedOpen);
   };
 
@@ -298,18 +413,35 @@ export default function Tooltip({
   const handleMouseEnter: MouseEventHandler<HTMLDivElement> = () => {
     if (disabled || lastPointerTypeRef.current !== "mouse") return;
 
-    setTooltipOpenState(true);
+    // ⚠️ 제어형은 지연을 적용하지 않는다 — 소비자가 시점을 소유한다.
+    if (isControlled) {
+      onOpenChange?.(true);
+
+      return;
+    }
+
+    openByHover();
   };
 
   const handleMouseLeave: MouseEventHandler<HTMLDivElement> = () => {
     if (lastPointerTypeRef.current !== "mouse") return;
 
-    setTooltipOpenState(false);
+    if (isControlled) {
+      onOpenChange?.(false);
+
+      return;
+    }
+
+    closeByHover();
   };
 
   const handleFocus: FocusEventHandler<HTMLDivElement> = () => {
     if (disabled) return;
 
+    // 키보드는 **즉시**다 (07 M3). 대기 중인 hover 타이머가 있으면 끊는다 —
+    // 안 끊으면 400ms 뒤에 한 번 더 열려는 호출이 온다.
+    clearHoverTimer();
+    setIsInstant(true);
     setTooltipOpenState(true);
   };
 
@@ -318,6 +450,7 @@ export default function Tooltip({
     if (event.currentTarget.contains(event.relatedTarget as Node | null))
       return;
 
+    clearHoverTimer();
     setTooltipOpenState(false);
   };
 
@@ -350,28 +483,42 @@ export default function Tooltip({
         <motion.div
           key="tooltip-panel"
           className={`${block}__panel`}
+          // 트리거에서 자란다 — 원점이 없으면 중앙에서 커진다 (07 M2)
+          style={{ transformOrigin }}
           initial={reduceMotion(
-            { opacity: 0, y: animationOffset, scale: 0.98 },
+            {
+              opacity: 0,
+              transform: `translateY(${animationOffset}px) scale(0.97)`,
+            },
             shouldReduceMotion,
           )}
           animate={reduceMotion(
-            { opacity: 1, y: 0, scale: 1 },
+            { opacity: 1, transform: "translateY(0px) scale(1)" },
             shouldReduceMotion,
           )}
           exit={{
             ...reduceMotion(
-              { opacity: 0, y: animationOffset, scale: 0.98 },
+              {
+                opacity: 0,
+                transform: `translateY(${animationOffset}px) scale(0.97)`,
+              },
               shouldReduceMotion,
             ),
             transition: reduceMotionTransition(
-              motionTransition.popoverExit,
+              motionTransition.tooltipExit,
               shouldReduceMotion,
             ),
           }}
-          transition={reduceMotionTransition(
-            motionTransition.popover,
-            shouldReduceMotion,
-          )}
+          // 이웃에서 옮겨 왔거나 키보드·터치로 열렸으면 **모션을 생략한다** —
+          // 지연 없이 뜨는데 모션이 남으면 그 모션이 지연처럼 느껴진다 (07 M3).
+          transition={
+            isInstant
+              ? { duration: 0 }
+              : reduceMotionTransition(
+                  motionTransition.tooltip,
+                  shouldReduceMotion,
+                )
+          }
         >
           <div id={tooltipId} role="tooltip" className={`${block}__bubble`}>
             <div className={`${block}__content`}>{content}</div>

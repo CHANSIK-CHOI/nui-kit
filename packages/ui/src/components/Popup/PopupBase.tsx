@@ -22,12 +22,24 @@ const VARIANT_CLASS: Record<PopupVariant, string> = {
   full: "full",
 };
 
+/**
+ * ⚠️ **`transform` 문자열로 준다** — `y`·`scale` 숏핸드가 아니다
+ *    (2026-09-08 · 07 M5).
+ *
+ * framer 의 숏핸드는 메인 스레드 rAF 로 매 프레임 inline style 을 쓴다.
+ * 페이지가 바쁠 때 프레임이 떨어진다. `transform` 문자열이면 WAAPI 로 넘어간다 —
+ * Emil `animate/SKILL.md`: *"In Motion, use the full transform string. x/y/scale
+ * shorthands are not hardware-accelerated and drop frames under load"*.
+ *
+ * ⚠️ 시트의 `translateY(100%)` 는 **퍼센트라 자기 크기 기준**이다. px 로 적으면
+ *    시트 높이가 바뀔 때 어긋난다 (motion.md §4).
+ */
 function getPanelMotion(variant: PopupVariant) {
   if (variant === "bottomSheet") {
     return {
-      initial: { opacity: 1, y: "100%" },
-      animate: { opacity: 1, y: 0 },
-      exit: { opacity: 1, y: "100%" },
+      initial: { opacity: 1, transform: "translateY(100%)" },
+      animate: { opacity: 1, transform: "translateY(0%)" },
+      exit: { opacity: 1, transform: "translateY(100%)" },
       enter: motionTransition.panelSheet,
       exitTransition: motionTransition.panelSheetExit,
     };
@@ -35,18 +47,18 @@ function getPanelMotion(variant: PopupVariant) {
 
   if (variant === "full") {
     return {
-      initial: { opacity: 1, x: "100%" },
-      animate: { opacity: 1, x: 0 },
-      exit: { opacity: 1, x: "100%" },
+      initial: { opacity: 1, transform: "translateX(100%)" },
+      animate: { opacity: 1, transform: "translateX(0%)" },
+      exit: { opacity: 1, transform: "translateX(100%)" },
       enter: motionTransition.panelFull,
       exitTransition: motionTransition.panelFullExit,
     };
   }
 
   return {
-    initial: { opacity: 0, y: 24, scale: 0.96 },
-    animate: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: 24, scale: 0.98 },
+    initial: { opacity: 0, transform: "translateY(24px) scale(0.96)" },
+    animate: { opacity: 1, transform: "translateY(0px) scale(1)" },
+    exit: { opacity: 0, transform: "translateY(24px) scale(0.97)" },
     enter: motionTransition.panelDialog,
     exitTransition: motionTransition.panelDialogExit,
   };

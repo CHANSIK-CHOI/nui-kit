@@ -113,10 +113,32 @@ export const motionTransition = {
     ease: motionEase.exit,
   } satisfies Transition,
 
-  // tooltip / popover — 가볍고 빠르게
+  // ── 툴팁 ★ 드롭다운과 **다른 시계**다 (2026-09-08 · 07 M2)
+  //
+  // motion.md §5-2 는 툴팁 150/100 · 드롭다운 200/250 을 **다른 행**으로 두는데
+  // 코드가 `popover` 하나로 둘을 먹이고 있었다 — 툴팁이 표보다 느렸다.
+  // Emil 표도 나눈다: Tooltips 125~200 · Dropdowns 150~250.
+  tooltip: {
+    duration: motionDuration.d3,
+    ease: motionEase.enterEmphasized,
+  } satisfies Transition,
+  tooltipExit: {
+    duration: motionDuration.d2,
+    ease: motionEase.exit,
+  } satisfies Transition,
+
+  // 드롭다운 · 셀렉트 · 달력 — 트리거에서 자란다
+  //
+  // ⚠️ `standard` 는 첫 프레임이 10% 라 뜸을 들인다. 등장에는 쓰지 않는다
+  //    (motion.md §5-1). `enterEmphasized` 는 43% 다.
+  //
+  // ⚠️ 08 SE1 이 이 값을 150/100 으로 내리자고 했는데 **따르지 않는다.**
+  //    근거가 SEED 인데 **시간의 정본은 Emil** 이다(2026-09-06 결정). Emil 의
+  //    드롭다운 범위는 150~250 이라 200 이 그 안이고, 우리 표는 드롭다운·셀렉트·
+  //    달력을 한 행으로 묶는다 — Select 만 내리면 같은 역할이 갈린다.
   popover: {
     duration: motionDuration.d4,
-    ease: motionEase.standard,
+    ease: motionEase.enterEmphasized,
   } satisfies Transition,
   popoverExit: {
     duration: motionDuration.d3,

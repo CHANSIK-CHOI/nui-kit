@@ -725,23 +725,26 @@ export default function DatepickerBase<
         <motion.div
           id={calendarDropdownId}
           className={cn(`${block}__dropdown`, dropdownClassName)}
+          // 입력창 아래로 열리므로 **위 왼쪽 모서리**에서 자란다 (07 M2).
+          // 위로 뒤집히는 경우가 생기면 그때 `bottom left` 를 준다.
+          style={{ transformOrigin: "top left" }}
+          // `transform` 문자열로 준다 — 숏핸드는 메인 스레드 rAF 다 (07 M5)
           initial={
             shouldReduceMotion
               ? { opacity: 0 }
-              : { opacity: 0, y: -8, scale: 0.98 }
+              : { opacity: 0, transform: "translateY(-8px) scale(0.97)" }
           }
           animate={
             shouldReduceMotion
               ? { opacity: 1 }
-              : { opacity: 1, y: 0, scale: 1 }
+              : { opacity: 1, transform: "translateY(0px) scale(1)" }
           }
           exit={
             shouldReduceMotion
               ? { opacity: 0 }
               : {
                   opacity: 0,
-                  y: -8,
-                  scale: 0.98,
+                  transform: "translateY(-8px) scale(0.97)",
                   transition: motionTransition.popoverExit,
                 }
           }

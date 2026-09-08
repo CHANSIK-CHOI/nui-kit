@@ -154,16 +154,18 @@ export default function Toast({
           onPointerLeave={handlePointerLeave}
           onFocus={() => setFocusedWithin(true)}
           onBlur={() => setFocusedWithin(false)}
+          // `transform` 문자열로 준다 — 숏핸드는 메인 스레드 rAF 다 (07 M5).
+          // 원점은 두지 않는다 — 아래에서 올라오는 것이라 의미가 없다.
           initial={reduceMotion(
-            { opacity: 0, y: 32, scale: 0.98 },
+            { opacity: 0, transform: "translateY(32px) scale(0.97)" },
             shouldReduceMotion,
           )}
           animate={reduceMotion(
-            { opacity: 1, y: 0, scale: 1 },
+            { opacity: 1, transform: "translateY(0px) scale(1)" },
             shouldReduceMotion,
           )}
           exit={reduceMotion(
-            { opacity: 0, y: 24, scale: 0.98 },
+            { opacity: 0, transform: "translateY(24px) scale(0.97)" },
             shouldReduceMotion,
           )}
           transition={reduceMotionTransition(
