@@ -120,7 +120,7 @@ export default function ElevationPage() {
         다크에서는 층이 올라갈수록 밝아진다.
       </div>
 
-      <h2>그림자</h2>
+      <h2 id="shadow">그림자</h2>
       <div className="doc-example">
         <div
           className="doc-example__preview doc-example__row"
@@ -200,7 +200,7 @@ export default function ElevationPage() {
         있다.
       </div>
 
-      <h2>쌓임 순서</h2>
+      <h2 id="z-index">쌓임 순서</h2>
       <p>
         <code>z-index</code> 를 직접 쓰지 않고 이 다섯 개 안에서 고른다. 값을
         직접 쓰기 시작하면 숫자 경쟁이 벌어진다.

@@ -200,7 +200,7 @@ body { font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; }`
         </p>
       </div>
 
-      <h2>전체 토큰</h2>
+      <h2 id="typography">전체 토큰</h2>
       <TokenTable group="typography" />
     </>
   );

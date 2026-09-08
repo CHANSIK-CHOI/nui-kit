@@ -197,7 +197,7 @@ export default function AccessibilityPage() {
         범위는 44 다.
       </div>
 
-      <h2>포커스</h2>
+      <h2 id="focus">포커스</h2>
       <p>
         키보드로 이동할 때 지금 위치를 알리는 표시다.{" "}
         <code>:focus-visible</code> 로만 그려서 마우스로 눌렀을 때는 나타나지

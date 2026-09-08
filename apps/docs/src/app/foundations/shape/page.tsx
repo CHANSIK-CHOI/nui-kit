@@ -31,7 +31,7 @@ export default function ShapePage() {
         문서에 있다.
       </p>
 
-      <h2>모서리</h2>
+      <h2 id="radius">모서리</h2>
       <div className="doc-example">
         <div
           className="doc-example__preview doc-example__row"
@@ -68,7 +68,7 @@ export default function ShapePage() {
         아니면 <code>radius-full</code> 을 쓴다.
       </div>
 
-      <h2>선 색</h2>
+      <h2 id="border">선 색</h2>
       <p>
         굵기가 아니라 한 화면에 몇 번 나오는지로 나눈다. 많이 나올수록 연하다.
         리스트 구분선이 진하면 화면이 줄무늬처럼 보인다.

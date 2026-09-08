@@ -36,7 +36,7 @@ export default function ColorPage() {
         <code>className</code> 으로 색을 맞출 때 아래 이름을 참조한다.
       </p>
 
-      <h3>글자</h3>
+      <h3 id="text">글자</h3>
       <p>
         글자로 쓸 수 있는 단계는 11번과 12번뿐이다. 9번과 10번은 채워진 배경
         자리라 글자로 쓰면 대비가 3점대로 떨어진다. <code>text-disabled</code>{" "}
@@ -44,7 +44,7 @@ export default function ColorPage() {
       </p>
       <TokenTable group="text" />
 
-      <h3>면</h3>
+      <h3 id="layer">면</h3>
       <p>
         면은 콘텐츠를 담는 것의 배경이다. 글자나 아이콘이 아니라 화면의 층을
         만든다. 층의 순서는 <Link href="/foundations/elevation">깊이</Link>{" "}
@@ -59,7 +59,7 @@ export default function ColorPage() {
       </p>
       <TokenTable group="border" omit="border-width" />
 
-      <h3>액션</h3>
+      <h3 id="action">액션</h3>
       <p>
         액션은 버튼 계열이다. 색이 아니라 역할이 이름이라 이 버튼이 삭제인지만
         물으면 정해진다. 각 역할의 <code>-fg</code> 는 그 배경 위에서 대비 4.5
@@ -68,14 +68,14 @@ export default function ColorPage() {
         투명도로 표현하지 않는다. 정부 가이드라인(KRDS)의 상태 색 규칙이다.
       </p>
       <TokenTable group="action" />
-      <h3>입력 컨트롤</h3>
+      <h3 id="control">입력 컨트롤</h3>
       <p>
         입력 컨트롤 색은 <code>Textfield</code> 와 <code>Select</code>,{" "}
         <code>Checkbox</code> 처럼 값을 받는 것들이 공유한다.
       </p>
       <TokenTable group="control" />
 
-      <h3>상태 표시</h3>
+      <h3 id="status">상태 표시</h3>
       <p>상태 표시는 알림이나 배지처럼 은은한 면으로 알릴 때 쓴다.</p>
       <TokenTable group="status" />
 
@@ -127,7 +127,7 @@ export default function ColorPage() {
         테마를 다 잰다.
       </div>
 
-      <h2>팔레트 전량</h2>
+      <h2 id="color">팔레트 전량</h2>
       <p>
         컴포넌트는 팔레트를 직접 참조하지 않는다. 참조하면 브랜드 색을 바꿔도 그
         컴포넌트만 옛 색으로 남는다.

@@ -167,7 +167,7 @@ export default function MotionPage() {
 />`}</code>
       </pre>
 
-      <h2>눌림</h2>
+      <h2 id="scale">눌림</h2>
       <p>
         눌림은 배율과 시간, 곡선 세 축을 함께 쓴다. 하나만 골라 쓰면 같은 눌림이
         컴포넌트마다 다르게 느껴진다.
@@ -210,7 +210,7 @@ export default function MotionPage() {
       </p>
       <TokenTable group="etc" only="scale-" swatch={false} />
 
-      <h2>전체 토큰</h2>
+      <h2 id="motion">전체 토큰</h2>
       <TokenTable group="motion" swatch={false} />
     </>
   );

@@ -55,7 +55,7 @@ export default function SpacingPage() {
         <code>space-9</code> 는 없다. 쓰이지 않아서 만들지 않았다.
       </p>
 
-      <h2>정해진 게 없으면 이것</h2>
+      <h2 id="space">정해진 게 없으면 이것</h2>
       <p>
         규칙이 따로 없을 때 쓸 기본값도 이름을 갖는다. 임의의 숫자가 코드에
         들어가는 경로를 막기 위해서다.
@@ -168,7 +168,7 @@ export default function SpacingPage() {
         라벨이 <code>&lt;label&gt;</code> 로 연결돼 있으면 자동으로 확보된다.
       </div>
 
-      <h2>전체 토큰</h2>
+      <h2 id="size">전체 토큰</h2>
       <TokenTable group="size" swatch={false} />
     </>
   );
