@@ -15,6 +15,7 @@
  * 2-c. 버튼 **조합 전수** — variant(solid·soft·line·text) × color(넷) × 상태(기본·비활성).
  *    예전에는 셋만 재고 있었고, 실제로 나온 위반 둘이 그 목록 밖이었다 (06 D10).
  * 2-e. soft · line · text 의 hover · active 글자 — 2-b 의 hover 항목은 solid 만 잰다.
+ * 2-f. 선택 컨트롤 **전수** — tone × 상태 × 테마. 채움과 그 위 표시의 반전 짝.
  *    면이 없는 것은 **실제로 마우스를 올리고 눌러서** 잰다.
  * 2-d. placeholder — `::placeholder` 는 의사요소라 요소 순회에 안 잡힌다. placeholder 도 글자다.
  * 3. 터치 영역 — 누를 수 있는 것의 히트 영역 실측 (a11y.md §8)
@@ -667,6 +668,119 @@ for (const theme of ["light", "dark"]) {
   await page.evaluate(() =>
     document.getElementById("nui-a11y-probe")?.remove(),
   );
+  await ctx.close();
+}
+
+// ── 2-f) 선택 컨트롤 전수 — tone × 상태 × 테마 (2026-09-08 · S1)
+//
+// 채움이 중립이 되면서 **반전 짝**이 생겼다. `control-accent` 는 다크에서 흰색으로
+// 뒤집히는데 그 위 표시(체크 · 라디오 점 · 스위치 썸)가 흰색으로 고정이면 흰 위
+// 흰색이 된다 — 실측 1.0:1 로 아예 안 보였다.
+//
+// 토큰 쌍으로는 이걸 못 잡는다. 짝이 맞는지가 **DOM 에서 어느 변수를 읽느냐**에
+// 달려 있어서다. 그래서 실제 컨트롤을 심어 놓고 렌더된 색을 읽는다.
+console.log("\n■ 선택 컨트롤 전수 — tone × 상태 (라이트 · 다크)");
+
+const SELECTION_TONES = [
+  ["neutral", ""],
+  ["brand", "--brand"],
+];
+const SELECTION_STATES = [
+  ["기본", "", ""],
+  ["에러", "nui-is-error", ""],
+  ["비활성", "nui-is-disabled", "disabled"],
+];
+
+/** 체크박스 · 라디오 · 스위치를 직접 심어 채움과 그 위 표시의 대비를 잰다. */
+const SELECTION_PROBE = ({ tones, states }) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 1;
+  const cx = canvas.getContext("2d", { willReadFrequently: true });
+  const flatten = (layers) => {
+    cx.clearRect(0, 0, 1, 1);
+    cx.fillStyle = "#fff";
+    cx.fillRect(0, 0, 1, 1);
+    for (const layer of layers) {
+      if (!layer || /rgba\(0, 0, 0, 0\)|transparent/.test(layer)) continue;
+      cx.fillStyle = layer;
+      cx.fillRect(0, 0, 1, 1);
+    }
+    const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
+    return [r, g, b];
+  };
+
+  let cur = document.querySelector(".nui-checkbox")?.parentElement;
+  let surface = "rgb(255, 255, 255)";
+  while (cur) {
+    const value = getComputedStyle(cur).backgroundColor;
+    if (value && !/rgba\(0, 0, 0, 0\)|transparent/.test(value)) {
+      surface = value;
+      break;
+    }
+    cur = cur.parentElement;
+  }
+
+  const host = document.createElement("div");
+  host.style.cssText = `position:fixed;left:24px;top:24px;z-index:99999;padding:8px;background:${surface}`;
+  document.body.appendChild(host);
+
+  // [이름, 블록 클래스, 표시 클래스, 표시의 색이 실린 속성]
+  const KINDS = [
+    ["Checkbox", "nui-checkbox", "nui-checkbox__indicator", "borderRightColor"],
+    ["Radio", "nui-radio", "nui-radio__indicator", "backgroundColor"],
+    ["Switch", "nui-switch", "nui-switch__thumb", "backgroundColor"],
+  ];
+
+  const rows = [];
+  for (const [kind, blockClass, markClass, markProp] of KINDS) {
+    for (const [tone, toneMod] of tones) {
+      for (const [state, stateClass, inputAttr] of states) {
+        host.innerHTML =
+          `<span class="${blockClass}${toneMod ? " " + blockClass + toneMod : ""}${stateClass ? " " + stateClass : ""}">` +
+          `<input type="checkbox" class="${blockClass}__input" checked ${inputAttr}>` +
+          `<span class="${blockClass}__control"><span class="${markClass}"></span></span>` +
+          `</span>`;
+        const control = host.querySelector(`.${blockClass}__control`);
+        const mark = host.querySelector(`.${markClass}`);
+        const fill = flatten([surface, getComputedStyle(control).backgroundColor]);
+        const markColor = flatten([
+          `rgb(${fill[0]}, ${fill[1]}, ${fill[2]})`,
+          getComputedStyle(mark)[markProp],
+        ]);
+        rows.push({ kind, tone, state, fill, mark: markColor, surface: flatten([surface]) });
+      }
+    }
+  }
+  host.remove();
+  return rows;
+};
+
+for (const theme of ["light", "dark"]) {
+  const ctx = await browser.newContext({ viewport: VIEWPORT, colorScheme: theme });
+  const page = await ctx.newPage();
+  await page.goto(BASE + "/components/checkbox", { waitUntil: "networkidle" });
+  const stamped = await page.evaluate(() => document.documentElement.dataset.theme);
+  if (stamped !== theme) {
+    bad(`선택 컨트롤: 테마가 ${theme} 이어야 하는데 ${stamped} 다`);
+    await ctx.close();
+    continue;
+  }
+  const rows = await page.evaluate(SELECTION_PROBE, {
+    tones: SELECTION_TONES,
+    states: SELECTION_STATES,
+  });
+  for (const { kind, tone, state, fill, mark, surface } of rows) {
+    const where = `${theme} ${kind}/${tone} ${state}`;
+    // 표시는 글자가 아니라 도형이다 — 비텍스트 3:1. 비활성은 하한 2.0
+    const markMin = state === "비활성" ? 2 : 3;
+    const m = ratio(mark, fill);
+    const mLine = `${where} 표시 ${m.toFixed(2)}:1`;
+    m >= markMin ? ok(mLine) : bad(`${mLine} — 기준 ${markMin}:1 미달`);
+    // 채움 자체도 표면과 갈려야 "선택됨"으로 읽힌다
+    const f = ratio(fill, surface);
+    const fLine = `${where} 채움 ${f.toFixed(2)}:1`;
+    f >= markMin ? ok(fLine) : bad(`${fLine} — 기준 ${markMin}:1 미달`);
+  }
   await ctx.close();
 }
 

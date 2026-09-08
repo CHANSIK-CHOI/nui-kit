@@ -111,6 +111,13 @@ const files = readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss"));
 const groups = [];
 let count = 0;
 
+// ⚠️ 한 훅이 **여러 파일**에 걸치는 경우가 있다. `selector--border-width` 는 셋이
+//    공유하는 골격의 두께라 `_choice-base.scss` 가 소유하는데, `_switch.scss` 도
+//    여백을 그 값에서 역산하느라 함께 읽는다. 파일별로만 걸러내면 목록에 두 번
+//    올라가고, 소비자는 스위치 전용 훅이 따로 있는 줄 안다.
+//    **먼저 나온 파일이 소유자다** — 파일을 이름순으로 도는 것이 그 순서를 정한다.
+const ownedGlobally = new Map();
+
 for (const file of files.sort()) {
   const key = file.replace(/^_/, "").replace(/\.scss$/, "");
   const scss = readFileSync(join(COMPONENTS_DIR, file), "utf8");
@@ -124,6 +131,11 @@ for (const file of files.sort()) {
       seen.get(name).places += 1;
       continue;
     }
+    const owner = ownedGlobally.get(name);
+    if (owner) {
+      owner.places += 1;
+      continue;
+    }
     const { prop, option } = parse(name);
     seen.set(name, {
       name: `--nui-${name}`,
@@ -132,6 +144,7 @@ for (const file of files.sort()) {
       option: option ? OPTION_LABEL[option] : null,
       places: 1,
     });
+    ownedGlobally.set(name, seen.get(name));
   }
 
   if (seen.size === 0) continue;

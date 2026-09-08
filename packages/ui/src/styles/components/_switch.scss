@@ -17,37 +17,58 @@
     &__control {
       justify-content: flex-start;
       align-items: center;
-      padding: 0 var(#{v("space-1")});
+      // ⚠️ 좌우 여백을 상수로 두지 않는다. 이동 거리(`트랙 너비 − 트랙 높이`)가
+      //    맞으려면 **썸 = 트랙 높이 − 좌우 여백 × 2 − 테두리 × 2** 가 성립해야 한다.
+      //    상수 4px 이던 시절 이 등식이 깨져서 켜짐일 때 썸이 오른쪽으로 2px 밀려
+      //    나갔다(왼쪽 여백 5 · 오른쪽 3). 여백을 썸에서 역산해 등식을 강제한다.
+      padding: 0
+        calc(
+          (
+              #{hook("switch--height", var(#{v("size-switch-track-h")}))} -
+                var(#{v("size-switch-thumb")})
+            ) / 2 - #{hook("selector--border-width", var(#{v("border-width-1")}))}
+        );
       background-color: var(#{v("control-track")});
       border-color: var(#{v("control-track")});
       border-radius: var(#{v("radius-full")});
     }
 
-    // 썸은 트랙 높이(24) − 테두리 2 − 여백 8 = 14 가 꽉 찬 값이지만 16 으로 두어 여백을 위아래
-    // 3px 씩 남긴다. 이동 거리는 트랙 너비 − 높이 = 16 이라 훅으로 계산한다.
+    // 썸의 **레이아웃 크기**는 항상 20 이고, 꺼짐일 때 0.8 로 줄여 16 처럼 보이게 한다
+    // (SEED `switchmark` — 켜지면 커진다). 크기를 transform 으로만 바꾸는 이유는
+    // 레이아웃 상자가 그대로여야 위 여백 계산과 이동 거리가 유지되기 때문이다.
+    //
+    // 켜졌다는 것을 이동과 크기가 함께 말한다 — motion.md §2 의 「상태 표시」다.
     &__thumb {
       display: inline-block;
-      width: var(#{v("size-icon-lg")});
-      height: var(#{v("size-icon-lg")});
+      width: var(#{v("size-switch-thumb")});
+      height: var(#{v("size-switch-thumb")});
+      // 꺼짐일 때는 회색 트랙 위라 흰색, 켜짐일 때는 채움 위라 반전 짝이다 (아래).
       background-color: var(#{v("control-thumb")});
       border-radius: var(#{v("radius-circle")});
       box-shadow: var(#{v("shadow-thumb")});
+      transform: translateX(0) scale(0.8);
 
       @include motion((transform, background-color));
     }
 
     &__input:checked + #{cls("switch")}__control {
-      background-color: var(#{v("control-accent")});
-      border-color: var(#{v("control-accent")});
+      background-color: var(#{iv("selector-accent")});
+      border-color: var(#{iv("selector-accent")});
     }
 
+    // 함수 목록을 꺼짐과 같게 유지한다 — 개수가 다르면 브라우저가 행렬 보간으로
+    // 떨어져 회전이 섞인 것처럼 움직인다.
     &__input:checked + #{cls("switch")}__control #{cls("switch")}__thumb {
+      // 썸도 채움 위의 표시다 — 중립 채움이 다크에서 흰색으로 뒤집히면
+      // 흰 썸이 사라진다 (실측 1.0:1)
+      background-color: var(#{iv("selector-accent-fg")});
       transform: translateX(
-        calc(
-          #{hook("switch--width", var(#{v("size-switch-track-w")}))} -
-            #{hook("switch--height", var(#{v("size-switch-track-h")}))}
+          calc(
+            #{hook("switch--width", var(#{v("size-switch-track-w")}))} -
+              #{hook("switch--height", var(#{v("size-switch-track-h")}))}
+          )
         )
-      );
+        scale(1);
     }
 
     &#{state("error")}:not(#{state("disabled")})
@@ -76,8 +97,8 @@
     &#{state("readonly")}:not(#{state("error")}):not(#{state("disabled")})
       #{cls("switch")}__input:checked
       + #{cls("switch")}__control {
-      background-color: var(#{v("control-accent")});
-      border-color: var(#{v("control-accent")});
+      background-color: var(#{iv("selector-accent")});
+      border-color: var(#{iv("selector-accent")});
     }
   }
 }

@@ -13,6 +13,7 @@ export * from "./components/Button/index.js";
 export * from "./components/Field/index.js";
 export * from "./components/Textfield/index.js";
 export * from "./components/Textarea/index.js";
+export type { SelectionTone } from "./types/selection.js";
 export * from "./components/Checkbox/index.js";
 export * from "./components/Radio/index.js";
 export * from "./components/Switch/index.js";

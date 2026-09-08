@@ -24,24 +24,29 @@
       transform: scale(0.4);
     }
 
-    // 체크박스와 달리 배경을 채우지 않고 테두리·점만 강조한다.
+    // 선택되면 **면을 채우고** 점은 채움 위의 반전 짝이 된다 (2026-09-08 · S2).
+    // 체크박스·스위치가 둘 다 채워지는데 라디오만 테두리로 남으면 한 가족 안에서
+    // 선택의 뜻이 갈린다. SEED `radiomark` 도 선택 시 `strokeWidth: 0` 으로 면을 채운다.
     &__input:checked + #{cls("radio")}__control {
-      color: var(#{v("control-accent")});
-      background-color: var(#{v("control-bg")});
-      border-color: var(#{v("control-accent")});
+      color: var(#{iv("selector-accent-fg")});
+      background-color: var(#{iv("selector-accent")});
+      border-color: var(#{iv("selector-accent")});
     }
 
+    // ⚠️ 채움이 생겼으므로 조합도 **면까지** 따라가야 한다. 빈 원이던 시절에는
+    //    배경이 `control-bg` 라 테두리 색만 바꾸면 됐다 — 그대로 두면 에러 라디오가
+    //    빨간 테두리에 검은 면으로 남는다 (design-system.md §3-2).
     &#{state("error")}:not(#{state("disabled")})
       #{cls("radio")}__input:checked
       + #{cls("radio")}__control {
-      color: var(#{v("control-accent-error")});
+      background-color: var(#{v("control-accent-error")});
       border-color: var(#{v("control-accent-error")});
     }
 
     &#{state("disabled")}
       #{cls("radio")}__input:checked
       + #{cls("radio")}__control {
-      color: var(#{v("control-selection-disabled")});
+      background-color: var(#{v("control-selection-disabled")});
       border-color: var(#{v("control-selection-disabled")});
     }
 
