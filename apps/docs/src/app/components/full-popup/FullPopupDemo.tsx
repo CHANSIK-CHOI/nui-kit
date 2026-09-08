@@ -25,7 +25,7 @@ function DetailPopup({
       title="상세 정보"
       footer={
         <Button color="primary" onClick={onRequestClose}>
-          확인
+          닫기
         </Button>
       }
     >
@@ -60,7 +60,7 @@ export function FullPopupDemo() {
         title="상세 정보"
         footer={
           <Button color="primary" onClick={() => setIsOpen(false)}>
-            확인
+            닫기
           </Button>
         }
       >

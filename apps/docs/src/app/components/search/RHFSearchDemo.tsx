@@ -19,10 +19,9 @@ export function RHFSearchDemo() {
     <>
       <h2>react-hook-form</h2>
       <p>
-        <code>RHFSearch</code> 는 <code>/rhf</code> 서브패스에 있다. 값과 에러는
-        RHF 가 소유하고, 검색 버튼은 <code>onSearch</code> 가 없으면{" "}
-        <code>type=&quot;submit&quot;</code> 이라 폼 제출로 이어진다. 그래서
-        검증에 걸리면 검색이 실행되지 않는다.
+        <code>RHFSearch</code> 에 <code>onSearch</code> 를 주지 않으면 버튼이 폼
+        제출이라 <strong>검증에 걸리면 검색이 실행되지 않는다.</strong> 검증과
+        검색을 한 흐름으로 묶는 가장 짧은 길이다.
       </p>
       <Example
         row={false}
@@ -76,7 +75,7 @@ export function RHFSearchDemo() {
       <div className="doc-note">
         <code>onSearch</code> 를 주면 버튼이{" "}
         <code>type=&quot;button&quot;</code> 이 되어 폼 제출 없이 그 콜백만
-        부른다. 이때는 검증과 무관하게 실행되므로 값은 <code>getValues()</code>{" "}
+        부른다. 이때는 검증과 무관하게 실행되므로 값을 <code>getValues()</code>{" "}
         로 읽는다.
       </div>
     </>

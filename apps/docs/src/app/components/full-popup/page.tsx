@@ -11,12 +11,7 @@ export default function FullPopupPage() {
         title="FullPopup"
         named={["FullPopup", "useFullPopup"]}
         subpath="popup"
-      >
-        화면 전체를 덮는 팝업이다. 오른쪽에서 슬라이드해 들어오고, 모바일에서 한
-        화면짜리 흐름(상세 보기 · 긴 양식)을 띄울 때 쓴다. 폭이 화면이므로{" "}
-        <code>size</code> 를 받지 않는다. 그 외의 props 와 여는 법은 LayerPopup
-        과 같다.
-      </GuideHeader>
+      />
 
       <FullPopupDemo />
 

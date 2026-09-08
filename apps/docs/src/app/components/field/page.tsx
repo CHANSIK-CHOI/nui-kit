@@ -35,10 +35,7 @@ export default function FieldPage() {
           "FieldItem",
         ]}
         subpath="field"
-      >
-        라벨과 설명, 메시지를 컨트롤에 묶는다. <code>id</code> 연결과{" "}
-        <code>aria</code> 속성을 대신 처리한다.
-      </GuideHeader>
+      />
 
       <div className="doc-note">
         이 페이지는 Server Component 라 dot notation 대신{" "}
@@ -116,7 +113,7 @@ export default function FieldPage() {
             <FieldLabel>이용약관에 동의합니다</FieldLabel>
           </FieldItem>
         </Case>
-        <Case label="아무것도 안 주면" note="표시 없음 — 예전 동작 그대로">
+        <Case label="아무것도 안 주면" note="표시가 붙지 않는다">
           <Field>
             <FieldLabel>별명</FieldLabel>
             <Textfield placeholder="선택 입력" />

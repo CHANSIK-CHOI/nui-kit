@@ -11,11 +11,7 @@ export default function BottomSheetPage() {
         title="BottomSheet"
         named={["BottomSheet", "useBottomSheet"]}
         subpath="popup"
-      >
-        화면 아래에서 올라오는 시트다. 모바일에서 선택지 몇 개를 고르게 할 때
-        쓴다. 폭은 화면에 맞춰 자기가 정하므로 <code>size</code> 를 받지 않는다.
-        그 외의 props 와 여는 법은 LayerPopup 과 같다.
-      </GuideHeader>
+      />
 
       <BottomSheetDemo />
 

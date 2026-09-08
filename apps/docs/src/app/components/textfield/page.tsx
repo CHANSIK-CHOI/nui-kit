@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Field, FieldLabel, Textfield } from "@nui-kit/react";
 import {
   GuideHeader,
+  DesignNote,
   Case,
   CaseGrid,
   InputStateCases,
@@ -13,61 +14,100 @@ import { CounterDemo } from "./CounterDemo";
 
 export const metadata = { title: "Textfield" };
 
+/** 축은 코드에서 뽑는다 — `TextfieldInputType` 은 타입 별칭이라 props 표에 값이 안 보인다 */
+const TYPES = [
+  ["text", "홍길동", "기본"],
+  ["email", "hong@example.com", "모바일에서 @ 키보드"],
+  ["tel", "010-0000-0000", "숫자 키패드"],
+  ["url", "https://", "URL 키보드"],
+  ["number", "0", "숫자만. unit 과 함께 쓴다"],
+  ["password", "8자 이상", "표시 토글이 필요하면 Password"],
+] as const;
+
 export default function TextfieldPage() {
   return (
     <>
-      <GuideHeader title="Textfield" named={["Textfield"]} subpath="textfield">
-        한 줄 입력이다. 값은 <code>value</code> 와 <code>onChange</code> 로
-        소유한다. <code>defaultValue</code> 는 타입에서 제외되어 있다.
-      </GuideHeader>
+      <GuideHeader
+        title="Textfield"
+        named={["Textfield"]}
+        subpath="textfield"
+      />
+
+      <p>
+        한 줄 텍스트 입력이다. <code>Field</code> 안에 두면 라벨 · 도움말 ·
+        에러가 연결된다 — <Link href="/forms">폼 만들기</Link> 참조.
+      </p>
 
       <h2>기본</h2>
       <CaseGrid
         columns={2}
-        caption="Field 와 함께 쓰면 id·label 이 자동 연결된다"
-        code={`<Textfield placeholder="내용" value={v} onChange={onChange} />`}
+        caption="unit 을 주면 값이 오른쪽으로 정렬된다"
+        code={`<Textfield value={v} onChange={onChange} placeholder="홍길동" />`}
       >
-        <Case label="기본" note="개인정보 필드에는 autoComplete 를 준다">
+        <Case label="기본">
           <Field>
             <FieldLabel>이름</FieldLabel>
-            <Textfield placeholder="내용을 입력해주세요" autoComplete="name" />
+            <Textfield placeholder="홍길동" autoComplete="name" />
           </Field>
         </Case>
-        <Case label="unit" note="값이 오른쪽으로 정렬된다">
+        <Case label="unit" note="오른쪽 정렬">
           <Field>
             <FieldLabel>금액</FieldLabel>
-            <Textfield placeholder="0" unit="원" />
+            <Textfield type="number" placeholder="0" unit="원" />
           </Field>
         </Case>
       </CaseGrid>
 
+      <h2>type</h2>
+      <p>
+        네이티브 <code>type</code> 그대로 넘어간다. 겉모습은 같고 모바일
+        키보드와 브라우저 검증이 달라진다.
+      </p>
+      <CaseGrid
+        columns={3}
+        caption="type 6 — text(기본) · email · tel · url · number · password"
+        code={`<Textfield type="tel" placeholder="010-0000-0000" autoComplete="tel" />`}
+      >
+        {TYPES.map(([type, placeholder, note]) => (
+          <Case key={type} label={type} note={note}>
+            <Field>
+              <FieldLabel>{type === "text" ? "이름" : type}</FieldLabel>
+              <Textfield type={type} placeholder={placeholder} />
+            </Field>
+          </Case>
+        ))}
+      </CaseGrid>
+      <div className="doc-note">
+        비밀번호에는 <Link href="/components/password">Password</Link> 를 쓴다.
+        표시 · 숨김 토글과 지우기 뒤 숨김 복귀가 들어 있다.
+      </div>
+
       <h2>메시지</h2>
       <p>
         <code>infoMessage</code> 는 안내, <code>errorMessage</code> 는 에러다.
-        에러가 있으면 안내 대신 에러가 보인다.
+        둘 다 주면 에러만 보인다. 자리 · 카운터 · 읽히는 방식은{" "}
+        <Link href="/components/message">Message</Link> 에 있다.
       </p>
       <CaseGrid
         columns={2}
-        code={`<Textfield errorMessage="8자 이상 입력해주세요" />`}
+        code={`<Textfield errorMessage="8자 이상 입력해 주세요" />`}
       >
         <Case label="infoMessage">
           <Field>
-            <FieldLabel>비밀번호</FieldLabel>
+            <FieldLabel>별명</FieldLabel>
             <Textfield
-              type="password"
-              placeholder="8자 이상"
-              infoMessage="영문·숫자·특수문자를 조합해주세요."
+              placeholder="2~10자"
+              infoMessage="다른 사람에게 보이는 이름이에요"
             />
           </Field>
         </Case>
-        <Case label="errorMessage">
+        <Case label="errorMessage" note="infoMessage 를 덮는다">
           <Field>
-            <FieldLabel>비밀번호</FieldLabel>
+            <FieldLabel>별명</FieldLabel>
             <Textfield
-              type="password"
-              placeholder="8자 이상"
-              infoMessage="영문·숫자·특수문자를 조합해주세요."
-              errorMessage="8자 이상 입력해주세요."
+              placeholder="2~10자"
+              infoMessage="다른 사람에게 보이는 이름이에요"
+              errorMessage="2자 이상 입력해 주세요"
             />
           </Field>
         </Case>
@@ -81,51 +121,46 @@ export default function TextfieldPage() {
           <Field>
             <FieldLabel>이름</FieldLabel>
             <Textfield
-              placeholder="내용을 입력해주세요"
+              placeholder="홍길동"
               value={p.disabled || p.readOnly ? "홍길동" : undefined}
-              errorMessage={p.isError ? "이름을 입력해주세요" : undefined}
+              errorMessage={p.isError ? "이름을 입력해 주세요" : undefined}
               disabled={p.disabled}
               readOnly={p.readOnly}
             />
           </Field>
         )}
       />
-
-      <div className="doc-note">
-        <code>readOnly</code> 는 배경까지 바뀌어 못 고치는 값임을 드러낸다.{" "}
-        <code>isTextInputBlocked</code> 는 타이핑만 막고 겉모습은 그대로다.
-        달력이나 목록으로만 값을 고르게 할 때 쓴다.
-      </div>
       <CaseGrid
         columns={2}
+        caption="readOnly 는 배경까지 바뀌고, isTextInputBlocked 는 타이핑만 막는다"
         code={`<Textfield value={picked} isTextInputBlocked />`}
       >
-        <Case label="readOnly" note="회색 배경">
+        <Case label="readOnly" note="못 고치는 값">
           <Field>
-            <FieldLabel>읽기 전용</FieldLabel>
+            <FieldLabel>가입일</FieldLabel>
             <Textfield value="2026-09-02" readOnly />
           </Field>
         </Case>
-        <Case label="isTextInputBlocked" note="겉모습은 활성 그대로">
+        <Case label="isTextInputBlocked" note="달력 · 목록으로만 고른다">
           <Field>
-            <FieldLabel>달력으로만 고른다</FieldLabel>
+            <FieldLabel>방문일</FieldLabel>
             <Textfield value="2026-09-02" isTextInputBlocked />
           </Field>
         </Case>
       </CaseGrid>
 
+      <DesignNote title="왜 에러여도 입력값은 빨개지지 않나">
+        <p>
+          에러에서 바뀌는 것은 테두리 · 캐럿 · 단위 표시 · 메시지다. 값까지
+          빨개지면 「이 값이 틀렸다」가 아니라 「이 값을 지워라」로 읽힌다. 값은
+          사용자가 쓴 것이고 고쳐야 할 곳은 메시지가 가리킨다.
+        </p>
+      </DesignNote>
+
       <h2>글자 수</h2>
       <p>
-        <code>maxLength</code> 를 주면 메시지 줄 오른쪽에 카운터가 붙는다.{" "}
-        <strong>제한이 있을 때만 나온다</strong> — 제한이 없으면 남은 글자라는
-        개념 자체가 없다. 현재 수는 진하게, 최대 수는 연하게 표시되고 넘치면 둘 다
-        빨개진다.
-      </p>
-      <p>
-        카운터는 <code>aria-live</code> 밖이다. 안에 두면 타이핑 한 글자마다
-        화면 낭독기가 숫자를 읽는다. 포커스가 왔을 때{" "}
-        <code>aria-describedby</code> 로 알리는 것으로 충분하다. 문구는{" "}
-        <code>counterLabel</code> 로 바꾼다.
+        <code>maxLength</code> 를 주면 메시지 줄 오른쪽에 카운터가 붙는다.
+        제한이 없으면 남은 글자라는 개념이 없어서 카운터도 없다.
       </p>
       <CounterDemo />
 
@@ -133,65 +168,51 @@ export default function TextfieldPage() {
       <p>
         <code>isClearable</code> 과 <code>onClear</code> 를 함께 준다. 값이 있고{" "}
         <code>readOnly</code> · <code>disabled</code> 가 아닐 때만 버튼이
-        나타난다.
+        나타난다. 접근 이름은 <code>clearButtonTitle</code> 로 바꾼다.
       </p>
       <TextfieldDemo />
 
+      <DesignNote title="왜 안쪽 버튼은 24px 인가">
+        <p>
+          손가락으로 누르는 자리는 44px 이 기준이다. 입력 안에는 지우기와 단위 ·
+          토글이 8px 간격으로 붙어 있어 44 를 채우면 서로의 누르는 범위를
+          삼킨다. 그래서 하한인 24px 을 쓴다 — 버튼 하나만 있는 자리(팝업 닫기 ·
+          달력 이전/다음)는 44 를 채운다.
+        </p>
+      </DesignNote>
+
       <h2>자동 완성</h2>
       <p>
-        <code>autoComplete</code> 를 <strong>기본으로 끄지 않는다.</strong> 이름
-        · 이메일 · 전화 · 주소 · 생년월일처럼 개인정보를 받는 입력에는 용도를
-        지정한다 — WCAG 1.3.5 와 KRDS 체크리스트 [텍스트 입력 필드 5] 가
-        요구하는 것이고, 손 떨림 · 인지 장애 · 모바일 사용자에게는 실질적인
-        접근성 장치다. <code>Search</code> · <code>Password</code> ·{" "}
-        <code>Datepicker</code> 도 이 필드를 그대로 쓴다.
+        개인정보를 받는 입력에는 <code>autoComplete</code> 를 준다. 손 떨림 ·
+        인지 장애 · 모바일 사용자에게 실질적인 접근성 장치다. 컴포넌트가
+        기본으로 끄지 않으므로 끌 때만 명시한다.
       </p>
       <pre className="doc-code">
-        <code>{`<Textfield autoComplete="email" />                 // 켠다
-<Search autoComplete="off" />                     // 검색어 이력이 싫으면 끈다
-<Datepicker autoComplete="bday" />                // 생년월일
-<Password autoComplete="current-password" />      // 비밀번호 관리자`}</code>
+        <code>{`<Textfield autoComplete="email" />
+<Search autoComplete="off" />                  // 검색어 이력을 안 남길 때
+<Datepicker autoComplete="bday" />
+<Password autoComplete="current-password" />`}</code>
       </pre>
 
       <h2>react-hook-form</h2>
       <p>
-        <code>RHFTextfield</code> 는 <code>/rhf</code> 서브패스에 있다.{" "}
-        <code>useController</code> 로 값을 소유하므로 <code>value</code> ·{" "}
-        <code>onChange</code> 를 넘기지 않는다.
+        <code>RHFTextfield</code> 가 <code>@nui-kit/react/rhf</code> 에 있다.{" "}
+        <code>control</code> 과 <code>name</code> 만 주면 값 · 검증 · 에러
+        표시가 이어진다 — <Link href="/forms">폼 만들기</Link> 에 움직이는 예가
+        있다.
       </p>
-      <pre className="doc-code">
-        <code>{`import { useForm } from "react-hook-form";
-import { RHFTextfield } from "@nui-kit/react/rhf";
-
-const { control } = useForm<{ email: string }>();
-
-<RHFTextfield
-  name="email"
-  control={control}
-  rules={{ required: "이메일을 입력해주세요." }}
-  placeholder="name@example.com"
-  isClearable
-/>`}</code>
-      </pre>
-      <div className="doc-note">
-        <code>react-hook-form</code> 은 optional peer 다. RHF 래퍼를 쓸 때만
-        설치하면 된다. 소비자의 <code>control</code> 을 그대로 받으므로 같은
-        인스턴스를 공유해야 하고, 그래서 dependency 가 아니라 peer 다.
-      </div>
 
       <h2>커스터마이징</h2>
       <p>
-        색은 컴포넌트별로 열지 않는다. 한 곳만 바꾸려면 <code>className</code>{" "}
-        을, 화면 전체를 바꾸려면 <Link href="/brand-colors">브랜드 프리셋</Link>
-        을 쓴다.
+        색은 컴포넌트별로 열려 있지 않다. 한 곳만 바꾸려면{" "}
+        <code>className</code> 을, 화면 전체를 바꾸려면{" "}
+        <Link href="/brand-colors">브랜드 프리셋</Link>을 쓴다. 아래 변수는{" "}
+        <code>Search</code> · <code>Password</code> 도 함께 쓴다.
       </p>
       <HookTable group="textfield" />
 
       <h2>API</h2>
-      <h3>Textfield</h3>
       <PropsTable of="Textfield" />
-      <h3>Message</h3>
-      <PropsTable of="Message" />
     </>
   );
 }

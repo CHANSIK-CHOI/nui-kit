@@ -366,6 +366,108 @@ body {
   background: var(--nui-status-warning-soft);
 }
 
+// ─── 예외 배지 · 설계 노트
+// 문장 층을 만드는 둘이다 (docs-voice 규칙 §1 · §4).
+// 배지는 규칙이 있는 곳을 가리키기만 하고, 설계 노트는 근거를 접는다.
+
+.doc-badges {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.doc-badge {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: var(--nui-font-size-1);
+  line-height: var(--nui-line-height-1);
+}
+
+.doc-badge__label {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  // 누르는 것의 선이라 action-border 다 — border-section(gray-a5)은 배경과
+  // 1.3:1 이라 "누를 수 있다"가 안 보인다 (design-system.md §2-4-0 · a11y.md §4-1)
+  border: 1px solid var(--nui-action-border);
+  border-radius: var(--nui-radius-full);
+  color: var(--nui-text-secondary);
+  background: var(--nui-surface-neutral-soft);
+  text-decoration: none;
+  font-weight: var(--nui-font-weight-bold);
+  white-space: nowrap;
+}
+
+.doc-badge__label:hover {
+  border-color: var(--nui-action-border-hover);
+  color: var(--nui-text-primary);
+}
+
+.doc-badge__label:focus-visible {
+  outline: var(--nui-focus-width) solid var(--nui-focus-color);
+  outline-offset: var(--nui-focus-offset);
+}
+
+.doc-badge__hint {
+  color: var(--nui-text-secondary);
+}
+
+.doc-why {
+  margin: 0 0 24px;
+  border: 1px solid var(--doc-border);
+  border-radius: var(--nui-radius-2);
+  background: var(--doc-bg-subtle);
+}
+
+.doc-why__summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  font-size: var(--nui-font-size-3);
+  color: var(--nui-text-secondary);
+  list-style: none;
+}
+
+.doc-why__summary::-webkit-details-marker {
+  display: none;
+}
+
+// 여는 표시를 직접 그린다 — 브라우저 기본 삼각형은 크기와 색이 제각각이다
+.doc-why__summary::before {
+  content: "▸";
+  display: inline-block;
+  width: 1em;
+  color: var(--nui-text-disabled);
+}
+
+.doc-why[open] > .doc-why__summary::before {
+  transform: rotate(90deg);
+}
+
+.doc-why__summary:focus-visible {
+  outline: var(--nui-focus-width) solid var(--nui-focus-color);
+  outline-offset: calc(-1 * var(--nui-focus-width));
+  border-radius: var(--nui-radius-2);
+}
+
+.doc-why__body {
+  padding: 0 14px 12px;
+  font-size: var(--nui-font-size-3);
+  line-height: var(--nui-line-height-3);
+  color: var(--nui-text-secondary);
+}
+
+.doc-why__body > :first-child {
+  margin-top: 0;
+}
+
+.doc-why__body > :last-child {
+  margin-bottom: 0;
+}
+
 @media (max-width: 860px) {
   .doc-shell {
     grid-template-columns: 1fr;
@@ -827,4 +929,11 @@ body {
 /* 테두리가 이웃 칸에 가리지 않도록 여백을 조금 준다 */
 .preset-scale {
   padding: 3px 0;
+}
+
+// 라벨 쓰기 — 「이렇게 말고」 칸. 취소선 대신 색으로 구분한다.
+// 취소선은 「지워진 것」으로 읽히는데 여기 있는 것은 지운 문구가 아니라
+// 쓰지 않는 문구다.
+.doc-label-no {
+  color: var(--nui-text-disabled);
 }

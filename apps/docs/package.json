@@ -12,7 +12,8 @@
     "verify:console": "node scripts/check-console.mjs",
     "verify:select-rhf": "node scripts/check-select-rhf.mjs",
     "verify:datepicker": "node scripts/check-datepicker.mjs",
-    "verify:a11y": "node scripts/check-a11y.mjs"
+    "verify:a11y": "node scripts/check-a11y.mjs",
+    "verify:docs": "node scripts/check-docs.mjs"
   },
   "dependencies": {
     "@nui-kit/react": "*",

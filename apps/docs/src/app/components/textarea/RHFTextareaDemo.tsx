@@ -19,10 +19,9 @@ export function RHFTextareaDemo() {
     <>
       <h2>react-hook-form</h2>
       <p>
-        <code>RHFTextarea</code> 는 <code>/rhf</code> 서브패스에 있다.{" "}
-        <code>control</code> 과 <code>name</code> 만 넘기면 값과 에러를 스스로
-        소유한다. <code>value</code> · <code>onChange</code> · <code>name</code>{" "}
-        · <code>onBlur</code> 는 타입에서 제외되어 중복 소유가 생기지 않는다.
+        <code>RHFTextarea</code> 는 <code>value</code> · <code>onChange</code> ·{" "}
+        <code>onBlur</code> 를 받지 않는다 — RHF 가 소유하는 것이라 타입에서
+        빠져 있다.
       </p>
       <Example
         row={false}
@@ -77,8 +76,7 @@ export function RHFTextareaDemo() {
       <div className="doc-note">
         <code>formatValue</code> 를 주면 입력값이 폼 상태에 들어가기 전에
         가공된다. <code>errorMessage</code> 를 직접 넘기면 RHF 에러가 없을 때의
-        대체값으로 쓰인다. <code>react-hook-form</code> 은 optional peer 라
-        래퍼를 쓸 때만 설치한다.
+        대체값으로 쓰인다.
       </div>
     </>
   );

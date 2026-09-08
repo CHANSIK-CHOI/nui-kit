@@ -43,7 +43,7 @@ export function RHFRadioDemo() {
             <Controller
               control={control}
               name="plan"
-              rules={{ required: "요금제를 골라 주세요." }}
+              rules={{ required: "요금제를 골라 주세요" }}
               render={({ field, fieldState }) => (
                 <RadioGroup
                   name={field.name}

@@ -13,6 +13,9 @@ export type NavSection = {
  *
  * Components 의 묶음은 라이브러리 README 의 컴포넌트 표와 같다 —
  * Button · Form · Popup · Feedback · Disclosure.
+ *
+ * 층은 큰 것부터 작은 것으로 쌓는다 — 왜 이렇게 생겼나(디자인 시스템) →
+ * 어떤 값이 있나(Foundations) → 하나씩 어떻게 쓰나(Components).
  */
 export const NAV: NavSection[] = [
   {
@@ -21,6 +24,16 @@ export const NAV: NavSection[] = [
       { title: "개요", href: "/" },
       { title: "설치와 사용", href: "/get-started" },
       { title: "브랜드 색 고르기", href: "/brand-colors" },
+    ],
+  },
+  {
+    title: "디자인 시스템",
+    items: [
+      { title: "무엇을 토대로 만들었나", href: "/design-system" },
+      { title: "오염시키지 않는다", href: "/design-system/isolation" },
+      { title: "색은 고르는 것이다", href: "/design-system/color" },
+      { title: "크기와 너비", href: "/design-system/size" },
+      { title: "API 일관성", href: "/design-system/api" },
     ],
   },
   {
@@ -36,9 +49,15 @@ export const NAV: NavSection[] = [
       { title: "깊이", href: "/foundations/elevation" },
       { title: "모션", href: "/foundations/motion" },
       { title: "상태", href: "/foundations/state" },
+      { title: "라벨 쓰기", href: "/foundations/label" },
+      { title: "피드백 고르기", href: "/foundations/feedback" },
       { title: "접근성", href: "/foundations/accessibility" },
       { title: "커스터마이징", href: "/foundations/customizing" },
     ],
+  },
+  {
+    title: "폼 만들기",
+    items: [{ title: "폼 만들기", href: "/forms" }],
   },
   {
     title: "Components",
@@ -46,7 +65,12 @@ export const NAV: NavSection[] = [
     groups: [
       {
         title: "Button",
-        items: [{ title: "Button", href: "/components/button" }],
+        items: [
+          { title: "Button", href: "/components/button" },
+          { title: "IconButton", href: "/components/icon-button" },
+          { title: "ButtonGroup", href: "/components/button-group" },
+          { title: "ButtonLink", href: "/components/button-link" },
+        ],
       },
       {
         title: "Form",
@@ -56,6 +80,7 @@ export const NAV: NavSection[] = [
           { title: "Textarea", href: "/components/textarea" },
           { title: "Search", href: "/components/search" },
           { title: "Password", href: "/components/password" },
+          { title: "Message", href: "/components/message" },
           { title: "Checkbox", href: "/components/checkbox" },
           { title: "Radio", href: "/components/radio" },
           { title: "Switch", href: "/components/switch" },

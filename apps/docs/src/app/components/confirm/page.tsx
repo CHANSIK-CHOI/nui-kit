@@ -11,11 +11,7 @@ export default function ConfirmPage() {
         title="Confirm"
         named={["useConfirm", "Confirm"]}
         subpath="popup"
-      >
-        확인과 취소 두 버튼으로 결정을 받는 팝업이다. Alert 과 같이 dim 클릭과
-        ESC 로는 닫히지 않는다. 명령형으로만 쓰고, 결과는 콜백 또는 Promise 로
-        받는다.
-      </GuideHeader>
+      />
 
       <div className="doc-note">
         <code>useConfirm()</code> 은 앱 루트의 <code>PopupHost</code> 가 있어야

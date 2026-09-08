@@ -49,15 +49,6 @@ export function RadioDemo() {
           ))}
         </RadioGroup>
       </Example>
-
-      <h2>상태</h2>
-      <Example caption="checked · disabled · readOnly · error">
-        <Radio name="state-demo" checked readOnly />
-        <Radio name="state-demo-2" checked disabled readOnly />
-        <Radio name="state-demo-3" disabled />
-        <Radio name="state-demo-4" checked isError readOnly />
-        <Radio name="state-demo-5" isError />
-      </Example>
     </>
   );
 }

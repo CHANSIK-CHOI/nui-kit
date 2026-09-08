@@ -12,11 +12,7 @@ export default function LayerPopupPage() {
         title="LayerPopup"
         named={["LayerPopup", "useLayerPopup"]}
         subpath="popup"
-      >
-        화면 가운데에 뜨는 대화상자다. 제목 · 본문 · 푸터를 갖고 닫기 버튼이
-        있으며, dim 클릭과 ESC 로 닫힌다. 선언형으로 열림 상태를 직접
-        소유하거나, 명령형으로 내용 컴포넌트를 등록해 연다.
-      </GuideHeader>
+      />
 
       <LayerPopupDemo />
 

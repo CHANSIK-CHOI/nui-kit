@@ -6,10 +6,8 @@ export const metadata = { title: "Tooltip" };
 export default function TooltipPage() {
   return (
     <>
-      <GuideHeader title="Tooltip" named={["Tooltip"]} subpath="tooltip">
-        요소에 붙는 짧은 설명이다. 기본은 트리거 옆에 붙고,{" "}
-        <code>hasPortal</code> 로 <code>body</code> 로 내보낼 수 있다.
-      </GuideHeader>
+      <GuideHeader title="Tooltip" named={["Tooltip"]} subpath="tooltip"
+      />
 
       <pre className="doc-code">
         <code>{`import { Tooltip } from "@nui-kit/react";

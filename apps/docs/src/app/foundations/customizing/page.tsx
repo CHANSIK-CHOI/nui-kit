@@ -129,52 +129,11 @@ export default function CustomizingPage() {
       </pre>
 
       <h2>막아둔 것</h2>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>무엇</th>
-              <th>왜</th>
-              <th>대신</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row" className="doc-wrap">
-                컴포넌트별 색
-              </th>
-              <td className="doc-wrap">
-                배경과 글자는 짝이라 한쪽만 바꾸면 대비가 깨지는데 화면에
-                드러나지 않는다
-              </td>
-              <td className="doc-wrap">
-                <code>className</code> 또는 브랜드 프리셋
-              </td>
-            </tr>
-            <tr>
-              <th scope="row" className="doc-wrap">
-                포커스 링 두께
-              </th>
-              <td className="doc-wrap">
-                얇아지면 키보드로 조작하는 사용자만 영향을 받는다
-              </td>
-              <td className="doc-wrap">—</td>
-            </tr>
-            <tr>
-              <th scope="row" className="doc-wrap">
-                바깥 여백 · 배치
-              </th>
-              <td className="doc-wrap">
-                <code>margin</code> · <code>position</code> ·{" "}
-                <code>z-index</code> 는 부모가 소유한다
-              </td>
-              <td className="doc-wrap">
-                감싸는 요소에서 <code>className</code> 으로
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <p>
+        색 · 포커스 링 두께 · 바깥 여백은 변수로 열지 않았다. 각각의 이유는{" "}
+        <Link href="/design-system">디자인 시스템</Link> 의 「바꿀 수 있는 것과
+        없는 것」 에 있다.
+      </p>
 
       <div className="doc-note doc-note--warn">
         <strong>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GuideHeader, HookTable, PropsTable } from "@/components/guide";
+import { GuideHeader, HookTable } from "@/components/guide";
 
 export const metadata = { title: "Popup" };
 
@@ -39,15 +39,7 @@ const KINDS = [
 export default function PopupPage() {
   return (
     <>
-      <GuideHeader
-        title="Popup"
-        named={["PopupHost", "PopupBase"]}
-        subpath="popup"
-      >
-        화면을 덮는 대화상자 계열이다. 다섯 종류가 하나의 <code>PopupBase</code>{" "}
-        위에 올라가며 dim 과 포커스 트랩, Escape, 스크롤 잠금, 배경 inert 를
-        공유한다. 이 페이지는 공통 계약만 다루고, 각 종류는 자기 페이지에 있다.
-      </GuideHeader>
+      <GuideHeader title="Popup" named={["PopupHost"]} subpath="popup" />
 
       <h2>다섯 종류</h2>
       <div className="doc-table-wrap">
@@ -192,14 +184,10 @@ export function Providers({ children }) {
       </p>
       <HookTable group="popup" />
 
-      <h2>API</h2>
-      <h3>PopupBase</h3>
       <p>
-        직접 쓰기보다 다섯 셸 컴포넌트를 쓴다. LayerPopup · BottomSheet ·
-        FullPopup 은 이 props 를 그대로 받고(<code>variant</code> 는 셸이
-        정한다), Alert · Confirm 은 내용에 필요한 것만 받는다.
+        다섯 종류는 dim · 포커스 트랩 · Escape · 스크롤 잠금 · 배경 inert 를
+        같은 방식으로 처리한다. 각각의 props 는 자기 페이지에 있다.
       </p>
-      <PropsTable of="PopupBase" />
     </>
   );
 }

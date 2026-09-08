@@ -13,17 +13,17 @@ const GROUPS = [
       },
       {
         name: "IconButton",
-        href: "/components/button",
+        href: "/components/icon-button",
         desc: "아이콘 전용 정사각 버튼",
       },
       {
         name: "ButtonGroup",
-        href: "/components/button",
+        href: "/components/button-group",
         desc: "버튼 나열 레이아웃. Item 을 함께 쓴다",
       },
       {
         name: "ButtonLink",
-        href: "/components/button",
+        href: "/components/button-link",
         desc: "버튼 모양의 링크 (next/link)",
       },
     ],
@@ -44,12 +44,12 @@ const GROUPS = [
       {
         name: "Textfield",
         href: "/components/textfield",
-        desc: "한 줄 텍스트 입력",
+        desc: "한 줄 텍스트 입력. type 6 · 단위 · 지우기",
       },
       {
         name: "Textarea",
         href: "/components/textarea",
-        desc: "여러 줄 텍스트 입력. 자동 높이 조절",
+        desc: "여러 줄 텍스트 입력. 글자 수 카운터",
       },
       {
         name: "Search",
@@ -60,6 +60,11 @@ const GROUPS = [
         name: "Password",
         href: "/components/password",
         desc: "비밀번호 입력. 표시/숨김 토글",
+      },
+      {
+        name: "Message",
+        href: "/components/message",
+        desc: "입력 아래 한 줄 — 안내 · 에러 · 글자 수",
       },
     ],
   },

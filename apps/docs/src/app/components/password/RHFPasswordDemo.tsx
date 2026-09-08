@@ -17,9 +17,8 @@ export function RHFPasswordDemo() {
     <>
       <h2>react-hook-form</h2>
       <p>
-        <code>RHFPassword</code> 는 <code>/rhf</code> 서브패스에 있다. 표시/숨김
-        토글은 컴포넌트가 갖고, 값과 에러는 RHF 가 갖는다. 지우기 버튼을 누르면
-        값이 비고 표시 상태도 숨김으로 돌아간다.
+        <code>RHFPassword</code> 에서 표시 · 숨김은 컴포넌트가, 값과 에러는 RHF
+        가 갖는다. 지우기를 누르면 RHF 값이 비고 표시도 숨김으로 돌아간다.
       </p>
       <Example
         row={false}

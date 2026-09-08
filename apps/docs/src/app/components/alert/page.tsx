@@ -7,10 +7,8 @@ export const metadata = { title: "Alert" };
 export default function AlertPage() {
   return (
     <>
-      <GuideHeader title="Alert" named={["useAlert", "Alert"]} subpath="popup">
-        확인 버튼 하나짜리 알림이다. 사용자에게 선택지가 없으므로 dim 클릭과 ESC
-        로는 닫히지 않고, 반드시 확인을 눌러야 한다. 명령형으로만 쓴다.
-      </GuideHeader>
+      <GuideHeader title="Alert" named={["useAlert", "Alert"]} subpath="popup"
+      />
 
       <div className="doc-note">
         <code>useAlert()</code> 는 앱 루트의 <code>PopupHost</code> 가 있어야

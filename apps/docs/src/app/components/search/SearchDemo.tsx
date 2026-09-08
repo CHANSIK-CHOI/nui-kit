@@ -12,30 +12,42 @@ import { Case, CaseGrid } from "@/components/guide";
  *    일 때만 나온다. `readOnly` 로 값을 고정해 두면 버튼이 보이지 않는다.
  */
 export function SearchDemo() {
-  const [value, setValue] = useState("검색어");
+  const [value, setValue] = useState("운동화");
+  const [ran, setRan] = useState<string | null>(null);
 
   return (
     <CaseGrid
       columns={2}
-      code={`<Search value={v} onChange={onChange} onSearch={onSearch} isClearable onClear={clear} />`}
+      caption="onSearch 를 주면 버튼은 그 콜백만 부른다. 폼 제출은 일어나지 않는다"
+      code={`<Search value={v} onChange={onChange} onSearch={run} isClearable onClear={clear} />`}
     >
-      <Case label="기본">
+      <Case label="기본" note="버튼은 submit">
         <Field>
-          <Field.Label>검색</Field.Label>
-          <Search placeholder="검색어를 입력하세요" />
+          <Field.Label>검색어</Field.Label>
+          <Search placeholder="상품명 · 브랜드" />
         </Field>
       </Case>
-      <Case label="isClearable" note="값이 있을 때만 버튼이 나온다">
+      <Case
+        label="onSearch + isClearable"
+        note="버튼은 button. 값이 있을 때만 지우기"
+      >
         <Field>
-          <Field.Label>검색</Field.Label>
+          <Field.Label>검색어</Field.Label>
           <Search
             value={value}
             onChange={(event) => setValue(event.target.value)}
+            onSearch={() => setRan(value)}
             onClear={() => setValue("")}
             isClearable
-            placeholder="검색어를 입력하세요"
+            placeholder="상품명 · 브랜드"
           />
         </Field>
+        <p
+          style={{ marginTop: 8, minHeight: 20, fontSize: 13 }}
+          aria-live="polite"
+        >
+          {ran ? `「${ran}」 로 검색했어요` : ""}
+        </p>
       </Case>
     </CaseGrid>
   );

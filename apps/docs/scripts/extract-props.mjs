@@ -125,11 +125,6 @@ const TARGETS = [
   },
   { name: "Switch", file: "components/Switch/Switch.tsx", type: "SwitchProps" },
   {
-    name: "PopupBase",
-    file: "components/Popup/Popup.types.ts",
-    type: "PopupBaseProps",
-  },
-  {
     name: "Alert",
     file: "components/Popup/Popup.types.ts",
     type: "AlertProps",

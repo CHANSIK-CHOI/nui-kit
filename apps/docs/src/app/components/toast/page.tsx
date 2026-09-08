@@ -16,10 +16,7 @@ export default function ToastPage() {
         title="Toast"
         named={["Toast", "ToastHost", "useToast"]}
         subpath="toast"
-      >
-        잠깐 떴다 사라지는 알림이다. 사용자의 행동을 요구하지 않는다. 결정을
-        요구한다면 <code>Confirm</code> 을 쓴다.
-      </GuideHeader>
+      />
 
       <pre className="doc-code">
         <code>{`// app/layout.tsx 를 ToastHost 로 감싼 뒤

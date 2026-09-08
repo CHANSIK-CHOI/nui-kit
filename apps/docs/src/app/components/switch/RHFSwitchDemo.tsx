@@ -17,9 +17,8 @@ export function RHFSwitchDemo() {
     <>
       <h2>react-hook-form</h2>
       <p>
-        <code>RHFSwitch</code> 는 <code>/rhf</code> 서브패스에 있다. 스위치
-        하나가 boolean 필드 하나다. <code>checked</code> · <code>onChange</code>{" "}
-        · <code>name</code> 은 RHF 가 소유한다.
+        스위치 하나가 boolean 필드 하나다. <code>checked</code> ·{" "}
+        <code>onChange</code> · <code>name</code> 의 소유권은 RHF 에 있다.
       </p>
       <Example
         row={false}
@@ -33,7 +32,7 @@ export function RHFSwitchDemo() {
           <div style={{ display: "grid", gap: 12 }}>
             <Field direction="row" align="center">
               <RHFSwitch control={control} name="nightAlarm" />
-              <Field.Label>야간 알림 받기</Field.Label>
+              <Field.Label>야간 알림</Field.Label>
             </Field>
             <Field direction="row" align="center">
               <RHFSwitch control={control} name="weeklyDigest" />

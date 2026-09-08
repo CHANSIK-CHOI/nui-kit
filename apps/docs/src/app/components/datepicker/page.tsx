@@ -12,11 +12,7 @@ export default function DatepickerPage() {
         title="Datepicker"
         named={["Datepicker", "DateRangePicker", "DateMultiplePicker"]}
         subpath="datepicker"
-      >
-        달력에서 날짜를 고른다. 내부는 <code>react-day-picker</code> 이고 값은{" "}
-        <code>Date</code> 객체로 주고받는다. 기간은 <code>DateRangePicker</code>
-        , 여러 날짜는 <code>DateMultiplePicker</code> 다.
-      </GuideHeader>
+      />
 
       <pre className="doc-code">
         <code>{`import { Datepicker, DateRangePicker } from "@nui-kit/react";
@@ -83,10 +79,9 @@ export default function DatepickerPage() {
         </table>
       </div>
       <p>
-        치는 동안 달력은 <strong>그 날짜의 달로 따라 이동한다.</strong> 예전처럼
-        달력으로만 값을 받고 싶으면 <code>isTextInputBlocked</code> 를 준다.{" "}
-        <code>DateMultiplePicker</code> 는 아직 읽기 전용이다 — 날짜 목록의
-        구분자 규칙이 따로 필요해 다음 단계로 미뤘다.
+        치는 동안 달력은 <strong>그 날짜의 달로 따라 이동한다.</strong> 달력으로만
+        값을 받으려면 <code>isTextInputBlocked</code> 를 준다.{" "}
+        <code>DateMultiplePicker</code> 는 직접 입력을 받지 않는다.
       </p>
       <p>
         형식 안내는 <code>infoMessage</code> 로 적는다. 플레이스홀더만으로

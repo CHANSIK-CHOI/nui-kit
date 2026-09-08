@@ -117,15 +117,6 @@ export function CheckboxDemo() {
           ))}
         </CheckboxGroup>
       </Example>
-
-      <h2>상태</h2>
-      <Example caption="checked · disabled · readOnly · error">
-        <Checkbox checked readOnly />
-        <Checkbox checked disabled readOnly />
-        <Checkbox disabled />
-        <Checkbox checked isError readOnly />
-        <Checkbox isError />
-      </Example>
     </>
   );
 }

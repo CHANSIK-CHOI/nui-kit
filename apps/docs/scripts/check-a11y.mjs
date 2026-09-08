@@ -943,7 +943,8 @@ const INPUT_AUX_REASON =
   "입력 안에 버튼 둘이 8px 로 붙는다. 44 를 채우면 히트가 겹쳐 인접 시 38 이 상한이라 하한 24 를 쓴다";
 
 const TOUCH_TARGETS = [
-  ["IconButton", "/components/button", ".nui-button--icon"],
+  // IconButton 은 2026-09-08 에 자기 페이지로 나갔다 — Button 페이지에는 없다
+  ["IconButton", "/components/icon-button", ".nui-button--icon"],
   [
     "Textfield 지우기",
     "/components/textfield",
