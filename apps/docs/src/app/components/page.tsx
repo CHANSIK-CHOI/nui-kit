@@ -108,13 +108,13 @@ const GROUPS = [
       },
       {
         name: "DateRangePicker",
-        href: "/components/datepicker",
-        desc: "시작·종료 기간 선택. 둘 다 정해져야 값이 전달된다",
+        href: "/components/date-range-picker",
+        desc: "시작·종료 기간 선택. 확정 버튼을 눌러야 값이 전달된다",
       },
       {
         name: "DateMultiplePicker",
-        href: "/components/datepicker",
-        desc: "여러 날짜를 개별 선택",
+        href: "/components/date-multiple-picker",
+        desc: "여러 날짜를 개별 선택. 확정 버튼을 눌러야 값이 전달된다",
       },
     ],
   },

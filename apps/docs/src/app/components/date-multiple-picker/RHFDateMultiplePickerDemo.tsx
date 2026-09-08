@@ -2,33 +2,32 @@
 
 import { useForm } from "react-hook-form";
 import { Button, ButtonGroup, Field } from "@nui-kit/react";
-import { RHFDatepicker } from "@nui-kit/react/rhf";
+import { RHFDateMultiplePicker } from "@nui-kit/react/rhf";
 import { Example } from "@/components/guide";
 
-type FormValues = { visitDate: Date | undefined };
+type FormValues = { extraDates: Date[] | undefined };
 
-export function RHFDatepickerDemo() {
+export function RHFDateMultiplePickerDemo() {
   const { control, handleSubmit, formState, reset, watch } =
     useForm<FormValues>({
       mode: "onChange",
-      defaultValues: { visitDate: undefined },
+      defaultValues: { extraDates: undefined },
     });
 
-  const visitDate = watch("visitDate");
+  const extraDates = watch("extraDates");
 
   return (
     <>
       <h2>react-hook-form</h2>
       <p>
-        <code>RHFDatepicker</code> 가 <code>@nui-kit/react/rhf</code> 에 있다.{" "}
-        <code>control</code> 과 <code>name</code> 만 주면 값 · 검증 · 에러
-        표시가 이어진다. 검증에 걸려 포커스가 이 입력으로 와도 달력은 열리지
-        않는다. 에러 메시지를 가리지 않기 위해서다.
+        <code>RHFDateMultiplePicker</code> 가 <code>@nui-kit/react/rhf</code> 에
+        있다. 값은 <code>Date[]</code> 로 들어오고 확정 전에는{" "}
+        <code>undefined</code> 다. 최소 개수는 <code>validate</code> 로 본다.
       </p>
       <Example
         row={false}
-        caption="required 검증. 값은 Date 로 들어온다"
-        code={`<RHFDatepicker control={control} name="visitDate" rules={{ required: "방문일을 골라 주세요" }} isClearable />`}
+        caption="확정한 날짜들만 폼 값이 된다"
+        code={`<RHFDateMultiplePicker control={control} name="extraDates" rules={{ validate: (v) => (v?.length ?? 0) > 0 || "하루 이상 골라 주세요" }} />`}
         overflow
       >
         <form
@@ -37,11 +36,14 @@ export function RHFDatepickerDemo() {
           })}
         >
           <Field>
-            <Field.Label>방문일</Field.Label>
-            <RHFDatepicker
+            <Field.Label>추가 방문일</Field.Label>
+            <RHFDateMultiplePicker
               control={control}
-              name="visitDate"
-              rules={{ required: "방문일을 골라 주세요" }}
+              name="extraDates"
+              rules={{
+                validate: (value: Date[] | undefined) =>
+                  (value?.length ?? 0) > 0 || "하루 이상 골라 주세요",
+              }}
               placeholder="날짜를 고르세요"
               isClearable
             />
@@ -53,7 +55,7 @@ export function RHFDatepickerDemo() {
                 <Button
                   type="button"
                   variant="line"
-                  onClick={() => reset({ visitDate: undefined })}
+                  onClick={() => reset({ extraDates: undefined })}
                 >
                   초기화
                 </Button>
@@ -68,9 +70,9 @@ export function RHFDatepickerDemo() {
             <code>
               {JSON.stringify(
                 {
-                  visitDate: visitDate
-                    ? visitDate.toLocaleDateString("ko-KR")
-                    : null,
+                  extraDates:
+                    extraDates?.map((d) => d.toLocaleDateString("ko-KR")) ??
+                    null,
                   isValid: formState.isValid,
                   errors: Object.fromEntries(
                     Object.entries(formState.errors).map(([key, error]) => [

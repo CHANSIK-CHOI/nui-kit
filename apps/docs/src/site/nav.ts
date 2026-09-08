@@ -86,6 +86,11 @@ export const NAV: NavSection[] = [
           { title: "Switch", href: "/components/switch" },
           { title: "Select", href: "/components/select" },
           { title: "Datepicker", href: "/components/datepicker" },
+          { title: "DateRangePicker", href: "/components/date-range-picker" },
+          {
+            title: "DateMultiplePicker",
+            href: "/components/date-multiple-picker",
+          },
         ],
       },
       {

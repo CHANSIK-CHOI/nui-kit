@@ -858,6 +858,18 @@ const PLACEHOLDER_TARGETS = [
   ["Textarea", "/components/textarea", ".nui-textarea__input", true],
   ["Search", "/components/search", ".nui-textfield__input", true],
   ["Datepicker", "/components/datepicker", ".nui-textfield__input", true],
+  [
+    "DateRangePicker",
+    "/components/date-range-picker",
+    ".nui-textfield__input",
+    true,
+  ],
+  [
+    "DateMultiplePicker",
+    "/components/date-multiple-picker",
+    ".nui-textfield__input",
+    true,
+  ],
   ["Select", "/components/select", ".nui-select__placeholder", false],
 ];
 

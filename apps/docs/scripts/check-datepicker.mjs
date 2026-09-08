@@ -13,12 +13,19 @@
  *      정작 읽어야 할 에러 메시지를 가렸다.
  *   3. 팝업이 조상의 `overflow: hidden` 에 잘려 날짜를 하나도 고를 수 없다
  *
+ * 세 컴포넌트가 각자 페이지를 가진다 (2026-09-08 · 8단계). 페이지마다 RHF 폼이
+ * 하나씩 있고, 폼의 `pre code` 가 폼 상태를 JSON 으로 보여준다.
+ *
  * 사용: dev server 기동 후  node scripts/check-datepicker.mjs [baseUrl]
  */
 import { chromium } from "playwright";
 
 const BASE = process.argv[2] ?? "http://localhost:3000";
-const URL = `${BASE}/components/datepicker`;
+const PAGES = {
+  single: `${BASE}/components/datepicker`,
+  range: `${BASE}/components/date-range-picker`,
+  multiple: `${BASE}/components/date-multiple-picker`,
+};
 
 try {
   await fetch(BASE, { signal: AbortSignal.timeout(3000) });
@@ -45,12 +52,19 @@ page.on("console", (m) => {
   }
 });
 page.on("dialog", (d) => d.accept());
-await page.goto(URL, { waitUntil: "networkidle" });
 
 const openCalendars = () => page.locator(".nui-daypicker").count();
+const confirmButton = () =>
+  page.locator(".nui-datepicker__dropdown-foot button");
+const readFormState = async (form) =>
+  JSON.parse(await form.locator("pre code").textContent());
+
+// ── Datepicker ──────────────────────────────────────────────────────────
+console.log("\n■ Datepicker");
+await page.goto(PAGES.single, { waitUntil: "networkidle" });
 const first = page.locator(".nui-datepicker").first();
 
-// ── 1) 열기 → 날짜 선택 → 닫힘 + 포커스 복귀
+// 1) 열기 → 날짜 선택 → 닫힘 + 포커스 복귀
 await first.locator("input").click();
 await page.waitForSelector(".nui-daypicker");
 await first
@@ -73,7 +87,7 @@ afterPick.focusRole === "combobox"
   ? ok("닫을 때 포커스가 입력창으로 돌아온다")
   : bad(`닫은 뒤 포커스가 ${afterPick.focusRole} 로 유실됐다`);
 
-// ── 2) 팝업이 잘리지 않고 전 날짜를 클릭할 수 있다
+// 2) 팝업이 잘리지 않고 전 날짜를 클릭할 수 있다
 await first.locator("input").click();
 await page.waitForSelector(".nui-daypicker");
 const hitTest = await page.evaluate(() => {
@@ -102,14 +116,14 @@ hitTest.hittable === hitTest.total
 await page.keyboard.press("Escape");
 await page.waitForTimeout(400);
 
-// ── 3) RHF: 검증 실패가 캘린더를 열지 않는다
-const form = page.locator("form");
-await form.locator("button[type=submit]").click();
+// 3) RHF: 검증 실패가 캘린더를 열지 않는다
+const singleForm = page.locator("form");
+await singleForm.locator("button[type=submit]").click();
 await page.waitForTimeout(800);
 (await openCalendars()) === 0
   ? ok("검증 실패로 포커스가 옮겨져도 캘린더가 열리지 않는다")
   : bad("검증 실패 시 캘린더가 열려 에러 메시지를 가린다");
-const errorText = await form
+const errorText = await singleForm
   .locator(".nui-message__msg--error")
   .first()
   .textContent()
@@ -117,41 +131,80 @@ const errorText = await form
 errorText ? ok("에러 메시지가 보인다") : bad("에러 메시지가 없다");
 
 // 그 뒤 사용자가 직접 클릭하면 정상적으로 열려야 한다 (과잉 차단 방지)
-await form.locator(".nui-datepicker").first().locator("input").click();
+await singleForm.locator(".nui-datepicker input").click();
 await page.waitForTimeout(400);
 (await openCalendars()) > 0
   ? ok("검증 실패 후에도 클릭하면 정상적으로 열린다")
   : bad("클릭해도 열리지 않는다 — 과잉 차단");
-
-// ── 4) RHF 3종 값 반영 + 제출
-await form
+await singleForm
   .locator(".nui-daypicker__day-button:not([disabled])")
   .nth(15)
   .click();
 await page.waitForTimeout(500);
-const rangeField = form.locator(".nui-datepicker").nth(1);
-await rangeField.locator("input").click();
+const singleState = await readFormState(singleForm);
+singleState.isValid && singleState.visitDate
+  ? ok("RHFDatepicker 값이 반영되어 isValid true")
+  : bad(`isValid=${singleState.isValid} / visitDate=${singleState.visitDate}`);
+await singleForm
+  .locator("button[type=submit]")
+  .click({ timeout: 5000 })
+  .then(() => ok("제출 버튼을 클릭할 수 있다 (달력이 가리지 않는다)"))
+  .catch(() => bad("제출 버튼이 가려져 클릭할 수 없다"));
+await singleForm.locator("button", { hasText: "초기화" }).click();
+await page.waitForTimeout(400);
+(await singleForm.locator(".nui-datepicker input").inputValue()) === ""
+  ? ok("reset 이 입력창에 반영된다")
+  : bad("reset 후에도 값이 남아 있다");
+
+// ── DateRangePicker ─────────────────────────────────────────────────────
+console.log("\n■ DateRangePicker");
+await page.goto(PAGES.range, { waitUntil: "networkidle" });
+const rangeForm = page.locator("form");
+await rangeForm.locator(".nui-datepicker input").click();
 await page.waitForSelector(".nui-daypicker");
-const rangeButtons = form.locator(".nui-daypicker__day-button:not([disabled])");
+const rangeButtons = rangeForm.locator(
+  ".nui-daypicker__day-button:not([disabled])",
+);
 await rangeButtons.nth(8).click();
 await page.waitForTimeout(250);
+(await confirmButton().isDisabled())
+  ? ok("시작일만 고르면 확정 버튼이 잠긴다")
+  : bad("미완성 기간인데 확정 버튼이 열려 있다");
 await rangeButtons.nth(13).click();
 await page.waitForTimeout(300);
 
 // 기간·다중은 **확정 버튼을 눌러야** 값이 나간다 (2026-09-08 · 08 DP2).
-// 예전에는 둘 다 고르는 순간 값이 나가고 닫혔다. 시작만 고른 중간 상태가
-// 값으로 새어 나가던 것을 막은 변경이라, 검사도 새 흐름을 밟는다.
-const rangeConfirm = page.locator(".nui-datepicker__dropdown-foot button");
-(await rangeConfirm.isDisabled())
+// 시작만 고른 중간 상태가 값으로 새어 나가던 것을 막은 변경이라, 검사도 새 흐름을 밟는다.
+(await confirmButton().isDisabled())
   ? bad("기간을 둘 다 골랐는데 확정 버튼이 잠겨 있다")
   : ok("기간을 둘 다 고르면 확정 버튼이 풀린다");
-await rangeConfirm.click();
+const beforeConfirm = await readFormState(rangeForm);
+beforeConfirm.stay === null
+  ? ok("확정 전에는 값이 폼에 들어가지 않는다")
+  : bad(`확정 전인데 값이 나갔다: ${JSON.stringify(beforeConfirm.stay)}`);
+await confirmButton().click();
 await page.waitForTimeout(500);
+const rangeState = await readFormState(rangeForm);
+rangeState.isValid && rangeState.stay?.from && rangeState.stay?.to
+  ? ok("확정하면 from · to 가 폼에 들어가 isValid true")
+  : bad(
+      `isValid=${rangeState.isValid} / stay=${JSON.stringify(rangeState.stay)}`,
+    );
+await rangeForm.locator("button", { hasText: "초기화" }).click();
+await page.waitForTimeout(400);
+(await rangeForm.locator(".nui-datepicker input").inputValue()) === ""
+  ? ok("reset 이 입력창에 반영된다")
+  : bad("reset 후에도 값이 남아 있다");
 
-const multiField = form.locator(".nui-datepicker").nth(2);
-await multiField.locator("input").click();
+// ── DateMultiplePicker ──────────────────────────────────────────────────
+console.log("\n■ DateMultiplePicker");
+await page.goto(PAGES.multiple, { waitUntil: "networkidle" });
+const multiForm = page.locator("form");
+await multiForm.locator(".nui-datepicker input").click();
 await page.waitForSelector(".nui-daypicker");
-const multiButtons = form.locator(".nui-daypicker__day-button:not([disabled])");
+const multiButtons = multiForm.locator(
+  ".nui-daypicker__day-button:not([disabled])",
+);
 await multiButtons.nth(5).click();
 await page.waitForTimeout(250);
 (await openCalendars()) > 0
@@ -160,35 +213,22 @@ await page.waitForTimeout(250);
 await multiButtons.nth(9).click();
 await page.waitForTimeout(250);
 // ⚠️ Escape 로 닫으면 임시 선택이 **버려진다** — 확정을 눌러야 값이 나간다.
-await page.locator(".nui-datepicker__dropdown-foot button").click();
+await confirmButton().click();
 await page.waitForTimeout(500);
-
-const formState = JSON.parse(await form.locator("pre code").textContent());
-formState.isValid
-  ? ok("RHF 3종 값이 모두 반영되어 isValid true")
-  : bad(
-      `isValid=${formState.isValid} / errors=${JSON.stringify(formState.errors)}`,
-    );
-formState.extraDates?.length === 2
+const multiState = await readFormState(multiForm);
+multiState.extraDates?.length === 2
   ? ok("RHFDateMultiplePicker 가 여러 날짜를 누적한다")
-  : bad(`다중 값이 ${JSON.stringify(formState.extraDates)}`);
-
-await form
-  .locator("button[type=submit]")
-  .click({ timeout: 5000 })
-  .then(() => ok("제출 버튼을 클릭할 수 있다 (달력이 가리지 않는다)"))
-  .catch(() => bad("제출 버튼이 가려져 클릭할 수 없다"));
-
-// ── 5) reset
-await form.locator("button", { hasText: "초기화" }).click();
+  : bad(`다중 값이 ${JSON.stringify(multiState.extraDates)}`);
+multiState.isValid
+  ? ok("확정하면 isValid true")
+  : bad(`isValid=${multiState.isValid}`);
+await multiForm.locator("button", { hasText: "초기화" }).click();
 await page.waitForTimeout(400);
-const values = await form
-  .locator(".nui-datepicker input")
-  .evaluateAll((els) => els.map((el) => el.value));
-values.every((v) => v === "")
-  ? ok("reset 이 3종 모두에 반영된다")
-  : bad(`reset 후에도 값이 남아 있다: ${JSON.stringify(values)}`);
+(await multiForm.locator(".nui-datepicker input").inputValue()) === ""
+  ? ok("reset 이 입력창에 반영된다")
+  : bad("reset 후에도 값이 남아 있다");
 
+console.log("");
 consoleMessages.length === 0
   ? ok("콘솔 에러·경고 0건")
   : bad(`콘솔 출력: ${consoleMessages.slice(0, 3).join(" | ")}`);
@@ -200,5 +240,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.log(
-  "\n✅ Datepicker 검사 통과 — 개폐·포커스·팝업 클리핑·RHF 회귀 없음",
+  "\n✅ Datepicker 검사 통과 — 개폐·포커스·팝업 클리핑·확정 흐름·RHF 회귀 없음",
 );
