@@ -27,8 +27,17 @@ export default function Message({
   infoMessage = "",
   errorMessage = "",
 }: MessageProps) {
-  const hasInfoMessage = Boolean(infoMessage);
   const hasErrorMessage = Boolean(errorMessage);
+  // 에러가 있으면 도움말은 그리지 않는다 (SEED field.mdx — "Error Message와
+  // Helper Text가 동시에 존재할 경우 Error Message만 표시합니다").
+  //
+  // 둘을 함께 보여 주면 읽는 사람이 무엇을 고쳐야 하는지 두 문장에서 골라야 한다.
+  // 도움말은 "어떻게 쓰는가", 에러는 "지금 무엇이 잘못됐는가"라 **에러가 이긴다.**
+  //
+  // ⚠️ `hidden` 으로 숨기지 않고 **아예 렌더하지 않는다.** `__msg` 가
+  //    `display: block` 이라 `[hidden]` 을 이겨 버려서, 숨긴 줄 알고 남겨 두면
+  //    화면에 그대로 보인다.
+  const hasInfoMessage = Boolean(infoMessage) && !hasErrorMessage;
   const isEmpty = !hasInfoMessage && !hasErrorMessage;
 
   return (
