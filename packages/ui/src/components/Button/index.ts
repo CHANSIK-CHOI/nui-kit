@@ -15,7 +15,11 @@ export { default as IconButton } from "./IconButton.js";
 export type { IconButtonProps, IconButtonVariant } from "./IconButton.js";
 
 export { default as ButtonGroup, ButtonGroupItem } from "./ButtonGroup.js";
-export type { ButtonGroupProps, ButtonGroupItemProps } from "./ButtonGroup.js";
+export type {
+  ButtonGroupProps,
+  ButtonGroupItemProps,
+  ButtonGroupRatio,
+} from "./ButtonGroup.js";
 
 export { default as ButtonLink } from "./ButtonLink.js";
 export type { ButtonLinkProps } from "./ButtonLink.js";

@@ -329,7 +329,11 @@
       flex-basis: calc(50% - var(#{v("space-2")}));
     }
 
-    &__item > #{cls("button")} {
+    // ⚠️ `--icon` 은 빼야 한다. 이 셀렉터가 (0,2,0) 이라 `--icon` 의 정사각
+    //    치수 (0,1,0) 를 이겨서, 아이콘 버튼을 그룹에 넣으면 22×48 로 눌린다.
+    //    셋째 액션을 아이콘으로 접는 것은 우리가 권하는 사용법이다
+    //    (design-system.md §2-4-1). 자기 치수를 갖는 것은 찌그러지지 않는다 (§7).
+    &__item > #{cls("button")}:not(#{cls("button")}--icon) {
       width: 100%;
     }
 
@@ -338,6 +342,32 @@
       flex-basis: auto;
       width: fit-content;
       max-width: 100%;
+    }
+
+    // 첫 항목이 Dismiss(취소 · 닫기 · 초기화)일 때의 3 : 7.
+    // SEED `action-button.mdx` 「Button의 배치」 — 위계를 폭으로도 드러낸다.
+    //
+    // `flex-basis: 0` 으로 두고 `flex-grow` 가 비율을 만든다. 퍼센트 basis 로
+    // 하면 gap 을 빼야 해서 항목 수마다 값이 달라진다 — grow 는 남는 공간을
+    // 나누므로 gap 과 무관하게 정확히 3 : 7 이다.
+    &--ratio-dismiss > #{cls("button-group")}__wrap {
+      > #{cls("button-group")}__item {
+        flex-basis: 0;
+      }
+
+      > #{cls("button-group")}__item:first-child {
+        flex-grow: 3;
+      }
+
+      > #{cls("button-group")}__item:last-child {
+        flex-grow: 7;
+      }
+
+      // 내용 폭을 명시한 항목은 비율 밖이다 — 두 규칙이 부딪히면 명시가 이긴다
+      > #{cls("button-group")}__item--auto {
+        flex-grow: 0;
+        flex-basis: auto;
+      }
     }
   }
 }
