@@ -93,7 +93,7 @@ const GROUPS = [
       },
       {
         name: "MultiSelect",
-        href: "/components/select",
+        href: "/components/multi-select",
         desc: "다중 선택 드롭다운. 선택값을 칩으로 표시",
       },
     ],

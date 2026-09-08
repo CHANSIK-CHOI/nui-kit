@@ -12,12 +12,18 @@
  * 검사 방식: input DOM 노드에 표식(dataset)을 남기고, 에러를 껐다 켠 뒤에도
  *   같은 노드인지 본다. remount 되면 표식이 사라진다.
  *
+ * Select 와 MultiSelect 가 각자 페이지를 가진다 (2026-09-08 · 8단계). 페이지마다
+ * RHF 폼이 하나씩 있고 `pre code` 가 폼 상태를 JSON 으로 보여준다.
+ *
  * 사용: dev server 기동 후  node scripts/check-select-rhf.mjs [baseUrl]
  */
 import { chromium } from "playwright";
 
 const BASE = process.argv[2] ?? "http://localhost:3000";
-const URL = `${BASE}/components/select`;
+const PAGES = {
+  select: `${BASE}/components/select`,
+  multi: `${BASE}/components/multi-select`,
+};
 
 try {
   await fetch(BASE, { signal: AbortSignal.timeout(3000) });
@@ -44,17 +50,19 @@ page.on("console", (m) => {
   }
 });
 page.on("dialog", (d) => d.accept());
-await page.goto(URL, { waitUntil: "networkidle" });
 
-const form = page.locator("form");
-const select = form.locator(".nui-select").nth(0);
-const multi = form.locator(".nui-select").nth(1);
 const combobox = (root) => root.locator('input[role="combobox"]');
-const formState = async () =>
+const readFormState = async (form) =>
   JSON.parse(await form.locator("pre code").textContent());
 
-// ── 에러를 발생시키고 input 에 표식을 남긴다
-await form.locator("button[type=submit]").click();
+// ── Select ──────────────────────────────────────────────────────────────
+console.log("\n■ Select");
+await page.goto(PAGES.select, { waitUntil: "networkidle" });
+const selectForm = page.locator("form");
+const select = selectForm.locator(".nui-select").first();
+
+// 에러를 발생시키고 input 에 표식을 남긴다
+await selectForm.locator("button[type=submit]").click();
 await page.waitForTimeout(300);
 await combobox(select).evaluate((el) => {
   el.dataset.nuiProbe = "keep-me";
@@ -62,12 +70,12 @@ await combobox(select).evaluate((el) => {
 const probe = () =>
   combobox(select).evaluate((el) => el.dataset.nuiProbe ?? "(remount 됨)");
 
-// ── 값 선택 → 에러 해제 (aria-describedby 가 변한다)
+// 값 선택 → 에러 해제 (aria-describedby 가 변한다)
 await select.locator(".nui-select__control").click();
 await page.waitForSelector(".nui-select__option");
 await page.locator(".nui-select__option", { hasText: "부산" }).first().click();
 await page.waitForTimeout(300);
-const cleared = await formState();
+const cleared = await readFormState(selectForm);
 cleared.errors.city
   ? bad("값을 선택했는데 에러가 해제되지 않았다")
   : ok("값 선택으로 에러 해제 (aria-describedby 변화 발생)");
@@ -75,10 +83,10 @@ cleared.errors.city
   ? ok("에러 해제 후에도 동일 input 노드 — remount 없음")
   : bad("에러 해제 시 input 이 remount 됐다 (포커스·검색어 소실)");
 
-// ── 값 해제 → 에러 재발생
+// 값 해제 → 에러 재발생
 await select.locator(".nui-select__clear-indicator").click();
 await page.waitForTimeout(300);
-const errored = await formState();
+const errored = await readFormState(selectForm);
 errored.errors.city
   ? ok("값 해제로 에러 재발생")
   : bad("값을 지웠는데 에러가 생기지 않았다");
@@ -86,7 +94,7 @@ errored.errors.city
   ? ok("에러 재발생 후에도 동일 input 노드 — remount 없음")
   : bad("에러 재발생 시 input 이 remount 됐다");
 
-// ── 에러 상태에서 검색 입력
+// 에러 상태에서 검색 입력
 await select.locator(".nui-select__control").click();
 await combobox(select).type("대", { delay: 80 });
 await page.waitForTimeout(200);
@@ -102,8 +110,33 @@ typed === "대구"
 activeRole === "combobox" ? ok("포커스 유지") : bad(`포커스가 ${activeRole}`);
 await page.keyboard.press("Enter");
 await page.waitForTimeout(300);
+const picked = await readFormState(selectForm);
+picked.city === "daegu"
+  ? ok("검색해 고른 값이 폼에 들어간다")
+  : bad(`city=${JSON.stringify(picked.city)} (기대 "daegu")`);
 
-// ── MultiSelect 값 순서 보존
+// reset 반영
+await selectForm.locator("button", { hasText: "초기화" }).click();
+await page.waitForTimeout(300);
+const afterReset = await readFormState(selectForm);
+afterReset.city === null
+  ? ok("reset 이 컨트롤에 반영된다")
+  : bad(`reset 후 값이 ${JSON.stringify(afterReset.city)}`);
+
+// ── MultiSelect ─────────────────────────────────────────────────────────
+console.log("\n■ MultiSelect");
+await page.goto(PAGES.multi, { waitUntil: "networkidle" });
+const multiForm = page.locator("form");
+const multi = multiForm.locator(".nui-select").first();
+
+await multiForm.locator("button[type=submit]").click();
+await page.waitForTimeout(300);
+const multiErrored = await readFormState(multiForm);
+multiErrored.errors.interests
+  ? ok("빈 배열이 검증에 걸린다")
+  : bad("빈 배열인데 에러가 없다");
+
+// 값 순서 보존
 await multi.locator(".nui-select__control").click();
 await page.waitForSelector(".nui-select__option");
 await page.locator(".nui-select__option", { hasText: "서울" }).first().click();
@@ -111,25 +144,37 @@ await page.waitForTimeout(200);
 await multi.locator(".nui-select__control").click();
 await page.locator(".nui-select__option", { hasText: "광주" }).first().click();
 await page.waitForTimeout(200);
-const picked = await formState();
-JSON.stringify(picked.values.interests) === JSON.stringify(["seoul", "gwangju"])
+const multiPicked = await readFormState(multiForm);
+JSON.stringify(multiPicked.interests) === JSON.stringify(["seoul", "gwangju"])
   ? ok("MultiSelect 가 선택 순서를 보존한다")
-  : bad(`값 순서가 ${JSON.stringify(picked.values.interests)}`);
+  : bad(`값 순서가 ${JSON.stringify(multiPicked.interests)}`);
 const chips = await multi
   .locator(".nui-select__multi-value__label")
   .allTextContents();
 JSON.stringify(chips) === JSON.stringify(["서울", "광주"])
   ? ok("칩 렌더 순서도 value 배열과 일치")
   : bad(`칩 순서가 ${JSON.stringify(chips)}`);
+multiPicked.errors.interests
+  ? bad("값을 골랐는데 에러가 남아 있다")
+  : ok("값을 고르면 에러가 해제된다");
 
-// ── reset 반영
-await form.locator("button", { hasText: "초기화" }).click();
+// 칩 × 로 지운다
+await multi.locator(".nui-select__multi-value__remove").first().click();
+await page.waitForTimeout(200);
+const afterRemove = await readFormState(multiForm);
+JSON.stringify(afterRemove.interests) === JSON.stringify(["gwangju"])
+  ? ok("칩 × 가 그 값만 뺀다")
+  : bad(`× 뒤 값이 ${JSON.stringify(afterRemove.interests)}`);
+
+// reset 반영
+await multiForm.locator("button", { hasText: "초기화" }).click();
 await page.waitForTimeout(300);
-const afterReset = await formState();
-afterReset.values.city === null && afterReset.values.interests.length === 0
+const multiReset = await readFormState(multiForm);
+multiReset.interests.length === 0
   ? ok("reset 이 컨트롤에 반영된다")
-  : bad(`reset 후 값이 ${JSON.stringify(afterReset.values)}`);
+  : bad(`reset 후 값이 ${JSON.stringify(multiReset.interests)}`);
 
+console.log("");
 consoleMessages.length === 0
   ? ok("콘솔 에러·경고 0건")
   : bad(`콘솔 출력: ${consoleMessages.join(" | ")}`);
