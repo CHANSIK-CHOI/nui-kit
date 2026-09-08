@@ -40,6 +40,12 @@ type TextfieldBaseProps = {
   onClear?: () => void;
   /** 지우기 버튼의 접근 이름. 소비자의 어휘·언어로 바꿀 수 있어야 한다 (a11y.md §9) */
   clearButtonTitle?: string;
+  /**
+   * 글자 수 카운터의 sr-only 라벨. 소비자의 어휘·언어로 바꿀 수 있어야 한다 (a11y.md §9).
+   * 카운터는 `maxLength` 가 있을 때만 렌더된다 — 제한이 곧 카운터의 조건이다
+   * (KRDS 가이드 683쪽 · SEED `field.mdx`).
+   */
+  counterLabel?: string;
 };
 
 export type TextfieldProps = TextfieldBaseProps &
@@ -63,6 +69,8 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
       className,
       placeholder,
       value,
+      maxLength,
+      counterLabel = "글자 수",
       readOnly = false,
       isTextInputBlocked = false,
       disabled = false,
@@ -88,10 +96,16 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
     const resolvedId = id ?? fieldContextId ?? generatedId;
     const hasOwnMessage = Boolean(infoMessage || errorMessage);
     const resolvedIsError = isFieldError || Boolean(errorMessage);
+    // 제한이 있을 때만 센다 — Textarea 와 같은 규칙이다.
+    const hasCounter = typeof maxLength === "number";
+    // 세는 단위는 브라우저의 `maxlength` 와 같은 UTF-16 코드 단위다 —
+    // 다르게 세면 카운터가 100 인데 더 쳐지거나 99 인데 안 쳐진다.
+    const valueLength = value != null ? String(value).length : 0;
     const resolvedAriaDescribedBy = getMergedAriaIds(
       ariaDescribedBy,
       ...fieldDescribedByIds,
-      hasOwnMessage ? generatedMessageId : null,
+      // 메시지와 카운터가 한 줄에 오므로 둘 중 하나만 있어도 그 줄을 가리킨다.
+      hasOwnMessage || hasCounter ? generatedMessageId : null,
     );
     const hasValue = value != null && String(value).length > 0;
     const canClear =
@@ -121,6 +135,7 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
               placeholder={placeholder}
               disabled={disabled}
               readOnly={readOnly || isTextInputBlocked}
+              maxLength={maxLength}
               aria-describedby={resolvedAriaDescribedBy}
               aria-invalid={resolvedIsError ? true : undefined}
               aria-required={isFieldRequired ? true : undefined}
@@ -141,9 +156,12 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
           </div>
         </div>
         <Message
-          id={hasOwnMessage ? generatedMessageId : undefined}
+          id={hasOwnMessage || hasCounter ? generatedMessageId : undefined}
           infoMessage={infoMessage}
           errorMessage={errorMessage}
+          count={hasCounter ? valueLength : undefined}
+          maxCount={maxLength}
+          counterLabel={counterLabel}
         />
       </div>
     );

@@ -9,6 +9,7 @@ import {
   PropsTable,
 } from "@/components/guide";
 import { TextfieldDemo } from "./TextfieldDemo";
+import { CounterDemo } from "./CounterDemo";
 
 export const metadata = { title: "Textfield" };
 
@@ -112,6 +113,21 @@ export default function TextfieldPage() {
           </Field>
         </Case>
       </CaseGrid>
+
+      <h2>글자 수</h2>
+      <p>
+        <code>maxLength</code> 를 주면 메시지 줄 오른쪽에 카운터가 붙는다.{" "}
+        <strong>제한이 있을 때만 나온다</strong> — 제한이 없으면 남은 글자라는
+        개념 자체가 없다. 현재 수는 진하게, 최대 수는 연하게 표시되고 넘치면 둘 다
+        빨개진다.
+      </p>
+      <p>
+        카운터는 <code>aria-live</code> 밖이다. 안에 두면 타이핑 한 글자마다
+        화면 낭독기가 숫자를 읽는다. 포커스가 왔을 때{" "}
+        <code>aria-describedby</code> 로 알리는 것으로 충분하다. 문구는{" "}
+        <code>counterLabel</code> 로 바꾼다.
+      </p>
+      <CounterDemo />
 
       <h2>지우기</h2>
       <p>
