@@ -48,13 +48,20 @@ export function DatepickerDemo() {
 
       <h2>기간 선택</h2>
       <p>
-        시작일과 종료일을 차례로 고른다. 둘 다 정해지기 전까지는{" "}
-        <code>onSelectedChange</code> 가 <code>undefined</code> 를 넘긴다 —
-        불완전한 기간이 폼에 들어가지 않는다.
+        시작일과 종료일을 차례로 고르고 <strong>확정 버튼을 누른다.</strong> 그
+        전까지 고른 날짜는 달력 안에만 있고 값으로 나가지 않는다 — 시작일만 고른
+        미완성 기간이 폼에 들어가지 않는다. 미완성이면 버튼이 잠긴다.
+      </p>
+      <p>
+        확정하지 않고 <code>Escape</code> · 바깥 클릭으로 닫으면 고른 것을
+        버리고 <strong>열기 전 값으로 돌아간다.</strong> 문구는{" "}
+        <code>confirmLabel</code> 로 바꾸고, 버튼을 아예 없애려면{" "}
+        <code>hasConfirmButton={"{false}"}</code> 를 준다 — 그러면 둘 다
+        정해지는 순간 바로 반영된다.
       </p>
       <Example
         row={false}
-        caption="from → to 순서로 선택"
+        caption="from → to 순서로 고르고 확정"
         code={`<DateRangePicker selected={range} onSelectedChange={setRange} />`}
         overflow
       >

@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useCallback, useState } from "react";
+import { forwardRef } from "react";
 import type {
   DateRange,
   PropsRange,
@@ -48,18 +48,11 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(
       parseDisplayValue = parseRangeDateValue,
       getDefaultMonth = getRangeDefaultMonth,
       getShouldCloseOnSelect = getShouldCloseRangeOnSelect,
+      hasConfirmButton = true,
       ...restProps
     },
     ref,
   ) => {
-    // 캘린더가 열려 있는 동안에는 아직 확정되지 않은 기간 선택 상태를 로컬에
-    // 보관해서, { from, to } 가 모두 정해지기 전의 중간 선택도 UI 에 보여준다.
-    const [draftRange, setDraftRange] = useState<DateRange | undefined>();
-    const [isCalendarOpen, setIsCalendarOpen] = useState(defaultIsCalendarOpen);
-
-    const resolvedSelected =
-      isCalendarOpen && draftRange ? draftRange : selected;
-
     const resolvedDayPickerProps: NonNullable<
       DateRangePickerProps["dayPickerProps"]
     > = {
@@ -73,48 +66,21 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(
       resetOnSelect: dayPickerProps?.resetOnSelect ?? true,
     };
 
-    const handleCalendarOpenChange = useCallback((nextIsOpen: boolean) => {
-      if (!nextIsOpen) {
-        setDraftRange(undefined);
-      }
-
-      setIsCalendarOpen(nextIsOpen);
-    }, []);
-
-    const handleSelectedChange = useCallback(
-      (nextSelected: DateRange | undefined) => {
-        if (!nextSelected) {
-          setDraftRange(undefined);
-          onSelectedChange?.(undefined);
-          return;
-        }
-
-        setDraftRange(nextSelected);
-
-        if (isCompleteDateRange(nextSelected)) {
-          onSelectedChange?.(nextSelected);
-          return;
-        }
-
-        onSelectedChange?.(undefined);
-      },
-      [onSelectedChange],
-    );
-
     return (
       <DatepickerBase
         {...restProps}
         inputRef={ref}
         mode="range"
-        selected={resolvedSelected}
-        onSelectedChange={handleSelectedChange}
+        selected={selected}
+        onSelectedChange={onSelectedChange}
         dayPickerProps={resolvedDayPickerProps}
         formatDisplayValue={formatDisplayValue}
         parseDisplayValue={parseDisplayValue}
         getDefaultMonth={getDefaultMonth}
         getShouldCloseOnSelect={getShouldCloseOnSelect}
         defaultIsCalendarOpen={defaultIsCalendarOpen}
-        onCalendarOpenChange={handleCalendarOpenChange}
+        hasConfirmButton={hasConfirmButton}
+        getIsConfirmable={isCompleteDateRange}
       />
     );
   },

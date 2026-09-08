@@ -28,6 +28,7 @@ import { px } from "../../internal/prefix.js";
 import { PORTAL_ROOT_ATTRIBUTE } from "../../internal/portal.js";
 import { DaypickerChevron } from "./DaypickerChevron.js";
 import { motionTransition } from "../../internal/motion.js";
+import Button from "../Button/Button.js";
 import Textfield, { type TextfieldProps } from "../Textfield/Textfield.js";
 import TextfieldBtn from "../Textfield/TextfieldBtn.js";
 import {
@@ -126,6 +127,18 @@ export type DatepickerBaseProps<
   /** 캘린더 팝업의 접근 이름. i18n 을 위해 열어둔다. */
   calendarLabel?: string;
   shouldCloseOnSelect?: boolean;
+  /**
+   * 팝오버 아래 확정 버튼 (§6-8). 켜면 **날짜를 골라도 값이 바로 나가지 않는다** —
+   * 확정을 누를 때 한 번 나간다.
+   *
+   * 여러 번의 클릭이 하나의 값을 만드는 모드(range · multiple)의 것이다.
+   * single 은 고른 순간 결과가 확정되므로 두지 않는다.
+   */
+  hasConfirmButton?: boolean;
+  /** 확정 버튼 문구. 소비자의 어휘·언어로 바꿀 수 있어야 한다 (a11y.md §9) */
+  confirmLabel?: string;
+  /** 확정할 수 있는 임시 선택인가 — 미완성 범위에서 버튼을 잠근다 */
+  getIsConfirmable?: (selected: TSelected | undefined) => boolean;
   defaultIsCalendarOpen?: boolean;
   dropdownClassName?: string;
   /**
@@ -159,6 +172,9 @@ export default function DatepickerBase<
   calendarButtonTitle,
   calendarLabel = "날짜 선택 캘린더",
   shouldCloseOnSelect,
+  hasConfirmButton = false,
+  confirmLabel = "선택 완료",
+  getIsConfirmable,
   defaultIsCalendarOpen = false,
   onCalendarOpenChange,
   dropdownClassName,
@@ -305,6 +321,24 @@ export default function DatepickerBase<
    * 이후 Tab 이 문서 처음부터 다시 시작한다 (a11y.md §5).
    * 단 **바깥을 클릭해 닫는 경우는 제외한다** — 사용자가 옮긴 포커스를 빼앗게 된다.
    */
+  /**
+   * 확정 버튼이 있을 때의 **임시 선택** (§6-8).
+   *
+   * 팝오버가 열려 있는 동안만 살고, 확정을 누를 때 `onSelectedChange` 로 한 번
+   * 나간다. 확정 없이 닫히면 버린다.
+   *
+   * ⚠️ `components.md §5`(값형 입력은 controlled) 의 **예외**다. 그래도 소유권이
+   *    갈리지는 않는다 — 소비자의 `selected` 는 확정 전까지 한 번도 바뀌지 않고,
+   *    나가는 길이 `onSelectedChange` 하나다. 팝오버를 닫으면 임시 선택은 사라진다.
+   */
+  const [draftSelected, setDraftSelected] = useState<
+    { value: TSelected | undefined } | null
+  >(null);
+
+  // 확정 버튼이 켜져 있고 임시 선택이 살아 있으면 그것을, 아니면 소비자 값을 그린다.
+  const calendarSelected =
+    hasConfirmButton && draftSelected ? draftSelected.value : selected;
+
   const setIsCalendarOpenState = useCallback(
     (nextIsOpen: boolean, shouldRestoreFocus = false) => {
       setIsCalendarOpen(nextIsOpen);
@@ -313,6 +347,9 @@ export default function DatepickerBase<
       // 닫으면 보고 있던 달을 잊는다 — 다음에 열 때 고른 값의 달에서 시작한다.
       if (!nextIsOpen) {
         setMonth(undefined);
+        // 확정 없이 닫히면 임시 선택을 버린다 (§6-8). 다시 열면 소비자의
+        // `selected` 에서 새로 만든다.
+        setDraftSelected(null);
       }
 
       if (!nextIsOpen && shouldRestoreFocus) {
@@ -470,6 +507,20 @@ export default function DatepickerBase<
     }
 
     setDraftText(null);
+
+    // 확정 버튼이 있으면 값을 **아직 내보내지 않는다** (§6-8).
+    // 여러 번의 클릭이 하나의 값을 만드는 모드라, 중간 상태가 값으로 나가면
+    // 소비자가 불완전한 값을 받는다 — 시작만 고른 범위가 그것이다.
+    if (hasConfirmButton) {
+      setDraftSelected({ value: nextSelected });
+      (
+        dayPickerProps?.onSelect as
+          OnSelectHandler<TSelected | undefined> | undefined
+      )?.(nextSelected, triggerDate, modifiers, event);
+
+      return;
+    }
+
     onSelectedChange?.(nextSelected);
     (
       dayPickerProps?.onSelect as
@@ -480,6 +531,21 @@ export default function DatepickerBase<
       setIsCalendarOpenState(false, true);
     }
   };
+
+  /** 확정 — 임시 선택을 값으로 올리고 닫는다 (§6-8). */
+  const handleConfirm = () => {
+    if (readOnly || disabled) return;
+
+    onSelectedChange?.(draftSelected ? draftSelected.value : selected);
+    // 닫는 쪽이 임시 선택을 비운다 — 여기서 먼저 비우면 닫히기 전 한 프레임 동안
+    // 달력이 옛 값으로 되돌아간 것처럼 보인다.
+    setIsCalendarOpenState(false, true);
+  };
+
+  // 미완성 범위에서는 확정을 잠근다. 판정은 모드가 안다 — base 는 모른다.
+  const isConfirmable = getIsConfirmable
+    ? getIsConfirmable(calendarSelected)
+    : true;
 
   const handleClear = () => {
     setDraftText(null);
@@ -689,7 +755,7 @@ export default function DatepickerBase<
             {...dayPickerProps}
             mode={mode}
             required={dayPickerProps?.required}
-            selected={selected as never}
+            selected={calendarSelected as never}
             onSelect={handleDayPickerSelect as never}
             modifiers={resolvedModifiers}
             modifiersClassNames={resolvedModifiersClassNames}
@@ -721,6 +787,27 @@ export default function DatepickerBase<
             locale={resolvedLocale}
             className={cn(daypickerBlock, dayPickerProps?.className)}
           />
+          {/*
+            확정 버튼 (§6-8). 여러 번의 클릭이 하나의 값을 만드는 모드에만 있다 —
+            single 은 고른 순간 결과가 확정되므로 두지 않는다.
+
+            버튼이 **달력 뒤**에 온다. 고르고 나서 누르는 순서와 DOM 순서가 같아야
+            Tab 이 그 순서로 지나간다 — 팝업 닫기 버튼을 DOM 마지막으로 옮긴 것과
+            같은 이유다 (08 E1).
+          */}
+          {hasConfirmButton ? (
+            <div className={`${block}__dropdown-foot`}>
+              <Button
+                type="button"
+                size="medium"
+                color="primary"
+                disabled={!isConfirmable}
+                onClick={handleConfirm}
+              >
+                {confirmLabel}
+              </Button>
+            </div>
+          ) : null}
         </motion.div>
       )}
     </AnimatePresence>

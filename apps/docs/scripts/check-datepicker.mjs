@@ -136,7 +136,17 @@ const rangeButtons = form.locator(".nui-daypicker__day-button:not([disabled])");
 await rangeButtons.nth(8).click();
 await page.waitForTimeout(250);
 await rangeButtons.nth(13).click();
-await page.waitForTimeout(600);
+await page.waitForTimeout(300);
+
+// 기간·다중은 **확정 버튼을 눌러야** 값이 나간다 (2026-09-08 · 08 DP2).
+// 예전에는 둘 다 고르는 순간 값이 나가고 닫혔다. 시작만 고른 중간 상태가
+// 값으로 새어 나가던 것을 막은 변경이라, 검사도 새 흐름을 밟는다.
+const rangeConfirm = page.locator(".nui-datepicker__dropdown-foot button");
+(await rangeConfirm.isDisabled())
+  ? bad("기간을 둘 다 골랐는데 확정 버튼이 잠겨 있다")
+  : ok("기간을 둘 다 고르면 확정 버튼이 풀린다");
+await rangeConfirm.click();
+await page.waitForTimeout(500);
 
 const multiField = form.locator(".nui-datepicker").nth(2);
 await multiField.locator("input").click();
@@ -149,8 +159,9 @@ await page.waitForTimeout(250);
   : bad("다중 선택 모드인데 첫 선택에 닫혔다");
 await multiButtons.nth(9).click();
 await page.waitForTimeout(250);
-await page.keyboard.press("Escape");
-await page.waitForTimeout(400);
+// ⚠️ Escape 로 닫으면 임시 선택이 **버려진다** — 확정을 눌러야 값이 나간다.
+await page.locator(".nui-datepicker__dropdown-foot button").click();
+await page.waitForTimeout(500);
 
 const formState = JSON.parse(await form.locator("pre code").textContent());
 formState.isValid

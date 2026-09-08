@@ -41,6 +41,7 @@ const DateMultiplePicker = forwardRef<
       formatDisplayValue = formatMultipleDateValue,
       getDefaultMonth = getMultipleDefaultMonth,
       getShouldCloseOnSelect = getShouldCloseMultipleOnSelect,
+      hasConfirmButton = true,
       ...restProps
     },
     ref,
@@ -53,6 +54,8 @@ const DateMultiplePicker = forwardRef<
         formatDisplayValue={formatDisplayValue}
         getDefaultMonth={getDefaultMonth}
         getShouldCloseOnSelect={getShouldCloseOnSelect}
+        hasConfirmButton={hasConfirmButton}
+        getIsConfirmable={(value) => Boolean(value?.length)}
       />
     );
   },

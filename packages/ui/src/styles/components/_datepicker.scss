@@ -60,6 +60,20 @@
       background-color: var(#{v("layer-floating")});
       box-shadow: var(#{v("shadow-2")});
     }
+
+    // 확정 버튼 자리 (2026-09-08 · 08 DP2). range · multiple 에만 있다.
+    // 달력과 경계를 두는 선은 「한 화면에 한두 번」이라 의미경계선이다 —
+    // design-system.md §2-6
+    &__dropdown-foot {
+      display: flex;
+      margin-top: var(#{v("space-3")});
+      padding-top: var(#{v("space-3")});
+      border-top: #{hook(
+          "datepicker--border-width",
+          var(#{v("border-width-1")})
+        )}
+        solid var(#{v("border-section")});
+    }
   }
 
   // ── 달력 본체
