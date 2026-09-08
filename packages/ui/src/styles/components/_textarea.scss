@@ -131,27 +131,11 @@
       gap: var(#{v("space-2")});
     }
 
-    &__counter {
-      flex-shrink: 0;
-      // 메시지와 같은 위 여백을 줘야 두 글의 첫 줄이 맞는다 (_message.scss)
-      margin-top: var(#{v("space-2")});
-      margin-left: auto;
-      padding-right: var(#{v("space-2")});
-      color: var(#{v("text-secondary")});
-      // 숫자가 늘고 줄 때 폭이 흔들리지 않게
-      font-variant-numeric: tabular-nums;
-
-      @include typo(1, "regular");
-    }
-
-    // 브라우저는 maxlength 로 타이핑을 막지만 프로그램으로 넣은 값은 넘을 수 있다.
-    // 컨트롤 **밖**의 상태 글자라 `text-danger` 다 — `control-text-error` 는
-    // 입력 안쪽(caret · 단위)의 이름이다 (design-system.md §2-1).
-    &__counter--over {
-      color: var(#{v("text-danger")});
-    }
-
-    &#{state("disabled")} &__counter {
+    // 비활성에서는 카운터도 죽은 글자다. 카운터 자체는 `_message.scss` 가 갖는다
+    // (2026-09-08 · 08 F3) — Textfield 에도 같은 자리를 주기 위해 옮겼다.
+    &#{state("disabled")} #{cls("message")}__counter,
+    &#{state("disabled")} #{cls("message")}__counter-current,
+    &#{state("disabled")} #{cls("message")}__counter-max {
       color: var(#{v("control-text-disabled")});
     }
 
