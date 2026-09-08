@@ -707,7 +707,15 @@ export default function DatepickerBase<
             startMonth={resolvedStartMonth}
             endMonth={resolvedEndMonth}
             disabled={isDayPickerDisabled}
-            showOutsideDays={dayPickerProps?.showOutsideDays ?? true}
+            // 앞뒤 달 날짜는 **비워 둔다** (2026-09-08 · 08 DP1).
+            // SEED — "달의 앞뒤 빈 자리(이전·다음 달 날짜)는 흐리게 표시하지
+            // 않고 비워 둡니다". 흐린 날짜는 「고를 수 있나」를 헷갈리게 한다.
+            //
+            // ⚠️ 실제로 **색과 동작이 어긋나 있었다.** 비활성 색(gray-9)인데
+            //    버튼이 살아 있어 눌렸고(cursor: pointer), 누를 수 있는 글자의
+            //    대비 기준 4.5 에 미달했다(실측 3.30). `verify:a11y` 가 달력
+            //    앞뒤 달을 재지 않아 검사 밖에 숨어 있었다.
+            showOutsideDays={dayPickerProps?.showOutsideDays ?? false}
             captionLayout={resolvedCaptionLayout}
             navLayout={dayPickerProps?.navLayout ?? "after"}
             locale={resolvedLocale}
