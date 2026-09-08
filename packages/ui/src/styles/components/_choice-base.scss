@@ -23,6 +23,9 @@
     // 색을 컴포넌트별 훅으로 열지 않는 이유는 tokens.md §1-2 와 같다 —
     // 배경만 바뀌면 그 위 표시가 안 보이게 되는데 그 사실이 화면에 안 드러난다.
     #{iv("selector-accent")}: var(#{v("control-accent")});
+    // 선택된 채로 누를 때의 채움 — 같은 색조의 다음 단계다 (design-system.md §2-4).
+    // SEED 도 `radiomark` 의 `selected,pressed` 를 `bg.brand-solid-pressed` 로 둔다.
+    #{iv("selector-accent-active")}: var(#{v("action-neutral-active")});
     #{iv("selector-accent-fg")}: var(#{v("control-accent-fg")});
 
     position: relative;
@@ -33,6 +36,7 @@
     // 브랜드로 강조하는 자리. 기본은 조용하고 여기만 색이 온다
     &--brand {
       #{iv("selector-accent")}: var(#{v("control-accent-brand")});
+      #{iv("selector-accent-active")}: var(#{v("action-primary-active")});
     }
 
     // ⚠️ 브랜드·에러·비활성 채움은 두 테마에서 값이 **고정**이라 그 위 표시도
@@ -42,6 +46,13 @@
     &#{state("error")},
     &#{state("disabled")} {
       #{iv("selector-accent-fg")}: var(#{v("control-accent-fg-static")});
+    }
+
+    // ⚠️ 에러도 눌림 단계를 갖는다. 안 두면 **빨간 채움이 눌리는 순간 중립색으로
+    //    바뀐다** — 눌림 규칙의 상세도가 컴포넌트별 에러 규칙보다 높아서다
+    //    (`_checkbox.scss` 의 `is-error` 블록). 합성 규칙은 §3-2 가 정본이다.
+    &#{state("error")} {
+      #{iv("selector-accent-active")}: var(#{v("action-danger-active")});
     }
 
     &#{state("disabled")} {
@@ -90,7 +101,12 @@
       border: #{hook("selector--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border")});
 
-      @include motion((border-color, background-color, box-shadow, color));
+      // 눌림은 배율·시간·곡선 세 축을 함께 써야 한 인터랙션이 된다 —
+      // `transition` 은 한 번만 선언할 수 있으므로 `motion-press` 로 묶는다
+      // (design-system.md §6-3).
+      @include motion-press(
+        (border-color, background-color, box-shadow, color)
+      );
     }
 
     &__indicator {
@@ -107,6 +123,35 @@
         &__control {
         border-color: var(#{iv("selector-accent")});
       }
+    }
+
+    // ── 눌림 ★ (2026-09-08 · 08 C1)
+    //
+    // SEED 는 `checkmark` · `radiomark` · `switchmark` 셋 다 `pressed` 에
+    // `scaleScope: self` 를 준다. Emil 도 "모든 pressable 에 scale" 이다.
+    // 우리는 Button 계열에만 있었다.
+    //
+    // ⚠️ **§2-3-1 의 「목록·격자의 칸에는 scale 을 걸지 않는다」와 어긋나지 않는다.**
+    //    그 규칙은 폭을 꽉 채우며 반복되는 **칸**(Accordion 헤더 · Select 옵션 ·
+    //    달력 날짜)의 것이다. 선택 컨트롤은 24px 짜리 **자기 경계가 있는 컨트롤**이라
+    //    앞쪽 무리(개별 버튼)에 속한다.
+    //
+    // 미선택은 알파 면(SEED `bg.transparent-pressed`), 선택은 채움색의 다음 단계다.
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__input:active
+      + &__control {
+      background-color: var(#{v("control-bg-active")});
+      transform: scale(var(#{v("scale-94")}));
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__input:checked:active
+      + &__control,
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__input:indeterminate:active
+      + &__control {
+      background-color: var(#{iv("selector-accent-active")});
+      border-color: var(#{iv("selector-accent-active")});
     }
 
     &#{state("error")} &__control {
