@@ -29,9 +29,12 @@ export const motionDuration = {
 export const motionEase = {
   standard: [0.2, 0, 0, 1],
   enter: [0, 0, 0.15, 1],
-  exit: [0.35, 0, 1, 1],
+  // ⚠️ **enter 와 같은 값이다.** 퇴장을 ease-in 으로 두면 닫기를 누른 뒤 100ms
+  //    동안 27% 만 사라져 「안 닫힌다」로 읽힌다(실측). 비대칭은 duration 이
+  //    만든다 — 이름은 자리를 말하려고 남긴다 (tokens.md §3-6 · §5-1).
+  exit: [0, 0, 0.15, 1],
   enterEmphasized: [0.16, 1, 0.3, 1],
-  exitEmphasized: [0.35, 0, 0.95, 0.55],
+  exitEmphasized: [0.16, 1, 0.3, 1],
   expand: [0.5, 1, 0.89, 1],
   pressed: [0, 0, 0.15, 1],
 } as const;
