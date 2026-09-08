@@ -151,9 +151,10 @@ const MultiSelect: ForwardRefExoticComponent<
       () => ({
         describedBy: resolvedAriaDescribedBy,
         readOnly,
+        isRequired: isFieldRequired,
         getRemoveButtonLabel: removeButtonLabel,
       }),
-      [resolvedAriaDescribedBy, readOnly, removeButtonLabel],
+      [resolvedAriaDescribedBy, readOnly, removeButtonLabel, isFieldRequired],
     );
 
     const handleChange = (
@@ -228,7 +229,6 @@ const MultiSelect: ForwardRefExoticComponent<
                 : undefined)
             }
             aria-invalid={ariaInvalid ?? (resolvedIsError || undefined)}
-            aria-required={isFieldRequired || undefined}
             aria-errormessage={
               resolvedIsError && errorMessage ? generatedMessageId : undefined
             }

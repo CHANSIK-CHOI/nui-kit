@@ -144,9 +144,10 @@ const Select: ForwardRefExoticComponent<
       () => ({
         describedBy: resolvedAriaDescribedBy,
         readOnly,
+        isRequired: isFieldRequired,
         getRemoveButtonLabel: DEFAULT_REMOVE_BUTTON_LABEL,
       }),
-      [resolvedAriaDescribedBy, readOnly],
+      [resolvedAriaDescribedBy, readOnly, isFieldRequired],
     );
 
     const handleChange = (
@@ -221,7 +222,6 @@ const Select: ForwardRefExoticComponent<
                 : undefined)
             }
             aria-invalid={ariaInvalid ?? (resolvedIsError || undefined)}
-            aria-required={isFieldRequired || undefined}
             aria-errormessage={
               resolvedIsError && errorMessage ? generatedMessageId : undefined
             }

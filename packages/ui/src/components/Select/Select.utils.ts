@@ -98,6 +98,7 @@ type ComboboxChildProps = {
   role?: string;
   "aria-describedby"?: string;
   "aria-readonly"?: boolean;
+  "aria-required"?: boolean;
 };
 
 type StyleFn = (base: CSSObjectWithLabel, props: never) => CSSObjectWithLabel;
@@ -191,7 +192,7 @@ export function createAriaValueContainer<IsMulti extends boolean>(
   function NuiValueContainer(
     props: ValueContainerProps<SelectOption, IsMulti, GroupBase<SelectOption>>,
   ) {
-    const { describedBy, readOnly } = useContext(SelectAriaContext);
+    const { describedBy, readOnly, isRequired } = useContext(SelectAriaContext);
     let hasCombobox = false;
 
     const children = Children.map(props.children, (child) => {
@@ -216,6 +217,10 @@ export function createAriaValueContainer<IsMulti extends boolean>(
         // 붙인다 — "텍스트 입력 불가" 를 뜻하지만, combobox 의 `aria-readonly` 는
         // "값 변경 불가" 다. 우리 readOnly 상태와 일치시킨다.
         "aria-readonly": readOnly ? true : undefined,
+        // `Field required` 를 전한다. react-select 은 자기 `required` prop 에서만
+        // 이 값을 만들고 우리가 넘긴 것을 덮어쓴다 — 그 prop 은 네이티브 검증
+        // input 을 함께 만들어 쓸 수 없다 (Select.context.ts 의 `isRequired`).
+        "aria-required": isRequired ? true : undefined,
       });
     });
 
