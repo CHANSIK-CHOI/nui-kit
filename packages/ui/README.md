@@ -109,15 +109,17 @@ import "@nui-kit/react/styles/preflight.css";
 
 ```css
 :root {
-  --nui-button--lg-height: 3.75rem; /* 버튼 · large 옵션 · 높이 */
-  --nui-button--radius: 0;
+  --nui-button--large-height: 3.75rem; /* 버튼 · large 옵션 · 높이 */
+  --nui-button--square-radius: 0;
   --nui-button--border-width: 2px;
 }
 ```
 
 | 컴포넌트 | 공개 변수 |
 | --- | --- |
-| Button | `-lg-height` `-md-height` `-sm-height` · `-lg-padding-x` `-md-padding-x` `-sm-padding-x` · `-min-width` · `-radius` `-round-radius` · `-border-width` |
+| Button · ButtonLink | `-large-height` `-medium-height` `-small-height` · `-large-padding-x` `-medium-padding-x` `-small-padding-x` · `-text-padding-x` `-text-padding-y` · `-min-width` · `-gap` · `-square-radius` `-round-radius` · `-border-width` |
+| IconButton | `--nui-icon-button--large-size` `-medium-size` `-small-size` · `-square-radius` `-round-radius` · `-border-width` |
+| ButtonGroup | `--nui-button-group--gap` |
 | Popup | `-lg-width` `-md-width` `-sm-width` · `-radius` · `-border-width` |
 | Textfield | `-height` · `-radius` · `-border-width` |
 | Textarea | `-min-height` · `-radius` · `-border-width` |
@@ -128,9 +130,16 @@ import "@nui-kit/react/styles/preflight.css";
 | Tooltip | `-max-width` · `-radius` |
 | Checkbox · Radio · Switch | `--nui-selector--size` · `--nui-selector--border-width` · `--nui-switch--width` `--nui-switch--height` |
 
-크기 옵션이 있는 것은 옵션별로 이름이 나뉩니다. `--nui-button--md-height` 하나만 두면
+크기 옵션이 있는 것은 옵션별로 이름이 나뉩니다. `--nui-button--medium-height` 하나만 두면
 `:root` 에 값을 넣는 순간 large·medium·small 이 전부 같은 높이가 되어 크기 variant 가
 죽기 때문입니다.
+
+**옵션 이름은 prop 값 그대로입니다.** `size="large"` 면 `--large-`, `shape="round"` 면
+`--round-` 입니다. 코드에서 읽은 낱말을 그대로 찾을 수 있습니다.
+
+**컴포넌트가 다르면 변수 이름도 다릅니다.** `Button` 은 `--nui-button--`,
+`IconButton` 은 `--nui-icon-button--`, `ButtonGroup` 은 `--nui-button-group--` 입니다.
+`IconButton` 만 손볼 때 옆의 `Button` 이 따라 움직이지 않습니다.
 
 > ⚠️ **`--nui-_` 로 시작하는 변수는 내부 배선입니다.** variant 가 갈아끼우는 수단이므로
 > 덮어쓰면 variant 가 무력화됩니다. 공개 API 가 아니며 예고 없이 바뀔 수 있습니다.

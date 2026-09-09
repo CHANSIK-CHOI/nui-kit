@@ -30,14 +30,23 @@ const COMPONENTS_DIR = join(
 );
 const OUT = join(HERE, "..", "src", "generated", "hooks.json");
 
-/** 파일명 → 문서에 보일 컴포넌트 이름. 없으면 파일명을 그대로 쓴다. */
+/**
+ * 훅 접두어 → 문서에 보일 컴포넌트 이름.
+ *
+ * ⚠️ **파일이 아니라 접두어로 묶는다** (2026-09-09). `_button.scss` 한 파일이
+ *    `Button` · `IconButton` · `ButtonGroup` 셋을 그리는데, 파일로 묶으면 셋의 훅이
+ *    한 표에 섞여 소비자가 "IconButton 은 무엇을 열어 뒀나"를 못 읽는다.
+ *    접두어가 곧 컴포넌트이므로 그것이 묶는 단위다.
+ */
 const LABEL = {
   accordion: "Accordion",
-  button: "Button · IconButton · ButtonLink",
-  "choice-base": "Checkbox · Radio · Switch",
+  button: "Button · ButtonLink",
+  "button-group": "ButtonGroup",
   datepicker: "Datepicker 계열",
+  "icon-button": "IconButton",
   popup: "Popup 계열",
   select: "Select · MultiSelect",
+  selector: "Checkbox · Radio · Switch",
   switch: "Switch",
   textarea: "Textarea",
   textfield: "Textfield · Search · Password",
@@ -61,11 +70,27 @@ const PROPS = [
   "gap",
 ];
 
+/**
+ * 옵션 낱말 → 표에 보일 이름과 **종류**.
+ *
+ * 낱말은 prop 값 그대로다 (`size="large"` → `--large-`). 종류를 함께 두는 이유는
+ * 비고 칸이 "크기 large" 인지 "모양 round" 인지 "변형 text" 인지 말해야 하기
+ * 때문이다 — 예전에는 전부 「크기」로 찍혀 `round-radius` 가 "크기 round" 였다.
+ *
+ * ⚠️ `lg` · `md` · `sm` 은 **Popup 이 아직 쓰는 구 낱말**이다. Popup 이행이 끝나면
+ *    지운다.
+ */
 const OPTION_LABEL = {
-  lg: "large",
-  md: "medium (기본)",
-  sm: "small",
-  round: "round",
+  large: { label: "large", kind: "크기" },
+  medium: { label: "medium (기본)", kind: "크기" },
+  small: { label: "small", kind: "크기" },
+  square: { label: "square (기본)", kind: "모양" },
+  round: { label: "round", kind: "모양" },
+  text: { label: "text", kind: "변형" },
+  // Popup 이행 대기
+  lg: { label: "large", kind: "크기" },
+  md: { label: "medium (기본)", kind: "크기" },
+  sm: { label: "small", kind: "크기" },
 };
 
 /** `var(#{v("size-field")})` → `var(--nui-size-field)` · 공백 정리 */
@@ -95,69 +120,80 @@ function readArgument(text, from) {
 
 /** 훅 이름을 {컴포넌트}--{옵션?}-{요소?}-{속성} 으로 쪼갠다. 컴포넌트 뒤는 대시 두 개다 (KRDS 214쪽) */
 function parse(name) {
-  const rest = name.includes("--") ? name.slice(name.indexOf("--") + 2) : name;
+  const sep = name.indexOf("--");
+  const component = sep > 0 ? name.slice(0, sep) : name;
+  const rest = sep > 0 ? name.slice(sep + 2) : name;
   const prop = PROPS.find((p) => rest === p || rest.endsWith(`-${p}`));
-  if (!prop) return { prop: rest, option: null };
+  if (!prop) return { component, prop: rest, option: null };
 
   const parts = rest
     .slice(0, rest.length - prop.length)
     .split("-")
     .filter(Boolean);
   const option = parts[0] && OPTION_LABEL[parts[0]] ? parts[0] : null;
-  return { prop, option };
+  return { component, prop, option };
 }
 
 const files = readdirSync(COMPONENTS_DIR).filter((f) => f.endsWith(".scss"));
-const groups = [];
-let count = 0;
+
+/** 훅 접두어 → 훅 목록. 파일이 아니라 **컴포넌트**가 묶는 단위다. */
+const byComponent = new Map();
+/** 훅 이름 → 항목. 한 훅이 여러 자리·여러 파일에 걸치면 `places` 만 는다. */
+const byName = new Map();
 
 // ⚠️ 한 훅이 **여러 파일**에 걸치는 경우가 있다. `selector--border-width` 는 셋이
 //    공유하는 골격의 두께라 `_choice-base.scss` 가 소유하는데, `_switch.scss` 도
 //    여백을 그 값에서 역산하느라 함께 읽는다. 파일별로만 걸러내면 목록에 두 번
 //    올라가고, 소비자는 스위치 전용 훅이 따로 있는 줄 안다.
-//    **먼저 나온 파일이 소유자다** — 파일을 이름순으로 도는 것이 그 순서를 정한다.
-const ownedGlobally = new Map();
-
+//    이제 접두어로 묶으므로 이름이 같으면 처음 만난 자리가 소유자다.
 for (const file of files.sort()) {
-  const key = file.replace(/^_/, "").replace(/\.scss$/, "");
   const scss = readFileSync(join(COMPONENTS_DIR, file), "utf8");
 
-  const seen = new Map();
   // ⚠️ `hook(\s*"` — 줄바꿈까지 잡는다. `hook("` 로 세면 놓친다.
   for (const m of scss.matchAll(/hook\(\s*"([a-z0-9-]+)"\s*,/g)) {
     const name = m[1];
+    const existing = byName.get(name);
+    if (existing) {
+      existing.places += 1;
+      continue;
+    }
     const rawFallback = readArgument(scss, m.index + m[0].length);
-    if (seen.has(name)) {
-      seen.get(name).places += 1;
-      continue;
-    }
-    const owner = ownedGlobally.get(name);
-    if (owner) {
-      owner.places += 1;
-      continue;
-    }
-    const { prop, option } = parse(name);
-    seen.set(name, {
+    const { component, prop, option } = parse(name);
+    const entry = {
       name: `--nui-${name}`,
       fallback: readable(rawFallback),
       prop,
-      option: option ? OPTION_LABEL[option] : null,
+      option: option ? OPTION_LABEL[option].label : null,
+      optionKind: option ? OPTION_LABEL[option].kind : null,
       places: 1,
-    });
-    ownedGlobally.set(name, seen.get(name));
+    };
+    byName.set(name, entry);
+    if (!byComponent.has(component)) byComponent.set(component, []);
+    byComponent.get(component).push(entry);
   }
+}
 
-  if (seen.size === 0) continue;
-  groups.push({
+const groups = [...byComponent.entries()]
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([key, hooks]) => ({
     key,
     label: LABEL[key] ?? key,
-    hooks: [...seen.values()].sort((a, b) => a.name.localeCompare(b.name)),
-  });
-  count += seen.size;
-}
+    hooks: hooks.sort((a, b) => a.name.localeCompare(b.name)),
+  }));
+const count = byName.size;
+
+// 라벨을 안 붙인 컴포넌트가 있으면 표에 접두어가 그대로 나온다 — 알린다.
+const unlabeled = groups.filter((g) => !LABEL[g.key]).map((g) => g.key);
 
 mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify({ count, groups }, null, 2) + "\n", "utf8");
 console.log(
-  `✅ 공개 훅 추출 완료 — ${count}개 / ${groups.length}개 파일 → src/generated/hooks.json`,
+  `✅ 공개 훅 추출 완료 — ${count}개 / 컴포넌트 ${groups.length}개 → src/generated/hooks.json`,
 );
+for (const key of unlabeled) {
+  console.warn(`  ⚠️ 접두어 '${key}' 에 표시 이름(LABEL)이 없다`);
+}
+if (count === 0) {
+  console.error("❌ 훅을 하나도 못 찾았다 — 정규식이 낡았다");
+  process.exit(1);
+}

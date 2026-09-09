@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GuideHeader, DesignNote, PropsTable } from "@/components/guide";
+import { GuideHeader, ExceptionBadges, DesignNote, PropsTable } from "@/components/guide";
 import { AlertBasicDemo, AlertOptionsDemo } from "./AlertDemo";
 
 export const metadata = { title: "Alert" };
@@ -12,6 +12,8 @@ export default function AlertPage() {
         named={["useAlert", "Alert"]}
         subpath="popup"
       />
+
+      <ExceptionBadges items={[{ kind: "cappedWidth", target: "Alert" }]} />
 
       <p>
         알리는 팝업이다. 확인 버튼 하나가 유일한 출구라 dim 을 눌러도{" "}

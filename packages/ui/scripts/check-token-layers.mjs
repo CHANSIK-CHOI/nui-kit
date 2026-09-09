@@ -96,22 +96,43 @@ const HOOK_PROPS = [
 ];
 
 /**
- * 크기·모양 옵션. **컴포넌트 이름 바로 뒤**에 온다 —
- * `button--lg-height` 처럼 옵션별로 묶여야 소비자가 "lg 버튼을 통째로" 찾을 수 있다.
+ * 크기 · 모양 · 변형 옵션. **컴포넌트 이름 바로 뒤**에 온다 —
+ * `button--large-height` 처럼 옵션별로 묶여야 소비자가 "large 버튼을 통째로"
+ * 찾을 수 있다.
+ *
+ * ⚠️ 낱말은 **prop 값 그대로**다 (2026-09-09). 예전에는 `lg` · `md` · `sm` 이었는데
+ *    prop 은 `large` · `medium` · `small` 이라 **같은 개념이 두 낱말**이었다
+ *    (components.md §9 「같은 개념은 같은 이름」). 소비자가 코드에서 읽은 낱말을
+ *    그대로 검색할 수 있어야 한다.
  */
-const HOOK_OPTIONS = new Set(["lg", "md", "sm", "round"]);
+const HOOK_OPTIONS = new Set([
+  // size
+  "large",
+  "medium",
+  "small",
+  // shape
+  "square",
+  "round",
+  // variant
+  "text",
+]);
 
 /**
  * 훅 이름이 `{컴포넌트}--{옵션?}-{요소?}-{속성}` 을 지키는지. 문제가 없으면 null.
  *
  * 컴포넌트 이름 뒤에 **대시 두 개**를 둔다 — KRDS 디자인 토큰 표기(가이드 214쪽)다.
- * `--nui-button--md-height` 를 읽으면 "button 의 md 옵션의 height" 로 끊긴다.
+ * `--nui-button--medium-height` 를 읽으면 "button 의 medium 옵션의 height" 로 끊긴다.
  * 소비자가 `button--` 로 검색하면 버튼 훅만 모인다.
+ *
+ * ⚠️ 컴포넌트 이름은 **컴포넌트마다 다르다.** `IconButton` 은 `icon-button--`,
+ *    `ButtonGroup` 은 `button-group--` 이다. 한 SCSS 파일에 셋이 들어 있어도
+ *    이름을 나눈다 — 안 나누면 `IconButton` 만 손보려는 소비자가 `Button` 까지
+ *    움직인다.
  */
 function checkHookName(name) {
   const sep = name.indexOf("--");
   if (sep <= 0 || name.indexOf("--", sep + 2) !== -1) {
-    return "컴포넌트 이름 뒤에 대시 두 개가 정확히 한 번 와야 한다 (`button--md-height`)";
+    return "컴포넌트 이름 뒤에 대시 두 개가 정확히 한 번 와야 한다 (`button--medium-height`)";
   }
   const rest = name.slice(sep + 2);
   const prop = HOOK_PROPS.find((p) => rest === p || rest.endsWith(`-${p}`));
@@ -312,9 +333,7 @@ if (warnings.length > 0) {
   console.warn(
     `\n⚠️  구 토큰 이름 ${warnings.length}건 (파일 ${byFile.size}개) — 컴포넌트 반영 단계에서 정리한다.`,
   );
-  console.warn(
-    "   대응표는 이 스크립트의 DEPRECATED 맵이다\n",
-  );
+  console.warn("   대응표는 이 스크립트의 DEPRECATED 맵이다\n");
   for (const [file, n] of [...byFile].sort((a, b) => b[1] - a[1])) {
     console.warn(`   ${String(n).padStart(3)}건  ${file}`);
   }

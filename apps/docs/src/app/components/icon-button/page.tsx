@@ -8,6 +8,7 @@ import {
   Case,
   CaseGrid,
   CaseMatrix,
+  Example,
   HookTable,
   PropsTable,
 } from "@/components/guide";
@@ -135,7 +136,27 @@ export default function IconButtonPage() {
         전용 화면이나 다른 컨트롤 안에 들어갈 때만 쓴다.
       </div>
 
-      <HookTable group="button" />
+      <h2>커스터마이징</h2>
+      <p>
+        크기는 이름 하나가 가로와 세로를 함께 바꾼다. 변수는{" "}
+        <code>--nui-icon-button--</code> 으로 시작한다.{" "}
+        <Link href="/components/button">Button</Link> 과 이름이 달라서 한쪽만
+        바꿀 수 있다.
+      </p>
+      <Example
+        caption="medium 만 48px 에서 44px 로 줄인 예"
+        style={
+          { "--nui-icon-button--medium-size": "2.75rem" } as React.CSSProperties
+        }
+      >
+        <IconButton aria-label="검색">
+          <SearchIcon />
+        </IconButton>
+        <IconButton aria-label="검색" size="large">
+          <SearchIcon />
+        </IconButton>
+      </Example>
+      <HookTable group="icon-button" />
 
       <h2>API</h2>
       <PropsTable of="IconButton" />

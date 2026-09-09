@@ -963,6 +963,15 @@ const INPUT_AUX_REASON =
 const TOUCH_TARGETS = [
   // IconButton 은 2026-09-08 에 자기 페이지로 나갔다 — Button 페이지에는 없다
   ["IconButton", "/components/icon-button", ".nui-button--icon"],
+  // text 버튼은 2026-09-09 에 글자 폭이 됐다. 그 전에는 부모 폭이라 히트가 넓었고
+  // 이 자리가 검사 밖이었다 — 좁아진 지금부터 재야 한다.
+  [
+    "Button text",
+    "/components/button",
+    ".nui-button--text",
+    null,
+    "문장 안·목록 행 안에 놓이는 variant 라 세로 44 를 채우면 줄 간격이 벌어져 문단이 어긋나고, 가로는 글자 폭이 이 variant 의 정의다. 하한 24 를 쓴다",
+  ],
   [
     "Textfield 지우기",
     "/components/textfield",

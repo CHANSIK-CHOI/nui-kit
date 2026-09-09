@@ -146,8 +146,8 @@ export default function SpacingPage() {
       </div>
       <p>
         크기별 값은 단계마다 이름이 따로 있는 변수로 연다.{" "}
-        <code>--nui-button--lg-height</code> · <code>-md-height</code> ·{" "}
-        <code>-sm-height</code> 가 그렇다. 하나로 두면 값을 넣는 순간 세 단계가
+        <code>--nui-button--large-height</code> · <code>-medium-height</code> ·{" "}
+        <code>-small-height</code> 가 그렇다. 하나로 두면 값을 넣는 순간 세 단계가
         전부 같아진다. 자세한 것은{" "}
         <Link href="/foundations/customizing">커스터마이징</Link> 문서에 있다.
       </p>

@@ -79,10 +79,11 @@ export default function CustomizingPage() {
         이름은 컴포넌트, 옵션, 요소, 속성 순서로 붙는다. 읽으면 문장이 된다.
       </p>
       <pre className="doc-code">
-        <code>{`--nui-button--lg-height        버튼 · large 옵션 · 높이
---nui-button--radius           버튼 · 둥글기 (옵션 없음)
---nui-button--border-width     버튼 · 테두리 두께 (옵션 없음)
---nui-datepicker--day-size     달력 · 날짜 · 크기 (요소 있음)`}</code>
+        <code>{`--nui-button--large-height      버튼 · large 옵션 · 높이
+--nui-button--square-radius     버튼 · square 옵션 · 둥글기
+--nui-button--border-width      버튼 · 테두리 두께 (옵션 없음)
+--nui-icon-button--medium-size  아이콘 버튼 · medium 옵션 · 크기
+--nui-datepicker--day-size      달력 · 날짜 · 크기 (요소 있음)`}</code>
       </pre>
       <ul>
         <li>
@@ -90,13 +91,19 @@ export default function CustomizingPage() {
           한자리에 모이기 때문이다
         </li>
         <li>
-          옵션 이름은 큰 것부터 <code>lg</code> · <code>md</code> ·{" "}
-          <code>sm</code> 이고 기본은 <code>md</code> 다
+          옵션 이름은 prop 값 그대로다. <code>size=&quot;large&quot;</code> 면{" "}
+          <code>--large-</code>, <code>shape=&quot;round&quot;</code> 면{" "}
+          <code>--round-</code> 다
         </li>
         <li>
           크기 옵션마다 이름을 나눈다. 하나로 덮으면 세 크기가 전부 같아진다
         </li>
         <li>없는 옵션은 이름에 넣지 않는다. 테두리 두께는 컴포넌트당 하나다</li>
+        <li>
+          컴포넌트가 다르면 이름도 다르다. <code>Button</code> 은{" "}
+          <code>--nui-button--</code>, <code>IconButton</code> 은{" "}
+          <code>--nui-icon-button--</code> 다
+        </li>
       </ul>
 
       <h2>전체 목록</h2>
@@ -106,8 +113,8 @@ export default function CustomizingPage() {
       <pre className="doc-code">
         <code>{`/* 전역으로 — 모든 버튼 */
 :root {
-  --nui-button--radius: 0;
-  --nui-button--lg-height: 3.75rem;
+  --nui-button--square-radius: 0;
+  --nui-button--large-height: 3.75rem;
   --nui-button--border-width: 2px;
 }
 

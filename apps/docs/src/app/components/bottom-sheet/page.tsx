@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GuideHeader, DesignNote, PropsTable } from "@/components/guide";
+import { GuideHeader, ExceptionBadges, DesignNote, PropsTable } from "@/components/guide";
 import {
   BottomSheetDeclarativeDemo,
   BottomSheetImperativeDemo,
@@ -16,6 +16,8 @@ export default function BottomSheetPage() {
         named={["BottomSheet", "useBottomSheet"]}
         subpath="popup"
       />
+
+      <ExceptionBadges items={[{ kind: "cappedWidth", target: "BottomSheet" }]} />
 
       <p>
         화면 아래에서 올라오는 시트다. 공유하기 · 정렬 방식처럼 선택지 몇 개를

@@ -1,6 +1,7 @@
 import { ButtonLink } from "@nui-kit/react";
 import {
   GuideHeader,
+  ExceptionBadges,
   DesignNote,
   Case,
   CaseGrid,
@@ -30,7 +31,8 @@ export default function ButtonLinkPage() {
 
       <p>
         생김새는 <code>Button</code> 과 같고 누르는 대신 이동한다.{" "}
-        <code>href</code> 가 필수다.
+        <code>href</code> 가 필수다. 부모 폭을 채우고{" "}
+        <code>variant=&quot;text&quot;</code> 만 글자 폭이다.
       </p>
 
       <div className="doc-note">
@@ -60,6 +62,10 @@ export default function ButtonLinkPage() {
             </ButtonLink>
           </div>
         )}
+      />
+
+      <ExceptionBadges
+        items={[{ kind: "contentWidth", target: 'variant="text"' }]}
       />
 
       <h2>크기와 모양</h2>
@@ -108,6 +114,11 @@ export default function ButtonLinkPage() {
         </p>
       </DesignNote>
 
+      <h2>커스터마이징</h2>
+      <p>
+        <code>Button</code> 과 같은 변수를 쓴다. 한 요소만 바꾸려면{" "}
+        <code>className</code> 으로 그 요소에만 값을 준다.
+      </p>
       <HookTable group="button" />
 
       <h2>API</h2>

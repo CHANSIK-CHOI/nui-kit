@@ -6,6 +6,7 @@ import {
   ExceptionBadges,
   DesignNote,
   Example,
+  HookTable,
   PropsTable,
 } from "@/components/guide";
 
@@ -155,6 +156,13 @@ export default function ButtonGroupPage() {
           셋을 나누면 글자가 잘린다. 짧은 라벨은 번역 시 최대 2.5배까지 늘어난다.
         </p>
       </DesignNote>
+
+      <h2>커스터마이징</h2>
+      <p>
+        항목 사이 간격 하나를 연다. 간격을 바꾸면 각 항목의 기준 폭도 같이
+        따라간다. 그래서 간격을 얼마로 두든 두 항목이 정확히 반씩 나뉜다.
+      </p>
+      <HookTable group="button-group" />
 
       <h2>API</h2>
       <h3>ButtonGroup</h3>

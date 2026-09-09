@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GuideHeader, DesignNote, PropsTable } from "@/components/guide";
+import { GuideHeader, ExceptionBadges, DesignNote, PropsTable } from "@/components/guide";
 import {
   LayerPopupDeclarativeDemo,
   LayerPopupImperativeDemo,
@@ -20,6 +20,8 @@ export default function LayerPopupPage() {
         named={["LayerPopup", "useLayerPopup"]}
         subpath="popup"
       />
+
+      <ExceptionBadges items={[{ kind: "cappedWidth", target: "LayerPopup" }]} />
 
       <p>
         가운데 뜨는 대화상자다. 제목 · 본문 · 푸터를 갖고 dim 과 <kbd>Esc</kbd>{" "}

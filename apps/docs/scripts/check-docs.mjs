@@ -151,6 +151,64 @@ for (const p of glob("src/app/**/*.tsx")) {
 
 console.log(`  라벨 ${labelCount}개`);
 
+console.log("\n■ 설치 안내가 required peer 를 전부 담았나");
+// ⚠️ 2026-09-09 — `lucide-react` 를 peer 로 올렸을 때 README 만 고치고 문서 사이트
+//    두 곳을 놓쳤다. 안내대로 설치한 pnpm · yarn 소비자는 빌드가 깨진다.
+//    peer 목록은 package.json 이 정본이다 — 손으로 적은 목록을 믿지 않는다.
+{
+  const pkg = JSON.parse(
+    read(join(DOCS, "..", "..", "packages", "ui", "package.json")),
+  );
+  const optional = new Set(Object.keys(pkg.peerDependenciesMeta ?? {}));
+  const required = Object.keys(pkg.peerDependencies ?? {}).filter(
+    (name) => !optional.has(name),
+  );
+  // 설치 명령을 담은 페이지 — 여기가 늘면 목록에 더한다
+  const INSTALL_PAGES = ["get-started/page.mdx", "page.tsx"];
+  for (const rel of INSTALL_PAGES) {
+    const file = join(APP, rel);
+    if (!existsSync(file)) {
+      fail("설치 안내", `${rel} — 파일이 없다. 목록을 고친다`);
+      continue;
+    }
+    const body = read(file);
+    for (const name of required) {
+      checked++;
+      // react·react-dom 은 소비자가 이미 갖고 있으므로 설치 명령에 안 적는다.
+      if (name === "react" || name === "react-dom") continue;
+      if (!body.includes(name))
+        fail("설치 안내", `${rel} — required peer \`${name}\` 이 안 적혀 있다`);
+    }
+  }
+  console.log(`  required peer ${required.length}개 × 페이지 ${INSTALL_PAGES.length}`);
+}
+
+console.log("\n■ 폭 규칙의 예외에 배지가 있나");
+// design-system.md §7 표 — 부모 폭을 채우지 않는 것은 페이지 머리에 예외 배지를 둔다
+// (docs-voice §4 「공통 규칙에서 벗어나면 배지」). 2026-09-09 에 「상한이 있는 폭」 다섯이
+// 통째로 빠져 있었다. 표가 바뀌면 이 목록을 같이 고친다 — 규칙 문서는 프라이빗이라
+// 여기서 읽지 못한다.
+{
+  const WIDTH_BADGES = {
+    // 자기 치수
+    switch: "ownSize", checkbox: "ownSize", radio: "ownSize", "icon-button": "ownSize",
+    // 상한이 있는 폭 — Toast(420) · Popup 패널(360·480·640)
+    toast: "cappedWidth", "layer-popup": "cappedWidth", alert: "cappedWidth",
+    confirm: "cappedWidth", "bottom-sheet": "cappedWidth",
+    // 내용 폭
+    tooltip: "contentWidth", button: "contentWidth", "button-link": "contentWidth",
+  };
+  let n = 0;
+  for (const [slug, kind] of Object.entries(WIDTH_BADGES)) {
+    checked++; n++;
+    const file = join(APP, "components", slug, "page.tsx");
+    if (!existsSync(file)) { fail("폭 배지", `${slug} — 페이지가 없다. 목록을 고친다`); continue; }
+    if (!read(file).includes(`kind: "${kind}"`))
+      fail("폭 배지", `/components/${slug} — \`${kind}\` 배지가 없다 (design-system.md §7)`);
+  }
+  console.log(`  ${n}개 페이지`);
+}
+
 console.log(`\n검사 ${checked}건`);
 if (failures.length === 0) {
   console.log("\n✅ 문서 구조 검사 통과\n");

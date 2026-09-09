@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Field,
   FieldLabel,
@@ -13,7 +14,6 @@ import {
   CaseGrid,
   CaseMatrix,
   Example,
-  HookTable,
   PropsTable,
 } from "@/components/guide";
 
@@ -203,7 +203,12 @@ export default function FieldPage() {
       </Example>
 
       <h2>커스터마이징</h2>
-      <HookTable group="field" />
+      <p>
+        <code>Field</code> 는 여는 변수가 없다. 간격을 바꾸려면{" "}
+        <code>className</code> 으로 그 자리에만 준다. 안에 놓이는 컨트롤의
+        변수는 <Link href="/foundations/customizing">커스터마이징</Link> 에
+        모여 있다.
+      </p>
 
       <h2>API</h2>
       <h3>Field</h3>
@@ -212,6 +217,8 @@ export default function FieldPage() {
       <PropsTable of="Field.Item" />
       <h3>Field.Grid</h3>
       <PropsTable of="Field.Grid" />
+      <h3>Field.Label</h3>
+      <PropsTable of="Field.Label" />
       <h3>Field.Description</h3>
       <PropsTable of="Field.Description" />
       <h3>Field.Message</h3>

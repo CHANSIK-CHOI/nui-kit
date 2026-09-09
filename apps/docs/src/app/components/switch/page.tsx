@@ -86,7 +86,7 @@ export default function SwitchPage() {
         <code>Radio</code> 와 함께 쓰는 변수다.
       </p>
       <HookTable group="switch" />
-      <HookTable group="choice-base" />
+      <HookTable group="selector" />
 
       <h2>API</h2>
       <PropsTable of="Switch" />

@@ -143,7 +143,7 @@ export default function SizePage() {
       </p>
       <Example
         caption="large 만 높이를 바꾼다 — medium 은 그대로다"
-        style={{ "--nui-button--lg-height": "4rem" } as React.CSSProperties}
+        style={{ "--nui-button--large-height": "4rem" } as React.CSSProperties}
       >
         <Button size="large">덮어쓴 large</Button>
         <Button>medium 유지</Button>

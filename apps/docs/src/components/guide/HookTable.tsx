@@ -5,6 +5,8 @@ type Hook = {
   fallback: string;
   prop: string;
   option: string | null;
+  /** 옵션의 종류 — 크기 · 모양 · 변형. `option` 이 있으면 함께 있다 */
+  optionKind: string | null;
   places: number;
 };
 type Group = { key: string; label: string; hooks: Hook[] };
@@ -59,7 +61,9 @@ export function HookTable({ group }: { group?: string }) {
                   <code>{hook.fallback}</code>
                 </td>
                 <td className="doc-wrap">
-                  {hook.option ? `크기 ${hook.option}` : "—"}
+                  {hook.option
+                    ? `${hook.optionKind ?? "옵션"} ${hook.option}`
+                    : "—"}
                   {hook.places > 1
                     ? ` · ${hook.places}자리를 함께 움직인다`
                     : ""}

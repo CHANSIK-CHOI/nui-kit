@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GuideHeader, DesignNote, PropsTable } from "@/components/guide";
+import { GuideHeader, ExceptionBadges, DesignNote, PropsTable } from "@/components/guide";
 import { ConfirmBasicDemo, ConfirmAsyncDemo } from "./ConfirmDemo";
 
 export const metadata = { title: "Confirm" };
@@ -12,6 +12,8 @@ export default function ConfirmPage() {
         named={["useConfirm", "Confirm"]}
         subpath="popup"
       />
+
+      <ExceptionBadges items={[{ kind: "cappedWidth", target: "Confirm" }]} />
 
       <p>
         결정을 묻는 팝업이다. 취소와 확인 두 버튼이 출구이고 dim 과{" "}

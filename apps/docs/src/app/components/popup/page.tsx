@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GuideHeader, DesignNote, HookTable } from "@/components/guide";
+import { GuideHeader, PropsTable, DesignNote, HookTable } from "@/components/guide";
 
 export const metadata = { title: "Popup" };
 
@@ -275,6 +275,10 @@ const closeEverything = usePopupStore((s) => s.closeAll);`}</code>
         <Link href="/design-system/color">프리셋과 className</Link> 둘뿐이다.
       </p>
       <HookTable group="popup" />
+
+      <h2>API</h2>
+      <h3>PopupHost</h3>
+      <PropsTable of="PopupHost" />
     </>
   );
 }

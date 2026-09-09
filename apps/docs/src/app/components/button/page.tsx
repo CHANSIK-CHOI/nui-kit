@@ -41,17 +41,33 @@ export default function ButtonPage() {
     <>
       <GuideHeader title="Button" named={["Button"]} subpath="button" />
 
-      <ExceptionBadges items={[{ kind: "noSize", target: 'variant="text"' }]} />
+      <ExceptionBadges
+        items={[
+          { kind: "noSize", target: 'variant="text"' },
+          { kind: "contentWidth", target: 'variant="text"' },
+        ]}
+      />
 
       <p>
         <code>Button</code> 은 부모 폭을 채운다. 좁히려면 바깥 컨테이너로
         감싸거나 <Link href="/components/button-group">ButtonGroup</Link> 을
-        쓴다.
+        쓴다. <code>variant=&quot;text&quot;</code> 만 예외로 글자 폭이다.
       </p>
       <Example row={false} caption="컨테이너로 너비를 제한한 예">
         <div style={{ display: "flex", gap: 8, maxWidth: 320 }}>
           <Button variant="line">취소</Button>
           <Button color="primary">저장</Button>
+        </div>
+      </Example>
+      <Example
+        row={false}
+        caption="text 는 글자 폭이라 문장 안에 넣을 수 있다"
+        code={`<Button variant="text">전체 보기</Button>`}
+      >
+        <div style={{ maxWidth: 320 }}>
+          <p style={{ margin: 0 }}>
+            주문 3건을 불러왔다. <Button variant="text">전체 보기</Button>
+          </p>
         </div>
       </Example>
 
@@ -134,11 +150,18 @@ export default function ButtonPage() {
         <code>shape</code> 를 받지 않는다. 주면 타입 에러가 난다.
       </div>
 
-      <DesignNote title="왜 text 만 크기가 없나">
+      <DesignNote title="왜 text 만 크기도 폭도 다른가">
         <p>
           <code>text</code> 는 면도 테두리도 없어서 크기를 바꿔도 바뀌는 것이
           글자 주변의 빈 공간뿐이다. 문장 안이나 목록 행 안에 놓이는 자리라
           높이를 스스로 정하면 오히려 줄 간격이 어긋난다.
+        </p>
+        <p>
+          폭도 같은 이유로 예외다. 부모 폭을 채우면 글자는 왼쪽 끝에 있는데
+          줄 전체가 눌린다 — 그 사실은 hover 면이 켜지는 순간에야 드러난다.
+          최소 폭 120px 도 걸려서 두 글자짜리 버튼이 그만큼 자리를 차지했다.
+          누르는 범위는 세로 32px 이라 44px 에 못 미치지만, 문장 안에서 세로를
+          늘리면 줄 간격이 벌어진다. 하한 24px 을 지키는 자리로 둔다.
         </p>
         <p>
           타입에서 <code>ButtonDesignProps</code> 가 두 갈래 유니온이고{" "}
@@ -254,21 +277,35 @@ export default function ButtonPage() {
 
       <h2>커스터마이징</h2>
       <p>
-        치수는 크기 옵션마다 이름이 따로 있다. 하나로 두면 값을 넣는 순간 세
-        크기가 전부 같아진다.
+        변수 이름은 <strong>컴포넌트 · 옵션 · 속성</strong> 셋으로 끊긴다.
+        옵션은 prop 값 그대로다 — <code>size=&quot;large&quot;</code> 면{" "}
+        <code>--large-</code>, <code>shape=&quot;square&quot;</code> 면{" "}
+        <code>--square-</code> 다. 그래서 한 크기만 바꿔도 나머지는 그대로다.
       </p>
       <Example
         caption="large 만 높이를 바꾼다 — medium 은 그대로다"
+        code={`--nui-button--large-height: 4rem;
+--nui-button--square-radius: 999px;`}
         style={
           {
-            "--nui-button--lg-height": "4rem",
-            "--nui-button--radius": "999px",
+            "--nui-button--large-height": "4rem",
+            "--nui-button--square-radius": "999px",
           } as React.CSSProperties
         }
       >
         <Button size="large">덮어쓴 large</Button>
         <Button>medium 유지</Button>
       </Example>
+      <div className="doc-note">
+        <strong>컴포넌트가 다르면 변수 이름도 다르다.</strong>{" "}
+        <code>Button</code> 은 <code>--nui-button--</code>,{" "}
+        <Link href="/components/icon-button">IconButton</Link> 은{" "}
+        <code>--nui-icon-button--</code>,{" "}
+        <Link href="/components/button-group">ButtonGroup</Link> 은{" "}
+        <code>--nui-button-group--</code> 이다. 하나를 손볼 때 옆이 따라 움직이지
+        않는다. <code>ButtonLink</code> 는 <code>Button</code> 과 같은 변수를
+        쓴다.
+      </div>
       <p>
         색은 컴포넌트별로 열려 있지 않다. 버튼 하나의 색을 바꾸려면{" "}
         <code>className</code> 을, 화면 전체를 바꾸려면{" "}

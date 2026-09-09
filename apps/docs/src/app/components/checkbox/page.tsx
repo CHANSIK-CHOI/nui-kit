@@ -110,7 +110,7 @@ export default function CheckboxPage() {
         <code>Switch</code> 와 함께 쓴다. 색이 바뀌는 창구는{" "}
         <Link href="/design-system/color">프리셋과 className</Link> 둘뿐이다.
       </p>
-      <HookTable group="choice-base" />
+      <HookTable group="selector" />
 
       <h2>API</h2>
       <h3>Checkbox</h3>

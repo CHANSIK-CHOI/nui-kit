@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   GuideHeader,
+  ExceptionBadges,
   DesignNote,
   HookTable,
   PropsTable,
@@ -23,6 +24,8 @@ export default function ToastPage() {
         named={["useToast", "ToastHost", "Toast", "useToastStack"]}
         subpath="toast"
       />
+
+      <ExceptionBadges items={[{ kind: "cappedWidth", target: "Toast" }]} />
 
       <p>
         화면 아래에 잠깐 떴다 사라지는 알림이다. <code>useToast()</code> 로 열고
@@ -177,6 +180,8 @@ const isShowing = toasts.some((t) => t.status === "open");`}</code>
         그 둘은 <code>ToastHost</code> 가 넣는다.
       </p>
       <PropsTable of="Toast" />
+      <h3>ToastHost</h3>
+      <PropsTable of="ToastHost" />
     </>
   );
 }

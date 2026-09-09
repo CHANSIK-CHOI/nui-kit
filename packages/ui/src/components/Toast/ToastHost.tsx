@@ -11,7 +11,7 @@ const TOAST_ROOT_ID = px("toast-root");
 const PORTAL_CLASS = px("toast-portal");
 const STACK_CLASS = px("toast-stack");
 
-type ToastHostProps = {
+export type ToastHostProps = {
   children: ReactNode;
 };
 

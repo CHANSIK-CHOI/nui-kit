@@ -11,7 +11,7 @@ import usePopupHostA11y from "./usePopupHostA11y.js";
 
 const POPUP_ROOT_ID = px("popup-root");
 
-type PopupHostProps = {
+export type PopupHostProps = {
   children: ReactNode;
 };
 

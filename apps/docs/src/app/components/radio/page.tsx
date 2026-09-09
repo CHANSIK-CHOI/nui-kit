@@ -92,7 +92,7 @@ export default function RadioPage() {
         <code>Switch</code> 와 함께 쓴다. 색을 바꾸는 창구는{" "}
         <Link href="/design-system/color">프리셋과 className</Link> 뿐이다.
       </p>
-      <HookTable group="choice-base" />
+      <HookTable group="selector" />
 
       <h2>API</h2>
       <h3>Radio</h3>
