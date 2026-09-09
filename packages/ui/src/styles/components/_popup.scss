@@ -27,6 +27,11 @@
     position: fixed;
     inset: 0;
     z-index: var(#{v("z-overlay-layer")});
+    // ⚠️ 루트가 클릭을 안 받아야 dim 이 받는다. `__positioner` 가 화면 전체를 덮는
+    //    flex 상자라, 여기가 `none` 이 아니면 positioner 가 dim 위에서 클릭을 먹어
+    //    「dim 을 누르면 닫힌다」가 조용히 죽는다 (2026-09-09 · 문서를 쓰다 발견).
+    //    dim 과 panel 이 `auto` 로 다시 켠다.
+    pointer-events: none;
 
     &__dim {
       position: absolute;
