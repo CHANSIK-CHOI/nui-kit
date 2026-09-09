@@ -1012,12 +1012,19 @@ const TOUCH_TARGETS = [
       page.getByRole("button", { name: "프로필 수정" }).first().click(),
   ],
   ["Accordion 헤더", "/components/accordion", ".nui-accordion__button"],
+  // 모드 B — 화살표만 버튼. 첫 `.nui-accordion__button` 은 모드 A(넓은 헤더)라 이 자리가
+  // 측정되지 않고 있었다 (2026-09-09). 36 으로 보이고 44 를 누른다.
+  [
+    "Accordion 화살표 버튼",
+    "/components/accordion",
+    ".nui-accordion__button--icon",
+  ],
   [
     "Toast 액션",
     "/components/toast",
     ".nui-toast__action",
     async (page) =>
-      page.getByRole("button", { name: "액션 있는 토스트" }).first().click(),
+      page.getByRole("button", { name: "되돌리기 있는 토스트" }).first().click(),
   ],
   [
     "Toast 닫기",

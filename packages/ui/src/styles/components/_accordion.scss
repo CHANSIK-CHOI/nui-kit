@@ -120,6 +120,11 @@
       width: 100%;
       height: 100%;
       border-radius: var(#{v("radius-full")});
+      // 36px 로 보이지만 44px 을 누른다 (a11y.md §8-1 · 2026-09-09). 헤더가 위아래
+      // 여백 16 을 갖고 있어 이웃 화살표와 68px 떨어진다 — 4px 씩 넓혀도 안 겹친다.
+      // 검사는 `.nui-accordion__button` 의 첫 번째만 재고 있어 이 자리가 한 번도
+      // 측정된 적이 없었다 (spec Accordion.md §13 4번).
+      @include hit-area;
     }
 
     &__head {
