@@ -137,8 +137,6 @@ export type DatepickerBaseProps<
   hasConfirmButton?: boolean;
   /** 확정 버튼 문구. 소비자의 어휘·언어로 바꿀 수 있어야 한다 (a11y.md §9) */
   confirmLabel?: string;
-  /** 확정할 수 있는 임시 선택인가 — 미완성 범위에서 버튼을 잠근다 */
-  getIsConfirmable?: (selected: TSelected | undefined) => boolean;
   defaultIsCalendarOpen?: boolean;
   dropdownClassName?: string;
   /**
@@ -152,8 +150,18 @@ export type DatepickerBaseProps<
   inputRef?: Ref<HTMLInputElement>;
 };
 
-type DatepickerBaseInternalProps = {
+/**
+ * 공개 타입에 섞이지 않는 내부 prop. 셸이 base 에 넘기지만 소비자에게는 안 보인다.
+ *
+ * ⚠️ `getIsConfirmable` 이 2026-09-09 에 여기로 왔다. 예전에는 공개 props 에 있어서
+ *    모드마다 `Omit` 을 적어야 비공개가 됐고, **네 번째 모드를 만들 때 빠뜨리면 다시
+ *    열리는** 구조였다. 무엇이 확정 가능한 값인가는 컴포넌트가 소비자에게 하는 약속이라
+ *    (spec §6-8) 넘겨받을 자리가 아니다.
+ */
+type DatepickerBaseInternalProps<TSelected> = {
   onCalendarOpenChange?: (isOpen: boolean) => void;
+  /** 확정할 수 있는 임시 선택인가 — 미완성 범위에서 버튼을 잠근다 */
+  getIsConfirmable?: (selected: TSelected | undefined) => boolean;
 };
 
 export default function DatepickerBase<
@@ -193,7 +201,7 @@ export default function DatepickerBase<
   onKeyDown,
   ...restTextfieldProps
 }: DatepickerBaseProps<TSelected, TDayPickerProps> &
-  DatepickerBaseInternalProps) {
+  DatepickerBaseInternalProps<TSelected>) {
   // framer-motion 은 `prefers-reduced-motion` 을 자동으로 따르지 않는다
   // (`MotionConfig.reducedMotion` 기본값이 "never"). CSS duration 토큰의 1ms
   // 무력화도 framer-motion 이 읽지 않으므로 여기서 직접 처리한다 (a11y.md §6).
@@ -417,11 +425,27 @@ export default function DatepickerBase<
           event.key === "Enter" ||
           event.key === " ";
 
-      if (isOpenKey) {
+      // ⚠️ 확정 판단이 **여는 키 판단보다 앞**이다 (2026-09-09 · spec §6-3).
+      //    타이핑이 막힌 DateMultiplePicker 에서 Enter 는 여는 키라, 뒤에 두면 열린
+      //    달력에서 확정 대신 재-열기가 이긴다.
+      //
+      //    확정 버튼이 있는 모드에서 열린 달력의 Enter 는 **확정 버튼을 누른 것과 같다.**
+      //    예전에는 그냥 닫았고, 달력을 클릭해 고른 임시 선택이 조용히 버려졌다 —
+      //    「친 값은 이미 반영돼 있다」는 전제가 **타이핑에만** 성립했기 때문이다.
+      //    확정할 수 없으면 아무것도 하지 않는다. 버튼이 잠겨 있으면 키도 잠겨 있다.
+      const isConfirmKey =
+        hasConfirmButton && isCalendarOpen && event.key === "Enter";
+
+      if (isConfirmKey) {
+        // 확정 못 하는 동안에도 키는 달력이 먹는다 — 열린 달력을 남긴 채 폼이 제출되면
+        // 사용자는 가려진 에러를 보게 된다. 나갈 길은 Escape · 바깥 클릭 · 확정이다.
+        event.preventDefault();
+        if (isConfirmable) handleConfirm();
+      } else if (isOpenKey) {
         event.preventDefault();
         setIsCalendarOpenState(true);
       } else if (canTypeDate && event.key === "Enter" && isCalendarOpen) {
-        // 친 값은 이미 반영돼 있다. Enter 는 달력을 닫는 몫만 한다.
+        // 확정 버튼이 없는 모드다. 친 값은 이미 반영돼 있으므로 닫는 몫만 한다.
         event.preventDefault();
         setIsCalendarOpenState(false, true);
       }
@@ -463,6 +487,12 @@ export default function DatepickerBase<
     if (parsed === undefined) return;
 
     onSelectedChange?.(parsed);
+
+    // ⚠️ **타이핑이 임시 선택을 이긴다** (2026-09-09). 달력에서 시작일만 골라 둔 채
+    //    입력창에 완전한 기간을 치면, 값은 나갔는데 임시 선택은 `{ from }` 에 머물러
+    //    확정 버튼도 `Enter` 도 잠긴 채가 된다 — 나갈 길이 Escape·바깥 클릭뿐이었다.
+    //    방금 친 것이 사용자의 최신 의사이므로 임시 선택을 비운다 (spec §6-8).
+    setDraftSelected(null);
 
     const nextMonth = getDefaultMonth({ selected: parsed });
 
@@ -549,6 +579,11 @@ export default function DatepickerBase<
 
   const handleClear = () => {
     setDraftText(null);
+    // ⚠️ 임시 선택도 함께 버린다 (2026-09-09). 안 비우면 **지운 값이 확정으로 되살아난다** —
+    //    달력을 연 채 두 날짜를 고르고(임시 선택 생성) 지우기를 누르면 값은 비지만
+    //    확정 판정은 여전히 임시 선택을 보므로 버튼이 열려 있고, 누르면 방금 지운 값이
+    //    다시 나간다. 지우기 버튼은 root 안이라 달력이 닫히지도 않는다.
+    setDraftSelected(null);
     onSelectedChange?.(undefined);
     onClear?.();
   };

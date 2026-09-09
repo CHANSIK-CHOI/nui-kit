@@ -196,6 +196,44 @@ await page.waitForTimeout(400);
   ? ok("reset 이 입력창에 반영된다")
   : bad("reset 후에도 값이 남아 있다");
 
+// ── 입력창 Enter 는 확정 버튼과 같은 일을 한다 (2026-09-09 · spec §6-3)
+//
+// 예전에는 그냥 닫았고 달력으로 고른 임시 선택이 조용히 버려졌다 — 「친 값은 이미
+// 반영돼 있다」는 전제가 **타이핑에만** 성립했기 때문이다. 확정할 수 없으면 닫지도 않는다.
+const rangeInput = rangeForm.locator(".nui-datepicker input");
+await rangeInput.click();
+await page.waitForSelector(".nui-daypicker");
+const enterButtons = rangeForm.locator(
+  ".nui-daypicker__day-button:not([disabled])",
+);
+await enterButtons.nth(9).click(); // 시작일만 — 확정 불가
+await page.waitForTimeout(250);
+await rangeInput.press("Enter");
+await page.waitForTimeout(300);
+(await openCalendars()) > 0
+  ? ok("확정할 수 없을 때 Enter 는 달력을 닫지 않는다")
+  : bad("미완성 기간인데 Enter 가 달력을 닫았다 — 임시 선택이 버려진다");
+const afterDeadEnter = await readFormState(rangeForm);
+afterDeadEnter.stay === null
+  ? ok("확정할 수 없을 때 Enter 는 값도 내보내지 않는다")
+  : bad(`Enter 로 미완성 값이 나갔다: ${JSON.stringify(afterDeadEnter.stay)}`);
+
+await enterButtons.nth(13).click(); // 종료일 — 확정 가능
+await page.waitForTimeout(250);
+await rangeInput.press("Enter");
+await page.waitForTimeout(500);
+(await openCalendars()) === 0
+  ? ok("확정할 수 있을 때 Enter 가 달력을 닫는다")
+  : bad("확정 가능한데 Enter 가 닫지 않았다");
+const afterEnter = await readFormState(rangeForm);
+afterEnter.stay?.from && afterEnter.stay?.to
+  ? ok("Enter 가 확정한다 — from · to 가 폼에 들어간다")
+  : bad(
+      `Enter 로 확정되지 않았다: ${JSON.stringify(afterEnter.stay)} — 임시 선택이 버려졌다`,
+    );
+await rangeForm.locator("button", { hasText: "초기화" }).click();
+await page.waitForTimeout(400);
+
 // ── DateMultiplePicker ──────────────────────────────────────────────────
 console.log("\n■ DateMultiplePicker");
 await page.goto(PAGES.multiple, { waitUntil: "networkidle" });
@@ -212,6 +250,21 @@ await page.waitForTimeout(250);
   : bad("다중 선택 모드인데 첫 선택에 닫혔다");
 await multiButtons.nth(9).click();
 await page.waitForTimeout(250);
+// ⚠️ 타이핑이 막힌 모드에서 Enter 는 **여는 키**다. 확정 판단이 그보다 앞에 있어야
+//    열린 달력에서 재-열기가 아니라 확정이 된다 (2026-09-09 · spec §6-3).
+//    순서가 뒤집히면 **이 모드가 먼저 깨진다** — Range 케이스로는 안 잡힌다.
+await multiForm.locator(".nui-datepicker input").press("Enter");
+await page.waitForTimeout(500);
+(await openCalendars()) === 0
+  ? ok("타이핑이 막힌 모드에서도 Enter 가 확정한다 (재-열기가 아니다)")
+  : bad("Multiple 에서 Enter 가 달력을 닫지 않았다 — 확정보다 여는 키가 이겼다");
+const multiEnter = await readFormState(multiForm);
+multiEnter.extraDates?.length === 2
+  ? ok(`Enter 로 확정한 값이 폼에 들어간다 (${multiEnter.extraDates.length}개)`)
+  : bad(`Enter 확정이 안 됐다: ${JSON.stringify(multiEnter.extraDates)}`);
+await multiForm.locator(".nui-datepicker input").click();
+await page.waitForSelector(".nui-daypicker");
+
 // ⚠️ Escape 로 닫으면 임시 선택이 **버려진다** — 확정을 눌러야 값이 나간다.
 await confirmButton().click();
 await page.waitForTimeout(500);

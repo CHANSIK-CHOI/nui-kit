@@ -43,6 +43,11 @@ export default function DateRangePickerPage() {
         미완성 기간이면 버튼이 잠긴다. 확정하지 않고 <kbd>Esc</kbd> · 바깥
         클릭으로 닫으면 고른 것을 버리고 열기 전 값으로 돌아간다.
       </p>
+      <p>
+        입력창에서 <kbd>Enter</kbd> 를 눌러도 확정된다. 확정 버튼을 누른 것과
+        결과가 같다. 미완성 기간이면 <kbd>Enter</kbd> 도 아무 일을 하지 않는다 —
+        버튼이 잠겨 있는 동안은 키도 잠겨 있다.
+      </p>
       <DateRangePickerBasicDemo />
       <div className="doc-note">
         같은 날을 두 번 누르면 하루짜리 기간이 된다. 최소 일수를 두려면{" "}
@@ -109,10 +114,10 @@ export default function DateRangePickerPage() {
 
       <h2>API</h2>
       <p>
-        <code>Datepicker</code> 의 prop 에 확정 버튼 셋(
-        <code>hasConfirmButton</code> · <code>confirmLabel</code> ·{" "}
-        <code>getIsConfirmable</code>)이 더해진다. <code>selected</code> 의
-        타입은 <code>DateRange</code> 다.
+        <code>Datepicker</code> 의 prop 에 확정 버튼 둘(
+        <code>hasConfirmButton</code> · <code>confirmLabel</code>)이 더해진다.{" "}
+        <code>selected</code> 의 타입은 <code>DateRange</code> 다. 무엇이 확정
+        가능한 값인지는 컴포넌트가 정한다 — 시작일과 종료일이 둘 다 있어야 한다.
       </p>
       <PropsTable of="DateRangePicker" />
     </>

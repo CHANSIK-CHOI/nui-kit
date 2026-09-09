@@ -47,6 +47,11 @@ export default function DateMultiplePickerPage() {
         <kbd>Esc</kbd> · 바깥 클릭으로 닫으면 고른 것을 버리고 열기 전 값으로
         돌아간다.
       </p>
+      <p>
+        입력창에서 <kbd>Enter</kbd> 를 눌러도 확정된다. 확정 버튼을 누른 것과
+        결과가 같다. 하나도 고르지 않았으면 <kbd>Enter</kbd> 도 아무 일을 하지
+        않는다.
+      </p>
       <DateMultiplePickerBasicDemo />
 
       <DesignNote title="왜 직접 입력이 없나">
@@ -97,11 +102,12 @@ export default function DateMultiplePickerPage() {
 
       <h2>API</h2>
       <p>
-        <code>Datepicker</code> 의 prop 에 확정 버튼 셋(
-        <code>hasConfirmButton</code> · <code>confirmLabel</code> ·{" "}
-        <code>getIsConfirmable</code>)이 더해지고, 직접 입력에 관한{" "}
-        <code>parseDisplayValue</code> · <code>isTextInputBlocked</code> 가
-        빠진다. <code>selected</code> 의 타입은 <code>Date[]</code> 다.
+        <code>Datepicker</code> 의 prop 에 확정 버튼 둘(
+        <code>hasConfirmButton</code> · <code>confirmLabel</code>)이 더해지고,
+        직접 입력에 관한 <code>parseDisplayValue</code> ·{" "}
+        <code>isTextInputBlocked</code> 가 빠진다. <code>selected</code> 의
+        타입은 <code>Date[]</code> 다. 무엇이 확정 가능한 값인지는 컴포넌트가
+        정한다 — 하나 이상 골라야 한다.
       </p>
       <PropsTable of="DateMultiplePicker" />
     </>

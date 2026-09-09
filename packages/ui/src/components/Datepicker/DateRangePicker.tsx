@@ -23,7 +23,10 @@ type DateRangePickerBaseProps = DatepickerBaseProps<
 
 export type DateRangePickerProps = Omit<
   DateRangePickerBaseProps,
-  "formatDisplayValue" | "getDefaultMonth" | "mode" | "getShouldCloseOnSelect"
+  | "formatDisplayValue"
+  | "getDefaultMonth"
+  | "getShouldCloseOnSelect"
+  | "mode"
 > & {
   formatDisplayValue?: DateRangePickerBaseProps["formatDisplayValue"];
   parseDisplayValue?: DateRangePickerBaseProps["parseDisplayValue"];

@@ -29,7 +29,6 @@ export type DatepickerProps = Omit<
   | "confirmLabel"
   | "formatDisplayValue"
   | "getDefaultMonth"
-  | "getIsConfirmable"
   | "getShouldCloseOnSelect"
   | "hasConfirmButton"
   | "mode"
