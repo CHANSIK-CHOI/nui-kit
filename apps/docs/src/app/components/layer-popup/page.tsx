@@ -1,6 +1,12 @@
 import Link from "next/link";
-import { GuideHeader, PropsTable } from "@/components/guide";
-import { LayerPopupDemo } from "./LayerPopupDemo";
+import { GuideHeader, DesignNote, PropsTable } from "@/components/guide";
+import {
+  LayerPopupDeclarativeDemo,
+  LayerPopupImperativeDemo,
+  LayerPopupOptionsDemo,
+  LayerPopupCloseDemo,
+  LayerPopupStackDemo,
+} from "./LayerPopupDemo";
 import { PopupSizeDemo } from "./PopupSizeDemo";
 
 export const metadata = { title: "LayerPopup" };
@@ -14,99 +20,93 @@ export default function LayerPopupPage() {
         subpath="popup"
       />
 
-      <LayerPopupDemo />
+      <p>
+        가운데 뜨는 대화상자다. 제목 · 본문 · 푸터를 갖고 dim 과 <kbd>Esc</kbd>{" "}
+        · 닫기 버튼으로 닫힌다. 선언형으로 직접 그리거나{" "}
+        <code>useLayerPopup()</code> 으로 연다. 두 길의 차이는{" "}
+        <Link href="/components/popup">Popup</Link> 에 있다.
+      </p>
+
+      <h2>선언형</h2>
+      <p>
+        <code>open</code> 을 쓰는 쪽이 갖는다. 컴포넌트는 닫아 달라고{" "}
+        <code>onRequestClose</code> 로 요청만 하고, 실제로 <code>open</code> 을
+        내리는 것은 쓰는 쪽이다.
+      </p>
+      <LayerPopupDeclarativeDemo />
+
+      <h2>명령형</h2>
+      <p>
+        <code>useLayerPopup().open({"{ component }"})</code> 에 내용 컴포넌트를
+        넘긴다. <code>PopupHost</code> 가 <code>open</code> ·{" "}
+        <code>onRequestClose</code> · <code>onCloseComplete</code> ·{" "}
+        <code>isTopmost</code> 를 넣어 렌더하므로 그 넷을 셸에 그대로 넘긴다.
+      </p>
+      <LayerPopupImperativeDemo />
 
       <h2>크기</h2>
       <p>
-        <code>size</code> 는 폭만 바꾼다. 다섯 종류 중 LayerPopup 만 크기를
-        받는다. BottomSheet 와 FullPopup 은 화면에 맞춰 자기 폭을 갖는다.
+        <code>size</code> 는 폭만 바꾼다. 다섯 중 LayerPopup 만 크기를 받는다.
+        BottomSheet 와 FullPopup 은 화면에 맞춰 자기 폭을 갖는다.
       </p>
       <PopupSizeDemo />
 
+      <h2>본문 정렬 · 아이콘 · 닫기 버튼</h2>
+      <p>
+        <code>contentAlign</code> 의 기본은 <code>left</code> 다. 짧은 안내 한
+        줄이면 <code>center</code> 가 어울린다. <code>icon</code> 을 주면 제목
+        위에 놓이고 <code>hasCloseButton={"{false}"}</code> 면 헤더의 × 가
+        없어진다.
+      </p>
+      <LayerPopupOptionsDemo />
+
       <h2>닫힘</h2>
       <p>
-        컴포넌트는 닫아 달라고 <strong>요청</strong>만 한다.{" "}
-        <code>onRequestClose</code> 가 dim 클릭 · ESC · 닫기 버튼에서 불리고,
-        실제로 <code>open</code> 을 내리는 것은 소비자다. 닫기 버튼만 따로 잡고
-        싶으면 <code>onClickClose</code> 를 쓴다. 둘 다 있으면{" "}
-        <code>onClickClose</code> 가 먼저, 그다음 <code>onRequestClose</code> 가
-        호출된다.
+        <code>onRequestClose</code> 는 dim 클릭 · <kbd>Esc</kbd> · 닫기 버튼
+        셋에서 불린다. 닫기 버튼만 따로 잡으려면 <code>onClickClose</code> 를
+        쓴다. 둘 다 있으면 <code>onClickClose</code> 가 먼저다. 닫힘 모션까지
+        끝난 순간은 <code>onCloseComplete</code> 다.
       </p>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>prop</th>
-              <th>기본값</th>
-              <th>효과</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <code>shouldCloseOnBackdrop</code>
-              </td>
-              <td>
-                <code>true</code>
-              </td>
-              <td className="doc-wrap">dim 클릭으로 닫힘 요청</td>
-            </tr>
-            <tr>
-              <td>
-                <code>shouldCloseOnEscape</code>
-              </td>
-              <td>
-                <code>true</code>
-              </td>
-              <td className="doc-wrap">ESC 로 닫힘 요청. 최상단일 때만</td>
-            </tr>
-            <tr>
-              <td>
-                <code>hasCloseButton</code>
-              </td>
-              <td>
-                <code>true</code>
-              </td>
-              <td className="doc-wrap">
-                헤더의 × 버튼. 제목이 없어도 버튼이 있으면 헤더가 렌더된다
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <code>onCloseComplete</code>
-              </td>
-              <td>—</td>
-              <td className="doc-wrap">
-                닫힘 애니메이션까지 끝난 뒤. 언마운트 타이밍을 잡을 때
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <LayerPopupCloseDemo />
+
+      <h2>겹쳐 열기</h2>
+      <p>
+        선언형으로 둘을 겹칠 때는 아래쪽에 <code>isTopmost={"{false}"}</code> 를
+        준다. 맨 위 팝업만 <kbd>Esc</kbd> 와 포커스 트랩을 처리한다. 명령형은{" "}
+        <code>PopupHost</code> 가 계산한다.
+      </p>
+      <LayerPopupStackDemo />
+
+      <DesignNote title="왜 isTopmost 의 기본이 true 인가">
+        <p>
+          <code>false</code> 를 기본으로 두면 첫 포커스 이동 · 포커스 트랩 ·{" "}
+          <kbd>Esc</kbd> 셋이 조용히 죽는다. 화면도 마우스도 멀쩡해서 키보드
+          사용자만 겪는다. 선언형에서 팝업을 하나만 띄우는 대부분의 자리에서
+          답은 <code>true</code> 이고, 겹칠 때만 아래쪽이 <code>false</code> 다.
+        </p>
+      </DesignNote>
 
       <h2>접근성</h2>
       <ul>
         <li>
-          제목이 없으면 <code>aria-label=&quot;레이어 팝업&quot;</code> 이
-          붙는다. <code>dialogLabel</code> 로 바꾼다
+          제목이 <code>aria-labelledby</code> 로 붙는다. 제목이 없으면{" "}
+          <code>dialogLabel</code> 을 준다. 둘 다 없으면 타입이 막는다
         </li>
         <li>
-          닫기 버튼의 접근 이름은 <code>closeLabel</code>
-          (기본 &quot;팝업 닫기&quot;)이고, 40px 로 보이지만 44px 을 누른다.
-          마크업에서는 패널의 마지막 요소라 첫 포커스는 본문·푸터로 간다
+          닫기 버튼의 접근 이름은 <code>closeLabel</code>(기본 「팝업 닫기」)
+          이다. 마크업의 마지막이라 첫 포커스는 본문 · 푸터로 간다
         </li>
+        <li>본문이 넘치면 위아래에 선이 생겨 더 있음을 알린다</li>
         <li>
-          본문 정렬 <code>contentAlign</code> 의 기본은 <code>left</code> 다. 긴
-          글은 왼쪽 정렬이 읽기 쉽다
-        </li>
-        <li>
-          포커스 트랩 · 배경 inert · 쌓임 · 모션 감소 등 공통 계약은{" "}
-          <Link href="/components/popup">Popup 개요</Link>
+          포커스 트랩 · 배경 inert · 쌓임 · 모션 감소는{" "}
+          <Link href="/components/popup">Popup</Link> 과 같다
         </li>
       </ul>
 
       <h2>API</h2>
-      <h3>LayerPopup</h3>
+      <p>
+        <code>title</code> 과 <code>dialogLabel</code> 중 하나는 있어야 한다.
+      </p>
       <PropsTable of="LayerPopup" />
     </>
   );

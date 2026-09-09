@@ -1009,7 +1009,7 @@ const TOUCH_TARGETS = [
     ".nui-popup__close",
     // Alert 은 닫기 버튼이 없다. 헤더가 있는 LayerPopup 을 연다.
     async (page) =>
-      page.getByRole("button", { name: "프로필 팝업" }).first().click(),
+      page.getByRole("button", { name: "프로필 수정" }).first().click(),
   ],
   ["Accordion 헤더", "/components/accordion", ".nui-accordion__button"],
   [

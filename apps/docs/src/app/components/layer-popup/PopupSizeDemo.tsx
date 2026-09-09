@@ -18,7 +18,7 @@ export function PopupSizeDemo() {
     <>
       <CaseGrid
         columns={3}
-        caption="size 는 dialog 형태에만 적용된다"
+        caption="size 는 dialog 형태에만 적용된다."
         code={`<LayerPopup open={isOpen} size="large" title="제목">내용</LayerPopup>`}
       >
         {SIZES.map(([size, width]) => (

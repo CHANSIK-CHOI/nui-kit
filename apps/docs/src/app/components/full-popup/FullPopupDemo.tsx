@@ -7,9 +7,38 @@ import {
   useFullPopup,
   type FullPopupComponentProps,
 } from "@nui-kit/react/popup";
-import { Example } from "@/components/guide";
+import { Case, CaseGrid, Example } from "@/components/guide";
 
-/** 명령형으로 등록할 전체 팝업 내용. PopupHost 가 런타임 props 를 주입한다. */
+export function FullPopupDeclarativeDemo() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      <Example
+        caption="open 을 쓰는 쪽이 갖는다"
+        code={`<FullPopup open={isOpen} onRequestClose={() => setIsOpen(false)} title="상품 상세">…</FullPopup>`}
+      >
+        <Button size="medium" variant="line" onClick={() => setIsOpen(true)}>
+          상품 상세 보기
+        </Button>
+      </Example>
+
+      <FullPopup
+        open={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+        title="상품 상세"
+        footer={<Button onClick={() => setIsOpen(false)}>장바구니 담기</Button>}
+      >
+        <p style={{ color: "var(--nui-text-secondary)" }}>
+          화면 전체를 덮고 오른쪽에서 들어옵니다. 긴 내용은 본문 안에서
+          스크롤됩니다.
+        </p>
+      </FullPopup>
+    </>
+  );
+}
+
+/** 명령형으로 등록할 전체 팝업 내용. PopupHost 가 런타임 props 를 넣는다. */
 function DetailPopup({
   open,
   onRequestClose,
@@ -22,70 +51,78 @@ function DetailPopup({
       onRequestClose={onRequestClose}
       onCloseComplete={onCloseComplete}
       isTopmost={isTopmost}
-      title="상세 정보"
-      footer={
-        <Button color="primary" onClick={onRequestClose}>
-          닫기
-        </Button>
-      }
+      title="주문 상세"
+      footer={<Button onClick={onRequestClose}>닫기</Button>}
     >
       <p style={{ color: "var(--nui-text-secondary)" }}>
-        명령형으로 등록한 전체 팝업입니다. 긴 내용은 본문 영역 안에서
-        스크롤됩니다.
+        명령형으로 연 전체 팝업입니다. 배경은 inert 가 되고 스크롤이 잠깁니다.
       </p>
     </FullPopup>
   );
 }
 
-export function FullPopupDemo() {
+export function FullPopupImperativeDemo() {
   const fullPopup = useFullPopup();
-  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Example
+      caption="내용 컴포넌트를 등록해서 연다"
+      code={`fullPopup.open({ component: DetailPopup });`}
+    >
+      <Button
+        size="medium"
+        onClick={() => fullPopup.open({ component: DetailPopup })}
+      >
+        주문 상세 보기
+      </Button>
+    </Example>
+  );
+}
+
+type OptionKey = "center" | "noClose";
+
+export function FullPopupOptionsDemo() {
+  const [open, setOpen] = useState<OptionKey | null>(null);
+  const close = () => setOpen(null);
 
   return (
     <>
-      <h2>선언형 — 열림 상태를 직접 소유</h2>
-      <Example
-        caption="open · onRequestClose · isTopmost"
-        code={`<FullPopup open={isOpen} onRequestClose={() => setIsOpen(false)} isTopmost title="상세 정보">…</FullPopup>`}
+      <CaseGrid
+        columns={2}
+        code={`<FullPopup contentAlign="center" />
+<FullPopup hasCloseButton={false} />`}
       >
-        <Button size="medium" variant="line" onClick={() => setIsOpen(true)}>
-          FullPopup 열기
-        </Button>
-      </Example>
+        <Case label='contentAlign="center"' note="짧은 안내">
+          <Button variant="line" onClick={() => setOpen("center")}>
+            가운데 정렬 열기
+          </Button>
+        </Case>
+        <Case label="hasCloseButton={false}" note="푸터 버튼과 Esc 로만">
+          <Button variant="line" onClick={() => setOpen("noClose")}>
+            닫기 버튼 없이 열기
+          </Button>
+        </Case>
+      </CaseGrid>
 
       <FullPopup
-        open={isOpen}
-        onRequestClose={() => setIsOpen(false)}
-        isTopmost
-        title="상세 정보"
-        footer={
-          <Button color="primary" onClick={() => setIsOpen(false)}>
-            닫기
-          </Button>
-        }
+        open={open === "center"}
+        onRequestClose={close}
+        contentAlign="center"
+        title="가입을 완료했습니다"
+        description="이제 모든 기능을 쓸 수 있습니다."
+        footer={<Button onClick={close}>시작하기</Button>}
+      />
+      <FullPopup
+        open={open === "noClose"}
+        onRequestClose={close}
+        hasCloseButton={false}
+        title="본인 확인"
+        footer={<Button onClick={close}>확인했습니다</Button>}
       >
         <p style={{ color: "var(--nui-text-secondary)" }}>
-          화면 전체를 덮고 오른쪽에서 슬라이드해 들어옵니다. 노치·홈 인디케이터
-          영역(safe-area)을 피해 여백이 잡힙니다.
+          × 가 없으면 푸터 버튼과 Esc 만 남으므로, 닫는 버튼은 푸터에 둡니다.
         </p>
       </FullPopup>
-
-      <h2>명령형 — 컴포넌트를 등록해서 열기</h2>
-      <p>
-        <code>useFullPopup().open({"{ component }"})</code> 로 내용 컴포넌트를
-        넘긴다.
-      </p>
-      <Example
-        caption="useFullPopup().open({ component })"
-        code={`fullPopup.open({ component: DetailPopup });`}
-      >
-        <Button
-          size="medium"
-          onClick={() => fullPopup.open({ component: DetailPopup })}
-        >
-          상세 팝업
-        </Button>
-      </Example>
     </>
   );
 }
