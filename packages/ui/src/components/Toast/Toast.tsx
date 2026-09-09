@@ -58,9 +58,17 @@ export default function Toast({
   const shouldReduceMotion = useReducedMotion();
 
   const hasOpenedRef = useRef(false);
+  // ⚠️ 닫힐 때는 초기화하지 않는다 (2026-09-09). AnimatePresence 는 나가는 요소를
+  //    열렸을 때의 props 로 얼려 두므로, 퇴장 모션이 끝나면 그 얼린
+  //    `onAnimationComplete` 가 다시 불린다. `open` 이 바뀔 때마다 초기화하면
+  //    그 호출이 통과해 `onOpenComplete` 가 닫힐 때 한 번 더 난다 — 실측
+  //    `onOpenComplete → onRequestClose → onOpenComplete → onCloseComplete`.
+  //    열릴 때만 초기화하고, 판정은 얼린 closure 가 아니라 최신 `open` 으로 한다.
+  const openRef = useRef(open);
+  openRef.current = open;
 
   useEffect(() => {
-    hasOpenedRef.current = false;
+    if (open) hasOpenedRef.current = false;
   }, [open]);
 
   // ⚠️ 콜백을 ref 로 받아 타이머 effect 의 의존성에서 뺀다.
@@ -114,7 +122,7 @@ export default function Toast({
   }, [duration, isPaused, open]);
 
   const handleAnimationComplete = () => {
-    if (!open || hasOpenedRef.current) return;
+    if (!openRef.current || hasOpenedRef.current) return;
 
     hasOpenedRef.current = true;
     onOpenComplete?.();

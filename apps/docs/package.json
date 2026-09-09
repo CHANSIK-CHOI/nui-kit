@@ -13,6 +13,7 @@
     "verify:select-rhf": "node scripts/check-select-rhf.mjs",
     "verify:datepicker": "node scripts/check-datepicker.mjs",
     "verify:popup": "node scripts/check-popup.mjs",
+    "verify:feedback": "node scripts/check-feedback.mjs",
     "verify:a11y": "node scripts/check-a11y.mjs",
     "verify:docs": "node scripts/check-docs.mjs"
   },

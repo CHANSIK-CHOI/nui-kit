@@ -52,6 +52,11 @@ export type TooltipPlacement =
  * 소비자가 Provider 를 감싸야 하고, 감싸지 않으면 조용히 동작하지 않는다.
  */
 let lastTooltipClosedAt = 0;
+// ⚠️ 「닫힌 시각」이 아니라 「닫히기 시작한 시각」이다 (2026-09-09). 실제로 닫히는
+//    것은 마우스가 떠난 `closeDelay`(100ms) 뒤인데, 툴바를 쓸며 지나가면 이웃에
+//    닿는 것이 그보다 빠르다(실측 11ms). 닫힌 순간만 적으면 이웃이 「직전에 열려
+//    있었나」를 못 보고 400ms 를 다시 기다린다 — 실측 484ms. 그래서 hover 가
+//    열린 툴팁을 떠나는 순간에도 적는다.
 
 /** 이 시간 안에 이웃이 열리면 즉시 연다 */
 const INSTANT_WINDOW_MS = 300;
@@ -252,6 +257,11 @@ export default function Tooltip({
   const closeByHover = useCallback(() => {
     clearHoverTimer();
 
+    // 열려 있던 것을 떠난다 — 이웃이 즉시 열릴 수 있게 지금 적는다 (위 주석).
+    if (resolvedOpen) {
+      lastTooltipClosedAt = Date.now();
+    }
+
     if (closeDelay <= 0) {
       setTooltipOpenState(false);
 
@@ -262,7 +272,7 @@ export default function Tooltip({
       hoverTimerRef.current = null;
       setTooltipOpenState(false);
     }, closeDelay);
-  }, [clearHoverTimer, closeDelay, setTooltipOpenState]);
+  }, [clearHoverTimer, closeDelay, resolvedOpen, setTooltipOpenState]);
 
   // ── portal 컨테이너
   //
