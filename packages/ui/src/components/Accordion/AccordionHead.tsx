@@ -4,6 +4,7 @@ import cn from "classnames";
 import { ChevronDown } from "lucide-react";
 import { type HTMLAttributes, type ReactNode } from "react";
 import { px } from "../../internal/prefix.js";
+import Icon from "../Icon/Icon.js";
 import AccordionButton from "./AccordionButton.js";
 import { useAccordionContext } from "./Accordion.context.js";
 
@@ -33,10 +34,7 @@ export default function AccordionHead({
       : undefined;
 
   return (
-    <div
-      {...rest}
-      className={cn(`${block}__head`, className)}
-    >
+    <div {...rest} className={cn(`${block}__head`, className)}>
       <div id={titleId} className={`${block}__title-box`}>
         {children ? <div className={`${block}__title`}>{children}</div> : null}
       </div>
@@ -50,13 +48,10 @@ export default function AccordionHead({
             aria-label={titleId ? undefined : toggleLabel}
             aria-labelledby={titleId}
           >
-            <ChevronDown
-              className={`${block}__arrow-icon`}
-              aria-hidden="true"
-            />
+            <Icon icon={<ChevronDown />} className={`${block}__arrow-icon`} />
           </AccordionButton>
         ) : (
-          <ChevronDown className={`${block}__arrow-icon`} aria-hidden="true" />
+          <Icon icon={<ChevronDown />} className={`${block}__arrow-icon`} />
         )}
       </span>
     </div>

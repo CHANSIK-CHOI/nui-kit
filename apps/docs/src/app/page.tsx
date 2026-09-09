@@ -11,13 +11,14 @@ export default function HomePage() {
 
       <h2>설치</h2>
       <pre className="doc-code">
-        <code>npm install @nui-kit/react</code>
+        <code>npm install @nui-kit/react lucide-react</code>
       </pre>
       <p>
         peer dependency 는 <code>react</code> · <code>react-dom</code> ·{" "}
-        <code>next</code> 셋이다. <code>next</code> 는{" "}
-        <code>ButtonLink</code> 가 <code>next/link</code> 를 쓰고 그것이 배럴로
-        나가므로 필수다. <code>react-hook-form</code> 만{" "}
+        <code>next</code> · <code>lucide-react</code> 넷이다. <code>next</code>{" "}
+        는 <code>ButtonLink</code> 가 <code>next/link</code> 를 쓰고 그것이
+        배럴로 나가므로 필수다. <code>lucide-react</code> 는 아이콘 세트이고
+        소비자 프로젝트와 한 벌을 나눠 쓴다. <code>react-hook-form</code> 만{" "}
         <code>optional</code> 이고 RHF 래퍼를 쓸 때 설치한다.
       </p>
       <pre className="doc-code">

@@ -22,6 +22,7 @@ import {
   reduceMotion,
   reduceMotionTransition,
 } from "../../internal/motion.js";
+import Icon from "../Icon/Icon.js";
 import SelectAriaContext from "./Select.context.js";
 import { SELECT_BLOCK } from "./SelectBase.js";
 import type { SelectOption } from "./Select.types.js";
@@ -45,7 +46,7 @@ export function NuiDropdownIndicator<IsMulti extends boolean>(
 ) {
   return (
     <reactSelectComponents.DropdownIndicator {...props}>
-      <ChevronDown aria-hidden="true" />
+      <Icon icon={<ChevronDown />} />
     </reactSelectComponents.DropdownIndicator>
   );
 }
@@ -55,7 +56,7 @@ export function NuiClearIndicator<IsMulti extends boolean>(
 ) {
   return (
     <reactSelectComponents.ClearIndicator {...props}>
-      <X aria-hidden="true" />
+      <Icon icon={<X />} />
     </reactSelectComponents.ClearIndicator>
   );
 }
@@ -137,7 +138,7 @@ export function NuiMultiValueRemove<IsMulti extends boolean>({
       onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
-      <X aria-hidden="true" />
+      <Icon icon={<X />} />
     </button>
   );
 }

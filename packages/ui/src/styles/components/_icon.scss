@@ -9,20 +9,29 @@
 }
 
 @layer nui.components {
-  #{cls("icon")} {
+  // ⚠️ `:where()` 로 상세도를 0 으로 낮춘다 (2026-09-09).
+  //
+  // 아이콘은 **자리가 크기를 정하고** 자리가 없을 때만 부모를 채운다. 그런데
+  // 슬롯 규칙(`__arrow-icon` · `__chevron`)도 클래스 하나라 상세도가 같아,
+  // 소스 순서를 바꾸면 화살표 16px 이 슬롯을 통째로 채우는 쪽으로 조용히 뒤집힌다.
+  // 순서에 기대지 않는다 — styles.md §7 과 같은 이유다.
+  //
+  // 상세도 0 이면 슬롯 규칙이 언제나 이기고, 슬롯이 크기를 정하지 않을 때만
+  // 이 100% 가 남는다. 소비자가 `className` 으로 덮는 것도 쉬워진다.
+  :where(#{cls("icon")}) {
     display: block;
     flex-shrink: 0;
     width: 100%;
     height: 100%;
+  }
 
-    // 로딩 스피너. a11y.md §6 "2초 초과 금지"의 유일한 예외 — 멈추는 수단은
-    // OS 의 모션 감소 설정과 로딩 종료다. reduce 에서는 정지한 호 + 문자열로 충분하다.
-    &--spin {
-      animation: #{kf("spin")} 1s linear infinite;
+  // 로딩 스피너. a11y.md §6 "2초 초과 금지"의 유일한 예외 — 멈추는 수단은
+  // OS 의 모션 감소 설정과 로딩 종료다. reduce 에서는 정지한 호 + 문자열로 충분하다.
+  #{cls("icon")}--spin {
+    animation: #{kf("spin")} 1s linear infinite;
 
-      @media (prefers-reduced-motion: reduce) {
-        animation: none;
-      }
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
     }
   }
 }

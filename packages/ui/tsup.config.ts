@@ -43,8 +43,11 @@ export default defineConfig({
     "react-dom",
     "react/jsx-runtime",
     "react-hook-form",
-    // ButtonLink 만 사용. next 는 optional peer 이므로 절대 번들하지 않는다.
+    // ButtonLink 가 next/link 를 쓰고 그것이 배럴로 나간다. required peer 다.
     "next",
     "next/link",
+    // 소비자와 한 벌을 공유해야 한다 — `Icon` 이 소비자의 lucide 컴포넌트를
+    // `icon` 으로 받고, `LucideProvider` 의 Context 도 그 한 벌을 지난다.
+    "lucide-react",
   ],
 });

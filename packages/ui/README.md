@@ -6,18 +6,22 @@ Next.js **App Router 전용** React UI 컴포넌트 라이브러리.
 ## 설치
 
 ```bash
-npm install @nui-kit/react
+npm install @nui-kit/react lucide-react
 ```
 
-`react` / `react-dom` 외에 **추가로 설치할 것은 없습니다.**
+아이콘은 `lucide-react` 를 씁니다. 소비자 프로젝트와 **같은 한 벌을 나눠 쓰므로**
+직접 설치합니다 — 그래야 `<Icon icon={Star} />` 로 넘긴 아이콘과 라이브러리 안의
+아이콘이 한 세트가 됩니다.
+
 `react-hook-form` 은 RHF 래퍼(`/rhf`)를 사용할 때만 필요합니다.
 
 ```jsonc
 "peerDependencies": {
   "react": "^18 || ^19",
   "react-dom": "^18 || ^19",
-  "react-hook-form": ">=7.50.0",  // optional — /rhf 사용 시에만
-  "next": ">=14"                  // optional — ButtonLink 사용 시에만
+  "lucide-react": "^1.39.0",
+  "next": ">=14",
+  "react-hook-form": ">=7.50.0"  // optional — /rhf 사용 시에만
 }
 ```
 
@@ -154,17 +158,30 @@ import "@nui-kit/react/styles/preflight.css";
 
 ### 아이콘
 
-아이콘은 [`lucide-react`](https://lucide.dev) 입니다. 컴포넌트가 쓰는 아홉 개(`DelIcon` ·
-`CloseIcon` · `SearchIcon` · `ShowPwIcon` · `HidePwIcon` · `CalendarIcon` · `AttentionIcon` ·
-`SuccessIcon` · `SpinnerIcon`)는 `/icon` 에서 가져오고, `title` 을 주면 스크린리더가 읽고 없으면 장식으로 건너뜁니다.
-
-직접 넣을 아이콘은 `lucide-react` 에서 바로 가져오면 라이브러리와 선 굵기가 맞습니다.
-`size` 는 14 · 16 · 20 · 24 를 씁니다.
+아이콘은 [`lucide-react`](https://lucide.dev) 를 씁니다. **아이콘이 지나는 문은 `Icon` 하나**라
+크기 · 색 상속 · 스크린리더 규칙이 어디서든 같습니다.
 
 ```tsx
-import { Trash2 } from "lucide-react";
+import { Icon } from "@nui-kit/react";
+import { Star } from "lucide-react";
 
-<Button icon={<Trash2 size={20} />}>삭제</Button>;
+<Icon icon={<Star />} size={20} />;
+<Button icon={<Icon icon={<Star />} />}>즐겨찾기</Button>;
+```
+
+`title` 을 주면 스크린리더가 읽고, 없으면 장식으로 건너뜁니다. `size` 는 14 · 16 · 20 · 24 를
+씁니다. 버튼이나 컨트롤 안에 넣을 때는 자리가 크기를 정하므로 `size` 를 주지 않아도 됩니다.
+
+컴포넌트가 쓰는 아홉 개(`DelIcon` · `CloseIcon` · `SearchIcon` · `ShowPwIcon` · `HidePwIcon` ·
+`CalendarIcon` · `AttentionIcon` · `SuccessIcon` · `SpinnerIcon`)는 `/icon` 에서 가져옵니다.
+이름이 자리를 말합니다.
+
+직접 그린 SVG 는 `viewBox` 와 도형을 주면 같은 규칙을 따릅니다.
+
+```tsx
+<Icon viewBox="0 0 24 24" size={20} title="별점">
+  <path d="…" fill="currentColor" />
+</Icon>
 ```
 
 `Toast` 와 팝업 계열을 **명령형으로**(`useToast()` · `useAlert()` · `useConfirm()` ·
@@ -356,8 +373,8 @@ import { Field, FieldLabel } from "@nui-kit/react";
 
 ### ButtonLink 와 `next`
 
-`ButtonLink` 만 `next/link` 를 사용합니다. `next` 는 optional peer 이므로
-`ButtonLink` 를 쓰지 않으면 설치할 필요가 없습니다.
+`ButtonLink` 만 `next/link` 를 사용하고 그것이 배럴로 나갑니다. 이 라이브러리는
+App Router 전용이므로 `next` 는 required peer 입니다.
 
 ### Select / MultiSelect 와 `react-select`
 

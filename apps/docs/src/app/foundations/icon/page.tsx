@@ -238,21 +238,24 @@ export default function IconPage() {
         개(지우기 · 닫기 · 검색 · 비밀번호 보기/숨기기 · 달력 · 주의 · 성공 ·
         로딩)는 <Link href="/components/icon">Icon</Link> 페이지에 있고{" "}
         <code>@nui-kit/react/icon</code> 에서 가져온다. Select 의 화살표와
-        지우기, Datepicker 의 이전/다음, Accordion 의 화살표도 같은 세트다.
+        지우기, Datepicker 의 이전/다음, Accordion 의 화살표도 같은{" "}
+        <code>Icon</code> 을 지난다.
       </p>
       <p>
-        직접 넣을 아이콘은 <code>lucide-react</code> 에서 바로 가져온다.{" "}
-        <code>size</code> 에 14 · 16 · 20 · 24 를 주면 위 표와 같은 자리에
-        놓인다. 라이브러리가 쓰는 세트와 같아 선 굵기가 섞이지 않는다.
+        직접 넣을 아이콘은 <code>lucide-react</code> 에서 가져와{" "}
+        <Link href="/components/icon">Icon</Link> 의 <code>icon</code> 으로
+        넘긴다. <code>size</code> 에 14 · 16 · 20 · 24 를 주면 위 표와 같은
+        자리에 놓이고, 버튼이나 컨트롤 안에서는 자리가 크기를 정한다.
       </p>
       <pre className="doc-code">
         <code>{`import { Trash2 } from "lucide-react";
+import { Icon } from "@nui-kit/react";
 
-<Button icon={<Trash2 size={20} />}>삭제</Button>`}</code>
+<Button icon={<Icon icon={<Trash2 />} />}>삭제</Button>`}</code>
       </pre>
       <p>
-        직접 만든 SVG 를 쓸 때는 <code>Icon</code> 으로 감싸면 크기·색·접근성
-        처리가 함께 따라온다.
+        직접 그린 SVG 는 <code>viewBox</code> 와 도형을 <code>Icon</code> 에
+        넣는다. 같은 문을 지나므로 크기 · 색 · 접근성 처리가 함께 따라온다.
       </p>
 
       <h2>토큰</h2>

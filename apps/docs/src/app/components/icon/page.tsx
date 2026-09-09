@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Star } from "lucide-react";
 import {
   AttentionIcon,
   CalendarIcon,
@@ -11,12 +12,7 @@ import {
   SpinnerIcon,
   SuccessIcon,
 } from "@nui-kit/react/icon";
-import {
-  GuideHeader,
-  ExceptionBadges,
-  DesignNote,
-  PropsTable,
-} from "@/components/guide";
+import { GuideHeader, DesignNote, PropsTable } from "@/components/guide";
 import { IconRow, IconSizeDemo, IconColorDemo } from "./IconDemo";
 
 export const metadata = { title: "Icon" };
@@ -88,13 +84,12 @@ export default function IconPage() {
         subpath="icon"
       />
 
-      <ExceptionBadges items={[{ kind: "noSize", target: "Icon" }]} />
-
       <p>
-        컴포넌트가 쓰는 아이콘 아홉과, 직접 만든 SVG 를 같은 규칙에 얹는{" "}
-        <code>Icon</code> 래퍼다. 전부 <code>lucide-react</code> 위의 어댑터라
-        소비자가 lucide 를 바로 써도 선 굵기가 섞이지 않는다. 크기 자리와 읽히는
-        아이콘의 규칙은{" "}
+        아이콘이 지나는 문 하나다. <code>lucide-react</code> 의 아이콘을{" "}
+        <code>icon</code> 으로 넘기거나 직접 그린 SVG 를 넣으면 크기 · 색 상속 ·
+        읽힘 규칙이 같이 따라온다. 컴포넌트가 쓰는 아홉과 <code>Select</code> ·{" "}
+        <code>Datepicker</code> · <code>Accordion</code> 의 화살표도 같은 문을
+        지난다. 크기 자리와 읽히는 아이콘의 규칙은{" "}
         <Link href="/foundations/icon">Foundations · 아이콘</Link> 에 있다.
       </p>
 
@@ -201,7 +196,11 @@ export default function IconPage() {
       <IconRow
         code={`<SpinnerIcon size={20} />`}
         items={[
-          { label: "SpinnerIcon", note: "돈다", node: <SpinnerIcon size={20} /> },
+          {
+            label: "SpinnerIcon",
+            note: "돈다",
+            node: <SpinnerIcon size={20} />,
+          },
           {
             label: "title 과 함께",
             note: "읽힌다",
@@ -212,47 +211,52 @@ export default function IconPage() {
 
       <h2>다른 아이콘이 필요하면</h2>
       <p>
-        아홉 밖의 아이콘은 <code>lucide-react</code> 에서 바로 가져온다. 이
-        라이브러리가 쓰는 세트와 같아 한 화면에서 선 굵기가 섞이지 않는다.
-        이름은{" "}
+        아홉 밖의 아이콘은 <code>lucide-react</code> 에서 가져와{" "}
+        <code>icon</code> 으로 넘긴다. 이름은{" "}
         <a href="https://lucide.dev/icons/" target="_blank" rel="noreferrer">
           lucide.dev/icons
         </a>{" "}
-        에서 찾는다. 소비자 프로젝트의 의존성에 <code>lucide-react</code> 를
-        직접 더한다. 이 라이브러리가 쓰고 있어도 소비자가 import 하려면 자기
-        것이어야 한다.
+        에서 찾는다. <code>lucide-react</code> 는 이 라이브러리와 소비자
+        프로젝트가 <strong>같은 한 벌을 나눠 쓰는</strong> peer 라 프로젝트에
+        직접 설치한다.
       </p>
-      <pre className="doc-code">
-        <code>{`npm i lucide-react
+      <IconRow
+        code={`import { Star } from "lucide-react";
+import { Icon } from "@nui-kit/react";
 
-import { Star } from "lucide-react";
-
-<Button icon={<Star size={20} />}>즐겨찾기</Button>
-<IconButton aria-label="즐겨찾기"><Star size={20} /></IconButton>`}</code>
-      </pre>
+<Icon icon={<Star />} size={20} />
+<Button icon={<Icon icon={<Star />} />}>즐겨찾기</Button>`}
+        items={[
+          {
+            label: "icon 으로 넘긴다",
+            note: "아홉과 같은 규칙",
+            node: <Icon icon={<Star />} size={20} />,
+          },
+          {
+            label: "title 과 함께",
+            note: "읽힌다",
+            node: <Icon icon={<Star />} size={20} title="즐겨찾기" />,
+          },
+        ]}
+      />
       <div className="doc-note">
-        lucide 아이콘은 기본이 <code>aria-hidden</code> 이라 장식으로 들어간다.
-        뜻을 전해야 하면 버튼이나 옆 글자가 이름을 갖게 한다. 아이콘 자체가
-        읽혀야 하면 아래처럼 <code>Icon</code> 으로 감싸고 <code>title</code> 을
-        준다.
+        <code>Icon</code> 을 지나면 크기 · 색 상속 · 읽힘 규칙이 아홉과
+        같아진다. 아이콘 전용 버튼에서는 버튼이 이름을 갖고 아이콘은{" "}
+        <code>title</code> 없이 둔다.
       </div>
 
-      <h2>직접 만든 SVG</h2>
+      <h2>직접 그린 SVG</h2>
       <p>
-        <code>Icon</code> 에 <code>viewBox</code> 와 path 를 넣으면 크기 · 색 ·
-        읽힘 규칙이 같이 따라온다. lucide 에 있는 아이콘이면 바로 가져오는 편이
-        짧다.
+        lucide 에 없는 모양은 <code>viewBox</code> 와 도형을 직접 넣는다. 같은{" "}
+        <code>Icon</code> 이라 크기 · 색 · 읽힘 규칙이 그대로 따라온다.
       </p>
       <IconRow
         code={`<Icon viewBox="0 0 24 24" size={20} title="별점">
   <path d="…" fill="currentColor" />
-</Icon>
-
-import { Star } from "lucide-react";
-<Star size={20} />`}
+</Icon>`}
         items={[
           {
-            label: "Icon 으로 감싼다",
+            label: "viewBox 와 도형",
             note: "같은 규칙",
             node: (
               <Icon viewBox="0 0 24 24" size={20} title="별점">
@@ -263,41 +267,26 @@ import { Star } from "lucide-react";
               </Icon>
             ),
           },
-          {
-            label: "lucide 그대로",
-            note: "같은 세트",
-            node: (
-              <svg
-                width={20}
-                height={20}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-            ),
-          },
         ]}
       />
 
       <DesignNote title="왜 lucide 인가">
         <p>
           24px 격자에 stroke 2 인 line 아이콘이고 크기에 비례해 선이 가늘어진다.
-          컴포넌트가 쓰는 아홉을 라이브러리 이름으로 감싸 두면 소비자가 같은
-          세트에서 다른 아이콘을 골라도 한 화면에서 선 굵기가 같다. 세트를 두 개
-          섞으면 그 차이가 먼저 보인다.
+          세트를 두 개 섞으면 그 차이가 먼저 보인다.
+        </p>
+        <p>
+          <code>lucide-react</code> 가 peer 인 것도 같은 이유다. 두 벌이 설치되면
+          한 화면의 아이콘이 두 세트에서 오고, 소비자가{" "}
+          <code>LucideProvider</code> 로 선 굵기를 맞춰도 라이브러리 안 아이콘만
+          그대로 남는다. 버전이 갈리면 같은 이름이 다른 모양이 되기도 한다.
         </p>
       </DesignNote>
 
       <h2>API</h2>
       <p>
-        아홉 아이콘은 아래 표에서 <code>children</code> 과 <code>viewBox</code>{" "}
-        를 뺀 것을 받는다.
+        아홉 아이콘은 아래 표에서 <code>icon</code> · <code>viewBox</code> ·{" "}
+        <code>children</code> 을 뺀 것을 받는다.
       </p>
       <PropsTable of="Icon" />
     </>
