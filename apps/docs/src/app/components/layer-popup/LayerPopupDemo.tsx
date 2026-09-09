@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Field, SuccessIcon, Textfield } from "@nui-kit/react";
+import {
+  Button,
+  ButtonGroup,
+  Field,
+  SuccessIcon,
+  Textfield,
+} from "@nui-kit/react";
 import {
   LayerPopup,
   useLayerPopup,
@@ -235,7 +241,12 @@ export function LayerPopupFooterDemo() {
         caption="라벨만 주면 표준 푸터. 둘 다 있으면 취소 : 확인 = 3 : 7"
         code={`<LayerPopup confirmLabel="저장" onConfirm={save} />
 <LayerPopup cancelLabel="취소" confirmLabel="저장" onConfirm={save} />
-<LayerPopup footer={<Button variant="line" onClick={next}>다음 단계</Button>} />`}
+<LayerPopup footer={
+  <ButtonGroup>
+    <ButtonGroup.Item><Button variant="line" onClick={call}>전화 걸기</Button></ButtonGroup.Item>
+    <ButtonGroup.Item><Button onClick={navigate}>길 찾기</Button></ButtonGroup.Item>
+  </ButtonGroup>
+} />`}
       >
         <Case label="confirmLabel" note="확인 하나">
           <Button variant="line" onClick={() => setOpen("confirm")}>
@@ -247,7 +258,7 @@ export function LayerPopupFooterDemo() {
             둘 다 열기
           </Button>
         </Case>
-        <Case label="footer" note="둘로 안 되는 자리">
+        <Case label="footer" note="확인 · 취소가 아닌 행동 둘. 5 : 5">
           <Button variant="line" onClick={() => setOpen("custom")}>
             footer 로 열기
           </Button>
@@ -277,12 +288,19 @@ export function LayerPopupFooterDemo() {
         open={open === "custom"}
         onRequestClose={close}
         size="small"
-        title="가입 안내"
-        description="다음 단계에서 본인 확인을 합니다."
+        title="매장 안내"
+        description="영업시간은 10시부터 21시까지입니다."
         footer={
-          <Button variant="line" onClick={close}>
-            다음 단계
-          </Button>
+          <ButtonGroup>
+            <ButtonGroup.Item>
+              <Button variant="line" onClick={close}>
+                전화 걸기
+              </Button>
+            </ButtonGroup.Item>
+            <ButtonGroup.Item>
+              <Button onClick={close}>길 찾기</Button>
+            </ButtonGroup.Item>
+          </ButtonGroup>
         }
       />
     </>
