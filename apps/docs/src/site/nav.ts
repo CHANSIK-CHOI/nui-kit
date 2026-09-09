@@ -116,6 +116,10 @@ export const NAV: NavSection[] = [
         title: "Disclosure",
         items: [{ title: "Accordion", href: "/components/accordion" }],
       },
+      {
+        title: "Icon",
+        items: [{ title: "Icon", href: "/components/icon" }],
+      },
     ],
   },
 ];

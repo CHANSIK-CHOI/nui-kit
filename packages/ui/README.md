@@ -154,9 +154,9 @@ import "@nui-kit/react/styles/preflight.css";
 
 ### 아이콘
 
-아이콘은 [`lucide-react`](https://lucide.dev) 입니다. 컴포넌트가 쓰는 일곱 개(`DelIcon` ·
-`SearchIcon` · `ShowPwIcon` · `HidePwIcon` · `CloseIcon` · `CalendarIcon` · `AttentionIcon`)는
-`/icon` 에서 가져오고, `title` 을 주면 스크린리더가 읽고 없으면 장식으로 건너뜁니다.
+아이콘은 [`lucide-react`](https://lucide.dev) 입니다. 컴포넌트가 쓰는 아홉 개(`DelIcon` ·
+`CloseIcon` · `SearchIcon` · `ShowPwIcon` · `HidePwIcon` · `CalendarIcon` · `AttentionIcon` ·
+`SuccessIcon` · `SpinnerIcon`)는 `/icon` 에서 가져오고, `title` 을 주면 스크린리더가 읽고 없으면 장식으로 건너뜁니다.
 
 직접 넣을 아이콘은 `lucide-react` 에서 바로 가져오면 라이브러리와 선 굵기가 맞습니다.
 `size` 는 14 · 16 · 20 · 24 를 씁니다.
@@ -316,7 +316,7 @@ UTF-16 코드 단위여서 이모지는 2로 세집니다.
 
 ```tsx
 <Tooltip content="설명" hasPortal>
-  <IconButton aria-label="도움말"><InfoIcon /></IconButton>
+  <IconButton aria-label="검색"><SearchIcon /></IconButton>
 </Tooltip>
 ```
 

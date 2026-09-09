@@ -183,6 +183,16 @@ const GROUPS = [
       },
     ],
   },
+  {
+    title: "Icon",
+    items: [
+      {
+        name: "Icon",
+        href: "/components/icon",
+        desc: "컴포넌트가 쓰는 아이콘 아홉과 직접 만든 SVG 를 감싸는 래퍼",
+      },
+    ],
+  },
 ];
 
 export default function ComponentsPage() {
