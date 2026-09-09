@@ -48,8 +48,14 @@ function fromLucide(
   }: IconBaseProps) {
     const iconStyle: CSSProperties = { ...style };
     if (color) iconStyle.color = color;
-    if (width) iconStyle.width = width;
-    if (height) iconStyle.height = height;
+    // ⚠️ 치수는 인라인 style 로 준다 (2026-09-09). `.nui-icon` 이 `width: 100%` 라
+    //    lucide 가 붙이는 `width` 속성을 이긴다 — 단독으로 둔 `<SearchIcon size={20} />`
+    //    가 부모를 채웠다(문서 격자에서 24 → 259px). 슬롯이 상자를 잡는 라이브러리
+    //    안에서는 드러나지 않았다. `size` 는 정사각, `width`/`height` 는 따로 준다.
+    const resolvedWidth = width ?? size;
+    const resolvedHeight = height ?? size;
+    if (resolvedWidth) iconStyle.width = resolvedWidth;
+    if (resolvedHeight) iconStyle.height = resolvedHeight;
 
     return (
       <LucideComponent

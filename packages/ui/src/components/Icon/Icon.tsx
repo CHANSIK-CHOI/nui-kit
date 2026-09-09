@@ -24,6 +24,7 @@ export default function Icon({
   color,
   focusable = false,
   height,
+  size,
   style,
   title,
   viewBox,
@@ -33,14 +34,17 @@ export default function Icon({
   const iconStyle: CSSProperties = { ...style };
 
   if (color) iconStyle.color = color;
-  if (width) iconStyle.width = width;
-  if (height) iconStyle.height = height;
+  // `size` 는 정사각 단축이다. 치수는 인라인으로 — 이유는 icons.tsx 참조.
+  const resolvedWidth = width ?? size;
+  const resolvedHeight = height ?? size;
+  if (resolvedWidth) iconStyle.width = resolvedWidth;
+  if (resolvedHeight) iconStyle.height = resolvedHeight;
 
   return (
     <svg
       viewBox={viewBox}
-      width={width}
-      height={height}
+      width={resolvedWidth}
+      height={resolvedHeight}
       className={cn(px("icon"), className)}
       style={iconStyle}
       focusable={focusable}
