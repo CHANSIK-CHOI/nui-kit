@@ -10,6 +10,8 @@ import {
   reduceMotionTransition,
 } from "../../internal/motion.js";
 import { CloseIcon } from "../Icon/index.js";
+import Button from "../Button/Button.js";
+import ButtonGroup, { ButtonGroupItem } from "../Button/ButtonGroup.js";
 import type { PopupBaseProps, PopupVariant } from "./Popup.types.js";
 import usePopupPanelA11y from "./usePopupPanelA11y.js";
 
@@ -83,6 +85,10 @@ export default function PopupBase({
   icon,
   description,
   footer,
+  confirmLabel,
+  cancelLabel,
+  onConfirm,
+  onCancel,
   hasCloseButton = true,
   closeLabel = "팝업 닫기",
   shouldCloseOnBackdrop = true,
@@ -127,6 +133,41 @@ export default function PopupBase({
     onClickClose?.();
     onRequestClose?.();
   };
+
+  // ── 표준 푸터 (2026-09-09)
+  //
+  // 취소는 line · 확인은 solid 이고, 둘 다 있으면 3:7 이다 (design-system.md §2-4-1 —
+  // 첫 항목이 Dismiss 일 때). 하나만 있으면 비율 없이 그 하나가 폭을 채운다.
+  // `onCancel` 을 안 주면 `onRequestClose` 가 대신한다 — 취소는 닫아 달라는 뜻이다.
+  const hasStandardFooter =
+    footer == null && (confirmLabel != null || cancelLabel != null);
+  const standardFooter = hasStandardFooter ? (
+    <ButtonGroup
+      className={`${block}__actions`}
+      ratio={confirmLabel != null && cancelLabel != null ? "3:7" : "equal"}
+    >
+      {cancelLabel != null ? (
+        <ButtonGroupItem>
+          <Button
+            type="button"
+            variant="line"
+            size="medium"
+            onClick={onCancel ?? onRequestClose}
+          >
+            {cancelLabel}
+          </Button>
+        </ButtonGroupItem>
+      ) : null}
+      {confirmLabel != null ? (
+        <ButtonGroupItem>
+          <Button type="button" size="medium" onClick={onConfirm}>
+            {confirmLabel}
+          </Button>
+        </ButtonGroupItem>
+      ) : null}
+    </ButtonGroup>
+  ) : null;
+  const resolvedFooter = footer ?? standardFooter;
 
   // ── 본문 스크롤 경계선 ★ (2026-09-08 · 08 DL2)
   //
@@ -218,7 +259,7 @@ export default function PopupBase({
             contentAlign === "center" && `${block}--align-center`,
             hasCloseButton && `${block}--has-close`,
             !hasHeader && `${block}--no-header`,
-            !footer && `${block}--no-footer`,
+            !resolvedFooter && `${block}--no-footer`,
             className,
           )}
         >
@@ -284,9 +325,9 @@ export default function PopupBase({
                 {children}
               </div>
 
-              {footer ? (
+              {resolvedFooter ? (
                 <div className={cn(`${block}__foot`, footerClassName)}>
-                  {footer}
+                  {resolvedFooter}
                 </div>
               ) : null}
 

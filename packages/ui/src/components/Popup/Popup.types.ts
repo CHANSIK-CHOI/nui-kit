@@ -40,6 +40,15 @@ type PopupBaseOwnProps = {
   icon?: ReactNode | null;
   description?: ReactNode;
   footer?: ReactNode;
+  /**
+   * 표준 푸터 — 취소(line) · 확인(solid) 을 `ButtonGroup ratio="3:7"` 로 그린다.
+   * 하나만 줘도 된다. `footer` 와는 셸 타입에서 배타다 (`PopupFooterProps`).
+   */
+  confirmLabel?: ReactNode;
+  cancelLabel?: ReactNode;
+  onConfirm?: () => void;
+  /** 생략하면 `onRequestClose` 를 부른다 — 취소는 닫아 달라는 뜻이다 */
+  onCancel?: () => void;
   hasCloseButton?: boolean;
   closeLabel?: string;
   /** dim 클릭으로 닫히는가 */
@@ -76,8 +85,39 @@ type PopupInstanceProps = Pick<
 //    PopupBase 의 기본값 false 가 그대로 쓰이고 usePopupPanelA11y 가 전부
 //    early-return 한다 — 즉 ESC 로 닫히지도, 포커스가 갇히지도 않는다.
 //    화면도 마우스도 멀쩡해서 키보드 사용자만 겪는다.
-type PopupSharedShellProps = Omit<PopupBaseOwnProps, "variant" | "size"> &
-  PopupAccessibleName;
+/**
+ * 푸터는 둘 중 하나다 (2026-09-09). 표준 라벨 넷이거나 `footer` 슬롯이거나.
+ * 둘 다 주면 하나가 조용히 무시되므로 타입이 막는다. `footer` 는 확인 · 취소
+ * 둘로 안 되는 자리(진행 버튼 · 셋째 액션 · 링크)에만 쓴다.
+ */
+type PopupFooterProps =
+  | {
+      footer?: ReactNode;
+      confirmLabel?: never;
+      cancelLabel?: never;
+      onConfirm?: never;
+      onCancel?: never;
+    }
+  | {
+      footer?: never;
+      confirmLabel?: ReactNode;
+      cancelLabel?: ReactNode;
+      onConfirm?: () => void;
+      onCancel?: () => void;
+    };
+
+type PopupSharedShellProps = Omit<
+  PopupBaseOwnProps,
+  | "variant"
+  | "size"
+  | "footer"
+  | "confirmLabel"
+  | "cancelLabel"
+  | "onConfirm"
+  | "onCancel"
+> &
+  PopupAccessibleName &
+  PopupFooterProps;
 type PopupSizedShellProps = PopupSharedShellProps &
   Pick<PopupBaseOwnProps, "size">;
 

@@ -223,6 +223,17 @@
       @include typo(3, "regular");
     }
 
+    // 표준 푸터(confirmLabel · cancelLabel)의 버튼 묶음. Alert · Confirm 의 것과 같다.
+    &__actions {
+      #{cls("button-group")}__wrap {
+        width: 100%;
+      }
+
+      #{cls("button-group")}__item {
+        display: flex;
+      }
+    }
+
     &__foot {
       flex-shrink: 0;
       padding: 0 var(#{v("space-panel-card")}) var(#{v("space-panel-card")});

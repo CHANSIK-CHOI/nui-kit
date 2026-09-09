@@ -30,7 +30,8 @@ export default function Confirm({
   onConfirm,
 }: ConfirmProps) {
   const footerContent = (
-    <ButtonGroup className={`${block}__actions`}>
+    // 취소 : 확인 = 3 : 7 — 첫 항목이 Dismiss 다 (design-system.md §2-4-1 · 2026-09-09)
+    <ButtonGroup className={`${block}__actions`} ratio="3:7">
       <ButtonGroupItem>
         <Button type="button" variant="line" size="medium" onClick={onCancel}>
           {cancelLabel}
