@@ -39,11 +39,8 @@ export function PopupSizeDemo() {
           size={size}
           title={`size="${size}"`}
           description="폭만 다르고 나머지는 같다."
-          footer={
-            <Button color="primary" onClick={() => setOpen(null)}>
-              닫기
-            </Button>
-          }
+          confirmLabel="닫기"
+          onConfirm={() => setOpen(null)}
         >
           <p style={{ color: "var(--nui-text-secondary)" }}>
             dim 을 누르거나 Escape 를 눌러도 닫힌다.

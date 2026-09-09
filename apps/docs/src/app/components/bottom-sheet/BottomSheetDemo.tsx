@@ -127,14 +127,17 @@ export function BottomSheetOptionsDemo() {
         contentAlign="center"
         title="주문을 접수했습니다"
         description="배송이 시작되면 알려 드릴게요."
-        footer={<Button onClick={close}>주문 내역 보기</Button>}
+        confirmLabel="주문 내역 보기"
+        onConfirm={close}
       />
       <BottomSheet
         open={open === "noClose"}
         onRequestClose={close}
         hasCloseButton={false}
         title="필터"
-        footer={<Button onClick={close}>적용</Button>}
+        cancelLabel="닫기"
+        confirmLabel="적용"
+        onConfirm={close}
       >
         <p style={{ color: "var(--nui-text-secondary)" }}>
           × 가 없어도 dim 과 Esc 로 닫힙니다.

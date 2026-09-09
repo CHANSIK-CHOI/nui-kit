@@ -4,6 +4,7 @@ import {
   LayerPopupDeclarativeDemo,
   LayerPopupImperativeDemo,
   LayerPopupOptionsDemo,
+  LayerPopupFooterDemo,
   LayerPopupCloseDemo,
   LayerPopupStackDemo,
 } from "./LayerPopupDemo";
@@ -50,6 +51,16 @@ export default function LayerPopupPage() {
         BottomSheet 와 FullPopup 은 화면에 맞춰 자기 폭을 갖는다.
       </p>
       <PopupSizeDemo />
+
+      <h2>푸터</h2>
+      <p>
+        <code>confirmLabel</code> 과 <code>cancelLabel</code> 을 주면 취소(line)
+        · 확인(solid) 묶음이 그려진다. 하나만 줘도 된다. <code>onCancel</code>{" "}
+        을 생략하면 닫아 달라는 요청으로 처리된다. 확인 · 취소 둘로 안 되는
+        자리(진행 버튼 · 셋째 액션)는 <code>footer</code> 에 직접 그린다. 둘을
+        같이 주면 타입이 막는다.
+      </p>
+      <LayerPopupFooterDemo />
 
       <h2>본문 정렬 · 아이콘 · 닫기 버튼</h2>
       <p>

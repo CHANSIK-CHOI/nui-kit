@@ -79,7 +79,9 @@ export default function FullPopupPage() {
       <p>
         <code>contentAlign</code> 의 기본은 <code>left</code> 다. 화면을 다
         덮으므로 <code>hasCloseButton</code> 은 켜 두는 편이 안전하다. dim 이 안
-        보여서 누를 곳이 없고 <kbd>Esc</kbd> 는 키보드에만 있다.
+        보여서 누를 곳이 없고 <kbd>Esc</kbd> 는 키보드에만 있다. 푸터는{" "}
+        <code>confirmLabel</code> · <code>cancelLabel</code> 로 그리고, 둘로 안
+        되는 자리만 <code>footer</code> 다.
       </p>
       <FullPopupOptionsDemo />
 

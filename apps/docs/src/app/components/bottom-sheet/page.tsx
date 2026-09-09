@@ -70,7 +70,9 @@ export default function BottomSheetPage() {
       <p>
         <code>contentAlign</code> 의 기본은 <code>left</code> 다.{" "}
         <code>hasCloseButton={"{false}"}</code> 면 헤더의 × 가 없어지고 dim 과{" "}
-        <kbd>Esc</kbd> 로만 닫힌다.
+        <kbd>Esc</kbd>, 그리고 푸터의 취소 버튼으로 닫힌다. 푸터는{" "}
+        <code>confirmLabel</code> · <code>cancelLabel</code> 로 그리고, 둘로 안
+        되는 자리만 <code>footer</code> 다.
       </p>
       <BottomSheetOptionsDemo />
 

@@ -27,7 +27,8 @@ export function FullPopupDeclarativeDemo() {
         open={isOpen}
         onRequestClose={() => setIsOpen(false)}
         title="상품 상세"
-        footer={<Button onClick={() => setIsOpen(false)}>장바구니 담기</Button>}
+        confirmLabel="장바구니 담기"
+        onConfirm={() => setIsOpen(false)}
       >
         <p style={{ color: "var(--nui-text-secondary)" }}>
           화면 전체를 덮고 오른쪽에서 들어옵니다. 긴 내용은 본문 안에서
@@ -52,7 +53,8 @@ function DetailPopup({
       onCloseComplete={onCloseComplete}
       isTopmost={isTopmost}
       title="주문 상세"
-      footer={<Button onClick={onRequestClose}>닫기</Button>}
+      confirmLabel="닫기"
+      onConfirm={onRequestClose}
     >
       <p style={{ color: "var(--nui-text-secondary)" }}>
         명령형으로 연 전체 팝업입니다. 배경은 inert 가 되고 스크롤이 잠깁니다.
@@ -110,14 +112,16 @@ export function FullPopupOptionsDemo() {
         contentAlign="center"
         title="가입을 완료했습니다"
         description="이제 모든 기능을 쓸 수 있습니다."
-        footer={<Button onClick={close}>시작하기</Button>}
+        confirmLabel="시작하기"
+        onConfirm={close}
       />
       <FullPopup
         open={open === "noClose"}
         onRequestClose={close}
         hasCloseButton={false}
         title="본인 확인"
-        footer={<Button onClick={close}>확인했습니다</Button>}
+        confirmLabel="확인했습니다"
+        onConfirm={close}
       >
         <p style={{ color: "var(--nui-text-secondary)" }}>
           × 가 없으면 푸터 버튼과 Esc 만 남으므로, 닫는 버튼은 푸터에 둡니다.

@@ -16,7 +16,7 @@ export function LayerPopupDeclarativeDemo() {
     <>
       <Example
         caption="open 을 쓰는 쪽이 갖는다"
-        code={`<LayerPopup open={isOpen} onRequestClose={() => setIsOpen(false)} title="약관 동의" footer={…}>…</LayerPopup>`}
+        code={`<LayerPopup open={isOpen} onRequestClose={() => setIsOpen(false)} title="약관 동의" confirmLabel="동의합니다" onConfirm={agree}>…</LayerPopup>`}
       >
         <Button size="medium" variant="line" onClick={() => setIsOpen(true)}>
           약관 보기
@@ -29,7 +29,8 @@ export function LayerPopupDeclarativeDemo() {
   open={isOpen}
   onRequestClose={() => setIsOpen(false)}
   title="약관 동의"
-  footer={<Button onClick={() => setIsOpen(false)}>동의합니다</Button>}
+  confirmLabel="동의합니다"
+  onConfirm={() => setIsOpen(false)}
 >
   내용
 </LayerPopup>`}</code>
@@ -40,7 +41,8 @@ export function LayerPopupDeclarativeDemo() {
         onRequestClose={() => setIsOpen(false)}
         title="약관 동의"
         description="서비스 이용을 위해 아래 약관에 동의해 주세요."
-        footer={<Button onClick={() => setIsOpen(false)}>동의합니다</Button>}
+        confirmLabel="동의합니다"
+        onConfirm={() => setIsOpen(false)}
       >
         <p style={{ color: "var(--nui-text-secondary)" }}>
           dim 을 누르거나 Esc 를 눌러도 닫힙니다. Tab 은 팝업 밖으로 나가지
@@ -65,7 +67,9 @@ function ProfilePopup({
       onCloseComplete={onCloseComplete}
       isTopmost={isTopmost}
       title="프로필 수정"
-      footer={<Button onClick={onRequestClose}>저장</Button>}
+      cancelLabel="취소"
+      confirmLabel="저장"
+      onConfirm={onRequestClose}
     >
       <Field>
         <Field.Label>이름</Field.Label>
@@ -94,7 +98,7 @@ export function LayerPopupImperativeDemo() {
       <pre className="doc-code">
         <code>{`function ProfilePopup({ open, onRequestClose, onCloseComplete, isTopmost }: LayerPopupComponentProps) {
   return (
-    <LayerPopup open={open} onRequestClose={onRequestClose} onCloseComplete={onCloseComplete} isTopmost={isTopmost} title="프로필 수정">
+    <LayerPopup open={open} onRequestClose={onRequestClose} onCloseComplete={onCloseComplete} isTopmost={isTopmost} title="프로필 수정" cancelLabel="취소" confirmLabel="저장" onConfirm={onRequestClose}>
       …
     </LayerPopup>
   );
@@ -145,7 +149,8 @@ export function LayerPopupOptionsDemo() {
         contentAlign="center"
         title="업로드를 완료했습니다"
         description="파일 3개가 저장됐습니다."
-        footer={<Button onClick={close}>닫기</Button>}
+        confirmLabel="닫기"
+        onConfirm={close}
       />
       <LayerPopup
         open={open === "icon"}
@@ -154,7 +159,8 @@ export function LayerPopupOptionsDemo() {
         icon={<SuccessIcon width={28} height={28} />}
         title="새 기능이 추가됐습니다"
         description="설정에서 알림 방식을 고를 수 있습니다."
-        footer={<Button onClick={close}>설정 보기</Button>}
+        confirmLabel="설정 보기"
+        onConfirm={close}
       />
       <LayerPopup
         open={open === "noClose"}
@@ -163,7 +169,8 @@ export function LayerPopupOptionsDemo() {
         hasCloseButton={false}
         title="약관이 바뀌었습니다"
         description="계속 쓰려면 바뀐 약관에 동의해 주세요."
-        footer={<Button onClick={close}>동의합니다</Button>}
+        confirmLabel="동의합니다"
+        onConfirm={close}
       />
     </>
   );
@@ -215,6 +222,73 @@ export function LayerPopupCloseDemo() {
   );
 }
 
+type FooterKey = "confirm" | "both" | "custom";
+
+export function LayerPopupFooterDemo() {
+  const [open, setOpen] = useState<FooterKey | null>(null);
+  const close = () => setOpen(null);
+
+  return (
+    <>
+      <CaseGrid
+        columns={3}
+        caption="라벨만 주면 표준 푸터. 둘 다 있으면 취소 : 확인 = 3 : 7"
+        code={`<LayerPopup confirmLabel="저장" onConfirm={save} />
+<LayerPopup cancelLabel="취소" confirmLabel="저장" onConfirm={save} />
+<LayerPopup footer={<Button variant="line" onClick={next}>다음 단계</Button>} />`}
+      >
+        <Case label="confirmLabel" note="확인 하나">
+          <Button variant="line" onClick={() => setOpen("confirm")}>
+            확인만 열기
+          </Button>
+        </Case>
+        <Case label="cancelLabel + confirmLabel" note="3 : 7">
+          <Button variant="line" onClick={() => setOpen("both")}>
+            둘 다 열기
+          </Button>
+        </Case>
+        <Case label="footer" note="둘로 안 되는 자리">
+          <Button variant="line" onClick={() => setOpen("custom")}>
+            footer 로 열기
+          </Button>
+        </Case>
+      </CaseGrid>
+
+      <LayerPopup
+        open={open === "confirm"}
+        onRequestClose={close}
+        size="small"
+        title="알림을 켤까요?"
+        description="새 글이 오면 알려 드립니다."
+        confirmLabel="켜기"
+        onConfirm={close}
+      />
+      <LayerPopup
+        open={open === "both"}
+        onRequestClose={close}
+        size="small"
+        title="변경 사항을 저장할까요?"
+        description="저장하지 않으면 입력한 내용이 사라집니다."
+        cancelLabel="취소"
+        confirmLabel="저장"
+        onConfirm={close}
+      />
+      <LayerPopup
+        open={open === "custom"}
+        onRequestClose={close}
+        size="small"
+        title="가입 안내"
+        description="다음 단계에서 본인 확인을 합니다."
+        footer={
+          <Button variant="line" onClick={close}>
+            다음 단계
+          </Button>
+        }
+      />
+    </>
+  );
+}
+
 export function LayerPopupStackDemo() {
   const [isOuterOpen, setIsOuterOpen] = useState(false);
   const [isInnerOpen, setIsInnerOpen] = useState(false);
@@ -252,7 +326,9 @@ export function LayerPopupStackDemo() {
           onRequestClose={() => setIsInnerOpen(false)}
           size="small"
           title="주소 찾기"
-          footer={<Button onClick={() => setIsInnerOpen(false)}>선택</Button>}
+          cancelLabel="취소"
+          confirmLabel="선택"
+          onConfirm={() => setIsInnerOpen(false)}
         >
           <Field>
             <Field.Label>도로명</Field.Label>
