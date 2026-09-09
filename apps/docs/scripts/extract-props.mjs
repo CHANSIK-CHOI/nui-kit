@@ -88,11 +88,6 @@ const TARGETS = [
     type: "MessageProps",
   },
   {
-    name: "TextfieldBtn",
-    file: "components/Textfield/TextfieldBtn.tsx",
-    type: "TextfieldBtnProps",
-  },
-  {
     name: "Search",
     file: "components/Textfield/Search.tsx",
     type: "SearchProps",

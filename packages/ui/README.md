@@ -137,7 +137,7 @@ import "@nui-kit/react/styles/preflight.css";
 | --- | --- | --- |
 | `Button` · `IconButton` · `ButtonGroup`(`.Item`) · `ButtonLink` | `/button` | `button.css` |
 | `Field`(`.Item` `.Grid` `.Label` `.Description` `.Message`) | `/field` | `field.css` |
-| `Textfield` · `Search` · `Password` · `TextfieldBtn` · `Message` | `/textfield` | `textfield.css` |
+| `Textfield` · `Search` · `Password` · `Message` | `/textfield` | `textfield.css` |
 | `Textarea` | `/textarea` | `textarea.css` |
 | `Checkbox` · `CheckboxGroup` | `/checkbox` | `checkbox.css` |
 | `Radio` · `RadioGroup` | `/radio` | `radio.css` |
