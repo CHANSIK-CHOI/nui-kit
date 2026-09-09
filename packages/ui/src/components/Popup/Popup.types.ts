@@ -41,14 +41,14 @@ type PopupBaseOwnProps = {
   description?: ReactNode;
   footer?: ReactNode;
   hasCloseButton?: boolean;
-  closeButtonLabel?: string;
+  closeLabel?: string;
   /** dim 클릭으로 닫히는가 */
   shouldCloseOnBackdrop?: boolean;
   shouldCloseOnEscape?: boolean;
   onRequestClose?: () => void;
   onClickClose?: () => void;
   /** 닫힘 애니메이션까지 끝난 뒤 호출된다 */
-  onExited?: () => void;
+  onCloseComplete?: () => void;
   /** 스택 최상단인가 — 포커스 트랩과 ESC 를 이 팝업만 처리한다 */
   isTopmost?: boolean;
 };
@@ -68,7 +68,7 @@ export type PopupBaseProps = PopupBaseOwnProps & {
 
 type PopupInstanceProps = Pick<
   PopupBaseOwnProps,
-  "id" | "open" | "onExited" | "isTopmost"
+  "id" | "open" | "onCloseComplete" | "isTopmost"
 >;
 
 // ⚠️ isTopmost 를 Omit 하지 않는다.

@@ -87,7 +87,7 @@ export default function PopupHost({ children }: PopupHostProps) {
                             closePopup(item.id);
                           }
                         }}
-                        onExited={() => removePopup(item.id)}
+                        onCloseComplete={() => removePopup(item.id)}
                       />
                     );
                   }
@@ -119,7 +119,7 @@ export default function PopupHost({ children }: PopupHostProps) {
                             closePopup(item.id);
                           }
                         }}
-                        onExited={() => removePopup(item.id)}
+                        onCloseComplete={() => removePopup(item.id)}
                       />
                     );
                   }
@@ -135,7 +135,7 @@ export default function PopupHost({ children }: PopupHostProps) {
                         open={item.status === "open"}
                         isTopmost={item.id === topmostOpenPopupId}
                         onRequestClose={() => closePopup(item.id)}
-                        onExited={() => removePopup(item.id)}
+                        onCloseComplete={() => removePopup(item.id)}
                       />
                     );
                   }

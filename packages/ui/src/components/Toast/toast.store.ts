@@ -79,7 +79,7 @@ export const useToastStore = create<ToastStore>()((set) => ({
       const target = state.items.find((item) => item.id === id);
 
       // 차례를 기다리던 것은 나가는 모션이 없다 — 화면에 오른 적이 없으므로 그냥 뺀다.
-      // 렌더된 적이 없어 `onExited` 도 오지 않는다 (spec Toast.md §6-1).
+      // 렌더된 적이 없어 `onCloseComplete` 도 오지 않는다 (spec Toast.md §6-1).
       if (target?.status === "queued") {
         return { items: state.items.filter((item) => item.id !== id) };
       }

@@ -17,7 +17,7 @@ const block = px("popup-confirm");
 export default function Confirm({
   id,
   open,
-  onExited,
+  onCloseComplete,
   isTopmost,
   className,
   title,
@@ -48,7 +48,7 @@ export default function Confirm({
     <PopupBase
       id={id}
       open={open}
-      onExited={onExited}
+      onCloseComplete={onCloseComplete}
       isTopmost={isTopmost}
       className={cn(block, className)}
       title={title}

@@ -73,7 +73,7 @@ export default function LayerPopupPage() {
             </tr>
             <tr>
               <td>
-                <code>onExited</code>
+                <code>onCloseComplete</code>
               </td>
               <td>—</td>
               <td className="doc-wrap">
@@ -91,7 +91,7 @@ export default function LayerPopupPage() {
           붙는다. <code>dialogLabel</code> 로 바꾼다
         </li>
         <li>
-          닫기 버튼의 접근 이름은 <code>closeButtonLabel</code>
+          닫기 버튼의 접근 이름은 <code>closeLabel</code>
           (기본 &quot;팝업 닫기&quot;)이고, 40px 로 보이지만 44px 을 누른다.
           마크업에서는 패널의 마지막 요소라 첫 포커스는 본문·푸터로 간다
         </li>

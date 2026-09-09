@@ -13,14 +13,14 @@ import { Example } from "@/components/guide";
 function ProfilePopup({
   open,
   onRequestClose,
-  onExited,
+  onCloseComplete,
   isTopmost,
 }: LayerPopupComponentProps) {
   return (
     <LayerPopup
       open={open}
       onRequestClose={onRequestClose}
-      onExited={onExited}
+      onCloseComplete={onCloseComplete}
       isTopmost={isTopmost}
       title="프로필 수정"
       footer={
@@ -88,7 +88,7 @@ export function LayerPopupDemo() {
       <p>
         <code>useLayerPopup().open({"{ component }"})</code> 로 내용 컴포넌트를
         넘긴다. <code>PopupHost</code> 가 <code>open</code> ·{" "}
-        <code>onRequestClose</code> · <code>onExited</code> ·{" "}
+        <code>onRequestClose</code> · <code>onCloseComplete</code> ·{" "}
         <code>isTopmost</code> 를 넣어 렌더하므로 열림 상태를 화면 쪽에서 들고
         있을 필요가 없다.
       </p>
@@ -104,9 +104,9 @@ export function LayerPopupDemo() {
         </Button>
       </Example>
       <pre className="doc-code">
-        <code>{`function ProfilePopup({ open, onRequestClose, onExited, isTopmost }: LayerPopupComponentProps) {
+        <code>{`function ProfilePopup({ open, onRequestClose, onCloseComplete, isTopmost }: LayerPopupComponentProps) {
   return (
-    <LayerPopup open={open} onRequestClose={onRequestClose} onExited={onExited} isTopmost={isTopmost} title="프로필 수정">
+    <LayerPopup open={open} onRequestClose={onRequestClose} onCloseComplete={onCloseComplete} isTopmost={isTopmost} title="프로필 수정">
       …
     </LayerPopup>
   );

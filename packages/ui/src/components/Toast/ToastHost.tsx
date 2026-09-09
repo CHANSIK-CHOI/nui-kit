@@ -73,7 +73,7 @@ export default function ToastHost({ children }: ToastHostProps) {
                     {...toastProps}
                     open={item.status === "open"}
                     onRequestClose={() => closeToast(item.id)}
-                    onExited={() => {
+                    onCloseComplete={() => {
                       onCloseComplete?.();
                       removeToast(item.id);
                     }}

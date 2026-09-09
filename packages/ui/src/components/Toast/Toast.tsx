@@ -51,7 +51,7 @@ export default function Toast({
   action,
   open,
   onRequestClose,
-  onExited,
+  onCloseComplete,
   onOpenComplete,
 }: ToastProps) {
   // framer-motion 은 CSS duration 토큰의 1ms 무력화를 읽지 않는다 (design-system.md §6).
@@ -139,7 +139,7 @@ export default function Toast({
   const ToneIcon = TONE_ICON[tone];
 
   return (
-    <AnimatePresence onExitComplete={onExited}>
+    <AnimatePresence onExitComplete={onCloseComplete}>
       {open ? (
         <motion.article
           role={tone === "error" ? "alert" : "status"}

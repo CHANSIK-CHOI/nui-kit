@@ -13,14 +13,14 @@ import { Example } from "@/components/guide";
 function DetailPopup({
   open,
   onRequestClose,
-  onExited,
+  onCloseComplete,
   isTopmost,
 }: FullPopupComponentProps) {
   return (
     <FullPopup
       open={open}
       onRequestClose={onRequestClose}
-      onExited={onExited}
+      onCloseComplete={onCloseComplete}
       isTopmost={isTopmost}
       title="상세 정보"
       footer={

@@ -40,7 +40,7 @@ export type ToastSharedProps = {
 export type ToastProps = ToastSharedProps & {
   open: boolean;
   onRequestClose?: () => void;
-  onExited?: () => void;
+  onCloseComplete?: () => void;
   onOpenComplete?: () => void;
 };
 

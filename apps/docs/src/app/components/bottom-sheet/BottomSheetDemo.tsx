@@ -15,14 +15,14 @@ const OPTIONS = ["링크 복사", "카카오톡", "메시지", "메일"];
 function ShareSheet({
   open,
   onRequestClose,
-  onExited,
+  onCloseComplete,
   isTopmost,
 }: BottomSheetComponentProps) {
   return (
     <BottomSheet
       open={open}
       onRequestClose={onRequestClose}
-      onExited={onExited}
+      onCloseComplete={onCloseComplete}
       isTopmost={isTopmost}
       title="공유하기"
     >

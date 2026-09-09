@@ -84,13 +84,13 @@ export default function PopupBase({
   description,
   footer,
   hasCloseButton = true,
-  closeButtonLabel = "팝업 닫기",
+  closeLabel = "팝업 닫기",
   shouldCloseOnBackdrop = true,
   shouldCloseOnEscape = true,
   dialogLabel,
   onRequestClose,
   onClickClose,
-  onExited,
+  onCloseComplete,
   // 기본값은 `true` 다 — 스택을 아는 것은 `PopupHost` 뿐이고 그쪽은 열린 팝업마다
   // 값을 **항상 명시적으로** 넘긴다(`PopupHost.tsx`). 남는 자리는 소비자가 팝업을
   // 직접 렌더하는 선언형이고 거기서는 답이 사실상 언제나 `true` 다.
@@ -180,7 +180,7 @@ export default function PopupBase({
     <button
       type="button"
       className={`${block}__close`}
-      aria-label={closeButtonLabel}
+      aria-label={closeLabel}
       onClick={handleCloseButtonClick}
     >
       <CloseIcon width={20} height={20} />
@@ -207,7 +207,7 @@ export default function PopupBase({
   ) : null;
 
   return (
-    <AnimatePresence onExitComplete={onExited}>
+    <AnimatePresence onExitComplete={onCloseComplete}>
       {open ? (
         <motion.div
           id={id}

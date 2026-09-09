@@ -17,7 +17,7 @@ const block = px("popup-alert");
 export default function Alert({
   id,
   open,
-  onExited,
+  onCloseComplete,
   isTopmost,
   className,
   title,
@@ -41,7 +41,7 @@ export default function Alert({
     <PopupBase
       id={id}
       open={open}
-      onExited={onExited}
+      onCloseComplete={onCloseComplete}
       isTopmost={isTopmost}
       className={cn(block, className)}
       title={title}
