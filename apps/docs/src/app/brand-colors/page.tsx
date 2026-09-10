@@ -76,12 +76,24 @@ import "@nui-kit/react/styles/themes/preset-42.css";`}</code>
 
       <h2>목록에 없는 색을 쓰고 싶다면</h2>
       <p>
-        아직 안 된다. {data.count}색은 원본 400색에서 걸러낸 것이고, 기준은{" "}
-        <em>{data.rule}</em> 이다.
+        명령 하나로 만든다. 설치돼 있으면 바로 된다. 프리셋과 같은 규칙으로
+        나머지 색이 나온다.
+      </p>
+      <pre className="doc-code">
+        <code>{`npx nui-theme --accent "#b1002a"   # ./nui-theme.css 가 생긴다`}</code>
+      </pre>
+      <pre className="doc-code">
+        <code>{`import "@nui-kit/react/styles/index.css";
+import "./nui-theme.css";`}</code>
+      </pre>
+      <p>
+        거의 회색인 색은 받지 않는다. {data.count}색을 고를 때 쓴 기준과 같다.{" "}
+        <em>{data.rule}</em> 색깔 값이 우연한 숫자라 그 숫자로 화면 전체를
+        물들이면 엉뚱한 색이 나온다.
       </p>
       <p>
-        거의 회색인 색은 색깔 값이 우연한 숫자다. 그 숫자로 화면 전체를 물들이면
-        엉뚱한 색이 나온다.
+        채워진 버튼 위 글자 대비가 기준에 못 미치면 파일은 만들되 수치와 함께
+        알린다. 조금 더 진하거나 연한 색을 고르면 지켜진다.
       </p>
     </>
   );

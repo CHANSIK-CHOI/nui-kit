@@ -110,6 +110,21 @@ import "@nui-kit/react/styles/themes/preset-42.css";
 미리보기와 번호는 문서 사이트의 「브랜드 색 고르기」에 있습니다. 다크는 OS 설정을
 자동으로 따르고, `<html data-theme="dark">` 또는 `"light"` 로 강제할 수 있습니다.
 
+**목록에 없는 색은 명령으로 만듭니다.** 설치돼 있으면 바로 됩니다.
+
+```bash
+npx nui-theme --accent "#b1002a"     # ./nui-theme.css 가 생깁니다
+npx nui-theme --preset 42            # 프리셋도 같은 명령으로 파일로 받을 수 있습니다
+```
+
+```tsx
+import "@nui-kit/react/styles/index.css";
+import "./nui-theme.css";
+```
+
+회색에 가까운 색은 받지 않습니다. 색깔 값이 우연한 숫자라 화면 전체가 엉뚱한 색조로
+물듭니다. 채워진 버튼 위 글자 대비가 기준에 못 미치면 파일은 만들되 수치와 함께 알립니다.
+
 ### 치수·모양·선 두께는 컴포넌트별로 엽니다
 
 바꾸면 결과가 바로 보이고 짝이 없는 값들입니다. 이름은

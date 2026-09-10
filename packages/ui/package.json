@@ -28,6 +28,9 @@
     "**/*.css",
     "**/*.scss"
   ],
+  "bin": {
+    "nui-theme": "./dist/cli.js"
+  },
   "files": [
     "dist",
     "styles",
@@ -109,7 +112,7 @@
   },
   "scripts": {
     "build": "npm run build:js && npm run build:styles && npm run build:themes",
-    "build:js": "tsup && tsc -p tsconfig.build.json",
+    "build:js": "tsup && tsup --config tsup.cli.config.ts && tsc -p tsconfig.build.json",
     "build:styles": "node -e \"require('node:fs').rmSync('styles',{recursive:true,force:true})\" && sass --no-source-map --style=compressed --load-path=src/styles src/styles/entries:styles",
     "build:themes": "node scripts/color/build-themes.mjs",
     "dev:styles": "sass --watch --no-source-map --load-path=src/styles src/styles/entries:styles",
