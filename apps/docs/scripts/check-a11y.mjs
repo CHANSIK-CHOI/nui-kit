@@ -199,6 +199,78 @@ const CONTRAST_TARGETS = [
     async (page) =>
       page.getByRole("button", { name: "에러 토스트" }).first().click(),
   ],
+  // 2026-09-10 — 사이드바 28 중 19 만 재고 있었다. 컨트롤이 있는 여섯 페이지를 더한다.
+  //   「통과」가 「검사한 것만 통과」가 되지 않게 (a11y.md §4-1). icon · message · popup(개요)은
+  //   컨트롤이 없어 뺀다.
+  [
+    "ButtonLink 라벨",
+    "/components/button-link",
+    "a.nui-button .nui-button__wrap",
+    4.5,
+  ],
+  [
+    "ButtonLink primary 라벨",
+    "/components/button-link",
+    "a.nui-button--primary .nui-button__wrap",
+    4.5,
+  ],
+  [
+    "ButtonGroup 항목 라벨",
+    "/components/button-group",
+    ".nui-button-group .nui-button__wrap",
+    4.5,
+  ],
+  [
+    "Alert 제목",
+    "/components/alert",
+    ".nui-popup__title",
+    4.5,
+    async (page) => page.getByRole("button", { name: "저장" }).first().click(),
+  ],
+  [
+    "Alert 설명",
+    "/components/alert",
+    ".nui-popup__description",
+    4.5,
+    async (page) => page.getByRole("button", { name: "저장" }).first().click(),
+  ],
+  [
+    "Alert 확인 버튼 라벨",
+    "/components/alert",
+    ".nui-popup__actions .nui-button__wrap, .nui-popup__foot .nui-button__wrap",
+    4.5,
+    async (page) => page.getByRole("button", { name: "저장" }).first().click(),
+  ],
+  [
+    "Confirm 제목",
+    "/components/confirm",
+    ".nui-popup__title",
+    4.5,
+    async (page) => page.getByRole("button", { name: "삭제" }).first().click(),
+  ],
+  [
+    "Confirm 취소 버튼 라벨 (line)",
+    "/components/confirm",
+    ".nui-popup__actions .nui-button--line .nui-button__wrap, .nui-popup__foot .nui-button--line .nui-button__wrap",
+    4.5,
+    async (page) => page.getByRole("button", { name: "삭제" }).first().click(),
+  ],
+  [
+    "BottomSheet 제목",
+    "/components/bottom-sheet",
+    ".nui-popup__title",
+    4.5,
+    async (page) =>
+      page.getByRole("button", { name: "정렬 바꾸기" }).first().click(),
+  ],
+  [
+    "FullPopup 제목",
+    "/components/full-popup",
+    ".nui-popup__title",
+    4.5,
+    async (page) =>
+      page.getByRole("button", { name: "상품 상세 보기" }).first().click(),
+  ],
 ];
 
 for (const theme of ["light", "dark"]) {
@@ -683,14 +755,37 @@ console.log("\n■ 포커스가 글자를 밀지 않는가");
 
 /** [이름, 페이지, 컨트롤 셀렉터, 포커스 대상, 기준선 셀렉터] */
 const SHIFT_TARGETS = [
-  ["Textfield", "/components/textfield", ".nui-textfield__wrap", ".nui-textfield__input"],
-  ["Textarea", "/components/textarea", ".nui-textarea__wrap", ".nui-textarea__input"],
-  ["Search", "/components/search", ".nui-textfield__wrap", ".nui-textfield__input"],
-  ["Select", "/components/select", ".nui-select__control", ".nui-select__control"],
+  [
+    "Textfield",
+    "/components/textfield",
+    ".nui-textfield__wrap",
+    ".nui-textfield__input",
+  ],
+  [
+    "Textarea",
+    "/components/textarea",
+    ".nui-textarea__wrap",
+    ".nui-textarea__input",
+  ],
+  [
+    "Search",
+    "/components/search",
+    ".nui-textfield__wrap",
+    ".nui-textfield__input",
+  ],
+  [
+    "Select",
+    "/components/select",
+    ".nui-select__control",
+    ".nui-select__control",
+  ],
 ];
 
 {
-  const ctx = await browser.newContext({ viewport: VIEWPORT, colorScheme: "light" });
+  const ctx = await browser.newContext({
+    viewport: VIEWPORT,
+    colorScheme: "light",
+  });
   for (const [label, path, boxSel, focusSel] of SHIFT_TARGETS) {
     const page = await ctx.newPage();
     await page.goto(BASE + path, { waitUntil: "networkidle" });
@@ -805,12 +900,22 @@ const SELECTION_PROBE = ({ tones, states }) => {
           `</span>`;
         const control = host.querySelector(`.${blockClass}__control`);
         const mark = host.querySelector(`.${markClass}`);
-        const fill = flatten([surface, getComputedStyle(control).backgroundColor]);
+        const fill = flatten([
+          surface,
+          getComputedStyle(control).backgroundColor,
+        ]);
         const markColor = flatten([
           `rgb(${fill[0]}, ${fill[1]}, ${fill[2]})`,
           getComputedStyle(mark)[markProp],
         ]);
-        rows.push({ kind, tone, state, fill, mark: markColor, surface: flatten([surface]) });
+        rows.push({
+          kind,
+          tone,
+          state,
+          fill,
+          mark: markColor,
+          surface: flatten([surface]),
+        });
       }
     }
   }
@@ -819,10 +924,15 @@ const SELECTION_PROBE = ({ tones, states }) => {
 };
 
 for (const theme of ["light", "dark"]) {
-  const ctx = await browser.newContext({ viewport: VIEWPORT, colorScheme: theme });
+  const ctx = await browser.newContext({
+    viewport: VIEWPORT,
+    colorScheme: theme,
+  });
   const page = await ctx.newPage();
   await page.goto(BASE + "/components/checkbox", { waitUntil: "networkidle" });
-  const stamped = await page.evaluate(() => document.documentElement.dataset.theme);
+  const stamped = await page.evaluate(
+    () => document.documentElement.dataset.theme,
+  );
   if (stamped !== theme) {
     bad(`선택 컨트롤: 테마가 ${theme} 이어야 하는데 ${stamped} 다`);
     await ctx.close();
@@ -1033,7 +1143,10 @@ const TOUCH_TARGETS = [
     "/components/toast",
     ".nui-toast__action",
     async (page) =>
-      page.getByRole("button", { name: "되돌리기 있는 토스트" }).first().click(),
+      page
+        .getByRole("button", { name: "되돌리기 있는 토스트" })
+        .first()
+        .click(),
   ],
   [
     "Toast 닫기",
@@ -1056,6 +1169,39 @@ const TOUCH_TARGETS = [
     "세로 묶음의 간격이 16 이라 이웃 input(44)과 4px 겹친다. 겹친 곳은 가까운 쪽이 받으므로 상한이 40 이다. 24 하한은 넘는다",
   ],
   ["Switch", "/components/switch", ".nui-switch__input"],
+  // 2026-09-10 — 미등록이던 여섯 페이지의 누르는 것. 팝업 닫기는 hit-area 로 44 를 누른다 (a11y.md §8-1)
+  ["ButtonLink", "/components/button-link", "a.nui-button"],
+  [
+    "ButtonGroup 항목",
+    "/components/button-group",
+    ".nui-button-group .nui-button",
+  ],
+  [
+    "Alert 확인",
+    "/components/alert",
+    ".nui-popup__actions .nui-button, .nui-popup__foot .nui-button",
+    async (page) => page.getByRole("button", { name: "저장" }).first().click(),
+  ],
+  [
+    "Confirm 취소",
+    "/components/confirm",
+    ".nui-popup__actions .nui-button, .nui-popup__foot .nui-button",
+    async (page) => page.getByRole("button", { name: "삭제" }).first().click(),
+  ],
+  [
+    "BottomSheet 닫기",
+    "/components/bottom-sheet",
+    ".nui-popup__close",
+    async (page) =>
+      page.getByRole("button", { name: "정렬 바꾸기" }).first().click(),
+  ],
+  [
+    "FullPopup 닫기",
+    "/components/full-popup",
+    ".nui-popup__close",
+    async (page) =>
+      page.getByRole("button", { name: "상품 상세 보기" }).first().click(),
+  ],
 ];
 
 {
