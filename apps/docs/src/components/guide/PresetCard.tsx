@@ -108,7 +108,7 @@ export function PresetCard({ p }: { p: Preset }) {
       <Scale colors={p.secondary} labels={data.steps} mark={9} />
 
       <pre className="preset-cmd">
-        <code>npm run color:generate -- --preset {p.n}</code>
+        <code>{`import "@nui-kit/react/styles/themes/preset-${p.n}.css";`}</code>
       </pre>
 
       <details className="preset-more">

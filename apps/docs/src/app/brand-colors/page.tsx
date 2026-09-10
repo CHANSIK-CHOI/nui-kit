@@ -47,16 +47,18 @@ export default function BrandColorsPage() {
       <ol>
         <li>색깔 페이지에서 마음에 드는 번호를 찾는다</li>
         <li>
-          그 카드의 명령을 실행하면 <code>nui-theme.css</code> 가 생긴다
-        </li>
-        <li>
-          라이브러리 CSS 뒤에 불러온다
+          루트 <code>layout.tsx</code> 에서 그 번호의 CSS 를 불러온다. 패키지에
+          {data.count}색이 전부 들어 있어 설치할 것도 실행할 것도 없다
           <pre className="doc-code">
             <code>{`import "@nui-kit/react/styles/index.css";
-import "./nui-theme.css";`}</code>
+import "@nui-kit/react/styles/themes/preset-42.css";`}</code>
           </pre>
         </li>
       </ol>
+      <p>
+        다른 색으로 바꾸려면 숫자만 고친다. 라이브러리를 올리면 그 버전의 색을
+        받는다.
+      </p>
 
       <div className="doc-note doc-note--warn">
         <p>

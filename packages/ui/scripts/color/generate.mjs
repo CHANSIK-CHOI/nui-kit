@@ -158,6 +158,12 @@ export function generateTheme(accentHex, theme) {
   };
 }
 
+/**
+ * 패키지에 싣는 프리셋 파일 이름 — `styles/themes/preset-42.css`.
+ * 번호로 짓는다. 이름이 빈 프리셋이 있고(6 · 7번), 소비자가 문서에서 보는 것도 번호다.
+ */
+export const themeFileName = (n) => `preset-${n}.css`;
+
 /** 브랜드 색 하나로 라이트·다크 두 벌을 만든다. */
 export function generate(accentHex) {
   return {
@@ -193,22 +199,36 @@ function declarations(theme, indent) {
 /**
  * 소비자가 `import` 하는 CSS 한 장(`Q-3`).
  * 레이어에 넣지 않는다 — 레이어 밖이 항상 이기므로 우리 기본값을 덮어쓴다.
+ *
+ * `compact` 는 패키지에 싣는 프리셋 파일용이다(`build-themes.mjs`). 머리 주석 한 줄에
+ * 번호 · 이름 · hex · **패키지 버전**을 남긴다 — 소비자가 어느 버전의 색을 들고 있는지
+ * 파일만 열어도 알 수 있어야 한다.
  */
 export function toCss(result, meta = {}) {
+  const presetLine = meta.preset
+    ? `프리셋 ${meta.preset.n}. ${meta.preset.name || "(이름 없음)"} (${meta.preset.hex})`
+    : `브랜드 색 ${result.accent}`;
+
+  if (meta.compact) {
+    const head = `/* @nui-kit/react${meta.version ? `@${meta.version}` : ""} — ${presetLine}. 자동 생성. 손으로 고치지 말 것 */`;
+    const flat = (theme) => declarations(theme, 0).split("\n").join("");
+    return (
+      `${head}\n` +
+      `:root{${flat(result.light)}}\n` +
+      `@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${flat(result.dark)}}}\n` +
+      `:root[data-theme="dark"]{${flat(result.dark)}}\n`
+    );
+  }
+
   const head = [
     "/*",
     " * @nui-kit/react — 브랜드 색 테마",
-    meta.preset
-      ? ` * 프리셋 ${meta.preset.n}. ${meta.preset.name} (${meta.preset.hex})`
-      : null,
-    ` * 브랜드 색 ${result.accent}`,
+    ` * ${presetLine}`,
     " *",
     " * Radix 공식 생성기(radix-theme-generator)로 만든 자동 생성 파일이다.",
     " * 손으로 고치지 말 것. 라이브러리 CSS 뒤에 import 한다.",
     " */",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  ].join("\n");
 
   return `${head}
 

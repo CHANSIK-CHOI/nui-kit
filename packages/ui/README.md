@@ -98,9 +98,17 @@ import "@nui-kit/react/styles/preflight.css";
 ```
 
 **전체 브랜드 색은 프리셋으로 바꿉니다.** 185색 중 하나를 고르면 버튼·입력창·선택
-컨트롤·회색까지 **대비를 유지한 채** 함께 바뀝니다. 고르는 법과 미리보기는 문서
-사이트의 「브랜드 색 고르기」에 있습니다. 다크는 OS 설정을 자동으로 따르고,
-`<html data-theme="dark">` 또는 `"light"` 로 강제할 수 있습니다.
+컨트롤·회색까지 **대비를 유지한 채** 함께 바뀝니다. 185색이 전부 패키지에 들어 있어
+번호의 CSS 를 한 줄 더 불러오면 됩니다.
+
+```tsx
+// app/layout.tsx
+import "@nui-kit/react/styles/index.css";
+import "@nui-kit/react/styles/themes/preset-42.css";
+```
+
+미리보기와 번호는 문서 사이트의 「브랜드 색 고르기」에 있습니다. 다크는 OS 설정을
+자동으로 따르고, `<html data-theme="dark">` 또는 `"light"` 로 강제할 수 있습니다.
 
 ### 치수·모양·선 두께는 컴포넌트별로 엽니다
 
