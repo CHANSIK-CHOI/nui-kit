@@ -100,9 +100,10 @@ body { font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; }`
 
       <h2>행간과 자간</h2>
       <p>
-        큰 글자일수록 줄 높이 배수를 줄인다(1.5 → 1.4). 단일 배수를 전 스케일에
-        적용하면 큰 제목이 헐거워 보인다. 자간은 반대로 큰 글자일수록 좁힌다. 둘
-        다 광학 보정이다.
+        행간은 전 스케일 1.5 배수이고 자간은 0 이다. 같은 번호의 크기 · 행간 ·
+        자간이 한 벌이라 <code>typo(2)</code> 처럼 번호 하나로 셋이 함께 붙는다.
+        행간이 배수(unitless)인 것은 글자 크기를 덮어도 비율이 유지되게 하기
+        위해서다.
       </p>
 
       <div className="doc-table-wrap">

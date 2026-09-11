@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CircleHelp } from "lucide-react";
 import {
-  Button,
+  // Button — Header suffix 의 text 버튼은 보류 중 (2026-09-11)
   Field,
   FieldLabel,
   Icon,
@@ -24,6 +24,25 @@ import {
 } from "@/components/guide";
 
 export const metadata = { title: "Field" };
+
+/** Header suffix 의 도움말 아이콘 — 에러 아이콘과 같은 16px, 라벨과 같은 색(text-primary) */
+function HelpTip({ content }: { content: string }) {
+  return (
+    <Tooltip content={content}>
+      <span
+        tabIndex={0}
+        aria-label="도움말"
+        style={{
+          display: "inline-flex",
+          cursor: "help",
+          color: "var(--nui-text-primary)",
+        }}
+      >
+        <Icon icon={<CircleHelp />} size={16} />
+      </span>
+    </Tooltip>
+  );
+}
 
 const DIRECTIONS = ["column", "row"] as const;
 const ALIGNS = ["start", "center"] as const;
@@ -85,18 +104,12 @@ export default function FieldPage() {
             <FieldHeader
               suffix={
                 <>
-                  <Tooltip content="도로명 주소만 받습니다. 지번은 우편번호 찾기에서 바꿔 드려요">
-                    <span
-                      tabIndex={0}
-                      aria-label="도움말"
-                      style={{ display: "inline-flex", cursor: "help" }}
-                    >
-                      <Icon icon={<CircleHelp />} />
-                    </span>
-                  </Tooltip>
+                  <HelpTip content="도로명 주소만 받습니다. 지번은 우편번호 찾기에서 바꿔 드려요" />
+                  {/* text 버튼은 보류 — 모양을 다시 본 뒤 결정 (2026-09-11)
                   <Button type="button" variant="text">
                     우편번호 찾기
                   </Button>
+                  */}
                 </>
               }
             >
@@ -113,9 +126,8 @@ export default function FieldPage() {
             <Field>
               <FieldHeader
                 suffix={
-                  <Button type="button" variant="text">
-                    찾기
-                  </Button>
+                  <HelpTip content="특별시 · 광역시는 시 이름만 적어 주세요" />
+                  /* text 버튼은 보류 — <Button type="button" variant="text">찾기</Button> */
                 }
               >
                 <FieldLabel>시</FieldLabel>
@@ -232,9 +244,8 @@ export default function FieldPage() {
           <Field errorMessage="주소를 입력해 주세요">
             <FieldHeader
               suffix={
-                <Button type="button" variant="text">
-                  우편번호 찾기
-                </Button>
+                <HelpTip content="도로명 주소만 받습니다" />
+                /* text 버튼은 보류 — <Button type="button" variant="text">우편번호 찾기</Button> */
               }
             >
               <FieldLabel>주소</FieldLabel>

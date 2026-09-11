@@ -29,9 +29,10 @@ export default function MessagePage() {
 
       <h2>어디에 주나</h2>
       <p>
-        같은 문구를 그릴 수 있는 자리가 둘이다 — 컨트롤의{" "}
-        <code>errorMessage</code> 와 <code>Field.Message</code>.{" "}
-        <strong>한 곳에만 준다.</strong> 둘 다 주면 두 줄로 쌓인다.
+        같은 문구를 줄 수 있는 자리가 둘이다 — 컨트롤의{" "}
+        <code>errorMessage</code> 와 <code>Field</code>. <code>Field</code>{" "}
+        안에서는 어디에 주든 <strong>Field 의 Footer 한 줄</strong>에 모인다.
+        컨트롤 것이 있으면 그것이, 없으면 <code>Field</code> 것이 보인다.
       </p>
       <div className="doc-table-wrap">
         <table className="doc-table">
@@ -53,7 +54,8 @@ export default function MessagePage() {
                 손으로 검증한다
               </th>
               <td className="doc-wrap">
-                컨트롤 — <code>errorMessage</code>
+                <code>Field</code> — <code>errorMessage</code> ·{" "}
+                <code>infoMessage</code>. 서버 HTML 에 바로 들어간다
               </td>
             </tr>
             <tr>

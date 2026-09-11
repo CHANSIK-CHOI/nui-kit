@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { CircleHelp } from "lucide-react";
 import {
-  Button,
   Field,
+  Icon,
+  Tooltip,
   Textfield,
   Textarea,
   Password,
@@ -72,7 +74,7 @@ export function FieldFullDemo() {
       overflow
       caption="Field 의 prop 전부와 폼 컨트롤 열 개를 한 폼에 놓았다. 세로 간격은 Field.Grid columns={1} 이 만든다"
       code={`<Field required requiredLabel="필수 입력" infoMessage="회사 메일로 입력해 주세요">
-  <Field.Header suffix={<Button variant="text">인증 메일 보내기</Button>}>
+  <Field.Header suffix={<Tooltip content="…"><span aria-label="도움말" tabIndex={0}><Icon icon={<CircleHelp />} size={16} /></span></Tooltip>}>
     <Field.Label>이메일</Field.Label>
   </Field.Header>
   <Textfield … />
@@ -101,12 +103,23 @@ export function FieldFullDemo() {
               requiredLabel="필수 입력"
               infoMessage="회사 메일로 입력해 주세요"
             >
-              {/* Header — 좌 라벨 · 우 suffix(보조 액션). suffix 는 label 밖이다 */}
+              {/* Header — 좌 라벨 · 우 suffix(도움말 아이콘 16px · 라벨 색). suffix 는 label 밖이다.
+                  text 버튼은 보류 — <Button type="button" variant="text">인증 메일 보내기</Button> */}
               <Field.Header
                 suffix={
-                  <Button type="button" variant="text">
-                    인증 메일 보내기
-                  </Button>
+                  <Tooltip content="회사 도메인이 아니면 인증 메일이 반려될 수 있어요">
+                    <span
+                      tabIndex={0}
+                      aria-label="도움말"
+                      style={{
+                        display: "inline-flex",
+                        cursor: "help",
+                        color: "var(--nui-text-primary)",
+                      }}
+                    >
+                      <Icon icon={<CircleHelp />} size={16} />
+                    </span>
+                  </Tooltip>
                 }
               >
                 <Field.Label>이메일</Field.Label>

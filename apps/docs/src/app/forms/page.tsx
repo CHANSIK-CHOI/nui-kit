@@ -64,10 +64,13 @@ export default function FormsPage() {
         전체를 보고 정한다.
       </div>
 
-      <h2>메시지는 한 곳에만 준다</h2>
+      <h2>메시지는 Footer 한 줄에 모인다</h2>
       <p>
-        에러와 도움말을 그릴 수 있는 자리가 둘이다 — <code>Field</code> 와
-        컨트롤. <strong>둘 다 주면 같은 문구가 두 줄로 쌓인다.</strong>
+        에러와 도움말을 줄 수 있는 자리가 둘이다 — <code>Field</code> 와 컨트롤.{" "}
+        <code>Field</code> 안에서는 어디에 주든{" "}
+        <strong>Field 의 Footer 한 줄</strong>에 모인다. 에러가 있으면 도움말은
+        그리지 않고, 글자 수는 오른쪽에 선다. 그래도 어디에 주는지는 자리마다
+        정해져 있다.
       </p>
       <div className="doc-table-wrap">
         <table className="doc-table">
@@ -91,7 +94,11 @@ export default function FormsPage() {
                 손으로 검증한다
               </th>
               <td className="doc-wrap">
-                <strong>컨트롤</strong> — <code>errorMessage</code> 를 준다
+                <strong>
+                  <code>Field</code>
+                </strong>{" "}
+                — <code>errorMessage</code> · <code>infoMessage</code>. 서버
+                HTML 에 바로 들어간다. 컨트롤에 주면 hydration 뒤에 그려진다
               </td>
             </tr>
             <tr>
