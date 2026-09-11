@@ -12,7 +12,12 @@ const GROUPS: [string, string, string, string][] = [
   ["text", "글자색", "/foundations/color#text", "역할별 색 · 글자"],
   ["layer", "면", "/foundations/color#layer", "역할별 색 · 면"],
   ["border", "선", "/foundations/shape#border", "선 색과 두께"],
-  ["control", "입력 컨트롤", "/foundations/color#control", "역할별 색 · 입력 컨트롤"],
+  [
+    "control",
+    "입력 컨트롤",
+    "/foundations/color#control",
+    "역할별 색 · 입력 컨트롤",
+  ],
   ["action", "액션", "/foundations/color#action", "역할별 색 · 액션"],
   ["status", "상태 표시", "/foundations/color#status", "역할별 색 · 상태 표시"],
   [
@@ -58,8 +63,8 @@ export default function TokensPage() {
               <th scope="row">숫자</th>
               <td>
                 <span className="doc-token-name">space-4</span>{" "}
-                <span className="doc-token-name">radius-2</span>{" "}
-                <span className="doc-token-name">font-size-3</span>
+                <span className="doc-token-name">radius-3</span>{" "}
+                <span className="doc-token-name">font-size-2</span>
               </td>
               <td className="doc-wrap">
                 등간격 스케일 — 간격 · 모서리 · 글자 크기 · 시간
@@ -80,9 +85,9 @@ export default function TokensPage() {
       </div>
 
       <p>
-        숫자를 쓰면 값이 이름에서 계산되고(<code>space-4</code> = 4 × 4px)
-        중간값을 넣어도 기존 이름이 바뀌지 않는다(<code>space-1</code> 과{" "}
-        <code>space-2</code> 사이는 <code>space-1_5</code>).
+        숫자를 쓰면 값이 이름에서 계산된다(<code>space-4</code> = 4 × 4px).
+        번호는 1부터 순서대로이고 새 값은 끝 번호로만 더한다. 중간에 끼워 넣으면
+        뒤 번호가 밀린다.
       </p>
       <p>
         아이콘 크기는 14, 16, 20, 24px 로 불규칙해서 숫자의 두 이점이 모두 없다.
@@ -93,7 +98,7 @@ export default function TokensPage() {
         <code>{`색      color-brand-9  ─→  action-primary  ─→  .nui-button--primary
         팔레트            역할               컴포넌트가 참조하는 것
 
-그 외    radius-2       ─────────────────→  .nui-textfield
+그 외    radius-3       ─────────────────→  .nui-textfield
         스케일                              역할 층 없음`}</code>
       </pre>
       <p>

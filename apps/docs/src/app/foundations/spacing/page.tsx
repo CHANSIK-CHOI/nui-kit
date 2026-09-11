@@ -46,13 +46,12 @@ export default function SpacingPage() {
       </div>
 
       <p>
-        4px 기준 숫자 스케일이다. <code>space-4</code> 는 4 × 4px = 16px 이다.
-        중간값을 넣어도 기존 이름이 바뀌지 않는다. <code>space-1</code> 과{" "}
-        <code>space-2</code> 사이가 필요하면 <code>space-1_5</code> 다.
+        4px 기준 숫자 스케일이다. <code>space-4</code> 는 4 × 4px = 16px 이고{" "}
+        <code>space-5</code> 는 24px 이다. 번호는 1부터 5까지 순서대로다.
       </p>
       <p>
-        <code>space-5</code> · <code>space-7</code> · <code>space-8</code> ·{" "}
-        <code>space-9</code> 는 없다. 쓰이지 않아서 만들지 않았다.
+        다섯뿐이다. 쓰이지 않아서 만들지 않았다. 새 간격이 필요하면 끝 번호로
+        더한다. 중간에 끼워 넣지 않는다.
       </p>
 
       <h2 id="space">정해진 게 없으면 이것</h2>
@@ -88,7 +87,7 @@ export default function SpacingPage() {
                   height: `var(${token.name})`,
                   background: "var(--nui-color-brand-3)",
                   border: "1px solid var(--nui-color-brand-9)",
-                  borderRadius: "var(--nui-radius-2)",
+                  borderRadius: "var(--nui-radius-3)",
                   marginBottom: 8,
                 }}
               />
@@ -147,8 +146,8 @@ export default function SpacingPage() {
       <p>
         크기별 값은 단계마다 이름이 따로 있는 변수로 연다.{" "}
         <code>--nui-button--large-height</code> · <code>-medium-height</code> ·{" "}
-        <code>-small-height</code> 가 그렇다. 하나로 두면 값을 넣는 순간 세 단계가
-        전부 같아진다. 자세한 것은{" "}
+        <code>-small-height</code> 가 그렇다. 하나로 두면 값을 넣는 순간 세
+        단계가 전부 같아진다. 자세한 것은{" "}
         <Link href="/foundations/customizing">커스터마이징</Link> 문서에 있다.
       </p>
 

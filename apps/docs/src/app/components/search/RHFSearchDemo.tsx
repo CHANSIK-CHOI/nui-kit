@@ -64,7 +64,7 @@ export function RHFSearchDemo() {
             >
               초기화
             </Button>
-            <span style={{ fontSize: "var(--nui-font-size-3)" }}>
+            <span style={{ fontSize: "var(--nui-font-size-2)" }}>
               {submitted
                 ? `"${submitted}" 로 검색했습니다`
                 : `isValid: ${String(formState.isValid)}`}

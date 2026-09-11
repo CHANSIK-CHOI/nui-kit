@@ -17,7 +17,7 @@
       flex-direction: row;
       flex-wrap: wrap;
       align-items: center;
-      gap: var(#{v("space-4")}) var(#{v("space-6")});
+      gap: var(#{v("space-4")}) var(#{v("space-5")});
 
       // Field 는 기본이 width:100% 라 그대로 두면 가로 배치가 무의미해진다
       // (각 항목이 한 줄을 차지해 세로로 쌓인다).

@@ -17,7 +17,7 @@
       background-color: var(#{v("control-bg")});
       border: #{hook("textarea--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border")});
-      border-radius: #{hook("textarea--radius", var(#{v("radius-1_5")}))};
+      border-radius: #{hook("textarea--radius", var(#{v("radius-2")}))};
 
       @include motion(
         (border-color, background-color, box-shadow),
@@ -43,7 +43,7 @@
       color: var(#{v("control-text")});
       caret-color: var(#{v("control-text")});
 
-      @include typo(4, "regular");
+      @include typo(3, "regular");
     }
 
     &__input:focus,
@@ -54,7 +54,7 @@
     &__input::placeholder {
       color: var(#{v("control-text-placeholder")});
 
-      @include typo(4, "regular");
+      @include typo(3, "regular");
     }
 
     // ── interaction

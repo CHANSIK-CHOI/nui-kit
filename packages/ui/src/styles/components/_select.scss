@@ -36,7 +36,7 @@
       background-color: var(#{v("control-bg")});
       border: #{hook("select--border-width", var(#{v("border-width-1")}))} solid
         var(#{v("control-border")});
-      border-radius: #{hook("select--radius", var(#{v("radius-1_5")}))};
+      border-radius: #{hook("select--radius", var(#{v("radius-2")}))};
       cursor: pointer;
 
       @include motion(
@@ -63,7 +63,7 @@
       padding: 0;
       color: var(#{v("control-text")});
 
-      @include typo(4, "regular");
+      @include typo(3, "regular");
     }
 
     &__input-container input {
@@ -86,13 +86,13 @@
     &__single-value {
       color: var(#{v("control-text")});
 
-      @include typo(4, "regular");
+      @include typo(3, "regular");
     }
 
     &__placeholder {
       color: var(#{v("control-text-placeholder")});
 
-      @include typo(4, "regular");
+      @include typo(3, "regular");
     }
 
     // ── indicators
@@ -150,7 +150,7 @@
       // 가장자리는 반투명 링 + 두 겹 그림자 — design-system.md §2-5-2
       border: #{hook("select--border-width", var(#{v("border-width-1")}))} solid
         var(#{v("border-floating")});
-      border-radius: var(#{v("radius-3")});
+      border-radius: var(#{v("radius-5")});
       background-color: var(#{v("layer-floating")});
       box-shadow: var(#{v("shadow-2")});
       z-index: var(#{v("z-tooltip")});
@@ -182,12 +182,12 @@
       align-items: center;
       min-height: var(#{v("size-control-option")});
       padding: 0 var(#{v("space-3")});
-      border-radius: var(#{v("radius-1_5")});
+      border-radius: var(#{v("radius-2")});
       color: var(#{v("text-primary")});
       cursor: pointer;
 
       @include motion((background-color, color), "3");
-      @include typo(4, "regular");
+      @include typo(3, "regular");
     }
 
     &__option--is-focused {
@@ -233,7 +233,7 @@
       padding: var(#{v("space-2")}) var(#{v("space-1")}) var(#{v("space-2")})
         var(#{v("space-3")});
 
-      @include typo(3, "regular");
+      @include typo(2, "regular");
     }
 
     // react-select 의 `div role="button"` 대신 우리 `<button>` 이다 —
@@ -285,7 +285,7 @@
       // 라이브러리 기본값에 기대지 않는다.
       text-align: center;
 
-      @include typo(3, "regular");
+      @include typo(2, "regular");
     }
 
     // ── interaction

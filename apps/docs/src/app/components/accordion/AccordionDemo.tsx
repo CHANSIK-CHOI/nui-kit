@@ -182,7 +182,7 @@ export function AccordionControlDemo() {
           전부 닫기
         </Button>
         {lastClicked !== null ? (
-          <span style={{ fontSize: "var(--nui-font-size-3)" }}>
+          <span style={{ fontSize: "var(--nui-font-size-2)" }}>
             마지막으로 누른 항목 {lastClicked}
           </span>
         ) : null}

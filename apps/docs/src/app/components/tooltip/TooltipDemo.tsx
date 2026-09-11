@@ -38,7 +38,7 @@ export function TooltipBasicDemo() {
           style={{
             textDecoration: "underline dotted",
             cursor: "help",
-            fontSize: "var(--nui-font-size-3)",
+            fontSize: "var(--nui-font-size-2)",
           }}
           tabIndex={0}
         >
@@ -139,7 +139,7 @@ export function TooltipControlDemo() {
       <Case label="open" note="쓰는 쪽이 갖는다">
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           <Tooltip open={isOpen} content="버튼으로 여닫는 툴팁이에요">
-            <span style={{ fontSize: "var(--nui-font-size-3)" }}>
+            <span style={{ fontSize: "var(--nui-font-size-2)" }}>
               대상 요소
             </span>
           </Tooltip>
@@ -163,7 +163,7 @@ export function TooltipControlDemo() {
               defaultOpen
             </Button>
           </Tooltip>
-          <span style={{ fontSize: "var(--nui-font-size-3)" }}>
+          <span style={{ fontSize: "var(--nui-font-size-2)" }}>
             바뀐 횟수 {changes}
           </span>
         </div>
@@ -180,7 +180,7 @@ const CLIP_BOX = {
   overflow: "hidden",
   padding: 12,
   border: "1px dashed var(--nui-border-form)",
-  borderRadius: "var(--nui-radius-2)",
+  borderRadius: "var(--nui-radius-3)",
 } as const;
 
 export function TooltipPortalDemo() {

@@ -40,7 +40,7 @@
     padding: var(#{v("space-3")}) var(#{v("space-panel-compact")});
     color: var(#{v("text-on-inverse")});
     background: var(#{v("layer-inverse")});
-    border-radius: #{hook("toast--radius", var(#{v("radius-2")}))};
+    border-radius: #{hook("toast--radius", var(#{v("radius-3")}))};
     // 위쪽 밝은 1px 은 다크 `shadow-3` 이 갖는다 — 여기서 따로 얹으면 겹친다.
     box-shadow: var(#{v("shadow-3")});
     pointer-events: auto;
@@ -74,7 +74,7 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
 
-      @include typo(3, "regular");
+      @include typo(2, "regular");
     }
 
     // ── 액션 하나 (SEED Snackbar actionButton)
@@ -97,7 +97,7 @@
       color: var(#{v("text-brand-on-inverse")});
       white-space: nowrap;
 
-      @include typo(3, "bold");
+      @include typo(2, "bold");
       // 보이는 높이는 한 줄이지만 누르는 범위는 44 다 — a11y.md §8
       @include hit-area;
       @include motion-press(color);

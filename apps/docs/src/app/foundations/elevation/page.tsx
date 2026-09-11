@@ -51,14 +51,14 @@ export default function ElevationPage() {
           style={{
             background: "var(--nui-layer-basement)",
             padding: 28,
-            borderRadius: "var(--nui-radius-2)",
+            borderRadius: "var(--nui-radius-3)",
           }}
         >
           <div
             style={{
               background: "var(--nui-layer-default)",
               border: "1px solid var(--nui-border-form)",
-              borderRadius: "var(--nui-radius-2)",
+              borderRadius: "var(--nui-radius-3)",
               padding: 28,
             }}
           >
@@ -66,9 +66,9 @@ export default function ElevationPage() {
               style={{
                 background: "var(--nui-layer-floating)",
                 boxShadow: "var(--nui-shadow-2)",
-                borderRadius: "var(--nui-radius-2)",
+                borderRadius: "var(--nui-radius-3)",
                 padding: 20,
-                fontSize: "var(--nui-font-size-3)",
+                fontSize: "var(--nui-font-size-2)",
               }}
             >
               떠 있는 면 — <code>layer-floating</code>
@@ -133,7 +133,7 @@ export default function ElevationPage() {
                   width: 92,
                   height: 56,
                   background: "var(--nui-layer-floating)",
-                  borderRadius: "var(--nui-radius-2)",
+                  borderRadius: "var(--nui-radius-3)",
                   boxShadow: `var(${token.name})`,
                   marginBottom: 8,
                 }}

@@ -64,7 +64,7 @@ export function RHFPasswordDemo() {
             >
               초기화
             </Button>
-            <span style={{ fontSize: "var(--nui-font-size-3)" }}>
+            <span style={{ fontSize: "var(--nui-font-size-2)" }}>
               isValid: {String(formState.isValid)}
             </span>
           </div>

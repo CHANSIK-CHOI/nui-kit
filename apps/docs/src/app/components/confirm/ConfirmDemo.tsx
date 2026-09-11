@@ -32,7 +32,7 @@ export function ConfirmBasicDemo() {
           삭제
         </Button>
         {answer ? (
-          <span style={{ fontSize: "var(--nui-font-size-3)" }}>{answer}</span>
+          <span style={{ fontSize: "var(--nui-font-size-2)" }}>{answer}</span>
         ) : null}
       </div>
     </Example>
@@ -66,7 +66,7 @@ export function ConfirmAsyncDemo() {
             발송
           </Button>
           {answer ? (
-            <span style={{ fontSize: "var(--nui-font-size-3)" }}>{answer}</span>
+            <span style={{ fontSize: "var(--nui-font-size-2)" }}>{answer}</span>
           ) : null}
         </div>
       </Example>

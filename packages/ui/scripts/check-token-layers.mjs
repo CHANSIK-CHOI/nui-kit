@@ -158,9 +158,17 @@ function checkHookName(name) {
  * 이행 중이기 때문이다. 목록이 비면 `_seed.scss` 의 alias 를 지울 수 있다.
  */
 const DEPRECATED = {
-  // 둥근 정도 최대 12 (KRDS C1)
-  "radius-4": "radius-2_5",
-  "radius-6": "radius-3",
+  // 2026-09-11 — 번호를 순서대로 다시 매겼다 (tokens.md §2). 값은 그대로, 이름만.
+  //   ⚠️ 옛 `radius-2/3` · `font-size-3/4/5` · `line-height-3/4/5` 는 **새 이름과 겹쳐** 여기 못 넣는다
+  //      (같은 이름이 옛 뜻으로 남아 있어도 검사가 못 가른다 — 값 표로 본다). 겹치지 않는 옛 이름만 잡는다.
+  "radius-1_5": "radius-2",
+  "radius-2_5": "radius-4",
+  "space-6": "space-5",
+  "font-size-6": "font-size-5",
+  "line-height-6": "line-height-5",
+  "letter-spacing-6": "letter-spacing-5",
+  // 둥근 정도 최대 12 (KRDS C1) — 16 · 24 는 지웠다
+  "radius-6": "(삭제 — 최대 12 · radius-5)",
   // 굵기 두 단계 (KRDS B1, 2026-09-04)
   "font-weight-medium": "font-weight-regular",
   "font-weight-semi-bold": "font-weight-bold",
@@ -173,12 +181,12 @@ const DEPRECATED = {
   "space-xs": "space-2",
   "space-sm": "space-3",
   "space-md": "space-4",
-  "space-lg": "space-6",
+  "space-lg": "space-5",
   "radius-xs": "radius-1",
-  "radius-sm": "radius-2",
-  "radius-md": "radius-3",
-  "radius-lg": "radius-4",
-  "radius-xl": "radius-6",
+  "radius-sm": "radius-3",
+  "radius-md": "radius-5",
+  "radius-lg": "(삭제 — 최대 12 · radius-5)",
+  "radius-xl": "(삭제 — 최대 12 · radius-5)",
   "radius-pill": "radius-full",
   "radius-pill-fluid": "radius-full",
   "radius-round": "radius-circle",
@@ -215,18 +223,22 @@ const DEPRECATED = {
   "action-info": "(삭제 — Button variant 가 없다)",
   "action-success-fg": "(삭제)",
   "action-info-fg": "(삭제)",
-  "font-size-2": "(삭제 — 매트릭스 밖)",
+  // `font-size-2` · `line-height-2` · `space-5` 는 2026-09-11 재번호로 **새 이름이 됐다** — 여기서 뺐다
   "font-size-8": "(삭제 — 매트릭스 밖)",
-  "line-height-2": "(삭제)",
   "line-height-8": "(삭제)",
   "letter-spacing-8": "(삭제)",
-  "space-5": "(삭제 — 참조 0건)",
   "space-8": "(삭제 — 참조 0건)",
 };
 
-/** `typo()` / `motion()` 믹스인이 이름을 조립할 때 쓰는 구 스케일 키 */
+/** `typo()` / `motion()` 믹스인이 이름을 조립할 때 쓰는 구 스케일 키 (값은 2026-09-11 재번호 기준) */
 const DEPRECATED_SCALE = {
-  typo: { label: "1", "body-sm": "3", body: "4", title: "6", display: "8" },
+  typo: {
+    label: "1",
+    "body-sm": "2",
+    body: "3",
+    title: "5",
+    display: "(삭제)",
+  },
   motion: { quick: "2", fast: "3", base: "4", slow: "5", deliberate: "6" },
 };
 
@@ -282,7 +294,7 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
   //    실제로 Textfield 지우기 버튼의 hover 배경을 놓치고 있었다. 줄 첫머리의 `}` 까지 읽는다.
   const hoverBlock = /:hover[^{]*\{([\s\S]*?)\n\s*\}/g;
   for (const m of css.matchAll(hoverBlock)) {
-    for (const t of m[1].matchAll(/v\("([a-z0-9-]+)"\)/g)) {
+    for (const t of m[1].matchAll(/v\("([a-z0-9_-]+)"\)/g)) {
       if (HOVER_BG_FORBIDDEN.has(t[1])) {
         problems.push(
           `${file}: hover 배경에 '${t[1]}' 을 쓴다 — 'control-bg-hover' 로 통일할 것 (design-system.md §2-3)`,
@@ -442,7 +454,8 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
 )) {
   const css = readFileSync(join(COMPONENTS_DIR, file), "utf8");
 
-  for (const m of css.matchAll(/v\("([a-z0-9-]+)"\)/g)) {
+  // ⚠️ 문자 클래스에 `_` 가 있어야 한다 — 없으면 `radius-1_5` 같은 옛 이름을 영원히 못 잡는다 (리뷰 2026-09-11)
+  for (const m of css.matchAll(/v\("([a-z0-9_-]+)"\)/g)) {
     const next = DEPRECATED[m[1]];
     if (next) warnings.push(`${file}: '${m[1]}' → '${next}'`);
   }

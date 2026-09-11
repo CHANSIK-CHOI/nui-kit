@@ -88,12 +88,12 @@
     min-width: #{hook("button--min-width", 7.5rem)}; // 120px
     // 기본은 medium(48px). 위아래로 large·small 이 있는 형태가 표준이다.
     min-height: #{hook("button--medium-height", var(#{v("size-control-xl")}))};
-    padding: 0 #{hook("button--medium-padding-x", var(#{v("space-6")}))};
+    padding: 0 #{hook("button--medium-padding-x", var(#{v("space-5")}))};
     overflow-wrap: initial;
     background: var(#{iv("button-main")});
     border: #{hook("button--border-width", var(#{v("border-width-1")}))} solid
       var(#{iv("button-main")});
-    border-radius: #{hook("button--square-radius", var(#{v("radius-1_5")}))};
+    border-radius: #{hook("button--square-radius", var(#{v("radius-2")}))};
 
     @include motion-press((background-color, border-color, color));
 
@@ -128,7 +128,7 @@
       color: var(#{iv("button-fg")});
       text-align: center;
 
-      @include typo(4, "bold");
+      @include typo(3, "bold");
     }
 
     &__icon {
@@ -143,7 +143,7 @@
     // large 와 medium 은 지금 같은 여백(24px)이지만 이름을 나눈다. 나중에 따로 조정할 수 있어야 한다.
     &--large {
       min-height: #{hook("button--large-height", var(#{v("size-field")}))};
-      padding: 0 #{hook("button--large-padding-x", var(#{v("space-6")}))};
+      padding: 0 #{hook("button--large-padding-x", var(#{v("space-5")}))};
     }
 
     &--small {
@@ -157,7 +157,7 @@
     }
 
     &--small &__wrap {
-      @include typo(3, "bold");
+      @include typo(2, "bold");
     }
 
     // ── shape
@@ -343,7 +343,7 @@
       )};
     border-radius: #{hook(
         "icon-button--square-radius",
-        var(#{v("radius-1_5")})
+        var(#{v("radius-2")})
       )};
 
     &#{cls("button")}--large {

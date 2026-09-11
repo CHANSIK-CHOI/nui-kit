@@ -213,7 +213,7 @@ export function ToastDeclarativeDemo() {
           토스트 열기
         </Button>
         {log.length > 0 ? (
-          <code style={{ fontSize: "var(--nui-font-size-3)" }}>
+          <code style={{ fontSize: "var(--nui-font-size-2)" }}>
             {log.join(" → ")}
           </code>
         ) : null}

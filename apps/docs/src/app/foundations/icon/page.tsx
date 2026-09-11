@@ -91,7 +91,7 @@ export default function IconPage() {
           <tbody>
             <tr>
               <td className="doc-wrap">
-                <code>font-size-4</code> (16px) — 액션 라벨 · 입력값
+                <code>font-size-3</code> (16px) — 액션 라벨 · 입력값
               </td>
               <td>
                 <span className="doc-token-name">size-icon-2xl</span> 20px
@@ -100,7 +100,7 @@ export default function IconPage() {
             </tr>
             <tr>
               <td className="doc-wrap">
-                <code>font-size-3</code> (14px) — 보조 텍스트
+                <code>font-size-2</code> (14px) — 보조 텍스트
               </td>
               <td>
                 <span className="doc-token-name">size-icon-lg</span> 16px

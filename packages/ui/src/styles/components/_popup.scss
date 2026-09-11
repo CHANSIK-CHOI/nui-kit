@@ -64,7 +64,7 @@
       // 실선이 이겨서 그림자가 안 보인다 (design-system.md §2-5-2).
       border: #{hook("popup--border-width", var(#{v("border-width-1")}))} solid
         var(#{v("border-floating")});
-      border-radius: #{hook("popup--radius", var(#{v("radius-3")}))};
+      border-radius: #{hook("popup--radius", var(#{v("radius-5")}))};
       box-shadow: var(#{v("shadow-3")});
       pointer-events: auto;
       transform-origin: center;
@@ -102,7 +102,7 @@
     &__title {
       color: var(#{v("text-primary")});
 
-      @include typo(6, "bold");
+      @include typo(5, "bold");
     }
 
     &__close {
@@ -220,7 +220,7 @@
     &__description {
       color: var(#{v("text-secondary")});
 
-      @include typo(3, "regular");
+      @include typo(2, "regular");
     }
 
     // 표준 푸터(confirmLabel · cancelLabel)의 버튼 묶음. Alert · Confirm 의 것과 같다.
@@ -263,7 +263,7 @@
     &--bottom-sheet &__panel {
       width: 100%;
       max-height: min(88dvh, 45rem);
-      border-radius: var(#{v("radius-3")}) var(#{v("radius-3")}) 0 0;
+      border-radius: var(#{v("radius-5")}) var(#{v("radius-5")}) 0 0;
     }
 
     // ── variant: full
@@ -347,7 +347,7 @@
     }
 
     #{cls("popup")}__title {
-      @include typo(6, "bold");
+      @include typo(5, "bold");
     }
 
     #{cls("popup")}__description {

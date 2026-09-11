@@ -28,7 +28,7 @@ export function AlertBasicDemo() {
           저장
         </Button>
         {count > 0 ? (
-          <span style={{ fontSize: "var(--nui-font-size-3)" }}>
+          <span style={{ fontSize: "var(--nui-font-size-2)" }}>
             확인을 {count}번 눌렀습니다
           </span>
         ) : null}

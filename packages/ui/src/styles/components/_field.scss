@@ -38,7 +38,7 @@
       align-items: baseline;
       color: var(#{v("text-primary")});
 
-      @include typo(3, "regular");
+      @include typo(2, "regular");
     }
 
     // 필수 표시 — 6px 점. SEED `field.yaml` 의 `indicatorIcon`(size 6 · fg.critical)
