@@ -30,14 +30,14 @@ export function RHFSwitchDemo() {
           style={{ maxWidth: 480 }}
         >
           <div style={{ display: "grid", gap: 12 }}>
-            <Field direction="row" align="center">
+            <Field.Item>
               <RHFSwitch control={control} name="nightAlarm" />
               <Field.Label>야간 알림</Field.Label>
-            </Field>
-            <Field direction="row" align="center">
+            </Field.Item>
+            <Field.Item>
               <RHFSwitch control={control} name="weeklyDigest" />
               <Field.Label>주간 요약 메일</Field.Label>
-            </Field>
+            </Field.Item>
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
             <Button type="submit" size="medium">

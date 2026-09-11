@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { Radio } from "@nui-kit/react";
+import {
+  Field,
+  FieldItem,
+  FieldLabel,
+  Radio,
+  RadioGroup,
+} from "@nui-kit/react";
 import {
   GuideHeader,
   ExceptionBadges,
@@ -62,8 +68,8 @@ export default function RadioPage() {
       <DesignNote title="왜 Radio 도 면을 채우나">
         <p>
           체크박스와 스위치가 둘 다 채워지는데 라디오만 테두리 안의 점으로
-          남으면, 한 가족 안에서 「선택됐다」의 뜻이 갈린다. 같아 보이면 같게
-          동작해야 한다. 채움색과 강조 규칙도 셋이 같다.
+          남으면, 한 가족 안에서 「선택됐다」의 뜻이 갈린다. 같아 보이는 것은
+          같게 동작한다. 채움색과 강조 규칙도 셋이 같다.
         </p>
       </DesignNote>
 
@@ -83,6 +89,56 @@ export default function RadioPage() {
         <code>isError</code> 를 하위 전부에 전파하고, 에러면 그룹에{" "}
         <code>aria-invalid</code> 가 붙는다.
       </p>
+      <p>
+        선택지 여럿이 값 하나를 채우므로{" "}
+        <strong>필수 표시와 메시지는 그룹을 감싼 Field 가 갖는다.</strong> 점은
+        그룹 라벨 하나에 붙고 항목마다 붙지 않는다 — 그래도{" "}
+        <code>aria-required</code> 는 라디오 전부에 간다.
+      </p>
+      <CaseGrid
+        columns={2}
+        caption="Field.Item 은 항목의 라벨만 맡는다. 필수와 에러는 바깥 Field 가 맡는다"
+        code={`<Field required errorMessage={error}>
+  <Field.Label as="span">결제 수단</Field.Label>
+  <RadioGroup name="payment">
+    <Field.Item>
+      <Radio value="card" checked={v === "card"} onChange={pick} />
+      <Field.Label>신용카드</Field.Label>
+    </Field.Item>
+  </RadioGroup>
+</Field>`}
+      >
+        <Case label="required" note="점은 그룹 라벨 하나">
+          <Field required>
+            <FieldLabel as="span">결제 수단</FieldLabel>
+            <RadioGroup name="group-required">
+              <FieldItem>
+                <Radio value="card" />
+                <FieldLabel>신용카드</FieldLabel>
+              </FieldItem>
+              <FieldItem>
+                <Radio value="transfer" />
+                <FieldLabel>계좌이체</FieldLabel>
+              </FieldItem>
+            </RadioGroup>
+          </Field>
+        </Case>
+        <Case label="errorMessage" note="그룹 전체가 에러로 간다">
+          <Field required errorMessage="결제 수단을 골라 주세요">
+            <FieldLabel as="span">결제 수단</FieldLabel>
+            <RadioGroup name="group-error">
+              <FieldItem>
+                <Radio value="card" />
+                <FieldLabel>신용카드</FieldLabel>
+              </FieldItem>
+              <FieldItem>
+                <Radio value="transfer" />
+                <FieldLabel>계좌이체</FieldLabel>
+              </FieldItem>
+            </RadioGroup>
+          </Field>
+        </Case>
+      </CaseGrid>
 
       <RHFRadioDemo />
 

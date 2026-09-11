@@ -21,14 +21,14 @@ export function RadioDemo() {
           <Field.Label as="span">결제 수단</Field.Label>
           <RadioGroup name="payment">
             {OPTIONS.map((option) => (
-              <Field key={option.value} direction="row" align="center">
+              <Field.Item key={option.value}>
                 <Radio
                   value={option.value}
                   checked={value === option.value}
                   onChange={() => setValue(option.value)}
                 />
                 <Field.Label>{option.label}</Field.Label>
-              </Field>
+              </Field.Item>
             ))}
           </RadioGroup>
         </Field>
@@ -38,14 +38,14 @@ export function RadioDemo() {
       <Example row={false} caption='direction="row"'>
         <RadioGroup name="payment-row" direction="row">
           {OPTIONS.map((option) => (
-            <Field key={option.value} direction="row" align="center">
+            <Field.Item key={option.value}>
               <Radio
                 value={option.value}
                 checked={value === option.value}
                 onChange={() => setValue(option.value)}
               />
               <Field.Label>{option.label}</Field.Label>
-            </Field>
+            </Field.Item>
           ))}
         </RadioGroup>
       </Example>

@@ -34,7 +34,10 @@ export function RHFCheckboxDemo() {
           style={{ maxWidth: 480 }}
         >
           <div style={{ display: "grid", gap: 8 }}>
-            <Field direction="row" align="center" required>
+            <Field.Item
+              required
+              errorMessage={formState.errors.agree?.message ?? ""}
+            >
               <RHFCheckbox
                 control={control}
                 name="agree"
@@ -45,11 +48,11 @@ export function RHFCheckboxDemo() {
                 }}
               />
               <Field.Label>이용약관에 동의합니다</Field.Label>
-            </Field>
-            <Field direction="row" align="center">
+            </Field.Item>
+            <Field.Item>
               <RHFCheckbox control={control} name="marketing" />
               <Field.Label>마케팅 정보 수신</Field.Label>
-            </Field>
+            </Field.Item>
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
             <Button type="submit" size="medium">
@@ -80,10 +83,10 @@ export function RHFCheckboxDemo() {
         </form>
       </Example>
       <div className="doc-note doc-note--warn">
-        <strong>에러 문구는 컨트롤이 그리지 않는다.</strong> 체크박스는 메시지
-        영역이 없어 <code>isError</code> 로 빨간 테두리만 표시한다. 문구를 보여
-        주려면 <code>formState.errors</code> 를 읽어 <code>Field.Message</code>{" "}
-        등에 넘긴다.
+        <strong>에러 문구는 컨트롤이 그리지 않는다.</strong> 체크박스에는 메시지
+        자리가 없어 <code>isError</code> 로 빨간 테두리만 나온다. 문구는 감싼{" "}
+        <code>Field.Item</code> 의 <code>errorMessage</code> 에 넘긴다 — Footer
+        한 줄에 그려지고 <code>aria-describedby</code> 로 이어진다.
       </div>
     </>
   );

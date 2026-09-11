@@ -27,13 +27,13 @@ export function CheckboxDemo() {
     <>
       <h2>기본</h2>
       <Example caption="Field.Label 을 label 로 쓰면 클릭으로도 토글된다">
-        <Field direction="row" align="center">
+        <Field.Item>
           <Checkbox
             checked={checked.includes("email")}
             onChange={() => toggle("email")}
           />
           <Field.Label>이메일 수신 동의</Field.Label>
-        </Field>
+        </Field.Item>
       </Example>
 
       <h2>전체 선택 — 중간 상태</h2>
@@ -54,7 +54,7 @@ export function CheckboxDemo() {
 />`}
       >
         <Field>
-          <Field direction="row" align="center">
+          <Field.Item>
             <Checkbox
               checked={checked.length === OPTIONS.length}
               indeterminate={
@@ -63,17 +63,17 @@ export function CheckboxDemo() {
               onChange={toggleAll}
             />
             <Field.Label>전체 선택</Field.Label>
-          </Field>
+          </Field.Item>
           <CheckboxGroup name="channel-all">
             {OPTIONS.map((option) => (
-              <Field key={option.value} direction="row" align="center">
+              <Field.Item key={option.value}>
                 <Checkbox
                   value={option.value}
                   checked={checked.includes(option.value)}
                   onChange={() => toggle(option.value)}
                 />
                 <Field.Label>{option.label}</Field.Label>
-              </Field>
+              </Field.Item>
             ))}
           </CheckboxGroup>
         </Field>
@@ -90,14 +90,14 @@ export function CheckboxDemo() {
           <Field.Label as="span">수신 방법</Field.Label>
           <CheckboxGroup name="channel">
             {OPTIONS.map((option) => (
-              <Field key={option.value} direction="row" align="center">
+              <Field.Item key={option.value}>
                 <Checkbox
                   value={option.value}
                   checked={checked.includes(option.value)}
                   onChange={() => toggle(option.value)}
                 />
                 <Field.Label>{option.label}</Field.Label>
-              </Field>
+              </Field.Item>
             ))}
           </CheckboxGroup>
         </Field>
@@ -106,14 +106,14 @@ export function CheckboxDemo() {
       <Example row={false} caption='direction="row"'>
         <CheckboxGroup name="channel-row" direction="row">
           {OPTIONS.map((option) => (
-            <Field key={option.value} direction="row" align="center">
+            <Field.Item key={option.value}>
               <Checkbox
                 value={option.value}
                 checked={checked.includes(option.value)}
                 onChange={() => toggle(option.value)}
               />
               <Field.Label>{option.label}</Field.Label>
-            </Field>
+            </Field.Item>
           ))}
         </CheckboxGroup>
       </Example>

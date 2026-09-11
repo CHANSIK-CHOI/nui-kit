@@ -11,10 +11,10 @@ export function SwitchDemo() {
     <>
       <h2>기본</h2>
       <Example caption="label 클릭으로도 토글된다">
-        <Field direction="row" align="center">
+        <Field.Item>
           <Switch checked={on} onChange={(e) => setOn(e.target.checked)} />
           <Field.Label>야간 알림</Field.Label>
-        </Field>
+        </Field.Item>
       </Example>
 
       <h2>커스터마이징</h2>

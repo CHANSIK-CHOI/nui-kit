@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Checkbox } from "@nui-kit/react";
+import { Checkbox, FieldItem, FieldLabel } from "@nui-kit/react";
 import {
   GuideHeader,
   ExceptionBadges,
@@ -33,6 +33,45 @@ export default function CheckboxPage() {
       </p>
 
       <CheckboxDemo />
+
+      <h2>필수 표시와 메시지</h2>
+      <p>
+        체크박스 자체에는 메시지 자리가 없다. 필수 점 · 도움말 · 에러는 감싼{" "}
+        <code>Field.Item</code> 이 그리고, 셋 다 Footer 한 줄에 모인다. 언제
+        어느 표시를 쓰는지는 <Link href="/components/field">Field</Link> 가
+        정한다.
+      </p>
+      <CaseGrid
+        columns={3}
+        caption="errorMessage 를 주면 에러 상태로 올라가 라벨도 빨개진다"
+        code={`<Field.Item required errorMessage={error}>
+  <Checkbox checked={agreed} onChange={toggle} />
+  <Field.Label>이용약관 동의</Field.Label>
+</Field.Item>`}
+      >
+        <Case label="required" note="점 + aria-required">
+          <FieldItem required>
+            <Checkbox />
+            <FieldLabel>이용약관 동의</FieldLabel>
+          </FieldItem>
+        </Case>
+        <Case label="infoMessage" note="aria-describedby 로 이어진다">
+          <FieldItem infoMessage="만 14세 이상만 가입할 수 있어요">
+            <Checkbox />
+            <FieldLabel>본인 확인</FieldLabel>
+          </FieldItem>
+        </Case>
+        <Case label="errorMessage" note="도움말 대신 에러가 선다">
+          <FieldItem
+            required
+            infoMessage="만 14세 이상만 가입할 수 있어요"
+            errorMessage="약관에 동의해 주세요"
+          >
+            <Checkbox />
+            <FieldLabel>이용약관 동의</FieldLabel>
+          </FieldItem>
+        </Case>
+      </CaseGrid>
 
       <h2>강조 — tone</h2>
       <p>
@@ -106,7 +145,7 @@ export default function CheckboxPage() {
 
       <h2>커스터마이징</h2>
       <p>
-        크기와 테두리 두께를 연다. 아래 변수는 <code>Radio</code> ·{" "}
+        크기와 테두리 두께가 열려 있다. 아래 변수는 <code>Radio</code> ·{" "}
         <code>Switch</code> 와 함께 쓴다. 색이 바뀌는 창구는{" "}
         <Link href="/design-system/color">프리셋과 className</Link> 둘뿐이다.
       </p>

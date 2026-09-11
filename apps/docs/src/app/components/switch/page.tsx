@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Switch } from "@nui-kit/react";
+import { FieldItem, FieldLabel, Switch } from "@nui-kit/react";
 import {
   GuideHeader,
   ExceptionBadges,
@@ -33,6 +33,35 @@ export default function SwitchPage() {
       </div>
 
       <SwitchDemo />
+
+      <h2>설명 붙이기</h2>
+      <p>
+        설정 화면의 스위치는 <strong>켜면 무엇이 달라지는지</strong>를 한 줄로
+        덧붙일 때가 많다. 그 줄은 감싼 <code>Field.Item</code> 의{" "}
+        <code>infoMessage</code> 가 맡는다 — 라벨 아래에 서고{" "}
+        <code>aria-describedby</code> 로 이어져 스크린리더가 라벨과 함께 읽는다.
+      </p>
+      <CaseGrid
+        columns={2}
+        caption="설명은 라벨을 되풀이하기보다 켠 결과를 적는 자리다"
+        code={`<Field.Item infoMessage="밤 10시부터 아침 8시까지 알림을 멈춰요">
+  <Switch checked={night} onChange={toggle} />
+  <Field.Label>야간 알림 끄기</Field.Label>
+</Field.Item>`}
+      >
+        <Case label="라벨만">
+          <FieldItem>
+            <Switch defaultChecked />
+            <FieldLabel>야간 알림 끄기</FieldLabel>
+          </FieldItem>
+        </Case>
+        <Case label="infoMessage" note="켠 결과를 적는다">
+          <FieldItem infoMessage="밤 10시부터 아침 8시까지 알림을 멈춰요">
+            <Switch defaultChecked />
+            <FieldLabel>야간 알림 끄기</FieldLabel>
+          </FieldItem>
+        </Case>
+      </CaseGrid>
 
       <h2>강조 — tone</h2>
       <p>
@@ -81,8 +110,8 @@ export default function SwitchPage() {
 
       <h2>커스터마이징</h2>
       <p>
-        트랙 너비와 높이를 연다. 자기 치수를 갖는 컴포넌트라 라벨이 길어져도
-        찌그러지지 않는다. 테두리 두께는 <code>Checkbox</code> ·{" "}
+        트랙 너비와 높이가 열려 있다. 자기 치수를 갖는 컴포넌트라 라벨이
+        길어져도 찌그러지지 않는다. 테두리 두께는 <code>Checkbox</code> ·{" "}
         <code>Radio</code> 와 함께 쓰는 변수다.
       </p>
       <HookTable group="switch" />
