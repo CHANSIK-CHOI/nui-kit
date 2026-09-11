@@ -26,7 +26,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { generateRadixColors } from "radix-theme-generator";
-import { hexToOklch, oklchToHex } from "./oklch.mjs";
+import { hexToOklch, oklchToHex, parseHex, formatHex } from "./oklch.mjs";
 import { contrast, SOLID_TEXT } from "./contrast.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -119,10 +119,13 @@ export function generateTheme(accentHex, theme) {
     background: BACKGROUND[theme],
   });
 
+  // Radix 는 `#cc3366` 을 `#c36` 으로 줄여 준다. 6자리(반투명은 8자리)로 맞춘다 — `tokens.css` 표기와
+  // 같아야 하고, 「9번이 입력과 같은가」를 문자열로 비교하는 자리(gates · 문서 배지)가 있다.
+  const six = (hex) => formatHex(parseHex(hex));
   const pick = (scale, alphaScale, steps) => {
     const out = {};
-    for (const s of STEPS) out[s] = scale[s - 1];
-    for (const s of steps) out[`a${s}`] = alphaScale[s - 1];
+    for (const s of STEPS) out[s] = six(scale[s - 1]);
+    for (const s of steps) out[`a${s}`] = six(alphaScale[s - 1]);
     return out;
   };
 
@@ -148,12 +151,11 @@ export function generateTheme(accentHex, theme) {
     brand,
     secondary,
     gray: pick(r.grayScale, r.grayScaleAlpha, ALPHA_STEPS.gray),
-    contrast: text,
+    contrast: six(text),
     contrastRatio: Number(ratio.toFixed(2)),
-    secondaryContrast: sec.text,
+    secondaryContrast: six(sec.text),
     secondaryContrastRatio: Number(sec.ratio.toFixed(2)),
-    // 기준 미달이면 알린다 — 프리셋 목록에서 걸러내는 근거가 된다.
-    belowStandard: ratio < SOLID_TEXT || sec.ratio < SOLID_TEXT,
+    // 기준 판정은 여기서 하지 않는다 — `gates.mjs` 가 한 벌로 갖는다.
     background: r.background,
   };
 }
@@ -290,8 +292,13 @@ if (isMain) {
     console.log(
       `   ${theme.padEnd(5)} 9번 ${t.brand[9]} · 글자 ${t.contrast} (${t.contrastRatio}:1)` +
         ` · 보조 ${t.secondary[9]} · 글자 ${t.secondaryContrast} (${t.secondaryContrastRatio}:1)` +
-        `${t.belowStandard ? " ⚠️ 기준 미달" : ""} · 회색 ${t.gray[9]}`,
+        ` · 회색 ${t.gray[9]}`,
     );
   }
+  // 기준은 gates.mjs 한 벌 — 프리셋 검사 · CLI 와 같은 것
+  const { checkTheme } = await import("./gates.mjs");
+  const g = checkTheme(result);
+  for (const f of g.fails) console.log(`   ✗ ${f.message}`);
+  for (const i of g.infos) console.log(`   ⓘ ${i.message}`);
   console.log(`   → ${out.split("/").slice(-2).join("/")}`);
 }

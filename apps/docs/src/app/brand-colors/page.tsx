@@ -14,8 +14,11 @@ export default function BrandColorsPage() {
 
       <div className="doc-note">
         <p>
-          고른 색은 9단계 자리에 그대로 들어가고 나머지 11단계가 거기서 나온다.
-          회색은 브랜드의 색깔만 물려받아 거의 무채색으로 남는다.
+          고른 색은 색조의 원천이고, 9단계는 그 색조로 만든 채움이다. 페이지
+          배경과 구분되는 한 고른 색이 9단계 자리에 그대로 앉고, 나머지 11단계가
+          거기서 나온다. 배경에 녹는 색이면 같은 색조의 가장 가까운 채움이 대신
+          앉고 카드가 그 사실을 보여준다. 회색은 브랜드의 색깔만 물려받아 거의
+          무채색으로 남는다.
         </p>
       </div>
 
@@ -77,23 +80,21 @@ import "@nui-kit/react/styles/themes/preset-42.css";`}</code>
       <h2>목록에 없는 색을 쓰고 싶다면</h2>
       <p>
         명령 하나로 만든다. 설치돼 있으면 바로 된다. 프리셋과 같은 규칙으로
-        나머지 색이 나온다.
+        나머지 색이 나오고, 루트 <code>layout</code> 에 import 한 줄이 들어간다.
       </p>
       <pre className="doc-code">
-        <code>{`npx nui-theme --accent "#b1002a"   # ./nui-theme.css 가 생긴다`}</code>
-      </pre>
-      <pre className="doc-code">
-        <code>{`import "@nui-kit/react/styles/index.css";
-import "./nui-theme.css";`}</code>
+        <code>{`npx nui-theme --accent "#b1002a"
+# ./nui-theme.css 가 생기고 app/layout.tsx 에 import "../nui-theme.css" 가 들어간다`}</code>
       </pre>
       <p>
-        거의 회색인 색은 받지 않는다. {data.count}색을 고를 때 쓴 기준과 같다.{" "}
-        <em>{data.rule}</em> 색깔 값이 우연한 숫자라 그 숫자로 화면 전체를
-        물들이면 엉뚱한 색이 나온다.
+        프리셋 번호를 줘도 된다. 그때는 패키지에 든 파일을 그대로 복사한다. 다시
+        실행하면 파일을 덮어쓴다.
       </p>
       <p>
-        채워진 버튼 위 글자 대비가 기준에 못 미치면 파일은 만들되 수치와 함께
-        알린다. 조금 더 진하거나 연한 색을 고르면 지켜진다.
+        프리셋을 고를 때 쓴 기준을 그대로 지난다. 거의 회색인 색(
+        <em>{data.rule}</em>)과 채움 위 글자 · 본문 글자 대비가 기준에 못 미치는
+        색은 받지 않는다. 그때는 이유와 수치를 찍고 아무것도 바꾸지 않는다.
+        9단계가 고른 색과 다르면 카드의 배지와 같은 내용을 함께 찍는다.
       </p>
     </>
   );
