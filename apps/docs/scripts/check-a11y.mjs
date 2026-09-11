@@ -27,7 +27,23 @@
  */
 import { chromium } from "playwright";
 
-const BASE = process.argv[2] ?? "http://localhost:3000";
+const BASE =
+  process.argv.slice(2).find((a) => !a.startsWith("--")) ??
+  "http://localhost:3000";
+
+// --page=button,textfield — `scripts/changed-scope.mjs` 가 뽑은 슬러그만 잰다. 없으면 전체 (2026-09-11).
+// 고칠 때마다 3~4분을 기다리지 않게 하는 필터다. 공유 자산이 바뀌면 changed-scope 가 all 을 내고,
+// revise 4단계 직전의 전체 실행이 필터가 놓친 것을 잡는다. 필터로 건너뛴 절은 그 사실을 찍는다.
+const pageArg = process.argv.find((a) => a.startsWith("--page="));
+const SCOPE = pageArg
+  ? new Set(pageArg.slice("--page=".length).split(",").filter(Boolean))
+  : null;
+const inScope = (url) =>
+  !SCOPE || SCOPE.has(url.replace(/^\/components\//, "").replace(/^\//, ""));
+const skipped = (what) =>
+  console.log(
+    `  ⏭️  ${what} — 범위 밖 (--page=${[...(SCOPE ?? [])].join(",")})`,
+  );
 
 try {
   await fetch(BASE, { signal: AbortSignal.timeout(3000) });
@@ -61,7 +77,7 @@ const isStill = (transform) =>
 for (const [label, url, open, panel] of [
   ["Tooltip", "/components/tooltip", ".nui-tooltip", ".nui-tooltip__panel"],
   ["Popup", "/components/layer-popup", null, ".nui-popup__panel"],
-]) {
+].filter(([, url]) => inScope(url))) {
   const ctx = await browser.newContext({
     reducedMotion: "reduce",
     viewport: VIEWPORT,
@@ -102,7 +118,8 @@ for (const [label, url, open, panel] of [
 
 // 1-b) 로딩 스피너 — 회전 duration 이 스케일 밖(1s 고정)이라 1ms 무력화를 타지 않는다.
 //      `animation: none` 으로 직접 멈춰야 한다 (a11y.md §6 · Button.md spec §7).
-{
+if (!inScope("/components/button")) skipped("Button 로딩 스피너");
+else {
   const ctx = await browser.newContext({
     reducedMotion: "reduce",
     viewport: VIEWPORT,
@@ -281,7 +298,9 @@ for (const theme of ["light", "dark"]) {
   });
   const page = await ctx.newPage();
 
-  for (const [label, url, selector, min, open] of CONTRAST_TARGETS) {
+  for (const [label, url, selector, min, open] of CONTRAST_TARGETS.filter((t) =>
+    inScope(t[1]),
+  )) {
     await page.goto(BASE + url, { waitUntil: "networkidle" });
     // 문서 사이트는 저장된 테마가 없으면 OS 설정(colorScheme)을 따른다.
     const stamped = await page.evaluate(
@@ -405,7 +424,7 @@ const TOKEN_PAIRS = [
   ["danger 글자 · pressed 배경", "action-danger-fg", "action-danger-active", 3],
 ];
 
-for (const theme of ["light", "dark"]) {
+for (const theme of inScope("/components/button") ? ["light", "dark"] : []) {
   const ctx = await browser.newContext({
     viewport: VIEWPORT,
     colorScheme: theme,
@@ -563,7 +582,7 @@ const BUTTON_PROBE = ({ colors, variants }) => {
   return rows;
 };
 
-for (const theme of ["light", "dark"]) {
+for (const theme of inScope("/components/button") ? ["light", "dark"] : []) {
   const ctx = await browser.newContext({
     viewport: VIEWPORT,
     colorScheme: theme,
@@ -688,7 +707,7 @@ const READ_PROBE = () => {
   return { fg, bg, border, filled };
 };
 
-for (const theme of ["light", "dark"]) {
+for (const theme of inScope("/components/button") ? ["light", "dark"] : []) {
   const ctx = await browser.newContext({
     viewport: VIEWPORT,
     colorScheme: theme,
@@ -786,7 +805,9 @@ const SHIFT_TARGETS = [
     viewport: VIEWPORT,
     colorScheme: "light",
   });
-  for (const [label, path, boxSel, focusSel] of SHIFT_TARGETS) {
+  for (const [label, path, boxSel, focusSel] of SHIFT_TARGETS.filter((t) =>
+    inScope(t[1]),
+  )) {
     const page = await ctx.newPage();
     await page.goto(BASE + path, { waitUntil: "networkidle" });
     const moved = await page.evaluate(
@@ -923,7 +944,7 @@ const SELECTION_PROBE = ({ tones, states }) => {
   return rows;
 };
 
-for (const theme of ["light", "dark"]) {
+for (const theme of inScope("/components/checkbox") ? ["light", "dark"] : []) {
   const ctx = await browser.newContext({
     viewport: VIEWPORT,
     colorScheme: theme,
@@ -995,7 +1016,9 @@ for (const theme of ["light", "dark"]) {
     colorScheme: theme,
   });
   const page = await ctx.newPage();
-  for (const [label, url, selector, pseudo] of PLACEHOLDER_TARGETS) {
+  for (const [label, url, selector, pseudo] of PLACEHOLDER_TARGETS.filter((t) =>
+    inScope(t[1]),
+  )) {
     await page.goto(BASE + url, { waitUntil: "networkidle" });
     const el = page.locator(selector).first();
     const appeared = await el
@@ -1207,7 +1230,9 @@ const TOUCH_TARGETS = [
 {
   const ctx = await browser.newContext({ viewport: VIEWPORT });
   const page = await ctx.newPage();
-  for (const [label, url, selector, open, exception] of TOUCH_TARGETS) {
+  for (const [label, url, selector, open, exception] of TOUCH_TARGETS.filter(
+    (t) => inScope(t[1]),
+  )) {
     await page.goto(BASE + url, { waitUntil: "networkidle" });
     if (open) {
       try {
@@ -1275,7 +1300,7 @@ const TOUCH_TARGETS = [
   console.log("\n■ 글자 최소 13px (.nui-* 의 직접 텍스트)");
   const pages = [
     ...new Set([...CONTRAST_TARGETS, ...TOUCH_TARGETS].map((t) => t[1])),
-  ];
+  ].filter(inScope);
   const ctx = await browser.newContext({ viewport: VIEWPORT });
   const page = await ctx.newPage();
   let seen = 0;
@@ -1307,9 +1332,11 @@ const TOUCH_TARGETS = [
     seen += small.n;
     for (const s of small.out) bad(`${url} — ${s} (13px 미만)`);
   }
-  seen > 0
-    ? ok(`${pages.length}페이지 · 텍스트 요소 ${seen}개 · 13px 미만 없음`)
-    : bad("텍스트 요소를 하나도 못 셌다 — 셀렉터가 늙었다");
+  if (pages.length === 0) skipped("글자 최소 13px");
+  else
+    seen > 0
+      ? ok(`${pages.length}페이지 · 텍스트 요소 ${seen}개 · 13px 미만 없음`)
+      : bad("텍스트 요소를 하나도 못 셌다 — 셀렉터가 늙었다");
   await ctx.close();
 }
 
@@ -1317,7 +1344,7 @@ await browser.close();
 
 // 영수증 — 마지막 줄. 없으면 끝까지 안 돈 것이다 (tail 로 잘라 읽다가 대비 절을 놓친 적이 있다 · 2026-09-10).
 const receipt = (exit) =>
-  `RECEIPT check-a11y contrast=${CONTRAST_TARGETS.length}×2 touch=${TOUCH_TARGETS.length} failures=${failures.length} warnings=${warnings.length} exit=${exit}`;
+  `RECEIPT check-a11y scope=${SCOPE ? [...SCOPE].join(",") : "all"} contrast=${CONTRAST_TARGETS.filter((t) => inScope(t[1])).length}×2 touch=${TOUCH_TARGETS.filter((t) => inScope(t[1])).length} failures=${failures.length} warnings=${warnings.length} exit=${exit}`;
 
 if (warnings.length > 0) {
   console.warn(`\n⚠️  경고 ${warnings.length}건 — 실패는 아니다`);
