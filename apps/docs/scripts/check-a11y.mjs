@@ -1268,15 +1268,66 @@ const TOUCH_TARGETS = [
   await ctx.close();
 }
 
+// 글자 최소 13px (KRDS 서체 스케일 최소 · tokens.md §3-3) — 2026-09-11.
+// 토큰은 13 아래가 없지만 소비자 글꼴 축소·em 자식·인라인 스타일이 들어올 수 있어 렌더로 잰다.
+// 라이브러리 요소(.nui-*)의 직접 텍스트만 본다 — 문서 사이트 자체의 캡션은 대상이 아니다.
+{
+  console.log("\n■ 글자 최소 13px (.nui-* 의 직접 텍스트)");
+  const pages = [
+    ...new Set([...CONTRAST_TARGETS, ...TOUCH_TARGETS].map((t) => t[1])),
+  ];
+  const ctx = await browser.newContext({ viewport: VIEWPORT });
+  const page = await ctx.newPage();
+  let seen = 0;
+  for (const url of pages) {
+    await page.goto(BASE + url, { waitUntil: "networkidle" });
+    const small = await page.evaluate(() => {
+      const out = [];
+      let n = 0;
+      for (const el of document.querySelectorAll(
+        '[class^="nui-"], [class*=" nui-"]',
+      )) {
+        const text = [...el.childNodes].filter(
+          (c) => c.nodeType === 3 && c.textContent.trim(),
+        ).length;
+        if (!text) continue;
+        const cs = getComputedStyle(el);
+        if (
+          cs.display === "none" ||
+          cs.visibility === "hidden" ||
+          el.closest(".nui-sr-only")
+        )
+          continue;
+        n++;
+        const px = parseFloat(cs.fontSize);
+        if (px < 13) out.push(`${el.className.split(" ")[0]} ${px}px`);
+      }
+      return { n, out };
+    });
+    seen += small.n;
+    for (const s of small.out) bad(`${url} — ${s} (13px 미만)`);
+  }
+  seen > 0
+    ? ok(`${pages.length}페이지 · 텍스트 요소 ${seen}개 · 13px 미만 없음`)
+    : bad("텍스트 요소를 하나도 못 셌다 — 셀렉터가 늙었다");
+  await ctx.close();
+}
+
 await browser.close();
+
+// 영수증 — 마지막 줄. 없으면 끝까지 안 돈 것이다 (tail 로 잘라 읽다가 대비 절을 놓친 적이 있다 · 2026-09-10).
+const receipt = (exit) =>
+  `RECEIPT check-a11y contrast=${CONTRAST_TARGETS.length}×2 touch=${TOUCH_TARGETS.length} failures=${failures.length} warnings=${warnings.length} exit=${exit}`;
 
 if (warnings.length > 0) {
   console.warn(`\n⚠️  경고 ${warnings.length}건 — 실패는 아니다`);
 }
 if (failures.length > 0) {
   console.error(`\n❌ 접근성 검사 실패 — ${failures.length}건`);
+  console.log(receipt(1));
   process.exit(1);
 }
 console.log(
-  "\n✅ 접근성 검사 통과 — 모션 감소 대응 · 명도 대비(라이트·다크) · 터치 영역",
+  "\n✅ 접근성 검사 통과 — 모션 감소 대응 · 명도 대비(라이트·다크) · 터치 영역 · 글자 최소",
 );
+console.log(receipt(0));

@@ -180,8 +180,29 @@ console.log("\n■ 설치 안내가 required peer 를 전부 담았나");
         fail("설치 안내", `${rel} — required peer \`${name}\` 이 안 적혀 있다`);
     }
   }
-  console.log(`  required peer ${required.length}개 × 페이지 ${INSTALL_PAGES.length}`);
+  console.log(
+    `  required peer ${required.length}개 × 페이지 ${INSTALL_PAGES.length}`,
+  );
 }
+
+console.log("\n■ 도움말·에러 문구가 다음 행동을 지시하나");
+// design-system.md §11-1 · docs-voice.md §3 — 에러는 잘못을 알리는 것이 아니라 다음 행동을 알리는 것이다.
+// 「번호가 잘못됐습니다」✗ 「10-11자리로 입력해 주세요」✓. 도입 전 실측 1건(「필수 입력 항목입니다.」) · 헛짚기 0 (2026-09-11).
+let msgCount = 0;
+for (const p of glob("src/app/**/*.tsx")) {
+  const s = stripSamples(read(p));
+  const rel = relative(APP, p);
+  for (const m of s.matchAll(/(errorMessage|helpText)="([^"]{2,80})"/g)) {
+    checked++;
+    msgCount++;
+    if (!/(세요|십시오|시오)\.?$/.test(m[2].trim()))
+      fail(
+        "문구",
+        `${rel} — ${m[1]}="${m[2]}" 는 행동을 지시하지 않는다 (design-system.md §11-1)`,
+      );
+  }
+}
+console.log(`  문구 ${msgCount}개`);
 
 console.log("\n■ 폭 규칙의 예외에 배지가 있나");
 // design-system.md §7 표 — 부모 폭을 채우지 않는 것은 페이지 머리에 예외 배지를 둔다
@@ -191,30 +212,50 @@ console.log("\n■ 폭 규칙의 예외에 배지가 있나");
 {
   const WIDTH_BADGES = {
     // 자기 치수
-    switch: "ownSize", checkbox: "ownSize", radio: "ownSize", "icon-button": "ownSize",
+    switch: "ownSize",
+    checkbox: "ownSize",
+    radio: "ownSize",
+    "icon-button": "ownSize",
     // 상한이 있는 폭 — Toast(420) · Popup 패널(360·480·640)
-    toast: "cappedWidth", "layer-popup": "cappedWidth", alert: "cappedWidth",
-    confirm: "cappedWidth", "bottom-sheet": "cappedWidth",
+    toast: "cappedWidth",
+    "layer-popup": "cappedWidth",
+    alert: "cappedWidth",
+    confirm: "cappedWidth",
+    "bottom-sheet": "cappedWidth",
     // 내용 폭
-    tooltip: "contentWidth", button: "contentWidth", "button-link": "contentWidth",
+    tooltip: "contentWidth",
+    button: "contentWidth",
+    "button-link": "contentWidth",
   };
   let n = 0;
   for (const [slug, kind] of Object.entries(WIDTH_BADGES)) {
-    checked++; n++;
+    checked++;
+    n++;
     const file = join(APP, "components", slug, "page.tsx");
-    if (!existsSync(file)) { fail("폭 배지", `${slug} — 페이지가 없다. 목록을 고친다`); continue; }
+    if (!existsSync(file)) {
+      fail("폭 배지", `${slug} — 페이지가 없다. 목록을 고친다`);
+      continue;
+    }
     if (!read(file).includes(`kind: "${kind}"`))
-      fail("폭 배지", `/components/${slug} — \`${kind}\` 배지가 없다 (design-system.md §7)`);
+      fail(
+        "폭 배지",
+        `/components/${slug} — \`${kind}\` 배지가 없다 (design-system.md §7)`,
+      );
   }
   console.log(`  ${n}개 페이지`);
 }
 
 console.log(`\n검사 ${checked}건`);
+// 영수증 — 마지막 줄. 없으면 끝까지 안 돈 것이다. 호출자는 이 줄로 완주를 판정한다 (2026-09-11).
+const receipt = (exit) =>
+  `RECEIPT check-docs checks=${checked} failures=${failures.length} exit=${exit}`;
 if (failures.length === 0) {
   console.log("\n✅ 문서 구조 검사 통과\n");
+  console.log(receipt(0));
   process.exit(0);
 }
 console.log("");
 for (const f of failures) console.log(`  ❌ [${f.rule}] ${f.detail}`);
 console.log(`\n❌ ${failures.length}건\n`);
+console.log(receipt(1));
 process.exit(1);

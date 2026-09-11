@@ -107,7 +107,10 @@ export default function FieldPage() {
             <Textfield placeholder="회사명" />
           </Field>
         </Case>
-        <Case label="선택 컨트롤에도 간다" note="FieldItem 도 같은 prop 을 받는다">
+        <Case
+          label="선택 컨트롤에도 간다"
+          note="FieldItem 도 같은 prop 을 받는다"
+        >
           <FieldItem required>
             <Checkbox />
             <FieldLabel>이용약관에 동의합니다</FieldLabel>
@@ -129,10 +132,10 @@ export default function FieldPage() {
       <CaseGrid
         columns={2}
         caption="색만이 아니라 아이콘과 텍스트로 함께 표현한다"
-        code={`<Field errorMessage="필수 입력 항목입니다.">…</Field>`}
+        code={`<Field errorMessage="연락처를 입력해 주세요">…</Field>`}
       >
         <Case label="errorMessage">
-          <Field errorMessage="필수 입력 항목입니다.">
+          <Field errorMessage="연락처를 입력해 주세요">
             <FieldLabel>연락처</FieldLabel>
             <Textfield placeholder="01012345678" />
           </Field>
@@ -206,8 +209,8 @@ export default function FieldPage() {
       <p>
         <code>Field</code> 는 여는 변수가 없다. 간격을 바꾸려면{" "}
         <code>className</code> 으로 그 자리에만 준다. 안에 놓이는 컨트롤의
-        변수는 <Link href="/foundations/customizing">커스터마이징</Link> 에
-        모여 있다.
+        변수는 <Link href="/foundations/customizing">커스터마이징</Link> 에 모여
+        있다.
       </p>
 
       <h2>API</h2>
