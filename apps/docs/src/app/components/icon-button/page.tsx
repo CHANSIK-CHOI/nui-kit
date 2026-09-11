@@ -15,7 +15,7 @@ import {
 
 export const metadata = { title: "IconButton" };
 
-const COLORS = ["neutral", "primary", "secondary", "danger"] as const;
+const COLORS = ["neutral", "quiet", "primary", "secondary", "danger"] as const;
 const VARIANTS = ["solid", "line"] as const;
 const SIZES = [
   ["large", "56px"],
@@ -45,14 +45,16 @@ export default function IconButtonPage() {
 
       <DesignNote title="왜 접근 이름을 타입으로 강제하나">
         <p>
-          <code>children</code> 이 아이콘이라 <strong>글자에서 이름이 생길
-          길이 없다.</strong> 빠뜨리면 스크린리더가 &ldquo;버튼&rdquo; 이라고만
-          읽는데, 화면으로는 멀쩡해 보여서 개발 중에 드러나지 않는다.
+          <code>children</code> 이 아이콘이라{" "}
+          <strong>글자에서 이름이 생길 길이 없다.</strong> 빠뜨리면 스크린리더가
+          &ldquo;버튼&rdquo; 이라고만 읽는데, 화면으로는 멀쩡해 보여서 개발 중에
+          드러나지 않는다.
         </p>
         <p>
-          <code>aria-label</code> 하나만 필수로 두면 <code>aria-labelledby</code>{" "}
-          로 이름을 주는 정상 사용까지 막힌다. 그래서 둘 중 하나를 요구하는
-          유니온이다 — 두 경로를 다 열면서 누락만 잡는다.
+          <code>aria-label</code> 하나만 필수로 두면{" "}
+          <code>aria-labelledby</code> 로 이름을 주는 정상 사용까지 막힌다.
+          그래서 둘 중 하나를 요구하는 유니온이다 — 두 경로를 다 열면서 누락만
+          잡는다.
         </p>
       </DesignNote>
 
@@ -64,7 +66,7 @@ export default function IconButtonPage() {
       <CaseMatrix
         rows={VARIANTS}
         cols={COLORS}
-        caption="variant 2 × color 4 — 8조합"
+        caption="variant 2 × color 5 — 10조합"
         code={`<IconButton aria-label="닫기" variant="line" color="danger"><CloseIcon /></IconButton>`}
         render={(variant, color) => (
           <IconButton aria-label="닫기" variant={variant} color={color}>

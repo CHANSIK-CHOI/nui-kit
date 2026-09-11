@@ -107,9 +107,12 @@ export default function SpacingPage() {
 
       <h2>크기 옵션</h2>
       <p>
-        크기를 고를 수 있는 컴포넌트는 <code>lg</code> · <code>md</code> ·{" "}
-        <code>sm</code> 세 단계이고 기본은 <code>md</code> 다. 위아래로 하나씩
-        있는 형태가 표준이고 <code>sm</code> 은 가장 작은 것으로 읽힌다.
+        크기를 고를 수 있는 컴포넌트는 <code>large</code> · <code>medium</code>{" "}
+        · <code>small</code> 이고 기본은 <code>medium</code> 이다. 위아래로
+        하나씩 있는 형태가 표준이고 <code>small</code> 은 가장 작은 것으로
+        읽힌다. 입력 컨트롤은 <code>large</code> 와 <code>medium</code> 둘이다 —{" "}
+        <code>small</code>(40px)은 컨트롤 전체가 누르는 자리라 터치 기준 44px
+        아래로 내려간다.
       </p>
       <div className="doc-table-wrap">
         <table className="doc-table">
@@ -133,6 +136,16 @@ export default function SpacingPage() {
               <td>40px</td>
             </tr>
             <tr>
+              <th scope="row" className="doc-wrap">
+                입력 컨트롤 · Select · Datepicker 계열
+              </th>
+              <td>56px</td>
+              <td>
+                <strong>48px</strong>
+              </td>
+              <td>—</td>
+            </tr>
+            <tr>
               <th scope="row">Popup</th>
               <td>40rem</td>
               <td>
@@ -146,8 +159,10 @@ export default function SpacingPage() {
       <p>
         크기별 값은 단계마다 이름이 따로 있는 변수로 연다.{" "}
         <code>--nui-button--large-height</code> · <code>-medium-height</code> ·{" "}
-        <code>-small-height</code> 가 그렇다. 하나로 두면 값을 넣는 순간 세
-        단계가 전부 같아진다. 자세한 것은{" "}
+        <code>-small-height</code> 가 그렇다. 하나로 두면 값을 넣는 순간 모든
+        단계가 같아진다. 둥글기도 크기를 따라 나뉜다 —{" "}
+        <code>--nui-button--large-radius</code>(8px) ·{" "}
+        <code>-medium-radius</code>(6px). 자세한 것은{" "}
         <Link href="/foundations/customizing">커스터마이징</Link> 문서에 있다.
       </p>
 

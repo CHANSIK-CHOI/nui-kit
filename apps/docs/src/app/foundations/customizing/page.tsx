@@ -80,7 +80,7 @@ export default function CustomizingPage() {
       </p>
       <pre className="doc-code">
         <code>{`--nui-button--large-height      버튼 · large 옵션 · 높이
---nui-button--square-radius     버튼 · square 옵션 · 둥글기
+--nui-button--large-radius      버튼 · large 옵션 · 둥글기 (크기마다 따로)
 --nui-button--border-width      버튼 · 테두리 두께 (옵션 없음)
 --nui-icon-button--medium-size  아이콘 버튼 · medium 옵션 · 크기
 --nui-datepicker--day-size      달력 · 날짜 · 크기 (요소 있음)`}</code>
@@ -113,15 +113,15 @@ export default function CustomizingPage() {
       <pre className="doc-code">
         <code>{`/* 전역으로 — 모든 버튼 */
 :root {
-  --nui-button--square-radius: 0;
+  --nui-button--medium-radius: 0;
   --nui-button--large-height: 3.75rem;
   --nui-button--border-width: 2px;
 }
 
-/* 부분적으로 — 상속되므로 하위에만 적용된다 */
+/* 부분적으로 — 상속되므로 하위에만 적용된다. 옵션 낱말은 prop 값 그대로다 */
 .compact-form {
-  --nui-textfield--height: 2.5rem;
-  --nui-select--height: 2.5rem;
+  --nui-textfield--medium-height: 2.5rem;
+  --nui-select--medium-height: 2.5rem;
 }`}</code>
       </pre>
 

@@ -23,7 +23,7 @@ export const metadata = { title: "Button" };
  * 실제로 `soft` 가 늘었는데 이 배열이 따라오지 않아 16조합 중 4개가
  * 이 페이지에서 사라져 있었다.
  */
-const COLORS = ["neutral", "primary", "secondary", "danger"] as const;
+const COLORS = ["neutral", "quiet", "primary", "secondary", "danger"] as const;
 const VARIANTS = ["solid", "soft", "line", "text"] as const;
 const SIZES = [
   ["large", "56px"],
@@ -31,7 +31,7 @@ const SIZES = [
   ["small", "40px"],
 ] as const;
 
-/** `variant="text"` 는 size·shape 를 `never` 로 닫는다. 전개할 때 갈라 준다 */
+/** `variant="text"` 는 shape 를 `never` 로 닫는다. 전개할 때 갈라 준다 */
 type Variant = (typeof VARIANTS)[number];
 const asVariant = (v: Variant) =>
   v === "text" ? ({ variant: "text" } as const) : ({ variant: v } as const);
@@ -42,10 +42,7 @@ export default function ButtonPage() {
       <GuideHeader title="Button" named={["Button"]} subpath="button" />
 
       <ExceptionBadges
-        items={[
-          { kind: "noSize", target: 'variant="text"' },
-          { kind: "contentWidth", target: 'variant="text"' },
-        ]}
+        items={[{ kind: "contentWidth", target: 'variant="text"' }]}
       />
 
       <p>
@@ -75,12 +72,14 @@ export default function ButtonPage() {
       <p>
         색이 아니라 <strong>역할</strong>이 이름이다. 화면의 주 행동에는{" "}
         <code>primary</code>, 덜 중요한 행동에는 <code>secondary</code>, 되돌릴
-        수 없는 삭제나 탈퇴에는 <code>danger</code> 를 쓴다.
+        수 없는 삭제나 탈퇴에는 <code>danger</code> 를 쓴다. 취소 · 닫기처럼
+        눈에 덜 띄어야 하는 자리에는 <code>quiet</code> 가 있다 — 기본{" "}
+        <code>neutral</code> 보다 한 단계 조용하다.
       </p>
       <CaseMatrix
         rows={VARIANTS}
         cols={COLORS}
-        caption="variant 4 × color 4 — 16조합"
+        caption="variant 4 × color 5 — 20조합"
         code={`<Button variant="soft" color="danger">삭제</Button>`}
         render={(variant, color) => (
           <div style={{ minWidth: 108 }}>
@@ -145,28 +144,50 @@ export default function ButtonPage() {
         </Case>
       </CaseGrid>
 
-      <div className="doc-note doc-note--warn">
-        <code>variant=&quot;text&quot;</code> 는 <code>size</code> 와{" "}
-        <code>shape</code> 를 받지 않는다. 주면 타입 에러가 난다.
-      </div>
+      <h2>text 의 크기</h2>
+      <p>
+        <code>variant=&quot;text&quot;</code> 도 <code>size</code> 를 받는다.
+        바뀌는 것은 글자와 아이콘뿐이고 높이는 잡지 않는다 — 그래서{" "}
+        <code>large</code> 와 <code>medium</code> 은 같은 모양이다. 문장 안에 둘
+        때는 주변 글자 크기에 맞춘다(14px 문단이면 <code>small</code>).{" "}
+        <code>shape</code> 는 받지 않는다.
+      </p>
+      <CaseGrid
+        columns={3}
+        caption="variant=text × size 3 — large 와 medium 은 같다"
+        code={`<Button variant="text" size="small">더 보기</Button>`}
+      >
+        {SIZES.map(([size]) => (
+          <Case
+            key={size}
+            label={size}
+            note={size === "small" ? "14px · 아이콘 16" : "16px · 아이콘 20"}
+          >
+            <Button variant="text" size={size} icon={<DelIcon />}>
+              더 보기
+            </Button>
+          </Case>
+        ))}
+      </CaseGrid>
 
-      <DesignNote title="왜 text 만 크기도 폭도 다른가">
+      <DesignNote title="왜 text 는 폭도 높이도 다른가">
         <p>
-          <code>text</code> 는 면도 테두리도 없어서 크기를 바꿔도 바뀌는 것이
+          <code>text</code> 는 면도 테두리도 없어서 높이를 바꿔도 바뀌는 것이
           글자 주변의 빈 공간뿐이다. 문장 안이나 목록 행 안에 놓이는 자리라
-          높이를 스스로 정하면 오히려 줄 간격이 어긋난다.
+          높이를 스스로 정하면 오히려 줄 간격이 어긋난다. 그래서{" "}
+          <code>size</code> 가 글자와 아이콘만 바꾼다.
         </p>
         <p>
-          폭도 같은 이유로 예외다. 부모 폭을 채우면 글자는 왼쪽 끝에 있는데
-          줄 전체가 눌린다 — 그 사실은 hover 면이 켜지는 순간에야 드러난다.
-          최소 폭 120px 도 걸려서 두 글자짜리 버튼이 그만큼 자리를 차지했다.
-          누르는 범위는 세로 32px 이라 44px 에 못 미치지만, 문장 안에서 세로를
+          폭도 같은 이유로 예외다. 부모 폭을 채우면 글자는 왼쪽 끝에 있는데 줄
+          전체가 눌린다 — 그 사실은 hover 면이 켜지는 순간에야 드러난다. 최소 폭
+          120px 도 걸려서 두 글자짜리 버튼이 그만큼 자리를 차지했다. 누르는
+          범위는 세로 29~32px 이라 44px 에 못 미치지만, 문장 안에서 세로를
           늘리면 줄 간격이 벌어진다. 하한 24px 을 지키는 자리로 둔다.
         </p>
         <p>
           타입에서 <code>ButtonDesignProps</code> 가 두 갈래 유니온이고{" "}
-          <code>text</code> 쪽은 <code>size?: never</code> 다. 런타임에 무시하는
-          대신 컴파일에서 막는다.
+          <code>text</code> 쪽은 <code>shape?: never</code> 다. 런타임에
+          무시하는 대신 컴파일에서 막는다.
         </p>
       </DesignNote>
 
@@ -279,17 +300,20 @@ export default function ButtonPage() {
       <p>
         변수 이름은 <strong>컴포넌트 · 옵션 · 속성</strong> 셋으로 끊긴다.
         옵션은 prop 값 그대로다 — <code>size=&quot;large&quot;</code> 면{" "}
-        <code>--large-</code>, <code>shape=&quot;square&quot;</code> 면{" "}
-        <code>--square-</code> 다. 그래서 한 크기만 바꿔도 나머지는 그대로다.
+        <code>--large-</code>, <code>shape=&quot;round&quot;</code> 면{" "}
+        <code>--round-</code> 다. 둥글기는 크기를 따라{" "}
+        <code>--large-radius</code> · <code>--medium-radius</code> ·{" "}
+        <code>--small-radius</code> 로 나뉜다. 그래서 한 크기만 바꿔도 나머지는
+        그대로다.
       </p>
       <Example
-        caption="large 만 높이를 바꾼다 — medium 은 그대로다"
+        caption="large 만 높이와 둥글기를 바꾼다 — medium 은 그대로다"
         code={`--nui-button--large-height: 4rem;
---nui-button--square-radius: 999px;`}
+--nui-button--large-radius: 999px;`}
         style={
           {
             "--nui-button--large-height": "4rem",
-            "--nui-button--square-radius": "999px",
+            "--nui-button--large-radius": "999px",
           } as React.CSSProperties
         }
       >
@@ -302,9 +326,9 @@ export default function ButtonPage() {
         <Link href="/components/icon-button">IconButton</Link> 은{" "}
         <code>--nui-icon-button--</code>,{" "}
         <Link href="/components/button-group">ButtonGroup</Link> 은{" "}
-        <code>--nui-button-group--</code> 이다. 하나를 손볼 때 옆이 따라 움직이지
-        않는다. <code>ButtonLink</code> 는 <code>Button</code> 과 같은 변수를
-        쓴다.
+        <code>--nui-button-group--</code> 이다. 하나를 손볼 때 옆이 따라
+        움직이지 않는다. <code>ButtonLink</code> 는 <code>Button</code> 과 같은
+        변수를 쓴다.
       </div>
       <p>
         색은 컴포넌트별로 열려 있지 않다. 버튼 하나의 색을 바꾸려면{" "}
@@ -314,7 +338,7 @@ export default function ButtonPage() {
 
       <DesignNote title="왜 색만 못 바꾸나">
         <p>
-          배경과 글자는 짝이다. 배경만 연하게 바꾸면 글자색은 우리 값이 그대로
+          배경과 글자는 짝이다. 배경만 연하게 바꾸면 글자색은 기본값이 그대로
           남아 대비가 깨지는데,{" "}
           <strong>그 사실이 화면에 드러나지 않는다</strong> — 저시력 사용자만
           겪는다. 치수는 반대다. 바꾸면 바로 보이고 짝도 없다.

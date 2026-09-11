@@ -12,7 +12,7 @@ import {
 
 export const metadata = { title: "ButtonLink" };
 
-const COLORS = ["neutral", "primary", "secondary", "danger"] as const;
+const COLORS = ["neutral", "quiet", "primary", "secondary", "danger"] as const;
 const VARIANTS = ["solid", "soft", "line", "text"] as const;
 const SIZES = [
   ["large", "56px"],
@@ -49,7 +49,7 @@ export default function ButtonLinkPage() {
       <CaseMatrix
         rows={VARIANTS}
         cols={COLORS}
-        caption="variant 4 × color 4 — 16조합"
+        caption="variant 4 × color 5 — 20조합"
         code={`<ButtonLink href="/components" color="primary">컴포넌트 목록</ButtonLink>`}
         render={(variant, color) => (
           <div style={{ minWidth: 108 }}>
@@ -107,9 +107,9 @@ export default function ButtonLinkPage() {
       <DesignNote title="왜 button 이 아니라 a 인가">
         <p>
           누르는 것은 <code>&lt;button&gt;</code>, 이동하는 것은{" "}
-          <code>&lt;a&gt;</code> 다. 생김새가 같아도 요소가 달라야 한다 —
-          새 탭으로 열기, 주소 복사, 링크 목록으로 훑기가 전부 요소에 달려
-          있고, 스크린리더도 &ldquo;버튼&rdquo; 과 &ldquo;링크&rdquo; 를 다르게
+          <code>&lt;a&gt;</code> 다. 생김새가 같아도 요소가 달라야 한다 — 새
+          탭으로 열기, 주소 복사, 링크 목록으로 훑기가 전부 요소에 달려 있고,
+          스크린리더도 &ldquo;버튼&rdquo; 과 &ldquo;링크&rdquo; 를 다르게
           읽는다.
         </p>
       </DesignNote>

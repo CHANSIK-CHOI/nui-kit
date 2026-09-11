@@ -408,6 +408,10 @@ const TOKEN_PAIRS = [
     "action-neutral-active",
     4.5,
   ],
+  // quiet 은 채움이 gray-11 이라 neutral(gray-12)보다 여유가 적다. 기본 · hover · pressed 셋 다 잰다
+  ["quiet 글자 · 배경", "action-quiet-fg", "action-quiet", 4.5],
+  ["quiet 글자 · hover 배경", "action-quiet-fg", "action-quiet-hover", 4.5],
+  ["quiet 글자 · pressed 배경", "action-quiet-fg", "action-quiet-active", 4.5],
   ["primary 글자 · hover 배경", "action-primary-fg", "action-primary-hover", 3],
   [
     "primary 글자 · pressed 배경",
@@ -498,6 +502,8 @@ console.log("\n■ 버튼 조합 전수 — variant × color × 상태 (라이�
 
 const BUTTON_COLORS = [
   ["neutral", ""],
+  // quiet 은 2026-09-11 에 늘었다. soft 와 같다 — 목록에 안 더하면 새 색이 검사 밖이다.
+  ["quiet", "nui-button--quiet"],
   ["primary", "nui-button--primary"],
   ["secondary", "nui-button--secondary"],
   ["danger", "nui-button--danger"],

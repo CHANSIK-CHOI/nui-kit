@@ -13,14 +13,21 @@
 //   Button · ButtonLink  (`button--`)
 //     크기 : --large-height   --medium-height   --small-height
 //            --large-padding-x --medium-padding-x --small-padding-x
-//     모양 : --square-radius  --round-radius
-//     변형 : --text-padding-x --text-padding-y
+//            --large-radius    --medium-radius    --small-radius   (둥글기는 크기를 따른다)
+//     모양 : --round-radius
+//     변형 : --text-padding-x --text-padding-y   (세 size 가 한 값 — 의도해서 묶었다)
 //     공통 : --min-width  --gap  --border-width
 //
 //   IconButton  (`icon-button--`)
 //     크기 : --large-size  --medium-size  --small-size   (정사각이라 하나로 묶는다)
-//     모양 : --square-radius  --round-radius
+//            --large-radius --medium-radius --small-radius
+//     모양 : --round-radius
 //     공통 : --border-width
+//
+// ⚠️ 둥글기가 크기 훅이 된 이유 (2026-09-11): KRDS 산식(높이 × ⅛, 홀수면 위 짝수)으로
+//    large 56 은 8, medium 48 · small 40 은 6 이다. 옛 `--square-radius` 하나로는
+//    세 자리를 한 값으로 덮게 되어 large 만 8 로 둘 수 없었다. `round` 는 크기와
+//    무관하게 `radius-full` 이라 그대로 하나다.
 //
 //   ButtonGroup  (`button-group--`)
 //     공통 : --gap
@@ -79,6 +86,10 @@
     margin: 0;
     font: inherit;
     font-family: var(#{v("font-family-base")});
+    // ButtonLink 는 <a> 라 UA 의 밑줄이 그대로 남아 있었다 (2026-09-11 실측 — 네 variant
+    // 전부 underline). 버튼 모양이 곧 식별자이고 KRDS 498쪽도 용도가 명확한 요소에서는
+    // 인디케이터를 생략할 수 있다고 한다. <button> 은 원래 밑줄이 없어 한 줄로 둘이 같아진다.
+    text-decoration: none;
     cursor: pointer;
 
     display: flex;
@@ -93,7 +104,8 @@
     background: var(#{iv("button-main")});
     border: #{hook("button--border-width", var(#{v("border-width-1")}))} solid
       var(#{iv("button-main")});
-    border-radius: #{hook("button--square-radius", var(#{v("radius-2")}))};
+    // 둥글기는 KRDS 산식(높이 × ⅛, 홀수면 위 짝수) — medium 48 → 6
+    border-radius: #{hook("button--medium-radius", var(#{v("radius-2")}))};
 
     @include motion-press((background-color, border-color, color));
 
@@ -141,14 +153,32 @@
     // ── size
     // 옵션 이름은 prop 값 그대로다 — large · medium(기본) · small.
     // large 와 medium 은 지금 같은 여백(24px)이지만 이름을 나눈다. 나중에 따로 조정할 수 있어야 한다.
-    &--large {
+    //
+    // ⚠️ 높이 · 여백은 `text` 와 `icon` 에 걸지 않는다 — text 는 내용 폭 · `min-height: auto`,
+    //    icon 은 정사각 · `padding: 0` 이 정의다 (design-system.md §7 · §7-2). 예전에는 둘 다
+    //    뒤에 와서 소스 순서로만 이겼는데, text 가 size 를 받게 되면서(2026-09-11) 그 의존을
+    //    `:not()` 으로 명시한다 (styles.md §7). `:not()` 하나로 상세도가 (0,2,0) 이 되므로
+    //    **둘을 함께 열거해야 한다** — `--text` 만 빼면 `--icon` 의 `padding: 0`(0,1,0) 을 새로
+    //    이겨 large · small 아이콘 버튼 안에 좌우 여백이 들어간다(reviewer 가 잡았다).
+    //    타이포 · 아이콘 규칙은 text 에도 걸려야 하므로 안 붙인다.
+    &--large:not(#{cls("button")}--text):not(#{cls("button")}--icon) {
       min-height: #{hook("button--large-height", var(#{v("size-field")}))};
       padding: 0 #{hook("button--large-padding-x", var(#{v("space-5")}))};
     }
 
-    &--small {
+    // large 56 → 56 × ⅛ = 7 → 8. 입력 컨트롤의 large 와 같은 8 이라 나란히 놓아도 모서리가 맞는다.
+    &--large {
+      border-radius: #{hook("button--large-radius", var(#{v("radius-3")}))};
+    }
+
+    &--small:not(#{cls("button")}--text):not(#{cls("button")}--icon) {
       min-height: #{hook("button--small-height", var(#{v("size-control-lg")}))};
       padding: 0 #{hook("button--small-padding-x", var(#{v("space-4")}))};
+    }
+
+    // small 40 → 5 → 6. medium 과 같은 값이지만 자리가 다르므로 이름을 나눈다.
+    &--small {
+      border-radius: #{hook("button--small-radius", var(#{v("radius-2")}))};
     }
 
     &--small &__icon {
@@ -161,12 +191,30 @@
     }
 
     // ── shape
+    // size 의 radius 규칙(위)과 상세도가 같다 — 뒤에 와서 이긴다. 크기와 무관하게 pill 이다.
     &--round {
       border-radius: #{hook("button--round-radius", var(#{v("radius-full")}))};
     }
 
     // ── color
     // 훅 없이 semantic 을 직접 배선한다. 색은 컴포넌트별로 열지 않는다.
+    //
+    // quiet — neutral 보다 한 단계 낮은 강조 (2026-09-11). 취소 · 닫기 · 목록 행의 부차 액션.
+    // 채움은 gray-11(흰 글자 위 5.87 · 다크 9.11), 면 없는 글자는 gray-11(= text-secondary),
+    // 면이 깔리면 gray-12 — 그 자리가 neutral 의 쉬는 자리다. soft 의 면은 neutral 과 같은
+    // gray-3 이라 둘을 가르는 것은 글자(11 vs 12)뿐이다 (Button.md §9).
+    &--quiet {
+      #{iv("button-main")}: var(#{v("action-quiet")});
+      #{iv("button-fg")}: var(#{v("action-quiet-fg")});
+      #{iv("button-main-hover")}: var(#{v("action-quiet-hover")});
+      #{iv("button-main-active")}: var(#{v("action-quiet-active")});
+      #{iv("button-fg-line")}: var(#{v("action-quiet-fg-line")});
+      #{iv("button-fg-line-strong")}: var(#{v("action-quiet-fg-line-strong")});
+      #{iv("button-soft")}: var(#{v("action-quiet-soft")});
+      #{iv("button-soft-hover")}: var(#{v("action-quiet-soft-hover")});
+      #{iv("button-soft-active")}: var(#{v("action-quiet-soft-active")});
+    }
+
     &--primary {
       #{iv("button-main")}: var(#{v("action-primary")});
       #{iv("button-fg")}: var(#{v("action-primary-fg")});
@@ -341,20 +389,21 @@
         "icon-button--border-width",
         var(#{v("border-width-1")})
       )};
-    border-radius: #{hook(
-        "icon-button--square-radius",
-        var(#{v("radius-2")})
-      )};
+    // 둥글기는 크기를 따른다 — Button 과 같은 산식. 본체의 size radius 규칙(0,1,0)을
+    // (0,2,0) 으로 다시 쓴다.
+    border-radius: #{hook("icon-button--medium-radius", var(#{v("radius-2")}))};
 
     &#{cls("button")}--large {
       width: #{hook("icon-button--large-size", var(#{v("size-field")}))};
       height: #{hook("icon-button--large-size", var(#{v("size-field")}))};
+      border-radius: #{hook("icon-button--large-radius", var(#{v("radius-3")}))};
     }
 
     // small 은 40 — KRDS 버튼 계단(64/48/40)의 막내. 36 은 터치 44 에 너무 멀었다 (D1).
     &#{cls("button")}--small {
       width: #{hook("icon-button--small-size", var(#{v("size-control-lg")}))};
       height: #{hook("icon-button--small-size", var(#{v("size-control-lg")}))};
+      border-radius: #{hook("icon-button--small-radius", var(#{v("radius-2")}))};
     }
 
     // 본체의 `--round` 규칙(0,1,0)을 이겨야 하므로 (0,2,0) 으로 다시 쓴다.

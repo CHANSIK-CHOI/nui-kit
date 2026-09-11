@@ -99,15 +99,23 @@ export default function SizePage() {
         보이면 <code>--nui-button--min-width</code> 로 낮춘다.
       </div>
 
-      <h2>크기는 셋이고 기본은 가운데다</h2>
+      <h2>기본은 가운데다</h2>
       <p>
-        크기 옵션을 갖는 컴포넌트는 전부 <code>large</code> ·{" "}
-        <code>medium</code> · <code>small</code> 이고,{" "}
+        누르는 것(<code>Button</code> · <code>IconButton</code> ·{" "}
+        <code>ButtonLink</code>)은 <code>large</code> · <code>medium</code> ·{" "}
+        <code>small</code> 셋이고, 값을 넣는 것(<code>Textfield</code> 계열 ·{" "}
+        <code>Select</code> · <code>Datepicker</code> 계열)은 <code>large</code>{" "}
+        와 <code>medium</code> 둘이다.{" "}
         <strong>
           아무것도 주지 않으면 <code>medium</code>
         </strong>{" "}
-        이다.
+        이고, 같은 낱말은 같은 높이라 나란히 놓으면 줄이 맞는다.
       </p>
+      <div className="doc-note">
+        입력에 <code>small</code> 이 없는 이유는 터치다. 40px 은 버튼에서는 글자
+        폭이 타겟이라 괜찮지만, 입력은 컨트롤 전체가 타겟이라 기준 44px 아래로
+        내려간다.
+      </div>
       <CaseGrid
         columns={3}
         caption="size — 위아래로 하나씩 있다"

@@ -137,20 +137,20 @@ import "../nui-theme.css";
 ```css
 :root {
   --nui-button--large-height: 3.75rem; /* 버튼 · large 옵션 · 높이 */
-  --nui-button--square-radius: 0;
+  --nui-button--medium-radius: 0; /* 버튼 · medium 옵션 · 둥글기 (large · small 은 따로) */
   --nui-button--border-width: 2px;
 }
 ```
 
 | 컴포넌트 | 공개 변수 |
 | --- | --- |
-| Button · ButtonLink | `-large-height` `-medium-height` `-small-height` · `-large-padding-x` `-medium-padding-x` `-small-padding-x` · `-text-padding-x` `-text-padding-y` · `-min-width` · `-gap` · `-square-radius` `-round-radius` · `-border-width` |
-| IconButton | `--nui-icon-button--large-size` `-medium-size` `-small-size` · `-square-radius` `-round-radius` · `-border-width` |
+| Button · ButtonLink | `-large-height` `-medium-height` `-small-height` · `-large-padding-x` `-medium-padding-x` `-small-padding-x` · `-large-radius` `-medium-radius` `-small-radius` · `-text-padding-x` `-text-padding-y` · `-min-width` · `-gap` · `-round-radius` · `-border-width` |
+| IconButton | `--nui-icon-button--large-size` `-medium-size` `-small-size` · `-large-radius` `-medium-radius` `-small-radius` · `-round-radius` · `-border-width` |
+| Textfield · Search · Password | `--nui-textfield--medium-height` `-large-height` · `-medium-radius` `-large-radius` · `-border-width` |
+| Select · MultiSelect | `--nui-select--medium-height` `-large-height` · `-medium-radius` `-large-radius` · `-border-width` |
 | ButtonGroup | `--nui-button-group--gap` |
 | Popup | `-lg-width` `-md-width` `-sm-width` · `-radius` · `-border-width` |
-| Textfield | `-height` · `-radius` · `-border-width` |
 | Textarea | `-min-height` · `-radius` · `-border-width` |
-| Select | `-height` · `-radius` · `-border-width` |
 | Datepicker | `-dropdown-radius` · `-day-size` `-day-button-size` `-day-radius` · `-border-width` |
 | Accordion | `-gap` · `-radius` · `-border-width` |
 | Field | `-gap` · `-grid-gap` · `-row-label-width` |
@@ -439,7 +439,8 @@ const OPTIONS = [
 emotion 쪽에서 걷어내** CSS 가 책임지게 합니다.
 
 - 치수·모양은 위 커스터마이징 절의 CSS 변수로 조정합니다
-  (`--nui-select--height` / `-radius` / `-border-width`). 색은 `className` 으로 씁니다
+  (`--nui-select--medium-height` / `--large-height` / `--medium-radius` / `--large-radius` /
+  `--border-width`). 옵션 낱말은 `size` 값 그대로입니다. 색은 `className` 으로 씁니다
 - `styles` prop 을 직접 넘기면 그 정리된 값 위에 얹히므로 의도대로 덧칠됩니다
 - 다만 **메뉴 최대 높이는 CSS 가 아니라 `maxMenuHeight` prop** 으로 조정합니다.
   `react-select` 이 메뉴 배치를 계산할 때 이 값을 참조하므로, CSS 로 덮으면

@@ -14,8 +14,8 @@ Button 계열의 CSS 변수 이름을 컴포넌트·옵션·속성 셋으로 나
 | `--nui-button--lg-padding-x` | `--nui-button--large-padding-x` |
 | `--nui-button--md-padding-x` | `--nui-button--medium-padding-x` |
 | `--nui-button--sm-padding-x` | `--nui-button--small-padding-x` |
-| `--nui-button--radius` | `--nui-button--square-radius` |
-| `--nui-button--radius` (아이콘 버튼) | `--nui-icon-button--square-radius` |
+| `--nui-button--radius` | `--nui-button--medium-radius` · `--large-radius` · `--small-radius` (둥글기가 크기를 따릅니다) |
+| `--nui-button--radius` (아이콘 버튼) | `--nui-icon-button--medium-radius` · `--large-radius` · `--small-radius` |
 | `--nui-button--round-radius` (아이콘 버튼) | `--nui-icon-button--round-radius` |
 | `--nui-button--border-width` (아이콘 버튼) | `--nui-icon-button--border-width` |
 
@@ -26,7 +26,7 @@ Button 계열의 CSS 변수 이름을 컴포넌트·옵션·속성 셋으로 나
 **IconButton 과 ButtonGroup 이 자기 변수를 갖습니다.** 예전에는 `IconButton` 의 크기를 열어 두지 않아 바꿀 수 없었고, 모양과 선 두께는 `Button` 과 같은 이름을 써서 하나를 바꾸면 둘이 함께 움직였습니다.
 
 - `--nui-icon-button--large-size` · `-medium-size` · `-small-size` — 하나가 가로와 세로를 함께 먹여 정사각을 지킵니다
-- `--nui-icon-button--square-radius` · `-round-radius` · `-border-width`
+- `--nui-icon-button--medium-radius` · `-large-radius` · `-small-radius` · `-round-radius` · `-border-width`
 - `--nui-button-group--gap` — 항목 사이 간격. 항목의 기준 폭도 같이 따라갑니다
 
 **Button 에 변수 셋이 늘었습니다.** `--nui-button--gap`(아이콘과 라벨 사이) · `--nui-button--text-padding-x` · `-text-padding-y`.
