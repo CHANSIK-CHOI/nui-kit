@@ -318,7 +318,9 @@ for (const theme of ["light", "dark"]) {
         continue;
       }
     }
-    const el = page.locator(selector).first();
+    // 사이트 크롬(모바일 헤더의 IconButton · Switch)이 DOM 앞에 있고 데스크톱에서는
+    // display: none 이다. 보이는 것 중 첫 번째를 잰다 (2026-09-11 · 문서 반응형)
+    const el = page.locator(selector).filter({ visible: true }).first();
     const appeared = await el
       .waitFor({ state: "visible", timeout: 3000 })
       .then(() => true)
@@ -537,7 +539,9 @@ const BUTTON_PROBE = ({ colors, variants }) => {
   };
 
   // 데모 버튼과 같은 표면 위에 심는다. 없으면 body.
-  const sample = document.querySelector(".nui-button");
+  const sample = [...document.querySelectorAll(".nui-button")].find(
+    (b) => b.getClientRects().length > 0,
+  );
   const host = document.createElement("div");
   host.style.cssText = "position:absolute;left:-9999px;top:0;width:200px";
   (sample?.parentElement ?? document.body).appendChild(host);
@@ -655,7 +659,9 @@ const INSTALL_PROBE = () => {
     return [r, g, b];
   };
   // 데모 버튼이 실제로 놓인 표면
-  let cur = document.querySelector(".nui-button")?.parentElement;
+  let cur = [...document.querySelectorAll(".nui-button")].find(
+    (b) => b.getClientRects().length > 0,
+  )?.parentElement;
   let surface = "rgb(255, 255, 255)";
   while (cur) {
     const value = getComputedStyle(cur).backgroundColor;
@@ -1020,7 +1026,9 @@ for (const theme of ["light", "dark"]) {
     inScope(t[1]),
   )) {
     await page.goto(BASE + url, { waitUntil: "networkidle" });
-    const el = page.locator(selector).first();
+    // 사이트 크롬(모바일 헤더의 IconButton · Switch)이 DOM 앞에 있고 데스크톱에서는
+    // display: none 이다. 보이는 것 중 첫 번째를 잰다 (2026-09-11 · 문서 반응형)
+    const el = page.locator(selector).filter({ visible: true }).first();
     const appeared = await el
       .waitFor({ state: "visible", timeout: 3000 })
       .then(() => true)
@@ -1242,7 +1250,9 @@ const TOUCH_TARGETS = [
         continue;
       }
     }
-    const el = page.locator(selector).first();
+    // 사이트 크롬(모바일 헤더의 IconButton · Switch)이 DOM 앞에 있고 데스크톱에서는
+    // display: none 이다. 보이는 것 중 첫 번째를 잰다 (2026-09-11 · 문서 반응형)
+    const el = page.locator(selector).filter({ visible: true }).first();
     const appeared = await el
       .waitFor({ state: "visible", timeout: 3000 })
       .then(() => true)

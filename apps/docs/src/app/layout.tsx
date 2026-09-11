@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Sidebar } from "@/components/Sidebar";
+import { MobileHeader } from "@/components/MobileHeader";
 import { PopupProvider } from "@/components/PopupProvider";
 import { ThemeToggle, THEME_STORAGE_KEY } from "@/components/ThemeToggle";
 
@@ -38,6 +39,8 @@ export default function RootLayout({
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <PopupProvider>
+          {/* 970px 이하에서만 보인다. 사이드바와 떠 있는 토글은 그 위에서만 */}
+          <MobileHeader />
           <div className="doc-shell">
             <Sidebar />
             <main className="doc-main">{children}</main>

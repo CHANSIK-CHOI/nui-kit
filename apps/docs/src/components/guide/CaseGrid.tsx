@@ -47,11 +47,13 @@ export function CaseGrid({
 }) {
   return (
     <div className="doc-example">
+      {/* 열 수는 변수로만 준다 — 좁은 화면에서는 CSS 가 고정을 풀고 흐르게 한다 */}
       <div
         className="doc-example__preview doc-case-grid"
+        data-cols={columns}
         style={
           columns
-            ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }
+            ? ({ "--doc-case-cols": columns } as React.CSSProperties)
             : undefined
         }
       >
