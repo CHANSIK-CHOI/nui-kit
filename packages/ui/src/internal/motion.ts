@@ -13,7 +13,7 @@
  */
 import type { Transition } from "framer-motion";
 
-/** `--nui-duration-1` ~ `-8` 과 같은 값 (초 단위) */
+/** `--nui-duration-1` ~ `-6` 과 같은 값 (초 단위). 7 · 8 은 참조 0 이라 2026-09-11 에 지웠다 — UI 는 300ms 아래 */
 export const motionDuration = {
   d1: 0.05,
   d2: 0.1,
@@ -21,8 +21,6 @@ export const motionDuration = {
   d4: 0.2, // 마이크로/매크로 경계
   d5: 0.25,
   d6: 0.3,
-  d7: 0.35,
-  d8: 0.4,
 } as const;
 
 /** `--nui-easing-*` 과 같은 값 */
