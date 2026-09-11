@@ -128,7 +128,7 @@ export function LayerPopupOptionsDemo() {
       <CaseGrid
         columns={3}
         code={`<LayerPopup contentAlign="center" />
-<LayerPopup icon={<SuccessIcon />} />
+<LayerPopup description="…"><SuccessIcon size={40} /></LayerPopup>
 <LayerPopup hasCloseButton={false} />`}
       >
         <Case label='contentAlign="center"' note="짧은 안내">
@@ -136,7 +136,7 @@ export function LayerPopupOptionsDemo() {
             가운데 정렬 열기
           </Button>
         </Case>
-        <Case label="icon" note="제목 위">
+        <Case label="children 에 아이콘" note="설명 아래 · 크기는 쓰는 쪽이">
           <Button variant="line" onClick={() => setOpen("icon")}>
             아이콘 열기
           </Button>
@@ -158,16 +158,26 @@ export function LayerPopupOptionsDemo() {
         confirmLabel="닫기"
         onConfirm={close}
       />
+      {/*
+        아이콘 슬롯은 Alert · Confirm 전용이다. 셸 셋에서는 `children` 에 직접 넣고
+        크기 · 색도 쓰는 쪽이 정한다 (2026-09-11).
+
+        ⚠️ `description` 은 prop 으로 둔다 — 그래야 `aria-describedby` 가 이어지고
+           글자 토큰을 받는다. 본문 순서가 `description → children` 이라 아이콘은
+           글 아래에 선다. **제목 바로 아래 아이콘이 필요하면 Alert · Confirm 이다.**
+      */}
       <LayerPopup
         open={open === "icon"}
         onRequestClose={close}
         size="small"
-        icon={<SuccessIcon width={28} height={28} />}
+        contentAlign="center"
         title="새 기능이 추가됐습니다"
         description="설정에서 알림 방식을 고를 수 있습니다."
         confirmLabel="설정 보기"
         onConfirm={close}
-      />
+      >
+        <SuccessIcon size={40} color="var(--nui-text-success)" />
+      </LayerPopup>
       <LayerPopup
         open={open === "noClose"}
         onRequestClose={close}

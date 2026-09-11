@@ -82,6 +82,7 @@ export default function PopupBase({
   size = "medium",
   contentAlign = "center",
   title,
+  titlePlacement = "head",
   icon,
   description,
   footer,
@@ -112,7 +113,10 @@ export default function PopupBase({
   const generatedTitleId = useId();
   const generatedDescriptionId = useId();
   const panelMotion = getPanelMotion(variant);
-  const hasHeader = Boolean(title) || hasCloseButton;
+  // 본문에 그리는 제목은 head 를 부르지 않는다 — `Alert`·`Confirm` 은 닫기 버튼도 없으므로
+  // head 노드 자체가 사라진다 (spec §2 · §6-1).
+  const isTitleInBody = titlePlacement === "body";
+  const hasHeader = (Boolean(title) && !isTitleInBody) || hasCloseButton;
   const { panelRef } = usePopupPanelA11y({
     open,
     isTopmost,
@@ -231,18 +235,20 @@ export default function PopupBase({
   // 닫기 버튼은 DOM 의 가장 마지막에 둔다 (KRDS 가이드 397쪽 02).
   // 첫 포커스가 본문·푸터로 가고, 시각 위치는 CSS 가 우상단에 고정한다.
   // head 는 제목이 없어도 렌더한다 — 닫기 버튼이 앉을 자리를 비워 두는 몫이다.
+  const titleNode = title ? (
+    <span id={titleId} className={`${block}__title`}>
+      {title}
+    </span>
+  ) : null;
+
   const headerContent = hasHeader ? (
     <div
       className={cn(`${block}__head`, {
-        [`${block}__head--no-title`]: !title,
+        [`${block}__head--no-title`]: !title || isTitleInBody,
       })}
     >
-      {title ? (
-        <div className={`${block}__header-content`}>
-          <span id={titleId} className={`${block}__title`}>
-            {title}
-          </span>
-        </div>
+      {titleNode && !isTitleInBody ? (
+        <div className={`${block}__header-content`}>{titleNode}</div>
       ) : null}
     </div>
   ) : null;
@@ -259,6 +265,9 @@ export default function PopupBase({
             contentAlign === "center" && `${block}--align-center`,
             hasCloseButton && `${block}--has-close`,
             !hasHeader && `${block}--no-header`,
+            // `--no-header` 와 다른 것을 잰다 — 앞은 "head 노드가 없다", 이쪽은 "제목이 없다".
+            // `Alert`·`Confirm` 은 앞이 상수라 본문 최소 높이·설명 폭 보정이 이쪽에 걸린다 (spec §9).
+            !title && `${block}--no-title`,
             !resolvedFooter && `${block}--no-footer`,
             className,
           )}
@@ -317,6 +326,8 @@ export default function PopupBase({
                 {icon !== null && icon !== undefined ? (
                   <div className={`${block}__icon`}>{icon}</div>
                 ) : null}
+                {/* 아이콘 → 제목 → 설명. KRDS 390쪽의 「헤더」가 여기 들어온다 (spec §2) */}
+                {isTitleInBody ? titleNode : null}
                 {description ? (
                   <p id={descriptionId} className={`${block}__description`}>
                     {description}

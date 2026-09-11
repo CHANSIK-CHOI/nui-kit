@@ -4,6 +4,8 @@ export {
   DelIcon,
   AttentionIcon,
   SuccessIcon,
+  InfoIcon,
+  WarningIcon,
   SearchIcon,
   ShowPwIcon,
   HidePwIcon,

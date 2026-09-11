@@ -1,6 +1,15 @@
 import Link from "next/link";
-import { GuideHeader, ExceptionBadges, DesignNote, PropsTable } from "@/components/guide";
-import { ConfirmBasicDemo, ConfirmAsyncDemo } from "./ConfirmDemo";
+import {
+  GuideHeader,
+  ExceptionBadges,
+  DesignNote,
+  PropsTable,
+} from "@/components/guide";
+import {
+  ConfirmBasicDemo,
+  ConfirmAsyncDemo,
+  ConfirmToneDemo,
+} from "./ConfirmDemo";
 
 export const metadata = { title: "Confirm" };
 
@@ -30,6 +39,17 @@ export default function ConfirmPage() {
       </p>
       <ConfirmBasicDemo />
 
+      <h2>성격 — tone</h2>
+      <p>
+        무엇을 묻는 팝업인지에 따라 아이콘이 바뀌고, <code>danger</code> 일 때만
+        확인 버튼도 함께 빨개진다. 되돌릴 수 없는 일이면 <code>danger</code> 다.
+      </p>
+      <ConfirmToneDemo />
+      <div className="doc-note">
+        취소 버튼은 tone 과 무관하게 중립이다. 위험한 색은 위험한 행동에만
+        붙는다. 취소가 빨가면 어느 쪽이 위험한지 뒤집혀 보인다.
+      </div>
+
       <h2>답을 Promise 로 받기</h2>
       <p>
         <code>openAsync</code> 는 선택을 <code>Promise&lt;boolean&gt;</code>{" "}
@@ -54,11 +74,13 @@ export default function ConfirmPage() {
           <tbody>
             <tr>
               <td>
-                <code>icon</code>
+                <code>hasIcon</code>
               </td>
-              <td>주의 아이콘</td>
+              <td>
+                <code>true</code>
+              </td>
               <td className="doc-wrap">
-                <code>null</code> 이면 아이콘 자리가 없어진다
+                <code>false</code> 면 아이콘 자리가 없어진다
               </td>
             </tr>
             <tr>
@@ -101,7 +123,7 @@ export default function ConfirmPage() {
         <p>
           실수로 닫히면 어느 쪽을 골랐는지 모호해진다. 답을 요구하는 팝업은
           답으로만 닫힌다. Alert 과 같은 이유로 닫기 버튼 · dim · <kbd>Esc</kbd>{" "}
-          셋을 함께 막았다.
+          셋 다 닫는 길이 아니다.
         </p>
       </DesignNote>
 

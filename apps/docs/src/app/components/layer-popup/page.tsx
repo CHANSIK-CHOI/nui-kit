@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { GuideHeader, ExceptionBadges, DesignNote, PropsTable } from "@/components/guide";
+import {
+  GuideHeader,
+  ExceptionBadges,
+  DesignNote,
+  PropsTable,
+} from "@/components/guide";
 import {
   LayerPopupDeclarativeDemo,
   LayerPopupImperativeDemo,
@@ -21,7 +26,9 @@ export default function LayerPopupPage() {
         subpath="popup"
       />
 
-      <ExceptionBadges items={[{ kind: "cappedWidth", target: "LayerPopup" }]} />
+      <ExceptionBadges
+        items={[{ kind: "cappedWidth", target: "LayerPopup" }]}
+      />
 
       <p>
         가운데 뜨는 대화상자다. 제목 · 본문 · 푸터를 갖고 dim 과 <kbd>Esc</kbd>{" "}
@@ -67,9 +74,14 @@ export default function LayerPopupPage() {
       <h2>본문 정렬 · 아이콘 · 닫기 버튼</h2>
       <p>
         <code>contentAlign</code> 의 기본은 <code>left</code> 다. 짧은 안내 한
-        줄이면 <code>center</code> 가 어울린다. <code>icon</code> 을 주면 제목
-        위에 놓이고 <code>hasCloseButton={"{false}"}</code> 면 헤더의 × 가
-        없어진다.
+        줄이면 <code>center</code> 가 어울린다.{" "}
+        <code>hasCloseButton={"{false}"}</code> 면 헤더의 × 가 없어진다.
+      </p>
+      <p>
+        아이콘은 <code>children</code> 에 직접 넣는다. 크기와 색도 넣는 쪽이
+        정한다. 본문 순서가 설명 다음이라 아이콘은 설명 아래에 선다 — 제목 바로
+        아래에 놓고 싶으면 <Link href="/components/alert">Alert</Link> 이나{" "}
+        <Link href="/components/confirm">Confirm</Link> 이 그 자리다.
       </p>
       <LayerPopupOptionsDemo />
 

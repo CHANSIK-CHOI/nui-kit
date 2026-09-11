@@ -200,22 +200,15 @@
           0 var(#{v("border-section")});
     }
 
-    &__icon {
-      display: inline-flex;
-      flex-shrink: 0;
-      align-self: center;
-      align-items: center;
-      justify-content: center;
-      width: var(#{v("size-field")});
-      height: var(#{v("size-field")});
-      color: var(#{v("text-info")});
-      // 콘텐츠 위에 얹는 은은한 면 — 그라디언트는 쓰지 않는다 (design-system.md §2-5)
-      background: var(#{v("surface-neutral-soft")});
-      border: #{hook("popup--border-width", var(#{v("border-width-1")}))} solid
-        var(#{v("border-section")});
-      border-radius: var(#{v("radius-full")});
-      box-shadow: var(#{v("shadow-inset-soft")});
-    }
+    // ⚠️ `&__icon` 에 **골격은 규칙을 두지 않는다** ★ (2026-09-11)
+    //
+    // 이 자리를 쓰는 것은 `Alert`·`Confirm` 뿐이고(셸 셋은 타입에서 `icon` 을 닫았다),
+    // 크기·색은 그 둘의 tone 계약이라 아래 프리셋 절이 갖는다. 골격이 쥐고 있었더니
+    // 면을 없애는 변경이 **쓰지도 않는 셸 셋까지 따라가** 28px 글리프가 56px 빈 상자
+    // 안에 뜨는 자리가 생겼다(리뷰 실측 · LayerPopup 데모).
+    //
+    // 골격이 소유하는 것은 **구조 하나** — 「아이콘이 오면 본문 맨 앞 div 로 감싼다」.
+    // 그 div 를 어떻게 그릴지는 감싼 쪽이 정한다.
 
     &__description {
       color: var(#{v("text-secondary")});
@@ -342,12 +335,46 @@
   // ── Alert / Confirm 공통 (가운데 정렬 메시지형)
   #{cls("popup-alert")},
   #{cls("popup-confirm")} {
-    #{cls("popup")}__header-content {
-      text-align: center;
-    }
+    // 제목이 본문에 온다 — head 를 렌더하지 않으므로 `__header-content` 도 없다.
+    // 가운데 정렬은 `--align-center &__body` 가 이미 하고, `__title` 의 typo 는
+    // 골격의 것과 같아 여기서 다시 적지 않는다 (spec §9 「지워진 것」).
 
-    #{cls("popup")}__title {
-      @include typo(5, "bold");
+    // ── 아이콘 — **글리프만 선다. 면도 테두리도 없다** ★ (2026-09-11)
+    //
+    // 예전에는 56px 회색 원(`surface-neutral-soft` + `border-section` + `shadow-inset-soft`)
+    // 안에 24px 글리프가 있었다. 배지가 하나 더 있는 셈이라 제목보다 먼저 눈에 들어왔다.
+    // 지금은 **글리프가 그 56 을 그대로 차지한다** — 그릴 것이 하나면 그것이 tone 을 말한다.
+    //
+    // 덤으로 대비가 쉬워졌다. 알파 면 위가 아니라 패널 배경(`layer-floating`) 위라
+    // 합성 없이 재진다 (spec §9 · §11).
+    //
+    // **이 규칙이 골격이 아니라 여기 있는 이유** — `icon` 자리를 쓰는 것은 이 둘뿐이다.
+    // 골격에 두면 쓰지 않는 셸 셋까지 크기·색을 물려받는다 (spec §3-1).
+    //
+    // ⚠️ **`:where()` 로 상세도를 0 으로 낮춘다** (styles.md §7-1 · 2026-09-11 리뷰).
+    //    그냥 `.nui-popup-alert .nui-popup__icon` 이면 (0,2,0)이라 아래 tone 절과 **같고**,
+    //    그러면 tone 이 상세도가 아니라 **소스 순서로만** 이긴다. 골격에 있던 시절에는
+    //    기본이 (0,1,0)이라 그 문제가 없었다 — 자리를 옮기며 생긴 빚이다.
+    //    순서를 바꾸면 색이 조용히 뒤바뀌는 모양이고, Switch 의 readonly/error 사고가 그것이다.
+    //    `:where(&)` 는 **부모 셀렉터 목록 전체**를 감싼다 — 이 블록이 둘을 함께 열고
+    //    있으므로 `:where(.nui-popup-alert, .nui-popup-confirm)` 이 된다.
+    :where(&) #{cls("popup")}__icon {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-self: center;
+      align-items: center;
+      justify-content: center;
+      width: var(#{v("size-field")});
+      height: var(#{v("size-field")});
+      // 기본 tone(`info`)의 선 색. 나머지 셋은 아래 tone 절이 덮는다.
+      color: var(#{v("text-info")});
+
+      // 자리가 곧 크기다 — `:where(.nui-icon)` 의 100% 가 이 56 을 채운다 (styles.md §7-1).
+      // 그래도 명시해 둔다: 슬롯 규칙이 바뀌어도 이 자리는 56 이어야 한다.
+      #{cls("icon")} {
+        width: 100%;
+        height: 100%;
+      }
     }
 
     #{cls("popup")}__description {
@@ -355,7 +382,19 @@
       color: var(#{v("text-secondary")});
     }
 
-    &#{cls("popup")}--no-header {
+    // 본문 위를 더 연다 — 아이콘이 56px 로 커지면서 패널 천장에 붙어 보였다.
+    // ⚠️ 상세도를 소스 순서에 맡기지 않는다 (styles.md §7). 골격의
+    //    `--no-header &__body`(0,2,0)와 같은 값이 되므로 `--no-header` 를 함께 적어
+    //    (0,3,0)으로 올린다. Alert·Confirm 은 그 클래스가 **항상** 붙는다.
+    &#{cls("popup")}--no-header #{cls("popup")}__body {
+      padding-top: calc(var(#{v("space-5")}) + var(#{v("space-4")}));
+    }
+
+    // ⚠️ **`--no-title` 이다. `--no-header` 가 아니다** (2026-09-11).
+    // 제목을 본문으로 내린 뒤 이 둘은 다른 것을 잰다 — `--no-header` 는 "head 노드가
+    // 없다" 인데 Alert·Confirm 에서는 **항상 참**이라, 그대로 두면 제목이 있는 알림에도
+    // 180px 하한과 20rem 설명 폭이 걸린다 (spec §2 · §9).
+    &#{cls("popup")}--no-title {
       #{cls("popup")}__body {
         justify-content: center;
         min-height: 11.25rem;
@@ -366,6 +405,33 @@
         max-width: 20rem;
         margin: 0 auto;
       }
+    }
+
+    // 제목과 설명은 한 문장의 두 부분이라 더 붙인다 — 본문 기본 gap(12)이 아이콘↔제목이고
+    // 여기만 8 이다. SEED `alert-dialog.yaml` 의 `header.gap: x1_5`(6)를 우리 스케일로
+    // 옮긴 값이다 (spec §9 고유 치수).
+    #{cls("popup")}__title + #{cls("popup")}__description {
+      margin-top: calc(var(#{v("space-2")}) - var(#{v("space-component-gap")}));
+    }
+
+    // ── tone — **바뀌는 것은 선 색 하나다**
+    //
+    // 면이 없으므로 갈아끼울 면도 없다. 글리프 모양은 `tone.tsx` 가 고른다.
+    //
+    // 기본 `info` 는 클래스가 없다 — `__icon` 의 기본 색이 이미 `text-info` 다.
+    // 대비는 패널 표면(`layer-floating`) 위에서 두 테마로 쟀고 라이트 최저가 warning
+    // 4.41 · 다크 최저가 danger 7.18 이다. 아이콘은 글자가 아니므로 기준이 4.5 가 아니라
+    // 3.0 이다 (a11y.md §4-1). `check-a11y.mjs` 가 tone 마다 따로 잰다.
+    &--success #{cls("popup")}__icon {
+      color: var(#{v("text-success")});
+    }
+
+    &--warning #{cls("popup")}__icon {
+      color: var(#{v("text-warning")});
+    }
+
+    &--danger #{cls("popup")}__icon {
+      color: var(#{v("text-danger")});
     }
 
     &__actions {

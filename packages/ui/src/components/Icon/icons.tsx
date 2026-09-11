@@ -7,8 +7,10 @@ import {
   CircleCheck,
   Eye,
   EyeOff,
+  Info,
   LoaderCircle,
   Search,
+  TriangleAlert,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -47,14 +49,24 @@ function preset(
 /** 지우기 — Textfield · Textarea · Search 의 값 비우기 */
 export const DelIcon = preset(X, "DelIcon");
 
-/** 주의 — Message 의 에러 표시 · Alert · Confirm */
+/** 주의 — Message 의 에러 표시 · Toast 의 `tone="error"` · Alert·Confirm 의 `tone="danger"` */
 export const AttentionIcon = preset(CircleAlert, "AttentionIcon");
 
 /**
- * 완료 — Toast 의 `tone="success"`.
+ * 완료 — Toast 의 `tone="success"` · Alert·Confirm 의 `tone="success"`.
  * `AttentionIcon`(CircleAlert)과 같은 동그라미 계열이라 나란히 놓아도 결이 맞는다.
  */
 export const SuccessIcon = preset(CircleCheck, "SuccessIcon");
+
+/** 안내 — Alert·Confirm 의 `tone="info"`(기본). 동그라미 계열 셋째다 */
+export const InfoIcon = preset(Info, "InfoIcon");
+
+/**
+ * 경고 — Alert·Confirm 의 `tone="warning"`.
+ * **혼자 세모다** — 되돌릴 수 없는 것 앞에서 멈추라는 신호라 모양부터 다르다.
+ * 색만으로 구분하지 않는다는 규칙의 실행이기도 하다 (a11y.md §3).
+ */
+export const WarningIcon = preset(TriangleAlert, "WarningIcon");
 
 /** 검색 */
 export const SearchIcon = preset(Search, "SearchIcon");

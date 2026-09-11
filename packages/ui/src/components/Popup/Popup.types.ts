@@ -5,6 +5,16 @@ export type PopupSize = "small" | "medium" | "large";
 export type PopupContentAlign = "left" | "center";
 
 /**
+ * `Alert` · `Confirm` 의 성격. 아이콘 글리프와 **선 색**을 고른다 (spec §6-6).
+ *
+ * **바뀌는 것은 선 색 하나다.** 면도 테두리도 없다 — 글리프가 56px 자리를 그대로 차지한다.
+ *
+ * ⚠️ **「없음」은 여기 없다.** 아이콘을 끄는 것은 `hasIcon={false}` 다 — 색·글리프를 고르는
+ *    축에 「안 그림」을 섞지 않는다.
+ */
+export type PopupTone = "info" | "success" | "warning" | "danger";
+
+/**
  * 팝업에는 이름이 있어야 한다 — 둘 중 하나는 **반드시** (06 D5).
  *
  * 아무것도 안 주면 스크린리더가 "대화상자"만 읽는다. 무슨 팝업인지 알 수 없고,
@@ -37,6 +47,25 @@ type PopupBaseOwnProps = {
   variant?: PopupVariant;
   size?: PopupSize;
   contentAlign?: PopupContentAlign;
+  /**
+   * 제목을 어디에 그리나. **내부 전용** — `PopupBase` 는 공개하지 않는다(spec §3-3).
+   *
+   * `"body"` 면 head 대신 본문 맨 위(아이콘 다음)에 그리고 `hasHeader` 판정에서도 빠진다.
+   * `Alert`·`Confirm` 이 그 경우다 — 닫기 버튼이 없어 헤더가 빈 껍데기이고, SEED
+   * `alert-dialog.yaml` 의 `header` 슬롯이 title + description 한 쌍이다 (spec §2).
+   */
+  titlePlacement?: "head" | "body";
+  /**
+   * 본문 맨 앞에 오는 노드. **내부 전용** — 셸 다섯 전부가 타입에서 닫는다.
+   *
+   * 골격이 소유하는 것은 **구조 하나**다 — 「오면 `__icon` div 로 감싸 본문 맨 앞에 둔다」.
+   * 크기 · 색은 감싼 쪽(`Alert`·`Confirm` 의 tone 계약)이 정한다.
+   *
+   * ⚠️ `LayerPopup`·`BottomSheet`·`FullPopup` 은 **받지 않는다**(2026-09-11). 셋은 내용을
+   *    자유롭게 채우는 셸이라 아이콘이 필요하면 `children` 에 직접 넣는다 — 크기와 여백도
+   *    그쪽이 정한다. 예전에는 열려 있었고, 그래서 프리셋 전용 스타일(56px · tone 색)이
+   *    셋에까지 따라가 28px 글리프가 56px 빈 상자 안에 뜨는 자리가 있었다.
+   */
   icon?: ReactNode | null;
   description?: ReactNode;
   footer?: ReactNode;
@@ -110,6 +139,9 @@ type PopupSharedShellProps = Omit<
   PopupBaseOwnProps,
   | "variant"
   | "size"
+  // 내부 전용 둘 — 셸 셋은 제목을 head 에 그리고, 아이콘은 `children` 에 직접 넣는다 (spec §3-1)
+  | "titlePlacement"
+  | "icon"
   | "footer"
   | "confirmLabel"
   | "cancelLabel"
@@ -124,14 +156,28 @@ type PopupSizedShellProps = PopupSharedShellProps &
 export type PopupRuntimeProps = PopupInstanceProps &
   Pick<PopupBaseOwnProps, "onRequestClose">;
 
+/**
+ * 아이콘은 슬롯이 아니라 열거형이다 (2026-09-11). 자유 슬롯이면 소비자가 56px 자리에
+ * 아무 크기의 그림을 넣을 수 있고, 고른 그림이 문구의 뜻과 어긋나도 막을 길이 없었다.
+ *
+ * `LayerPopup` · `BottomSheet` · `FullPopup` 은 `icon` 자체를 받지 않는다 — 셋은 내용을
+ * 자유롭게 채우는 셸이라 아이콘도 `children` 에 직접 넣는다.
+ */
+type PopupToneProps = {
+  tone?: PopupTone;
+  /** `false` 면 아이콘을 그리지 않는다. 「없음」은 톤이 아니라 유무다 */
+  hasIcon?: boolean;
+};
+
 export type AlertContentProps = Pick<
   PopupBaseOwnProps,
-  "className" | "icon" | "description"
+  "className" | "description"
 > &
-  PopupAccessibleName & {
-  confirmLabel?: ReactNode;
-  onConfirm?: () => void;
-};
+  PopupAccessibleName &
+  PopupToneProps & {
+    confirmLabel?: ReactNode;
+    onConfirm?: () => void;
+  };
 
 export type AlertProps = AlertContentProps & PopupInstanceProps;
 
@@ -142,14 +188,15 @@ export type AlertPopupOptions = AlertContentProps & {
 
 export type ConfirmContentProps = Pick<
   PopupBaseOwnProps,
-  "className" | "icon" | "description"
+  "className" | "description"
 > &
-  PopupAccessibleName & {
-  cancelLabel?: ReactNode;
-  confirmLabel?: ReactNode;
-  onCancel?: () => void;
-  onConfirm?: () => void;
-};
+  PopupAccessibleName &
+  PopupToneProps & {
+    cancelLabel?: ReactNode;
+    confirmLabel?: ReactNode;
+    onCancel?: () => void;
+    onConfirm?: () => void;
+  };
 
 export type ConfirmProps = ConfirmContentProps & PopupInstanceProps;
 

@@ -368,6 +368,12 @@
     #{v("text-disabled")}: var(#{v("color-gray-9")});
     #{v("text-danger")}: var(#{v("color-danger-11")});
     #{v("text-info")}: var(#{v("color-info-11")});
+    // 상태 글자색은 넷이 한 세트다 (tokens.md §5-3). success · warning 은 2026-09-11 에
+    // 더했다 — Alert · Confirm 의 tone 아이콘 선 색이 소비처다 (Popup.md §6-6).
+    // ⚠️ `status-*-soft` 로 대신할 수 없다 — 그쪽은 배경 역할군이라 `color` 속성에 쓰면
+    //    `verify:tokens` 의 ROLE_RULES 가 실패시킨다 (tokens.md §4-3).
+    #{v("text-success")}: var(#{v("color-success-11")});
+    #{v("text-warning")}: var(#{v("color-warning-11")});
     // 반전 짝 — 한 이름이 두 자리를 맡으면 다크에서 깨진다 (tokens.md §4-1-2).
     //   text-on-inverse  layer-inverse(토스트·툴팁) 위. 다크에서 표면이 밝아지므로 글자는 어두워진다
     //   text-on-accent   control-accent · action 채움 위. 테마와 무관하게 brand-9 라 흰색으로 남는다

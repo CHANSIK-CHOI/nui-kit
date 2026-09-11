@@ -1,6 +1,11 @@
 import Link from "next/link";
-import { GuideHeader, ExceptionBadges, DesignNote, PropsTable } from "@/components/guide";
-import { AlertBasicDemo, AlertOptionsDemo } from "./AlertDemo";
+import {
+  GuideHeader,
+  ExceptionBadges,
+  DesignNote,
+  PropsTable,
+} from "@/components/guide";
+import { AlertBasicDemo, AlertOptionsDemo, AlertToneDemo } from "./AlertDemo";
 
 export const metadata = { title: "Alert" };
 
@@ -25,12 +30,24 @@ export default function AlertPage() {
       <h2>기본</h2>
       <AlertBasicDemo />
 
+      <h2>성격 — tone</h2>
+      <p>
+        무엇을 알리는 팝업인지에 따라 아이콘이 바뀐다. 넷 중 하나를 고르면
+        글리프와 선 색이 함께 정해진다. 넷 밖의 임의 아이콘은 넘길 수 없다.
+      </p>
+      <AlertToneDemo />
+      <div className="doc-note">
+        아이콘은 <code>aria-hidden</code> 이라 스크린리더가 읽지 않는다. 뜻은
+        제목과 설명이 전한다. 넷의 글리프 모양이 서로 달라 색을 구분하지 못해도
+        구별된다.
+      </div>
+
       <h2>옵션</h2>
       <p>
         <code>title</code> 이나 <code>dialogLabel</code> 중 하나는 있어야 한다.{" "}
-        <code>icon</code> 은 기본이 주의 아이콘이고 <code>null</code> 이면
-        자리가 없어진다. <code>confirmLabel</code> 은 「확인」 대신 그 자리의
-        행동으로 적는다.
+        <code>hasIcon</code> 을 <code>false</code> 로 주면 아이콘 자리가
+        없어진다. <code>confirmLabel</code> 은 「확인」 대신 그 자리의 행동으로
+        적는다.
       </p>
       <AlertOptionsDemo />
       <div className="doc-table-wrap">

@@ -37,6 +37,68 @@ export function AlertBasicDemo() {
   );
 }
 
+const TONES = [
+  {
+    tone: "info",
+    label: "info",
+    note: "기본",
+    title: "예약이 접수됐습니다",
+    description: "확정되면 알림으로 알려 드려요.",
+  },
+  {
+    tone: "success",
+    label: "success",
+    note: "일이 끝났다",
+    title: "결제를 완료했습니다",
+    description: "영수증을 이메일로 보냈어요.",
+  },
+  {
+    tone: "warning",
+    label: "warning",
+    note: "미리 알아둘 것",
+    title: "저장 공간이 얼마 남지 않았습니다",
+    description: "500MB 아래로 내려가면 업로드가 멈춰요.",
+  },
+  {
+    tone: "danger",
+    label: "danger",
+    note: "실패했다",
+    title: "업로드에 실패했습니다",
+    description: "파일 크기가 20MB를 넘어요. 줄여서 다시 올려 주세요.",
+  },
+] as const;
+
+export function AlertToneDemo() {
+  const alert = useAlert();
+
+  return (
+    <CaseGrid
+      columns={4}
+      caption="면과 테두리는 넷 다 같다. 글리프와 선 색만 바뀐다"
+      code={`alert.open({ tone: "warning", title: "저장 공간이 얼마 남지 않았습니다" });`}
+    >
+      {TONES.map((item) => (
+        <Case key={item.tone} label={item.label} note={item.note}>
+          <Button
+            size="medium"
+            variant="line"
+            onClick={() =>
+              alert.open({
+                tone: item.tone,
+                title: item.title,
+                description: item.description,
+                confirmLabel: "확인",
+              })
+            }
+          >
+            열기
+          </Button>
+        </Case>
+      ))}
+    </CaseGrid>
+  );
+}
+
 export function AlertOptionsDemo() {
   const alert = useAlert();
 
@@ -44,9 +106,9 @@ export function AlertOptionsDemo() {
     <CaseGrid
       columns={3}
       caption="세 버튼이 각각 다른 옵션으로 연다"
-      code={`alert.open({ title: "세션이 끝났습니다", confirmLabel: "다시 로그인", icon: null });`}
+      code={`alert.open({ title: "세션이 끝났습니다", confirmLabel: "다시 로그인", hasIcon: false });`}
     >
-      <Case label="icon={null}" note="아이콘 자리가 없다">
+      <Case label="hasIcon: false" note="아이콘 자리가 없다">
         <Button
           size="medium"
           variant="line"
@@ -55,7 +117,7 @@ export function AlertOptionsDemo() {
               title: "세션이 끝났습니다",
               description: "다시 로그인해 주세요.",
               confirmLabel: "다시 로그인",
-              icon: null,
+              hasIcon: false,
             })
           }
         >

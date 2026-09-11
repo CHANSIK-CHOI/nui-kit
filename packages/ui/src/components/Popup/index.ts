@@ -39,5 +39,6 @@ export type {
   PopupContentAlign,
   PopupRuntimeProps,
   PopupSize,
+  PopupTone,
   PopupVariant,
 } from "./Popup.types.js";

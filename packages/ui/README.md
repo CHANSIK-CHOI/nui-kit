@@ -209,8 +209,9 @@ import { Star } from "lucide-react";
 `title` 을 주면 스크린리더가 읽고, 없으면 장식으로 건너뜁니다. `size` 는 14 · 16 · 20 · 24 를
 씁니다. 버튼이나 컨트롤 안에 넣을 때는 자리가 크기를 정하므로 `size` 를 주지 않아도 됩니다.
 
-컴포넌트가 쓰는 아홉 개(`DelIcon` · `CloseIcon` · `SearchIcon` · `ShowPwIcon` · `HidePwIcon` ·
-`CalendarIcon` · `AttentionIcon` · `SuccessIcon` · `SpinnerIcon`)는 `/icon` 에서 가져옵니다.
+컴포넌트가 쓰는 열한 개(`DelIcon` · `CloseIcon` · `SearchIcon` · `ShowPwIcon` · `HidePwIcon` ·
+`CalendarIcon` · `AttentionIcon` · `SuccessIcon` · `InfoIcon` · `WarningIcon` · `SpinnerIcon`)는
+`/icon` 에서 가져옵니다.
 이름이 자리를 말합니다.
 
 직접 그린 SVG 는 `viewBox` 와 도형을 주면 같은 규칙을 따릅니다.

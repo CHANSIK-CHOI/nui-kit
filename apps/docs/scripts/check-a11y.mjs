@@ -264,6 +264,39 @@ const CONTRAST_TARGETS = [
     4.5,
     async (page) => page.getByRole("button", { name: "저장" }).first().click(),
   ],
+  // tone 아이콘 — **글자가 아니라 기준이 3.0 이다** (WCAG 1.4.11 · a11y.md §4-1).
+  // 면이 없어 패널 표면 위에서 바로 재진다.
+  //
+  // ⚠️ **셀렉터를 tone 마다 나눈다** (2026-09-11 리뷰). 넷을 전부 `.nui-popup__icon` 으로
+  //    두었더니 tone 클래스가 안 붙어도 · SCSS tone 절이 통째로 사라져도 넷 다 기본색을
+  //    재고 통과했다 — **검출력 0 인 검사가 「넷 통과」 문구를 만든다**(scripts.md §4).
+  //    지금은 클래스가 빠지면 「요소를 찾지 못했다」로 실패한다.
+  //
+  // ⚠️ 기본값 `info` 는 tone 클래스를 붙이지 않는데, `:not([class*="--"])` 로는 못 잡는다 —
+  //    루트에 `nui-popup--dialog` · `--small` 이 함께 있어 그 조건이 **언제나 거짓**이다
+  //    (검출력 시험에서 잡았다). tone 셋을 하나씩 부정해야 한다.
+  ...[
+    [
+      "info",
+      ".nui-popup-alert:not(.nui-popup-alert--success):not(.nui-popup-alert--warning):not(.nui-popup-alert--danger) .nui-popup__icon",
+    ],
+    ["success", ".nui-popup-alert--success .nui-popup__icon"],
+    ["warning", ".nui-popup-alert--warning .nui-popup__icon"],
+    ["danger", ".nui-popup-alert--danger .nui-popup__icon"],
+  ].map(([tone, selector], index) => [
+    `Alert tone=${tone} 아이콘`,
+    "/components/alert",
+    selector,
+    3,
+    async (page) =>
+      page
+        .locator(".doc-case-grid")
+        .first()
+        .locator(".doc-case")
+        .nth(index)
+        .getByRole("button")
+        .click(),
+  ]),
   [
     "Confirm 제목",
     "/components/confirm",

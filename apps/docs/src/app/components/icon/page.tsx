@@ -9,15 +9,17 @@ import {
   Icon,
   SearchIcon,
   ShowPwIcon,
+  InfoIcon,
   SpinnerIcon,
   SuccessIcon,
+  WarningIcon,
 } from "@nui-kit/react/icon";
 import { GuideHeader, DesignNote, PropsTable } from "@/components/guide";
 import { IconRow, IconSizeDemo, IconColorDemo } from "./IconDemo";
 
 export const metadata = { title: "Icon" };
 
-/** 배럴이 내보내는 아홉. 어디에 쓰이는지는 소스에서 셌다 */
+/** 배럴이 내보내는 열하나. 어디에 쓰이는지는 소스에서 셌다 */
 const ICONS = [
   {
     name: "DelIcon",
@@ -59,13 +61,25 @@ const ICONS = [
     name: "AttentionIcon",
     lucide: "CircleAlert",
     Comp: AttentionIcon,
-    where: "에러 메시지 · Alert · Confirm",
+    where: "에러 메시지 · 에러 토스트 · Alert · Confirm 의 danger",
   },
   {
     name: "SuccessIcon",
     lucide: "CircleCheck",
     Comp: SuccessIcon,
-    where: "성공 토스트",
+    where: "성공 토스트 · Alert · Confirm 의 success",
+  },
+  {
+    name: "InfoIcon",
+    lucide: "Info",
+    Comp: InfoIcon,
+    where: "Alert · Confirm 의 기본",
+  },
+  {
+    name: "WarningIcon",
+    lucide: "TriangleAlert",
+    Comp: WarningIcon,
+    where: "Alert · Confirm 의 warning",
   },
   {
     name: "SpinnerIcon",
@@ -87,13 +101,13 @@ export default function IconPage() {
       <p>
         아이콘이 지나는 문 하나다. <code>lucide-react</code> 의 아이콘을{" "}
         <code>icon</code> 으로 넘기거나 직접 그린 SVG 를 넣으면 크기 · 색 상속 ·
-        읽힘 규칙이 같이 따라온다. 컴포넌트가 쓰는 아홉과 <code>Select</code> ·{" "}
-        <code>Datepicker</code> · <code>Accordion</code> 의 화살표도 같은 문을
+        읽힘 규칙이 같이 따라온다. 컴포넌트가 쓰는 열하나와 <code>Select</code>{" "}
+        · <code>Datepicker</code> · <code>Accordion</code> 의 화살표도 같은 문을
         지난다. 크기 자리와 읽히는 아이콘의 규칙은{" "}
         <Link href="/foundations/icon">Foundations · 아이콘</Link> 에 있다.
       </p>
 
-      <h2>아홉 아이콘</h2>
+      <h2>열한 아이콘</h2>
       <p>이름은 자리를 말한다. 같은 모양이라도 자리가 다르면 이름이 다르다.</p>
       <div className="doc-table-wrap">
         <table className="doc-table">
@@ -211,7 +225,7 @@ export default function IconPage() {
 
       <h2>다른 아이콘이 필요하면</h2>
       <p>
-        아홉 밖의 아이콘은 <code>lucide-react</code> 에서 가져와{" "}
+        열하나 밖의 아이콘은 <code>lucide-react</code> 에서 가져와{" "}
         <code>icon</code> 으로 넘긴다. 이름은{" "}
         <a href="https://lucide.dev/icons/" target="_blank" rel="noreferrer">
           lucide.dev/icons
@@ -229,7 +243,7 @@ import { Icon } from "@nui-kit/react";
         items={[
           {
             label: "icon 으로 넘긴다",
-            note: "아홉과 같은 규칙",
+            note: "프리셋과 같은 규칙",
             node: <Icon icon={<Star />} size={20} />,
           },
           {
@@ -240,7 +254,7 @@ import { Icon } from "@nui-kit/react";
         ]}
       />
       <div className="doc-note">
-        <code>Icon</code> 을 지나면 크기 · 색 상속 · 읽힘 규칙이 아홉과
+        <code>Icon</code> 을 지나면 크기 · 색 상속 · 읽힘 규칙이 프리셋과
         같아진다. 아이콘 전용 버튼에서는 버튼이 이름을 갖고 아이콘은{" "}
         <code>title</code> 없이 둔다.
       </div>
@@ -276,8 +290,8 @@ import { Icon } from "@nui-kit/react";
           세트를 두 개 섞으면 그 차이가 먼저 보인다.
         </p>
         <p>
-          <code>lucide-react</code> 가 peer 인 것도 같은 이유다. 두 벌이 설치되면
-          한 화면의 아이콘이 두 세트에서 오고, 소비자가{" "}
+          <code>lucide-react</code> 가 peer 인 것도 같은 이유다. 두 벌이
+          설치되면 한 화면의 아이콘이 두 세트에서 오고, 소비자가{" "}
           <code>LucideProvider</code> 로 선 굵기를 맞춰도 라이브러리 안 아이콘만
           그대로 남는다. 버전이 갈리면 같은 이름이 다른 모양이 되기도 한다.
         </p>
@@ -285,7 +299,7 @@ import { Icon } from "@nui-kit/react";
 
       <h2>API</h2>
       <p>
-        아홉 아이콘은 아래 표에서 <code>icon</code> · <code>viewBox</code> ·{" "}
+        열한 아이콘은 아래 표에서 <code>icon</code> · <code>viewBox</code> ·{" "}
         <code>children</code> 을 뺀 것을 받는다.
       </p>
       <PropsTable of="Icon" />
