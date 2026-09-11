@@ -5,9 +5,11 @@
   #{cls("message")} {
     display: flex;
     align-items: flex-start;
+    // 부모 폭을 채운다 — 안 채우면 카운터가 오른쪽 끝이 아니라 글자 옆에 붙어 보인다
+    // (2026-09-11 실측 · 왼쪽 여백도 같이 뺐다. SEED footer paddingX 2px 는 옮기지 않는다)
+    width: 100%;
     gap: var(#{v("space-2")});
     margin-top: var(#{v("space-2")});
-    padding-left: var(#{v("space-2")});
 
     // 왼쪽은 무엇이 잘못됐는가, 오른쪽은 얼마나 남았는가다
     // (SEED `field.yaml` footer — 메시지는 좌측, characterCount 는 우측).

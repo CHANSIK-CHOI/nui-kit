@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useId, useMemo } from "react";
+import { forwardRef, useEffect, useId, useMemo } from "react";
 import type { ForwardRefExoticComponent, RefAttributes } from "react";
 import type {
   ActionMeta,
@@ -19,7 +19,7 @@ import {
   DEFAULT_NO_OPTIONS_MESSAGE,
   selectLoadingMessage,
   selectScreenReaderStatus,
-} from "./Select.locale.js"
+} from "./Select.locale.js";
 import {
   createAriaValueContainer,
   getReadOnlyGuardedProps,
@@ -114,7 +114,11 @@ const MultiSelect: ForwardRefExoticComponent<
       describedByIds: fieldDescribedByIds,
       isError: isFieldError,
       isRequired: isFieldRequired,
+      footerId: fieldFooterId,
+      registerFooter,
     } = useFieldContext();
+    // Field 안이면 메시지를 Field 의 Footer 로 올린다 (Field.md §6 「Footer 승계」)
+    const isInField = typeof registerFooter === "function";
     const generatedId = useId();
     const generatedMessageId = useId();
     const resolvedId = id ?? fieldContextId ?? generatedId;
@@ -124,8 +128,31 @@ const MultiSelect: ForwardRefExoticComponent<
     const resolvedAriaDescribedBy = getMergedAriaIds(
       ariaDescribedBy,
       ...fieldDescribedByIds,
-      hasOwnMessage ? generatedMessageId : null,
+      // Field 안에서는 자체 id 를 만들지 않는다 — Footer 의 id 가 describedByIds 로 들어온다
+      !isInField && hasOwnMessage ? generatedMessageId : null,
     );
+    // Field 안 · 밖에서 에러 문구의 id 가 다르다 — `aria-errormessage` 가 가리킨다
+    const errorMessageId = isInField
+      ? (fieldFooterId ?? undefined)
+      : generatedMessageId;
+
+    useEffect(() => {
+      if (!isInField) return;
+
+      return registerFooter({
+        id: resolvedId,
+        infoMessage,
+        errorMessage,
+        isError: isError || Boolean(errorMessage),
+      });
+    }, [
+      errorMessage,
+      infoMessage,
+      isError,
+      isInField,
+      registerFooter,
+      resolvedId,
+    ]);
 
     // ⚠️ 컴포넌트 함수 identity 는 소비자의 ValueContainer 에만 의존해야 한다.
     //    aria 값을 deps 에 넣으면 값이 바뀔 때마다 input 이 remount 되어
@@ -181,6 +208,7 @@ const MultiSelect: ForwardRefExoticComponent<
         infoMessage={infoMessage}
         errorMessage={errorMessage}
         messageId={hasOwnMessage ? generatedMessageId : undefined}
+        hasMessage={!isInField}
       >
         <SelectAriaContext.Provider value={ariaContextValue}>
           <ReactSelect<SelectOption, true, GroupBase<SelectOption>>
@@ -230,7 +258,7 @@ const MultiSelect: ForwardRefExoticComponent<
             }
             aria-invalid={ariaInvalid ?? (resolvedIsError || undefined)}
             aria-errormessage={
-              resolvedIsError && errorMessage ? generatedMessageId : undefined
+              resolvedIsError && errorMessage ? errorMessageId : undefined
             }
           />
         </SelectAriaContext.Provider>

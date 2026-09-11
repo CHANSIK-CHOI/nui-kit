@@ -43,6 +43,7 @@ const LABEL = {
   button: "Button · ButtonLink",
   "button-group": "ButtonGroup",
   datepicker: "Datepicker 계열",
+  field: "Field",
   "icon-button": "IconButton",
   popup: "Popup 계열",
   select: "Select · MultiSelect",
@@ -87,6 +88,7 @@ const OPTION_LABEL = {
   square: { label: "square (기본)", kind: "모양" },
   round: { label: "round", kind: "모양" },
   text: { label: "text", kind: "변형" },
+  row: { label: "row", kind: "방향" },
   // Popup 이행 대기
   lg: { label: "large", kind: "크기" },
   md: { label: "medium (기본)", kind: "크기" },

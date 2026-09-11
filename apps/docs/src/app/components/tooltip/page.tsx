@@ -35,7 +35,7 @@ export default function TooltipPage() {
       <div className="doc-note doc-note--warn">
         툴팁은 중요한 정보를 담기에 알맞지 않다. 터치 기기에서는 hover 가 없어
         열기 어렵고 사라지면 다시 볼 방법이 마땅치 않다. 꼭 필요한 설명은{" "}
-        <code>Field.Description</code> 으로 화면에 남긴다.
+        <code>Field</code> 의 <code>infoMessage</code> 로 화면에 남긴다.
       </div>
 
       <h2>위치</h2>

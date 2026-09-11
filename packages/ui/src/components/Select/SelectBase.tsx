@@ -16,6 +16,8 @@ export type SelectBaseProps = {
   infoMessage?: string;
   errorMessage?: string;
   messageId?: string;
+  /** Field 안에서는 `Select`/`MultiSelect` 가 Footer 로 올리므로 여기서 그리지 않는다 (Field.md §6) */
+  hasMessage?: boolean;
   children: ReactNode;
 };
 
@@ -27,6 +29,7 @@ export default function SelectBase({
   infoMessage = "",
   errorMessage = "",
   messageId,
+  hasMessage = true,
   children,
 }: SelectBaseProps) {
   const resolvedIsError = isError || Boolean(errorMessage);
@@ -40,11 +43,13 @@ export default function SelectBase({
       })}
     >
       {children}
-      <Message
-        id={messageId}
-        infoMessage={infoMessage}
-        errorMessage={errorMessage}
-      />
+      {hasMessage ? (
+        <Message
+          id={messageId}
+          infoMessage={infoMessage}
+          errorMessage={errorMessage}
+        />
+      ) : null}
     </div>
   );
 }

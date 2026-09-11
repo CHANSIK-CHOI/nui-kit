@@ -37,11 +37,8 @@ export function RHFDateRangePickerDemo() {
             window.alert("저장했습니다.");
           })}
         >
-          <Field>
+          <Field infoMessage="체크인과 체크아웃 날짜를 골라 주세요">
             <Field.Label>숙박 기간</Field.Label>
-            <Field.Description>
-              체크인과 체크아웃 날짜를 고릅니다.
-            </Field.Description>
             <RHFDateRangePicker
               control={control}
               name="stay"

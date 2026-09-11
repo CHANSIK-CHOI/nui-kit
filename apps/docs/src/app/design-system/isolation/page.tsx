@@ -6,8 +6,8 @@ export const metadata = { title: "프로젝트를 오염시키지 않는다" };
 const DOT_NOTATION = [
   ["Field.Item", "FieldItem"],
   ["Field.Grid", "FieldGrid"],
+  ["Field.Header", "FieldHeader"],
   ["Field.Label", "FieldLabel"],
-  ["Field.Description", "FieldDescription"],
   ["Field.Message", "FieldMessage"],
   ["Accordion.Item", "AccordionItem"],
   ["Accordion.Head", "AccordionHead"],
@@ -40,6 +40,13 @@ export default function IsolationPage() {
       <div className="doc-note">
         프로젝트도 <code>@layer</code> 를 쓴다면 순서를 직접 정한다. 선언한
         레이어끼리는 먼저 나온 쪽이 약하다.
+      </div>
+      <div className="doc-note doc-note--warn">
+        같은 이유로 프로젝트의 태그 셀렉터도 라이브러리 요소에 닿는다.{" "}
+        <code>label {"{ display: block }"}</code> 같은 리셋은{" "}
+        <code>Field.Label</code> 의 <code>&lt;label&gt;</code> 에도 들어간다.
+        리셋을 쓴다면 <code>:not([class^=&quot;nui-&quot;])</code> 로 라이브러리
+        요소를 뺀다.
       </div>
 
       <h2>2. 클래스 이름이 부딪히지 않는다</h2>

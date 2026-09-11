@@ -29,7 +29,7 @@ import { chromium } from "playwright";
 
 const BASE =
   process.argv.slice(2).find((a) => !a.startsWith("--")) ??
-  "http://localhost:3000";
+  `http://localhost:${process.env.PORT ?? 3000}`; // PORT 는 next dev 도 읽는다 — 세션마다 다른 포트 (2026-09-11)
 
 // --page=button,textfield — `scripts/changed-scope.mjs` 가 뽑은 슬러그만 잰다. 없으면 전체 (2026-09-11).
 // 고칠 때마다 3~4분을 기다리지 않게 하는 필터다. 공유 자산이 바뀌면 changed-scope 가 all 을 내고,
@@ -182,7 +182,13 @@ const CONTRAST_TARGETS = [
   ],
   ["입력 글자", "/components/textfield", ".nui-textfield__input", 4.5],
   ["에러 메시지", "/components/textfield", ".nui-message__msg--error", 4.5],
-  ["Field 설명", "/components/field", ".nui-field__description", 4.5],
+  // 도움말은 Footer 의 Message 다 — Field.Description 은 없다 (2026-09-11)
+  [
+    "Field 도움말",
+    "/components/field",
+    ".nui-field__footer .nui-message__msg",
+    4.5,
+  ],
   [
     "Tooltip 글자",
     "/components/tooltip",

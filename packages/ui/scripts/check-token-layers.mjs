@@ -115,6 +115,9 @@ const HOOK_OPTIONS = new Set([
   "round",
   // variant
   "text",
+  // direction — Field. 이름 검사는 이 낱말 없이도 통과한다(등록 안 된 낱말은 요소로 읽힌다).
+  // 등록은 「이 낱말은 prop 값」이라는 선언과 문서 표의 옵션 열을 위한 것이다
+  "row",
 ]);
 
 /**

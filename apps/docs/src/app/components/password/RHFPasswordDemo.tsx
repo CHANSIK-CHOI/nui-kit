@@ -29,9 +29,8 @@ export function RHFPasswordDemo() {
           onSubmit={handleSubmit(() => window.alert("제출되었습니다."))}
           style={{ maxWidth: 480 }}
         >
-          <Field>
+          <Field infoMessage="8자 이상, 숫자를 하나 이상 넣어 주세요">
             <Field.Label>비밀번호</Field.Label>
-            <Field.Description>8자 이상, 숫자를 하나 이상.</Field.Description>
             <RHFPassword
               control={control}
               name="password"

@@ -152,7 +152,7 @@ body {
 }
 
 // ⚠️ 태그 셀렉터는 라이브러리 요소에도 닿는다 — 레이어 밖이라 `@layer nui.*` 를 이긴다.
-//    `Field.Description`(<p>) 이 이 규칙의 12px 를 받아 spec 의 -2px 보정이 죽었다
+//    당시의 `Field.Description`(<p>) 이 이 규칙의 12px 를 받아 spec 의 -2px 보정이 죽었다
 //    (2026-09-11 실측). `.nui-` 클래스를 가진 요소는 뺀다. 소비자 앱의 리셋도 같은 길로
 //    들어온다 — Foundations 「오염시키지 않는다」에 적었다.
 .doc-main p:not([class^="nui-"]) {

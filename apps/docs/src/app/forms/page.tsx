@@ -36,10 +36,9 @@ export default function FormsPage() {
         붙이지 않아도 된다.
       </p>
       <pre className="doc-code">
-        <code>{`<Field>
+        <code>{`<Field infoMessage="본인 확인에만 사용해요">
   <Field.Label>휴대폰 번호</Field.Label>
   <Textfield placeholder="010-0000-0000" />
-  <Field.Description>본인 확인에만 사용해요</Field.Description>
 </Field>`}</code>
       </pre>
       <div className="doc-note doc-note--warn">

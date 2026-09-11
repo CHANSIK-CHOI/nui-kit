@@ -153,6 +153,7 @@ import "../nui-theme.css";
 | Select | `-height` · `-radius` · `-border-width` |
 | Datepicker | `-dropdown-radius` · `-day-size` `-day-button-size` `-day-radius` · `-border-width` |
 | Accordion | `-gap` · `-radius` · `-border-width` |
+| Field | `-gap` · `-grid-gap` · `-row-label-width` |
 | Toast | `-width` · `-radius` |
 | Tooltip | `-max-width` · `-radius` |
 | Checkbox · Radio · Switch | `--nui-selector--size` · `--nui-selector--border-width` · `--nui-switch--width` `--nui-switch--height` |
@@ -398,8 +399,8 @@ import { Field, FieldLabel } from "@nui-kit/react";
 | --- | --- |
 | `Field.Item` | `FieldItem` |
 | `Field.Grid` | `FieldGrid` |
+| `Field.Header` | `FieldHeader` |
 | `Field.Label` | `FieldLabel` |
-| `Field.Description` | `FieldDescription` |
 | `Field.Message` | `FieldMessage` |
 | `ButtonGroup.Item` | `ButtonGroupItem` |
 | `Accordion.Item` | `AccordionItem` |

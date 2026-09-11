@@ -1,9 +1,14 @@
 @use "../abstracts" as *;
 
 // ─────────────────────────────────────────────────────────────
-// Field / Field.Item / Field.Grid / Field.Label / Field.Description
+// Field / Field.Item / Field.Grid / Field.Header / Field.Label / Field.Message · Footer
 //
-// 공개 훅: 없다.
+// 공개 훅 (tokens.md §1-3 `{컴포넌트}--{옵션?}-{요소?}-{속성}`):
+//   --nui-field--gap              루트와 Item 의 라벨↔컨트롤 gap. 한 개념이라 두 자리를 묶는다
+//   --nui-field--grid-gap         Field.Grid 의 gap (필드와 필드 사이)
+//   --nui-field--row-label-width  direction="row" 인 **루트** 의 라벨 basis. Item 의 라벨은 아니다
+//
+// 글자 크기 · 아이콘 크기 훅은 열지 않는다 — 타이포는 매트릭스가 정한다 (design-system.md §5).
 //
 // ⚠️ `--nui-field-grid-columns` 는 훅이 아니라 **배선 값**이다. `Field.Grid` 가
 //    `columns` prop 을 인라인 style 로 심으므로 소비자가 CSS 로 덮을 수 없고
@@ -15,10 +20,31 @@
   #{cls("field")} {
     display: flex;
     width: 100%;
-    gap: var(#{v("space-component-gap")});
+    gap: #{hook("field--gap", var(#{v("space-component-gap")}))};
 
+    // row 는 grid 다 — "header input" / ". footer". 라벨 열은 고정 폭(훅)이라 row 끼리
+    // 모였을 때 컨트롤의 왼쪽이 맞고, Footer 는 input 열 아래에 선다(KRDS [입력폼 6] 요소 아래).
+    // 예전(flex)에는 라벨이 `flex-shrink: 1` 이라 컨트롤(100%)에 밀려 47px 까지 줄고
+    // 「요청 사 / 항」으로 글자 중간이 끊겼다 (2026-09-11 실측).
+    // `nowrap` 은 쓰지 않는다 — 긴 라벨은 열 폭 안에서 어절 단위로 줄을 바꾼다.
     &--row {
-      flex-direction: row;
+      display: grid;
+      grid-template-columns: #{hook("field--row-label-width", 7.5rem)} minmax(
+          0,
+          1fr
+        );
+
+      // 자식은 전부 input 열에 순서대로 쌓인다 — 같은 area 를 주면 겹치므로 열만 지정한다
+      > * {
+        grid-column: 2;
+      }
+
+      // 라벨(또는 Header)은 header 열. `Item--row` 의 라벨(체크박스 옆)은 열이 아니다
+      > #{cls("field")}__header,
+      > #{cls("field")}__label {
+        grid-column: 1;
+        word-break: keep-all;
+      }
     }
 
     &--column {
@@ -79,24 +105,53 @@
       user-select: none;
     }
 
+    // Header 안 라벨도 같은 색 — 직계 규율은 유지한다(Item 은 Context 로 자기 is-error 를 받는다)
     &#{state("error")} > &__label,
-    &__item#{state("error")} > &__label {
+    &#{state("error")} > &__header > &__label,
+    &__item#{state("error")} > &__label,
+    &__item#{state("error")} > &__header > &__label {
       color: var(#{v("text-danger")});
     }
 
-    &__description {
-      margin: -0.125rem 0 0; // -2px
-      color: var(#{v("text-secondary")});
-
-      @include typo(1, "regular");
+    // Header — 좌 라벨(점·선택 문구 포함) / 우 suffix. SEED field.mdx 의 Header
+    // (Label + Requirement Mark + Suffix Slot). gap 은 SEED x2_5(10)가 4px 스케일에
+    // 없어 space-2(8). suffix 는 <label> 밖이라 눌러도 컨트롤로 포커스가 가지 않는다.
+    // ⚠️ 높이는 라벨 한 줄로 고정한다 — suffix 에 버튼(32~40px)이 들어와도 Header 가 커지지
+    //    않아야 Grid 에서 이웃 필드와 input 라인이 맞는다. suffix 는 그 줄에 세로 중앙으로
+    //    넘친다(overflow visible). 라벨이 두 줄이면 그때만 자란다.
+    &__header {
+      display: flex;
+      gap: var(#{v("space-2")});
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      min-height: calc(var(#{v("font-size-2")}) * var(#{v("line-height-2")}));
     }
 
+    &__header-suffix {
+      display: inline-flex;
+      flex-shrink: 0;
+      gap: var(#{v("space-1")});
+      align-items: center;
+      height: calc(var(#{v("font-size-2")}) * var(#{v("line-height-2")}));
+      margin-left: auto;
+    }
+
+    // Footer — 루트·Item 이 children 뒤에 항상 그린다. Message 하나(좌 메시지 · 우 카운터).
+    // -2px 는 라벨·컨트롤에 조금 더 붙이는 광학 보정(spec §9 고유 치수).
+    &__footer,
     &__message {
+      width: 100%;
       margin-top: -0.125rem; // -2px
 
       #{cls("message")} {
         margin-top: 0;
       }
+    }
+
+    // 비어 있어도 live 영역을 남긴다 — Footer 가 컨트롤 대신 그 자리를 맡는다 (a11y.md §3)
+    &__footer--empty {
+      @include a11y-hidden;
     }
 
     // 비어 있어도 live 영역을 남긴다 (_message.scss 와 같은 이유). 래퍼까지 숨겨야
@@ -107,7 +162,7 @@
 
     &__grid {
       display: grid;
-      gap: var(#{v("space-4")});
+      gap: #{hook("field--grid-gap", var(#{v("space-4")}))};
       width: 100%;
 
       // ⏸️ 모바일 1열 붕괴(브레이크포인트)는 보류 — 별도 단계에서 일괄 적용.
@@ -128,7 +183,7 @@
       display: flex;
       flex-wrap: wrap;
       width: 100%;
-      gap: var(#{v("space-component-gap")});
+      gap: #{hook("field--gap", var(#{v("space-component-gap")}))};
       // ⚠️ 줄이 늘어나지 않게 한다. `__grid` 는 CSS grid 라 자식이 **행 높이로 늘어나는데**,
       // 여기가 wrap 이라 남는 높이만큼 줄 사이가 벌어진다. 설명이 있는 칸과 없는 칸을
       // 나란히 두면 라벨이 7px · 입력이 22px 어긋났다 (2026-09-07 실측).
@@ -151,7 +206,8 @@
         align-items: center;
       }
 
-      > #{cls("field")}__description,
+      > #{cls("field")}__header,
+      > #{cls("field")}__footer,
       > #{cls("field")}__message {
         flex: 1 1 100%;
       }

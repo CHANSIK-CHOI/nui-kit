@@ -3,6 +3,7 @@
 import cn from "classnames";
 import {
   forwardRef,
+  useEffect,
   useId,
   useState,
   type ChangeEvent,
@@ -83,7 +84,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       describedByIds: fieldDescribedByIds,
       isError: isFieldError,
       isRequired: isFieldRequired,
+      registerFooter,
     } = useFieldContext();
+    // Field 안이면 `__foot` 을 통째로 접고 Field 의 Footer 로 올린다 (Field.md §6 「Footer 승계」)
+    const isInField = typeof registerFooter === "function";
     const generatedId = useId();
     const generatedMessageId = useId();
     const resolvedId = id ?? fieldContextId ?? generatedId;
@@ -106,8 +110,36 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       ariaDescribedBy,
       ...fieldDescribedByIds,
       // 카운터가 메시지와 같은 컨테이너로 들어갔으므로 id 하나로 둘을 가리킨다.
-      hasFooter ? generatedMessageId : null,
+      // Field 안에서는 만들지 않는다 — Footer 의 id 가 describedByIds 로 들어온다.
+      !isInField && hasFooter ? generatedMessageId : null,
     );
+
+    // 카운터가 없으면 타이핑마다 Footer 를 다시 등록하지 않는다 — deps 에는 이 값만
+    const footerCount = hasCounter ? valueLength : undefined;
+
+    useEffect(() => {
+      if (!isInField) return;
+
+      return registerFooter({
+        id: resolvedId,
+        infoMessage,
+        errorMessage,
+        isError: Boolean(errorMessage),
+        count: footerCount,
+        maxCount: maxLength,
+        counterLabel,
+      });
+    }, [
+      counterLabel,
+      errorMessage,
+      footerCount,
+      hasCounter,
+      infoMessage,
+      isInField,
+      maxLength,
+      registerFooter,
+      resolvedId,
+    ]);
 
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
       setUncontrolledLength(event.target.value.length);
@@ -140,16 +172,18 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             onChange={handleChange}
           />
         </div>
-        <div className={`${block}__foot`}>
-          <Message
-            id={hasFooter ? generatedMessageId : undefined}
-            infoMessage={infoMessage}
-            errorMessage={errorMessage}
-            count={hasCounter ? valueLength : undefined}
-            maxCount={maxLength}
-            counterLabel={counterLabel}
-          />
-        </div>
+        {isInField ? null : (
+          <div className={`${block}__foot`}>
+            <Message
+              id={hasFooter ? generatedMessageId : undefined}
+              infoMessage={infoMessage}
+              errorMessage={errorMessage}
+              count={hasCounter ? valueLength : undefined}
+              maxCount={maxLength}
+              counterLabel={counterLabel}
+            />
+          </div>
+        )}
       </div>
     );
   },

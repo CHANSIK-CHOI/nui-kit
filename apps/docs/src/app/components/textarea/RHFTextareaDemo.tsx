@@ -32,9 +32,8 @@ export function RHFTextareaDemo() {
           onSubmit={handleSubmit(() => window.alert("제출되었습니다."))}
           style={{ maxWidth: 480 }}
         >
-          <Field>
+          <Field infoMessage="80자 이내로 적어 주세요">
             <Field.Label>소개</Field.Label>
-            <Field.Description>80자 이내로 적어 주세요.</Field.Description>
             <RHFTextarea
               control={control}
               name="bio"

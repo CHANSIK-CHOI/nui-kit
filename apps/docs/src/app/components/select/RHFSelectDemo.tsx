@@ -44,9 +44,8 @@ export function RHFSelectDemo() {
             window.alert("저장했습니다.");
           })}
         >
-          <Field>
+          <Field infoMessage="배송지 기준으로 골라 주세요">
             <Field.Label>거주 지역</Field.Label>
-            <Field.Description>배송지 기준으로 고릅니다.</Field.Description>
             <RHFSelect
               control={control}
               name="city"

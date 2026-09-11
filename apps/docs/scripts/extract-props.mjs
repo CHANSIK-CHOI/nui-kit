@@ -57,8 +57,16 @@ const TARGETS = [
     type: "ButtonLinkProps",
   },
   { name: "Field", file: "components/Field/Field.tsx", type: "FieldProps" },
-  { name: "ToastHost", file: "components/Toast/ToastHost.tsx", type: "ToastHostProps" },
-  { name: "PopupHost", file: "components/Popup/PopupHost.tsx", type: "PopupHostProps" },
+  {
+    name: "ToastHost",
+    file: "components/Toast/ToastHost.tsx",
+    type: "ToastHostProps",
+  },
+  {
+    name: "PopupHost",
+    file: "components/Popup/PopupHost.tsx",
+    type: "PopupHostProps",
+  },
   {
     name: "Field.Item",
     file: "components/Field/Field.tsx",
@@ -70,9 +78,9 @@ const TARGETS = [
     type: "FieldGridProps",
   },
   {
-    name: "Field.Description",
+    name: "Field.Header",
     file: "components/Field/Field.tsx",
-    type: "FieldDescriptionProps",
+    type: "FieldHeaderProps",
   },
   {
     name: "Field.Message",
@@ -147,21 +155,30 @@ const TARGETS = [
     file: "components/Popup/Popup.types.ts",
     type: "LayerPopupProps",
     // 타입만 있는 파일이라 기본값이 없다. 구현에서 읽는다 — 앞의 파일이 이긴다.
-    defaultsFrom: ["components/Popup/LayerPopup.tsx", "components/Popup/PopupBase.tsx"],
+    defaultsFrom: [
+      "components/Popup/LayerPopup.tsx",
+      "components/Popup/PopupBase.tsx",
+    ],
   },
   {
     name: "BottomSheet",
     file: "components/Popup/Popup.types.ts",
     type: "BottomSheetProps",
     // 타입만 있는 파일이라 기본값이 없다. 구현에서 읽는다 — 앞의 파일이 이긴다.
-    defaultsFrom: ["components/Popup/BottomSheet.tsx", "components/Popup/PopupBase.tsx"],
+    defaultsFrom: [
+      "components/Popup/BottomSheet.tsx",
+      "components/Popup/PopupBase.tsx",
+    ],
   },
   {
     name: "FullPopup",
     file: "components/Popup/Popup.types.ts",
     type: "FullPopupProps",
     // 타입만 있는 파일이라 기본값이 없다. 구현에서 읽는다 — 앞의 파일이 이긴다.
-    defaultsFrom: ["components/Popup/FullPopup.tsx", "components/Popup/PopupBase.tsx"],
+    defaultsFrom: [
+      "components/Popup/FullPopup.tsx",
+      "components/Popup/PopupBase.tsx",
+    ],
   },
   {
     name: "Toast",

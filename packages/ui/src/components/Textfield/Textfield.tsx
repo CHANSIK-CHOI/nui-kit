@@ -3,6 +3,7 @@
 import cn from "classnames";
 import {
   forwardRef,
+  useEffect,
   useId,
   type InputHTMLAttributes,
   type ReactNode,
@@ -90,7 +91,11 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
       describedByIds: fieldDescribedByIds,
       isError: isFieldError,
       isRequired: isFieldRequired,
+      registerFooter,
     } = useFieldContext();
+    // Field 안이면 자기 메시지 줄을 접고 Field 의 Footer 로 올린다 (Field.md §6 「Footer 승계」).
+    // 기본 Context 에는 registerFooter 가 없다 — 그 존재가 「Field 안」의 판정이다.
+    const isInField = typeof registerFooter === "function";
     const generatedId = useId();
     const generatedMessageId = useId();
     const resolvedId = id ?? fieldContextId ?? generatedId;
@@ -105,8 +110,37 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
       ariaDescribedBy,
       ...fieldDescribedByIds,
       // 메시지와 카운터가 한 줄에 오므로 둘 중 하나만 있어도 그 줄을 가리킨다.
-      hasOwnMessage || hasCounter ? generatedMessageId : null,
+      // Field 안에서는 자체 id 를 만들지 않는다 — Footer 의 id 가 describedByIds 로 들어온다.
+      !isInField && (hasOwnMessage || hasCounter) ? generatedMessageId : null,
     );
+
+    // 카운터가 없으면 타이핑마다 Footer 를 다시 등록하지 않는다 — deps 에는 이 값만
+    const footerCount = hasCounter ? valueLength : undefined;
+
+    useEffect(() => {
+      if (!isInField) return;
+
+      // `isError` 는 자기 것만 — Context 의 값을 되돌려 올리면 Field 가 에러를 못 거둔다 (래치)
+      return registerFooter({
+        id: resolvedId,
+        infoMessage,
+        errorMessage,
+        isError: Boolean(errorMessage),
+        count: footerCount,
+        maxCount: maxLength,
+        counterLabel,
+      });
+    }, [
+      counterLabel,
+      errorMessage,
+      footerCount,
+      hasCounter,
+      infoMessage,
+      isInField,
+      maxLength,
+      registerFooter,
+      resolvedId,
+    ]);
     const hasValue = value != null && String(value).length > 0;
     const canClear =
       isClearable &&
@@ -155,14 +189,16 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
             {unit ? <span className={`${block}__unit`}>{unit}</span> : null}
           </div>
         </div>
-        <Message
-          id={hasOwnMessage || hasCounter ? generatedMessageId : undefined}
-          infoMessage={infoMessage}
-          errorMessage={errorMessage}
-          count={hasCounter ? valueLength : undefined}
-          maxCount={maxLength}
-          counterLabel={counterLabel}
-        />
+        {isInField ? null : (
+          <Message
+            id={hasOwnMessage || hasCounter ? generatedMessageId : undefined}
+            infoMessage={infoMessage}
+            errorMessage={errorMessage}
+            count={hasCounter ? valueLength : undefined}
+            maxCount={maxLength}
+            counterLabel={counterLabel}
+          />
+        )}
       </div>
     );
   },
