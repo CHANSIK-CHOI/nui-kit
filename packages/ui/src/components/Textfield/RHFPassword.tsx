@@ -8,7 +8,11 @@ import TextfieldBtn from "./TextfieldBtn.js";
 export type RHFPasswordProps<
   TFormValues extends FieldValues,
   TFieldName extends FieldPath<TFormValues>,
-> = Omit<RHFTextfieldProps<TFormValues, TFieldName>, "children" | "type"> & {
+  // ⚠️ 부모가 `PasswordProps` 가 아니라 `RHFTextfieldProps` 다 (RHFSearch 와 같은 이유).
+> = Omit<
+  RHFTextfieldProps<TFormValues, TFieldName>,
+  "children" | "type" | "unit"
+> & {
   defaultIsPasswordVisible?: boolean;
   hidePasswordTitle?: string;
   showPasswordTitle?: string;

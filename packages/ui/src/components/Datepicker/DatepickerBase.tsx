@@ -89,7 +89,9 @@ export type DatepickerBaseProps<
   TDayPickerProps extends DayPickerSelectionShape,
 > = Omit<
   TextfieldProps,
-  "children" | "onChange" | "type" | "value"
+  // `unit` — 날짜에는 단위가 없다. 켜면 값이 오른쪽 정렬되고 달력 버튼 옆에 뜻 없는
+  // 글자가 붙는다. 이 타입 하나를 닫으면 모드 셋과 RHF 셋이 함께 닫힌다.
+  "children" | "onChange" | "type" | "unit" | "value"
 > & {
   mode: DatepickerMode;
   selected?: TSelected | undefined;
@@ -339,9 +341,9 @@ export default function DatepickerBase<
    *    갈리지는 않는다 — 소비자의 `selected` 는 확정 전까지 한 번도 바뀌지 않고,
    *    나가는 길이 `onSelectedChange` 하나다. 팝오버를 닫으면 임시 선택은 사라진다.
    */
-  const [draftSelected, setDraftSelected] = useState<
-    { value: TSelected | undefined } | null
-  >(null);
+  const [draftSelected, setDraftSelected] = useState<{
+    value: TSelected | undefined;
+  } | null>(null);
 
   // 확정 버튼이 켜져 있고 임시 선택이 살아 있으면 그것을, 아니면 소비자 값을 그린다.
   const calendarSelected =

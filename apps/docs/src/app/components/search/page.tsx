@@ -90,20 +90,13 @@ export default function SearchPage() {
         )}
       />
       <CaseGrid
-        columns={2}
-        caption="isTextInputBlocked — 타이핑만 막고 버튼은 산다"
+        caption="isTextInputBlocked — 타이핑만 막고 버튼은 동작한다"
         code={`<Search value={picked} isTextInputBlocked onSearch={run} />`}
       >
         <Case label="isTextInputBlocked" note="목록에서 고른 값으로만 검색">
           <Field>
             <FieldLabel>카테고리</FieldLabel>
             <Search value="신발" isTextInputBlocked />
-          </Field>
-        </Case>
-        <Case label="unit" note="Textfield 의 unit 그대로">
-          <Field>
-            <FieldLabel>최대 가격</FieldLabel>
-            <Search placeholder="0" unit="원" />
           </Field>
         </Case>
       </CaseGrid>

@@ -46,12 +46,19 @@
       height: 100%;
     }
 
+    // 담을 것이 없으면 아예 렌더되지 않는다 (Textfield.tsx — Textfield.md §6).
+    // 왼쪽 여백이 `space-1`(4)인 것은 input 의 오른쪽 `space-4`(16)와 짝이다 —
+    // 둘을 더한 20 이 값과 첫 버튼 사이이고, actions 가 없으면 input 의 16 만 남아
+    // 왼쪽과 대칭이 된다. 예전에는 반대(input 4 · actions 16)라 actions 가 없는
+    // 입력의 오른쪽 여백이 4 였다.
     &__actions {
       display: inline-flex;
       flex-shrink: 0;
       align-items: center;
+      // 항목 사이 간격의 단일 주체 — 자식은 margin 을 갖지 않는다
+      gap: var(#{v("space-2")});
       height: 100%;
-      padding: 0 var(#{v("space-4")});
+      padding: 0 var(#{v("space-4")}) 0 var(#{v("space-1")});
     }
 
     // 보조 버튼(지우기 · 눈 · 달력)은 `_textfield-btn.scss` 가 정한다 — 폼 요소 공통.
@@ -68,7 +75,8 @@
 
       width: 100%;
       height: 100%;
-      padding: 0 var(#{v("space-1")}) 0 var(#{v("space-4")});
+      // 좌우 대칭이다. actions 가 붙으면 그쪽 왼쪽 여백(4)이 더해져 값↔버튼이 20 이 된다.
+      padding: 0 var(#{v("space-4")});
       color: var(#{v("control-text")});
       caret-color: var(#{v("control-text")});
 
@@ -86,8 +94,8 @@
       @include typo(3, "regular");
     }
 
+    // 간격은 부모(`__actions`)의 gap 이 소유한다 — 자기 margin 을 갖지 않는다.
     &__unit {
-      margin-left: var(#{v("space-2")});
       color: var(#{v("control-text")});
 
       @include motion(color, "3");

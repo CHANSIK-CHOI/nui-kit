@@ -24,19 +24,17 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    // 자기 margin 을 갖지 않는다 — 항목 사이 간격은 부모 `__actions` 의 gap(8)이
+    // 소유한다. 예전에는 `margin-left: 8` + `:first-child { 0 }` 으로 자식이 나눠
+    // 가졌는데, 그 예외가 `__unit` 에는 없어 버튼 없이 단위만 있으면 간격이 달랐다.
     width: var(#{v("size-icon-3xl")});
     height: var(#{v("size-icon-3xl")});
-    margin-left: var(#{v("space-2")});
     padding: var(#{v("space-1")});
     color: var(#{v("control-icon")});
     border-radius: var(#{v("radius-circle")});
 
     // 눌림은 시간·곡선이 다르므로 전용 믹스인을 쓴다 — design-system.md §6-3
     @include motion-press((color, background-color, opacity), "3");
-
-    &:first-child {
-      margin-left: 0;
-    }
 
     #{cls("icon")} {
       width: 100%;

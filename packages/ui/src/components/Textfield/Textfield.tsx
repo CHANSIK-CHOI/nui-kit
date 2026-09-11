@@ -2,6 +2,7 @@
 
 import cn from "classnames";
 import {
+  Children,
   forwardRef,
   useEffect,
   useId,
@@ -164,6 +165,22 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
       hasValue &&
       !readOnly &&
       !disabled;
+    /**
+     * actions 에 담을 것이 있는가. 없으면 상자를 아예 만들지 않아 값의 좌우 여백이
+     * 16 으로 같아진다 (Textfield.md §6).
+     *
+     * ⚠️ `canClear` 가 아니라 **슬롯이 열려 있는가**로 가른다. `canClear` 는 값이 있을
+     * 때만 참이라 그것으로 가르면 첫 글자를 치는 순간 상자가 생기며 글자가 20px 밀린다.
+     * `readOnly` · `disabled` 도 같은 이유로 넣지 않는다 — 상태가 바뀔 때 값이 움직인다.
+     */
+    const hasActions =
+      (isClearable && typeof onClear === "function") ||
+      // ⚠️ `Boolean(children)` 으로는 못 가른다. 소비자가 버튼을 각각 조건부로 넣으면
+      //    children 이 `[false, false]` 가 되는데 그 배열은 참이라 빈 상자가 남고,
+      //    반대로 `0` 은 거짓인데 React 는 그것을 그린다. `Children.toArray` 가
+      //    `null`·`undefined`·`boolean` 을 걷어내고 `0`·`""` 은 남긴다.
+      Children.toArray(children).length > 0 ||
+      Boolean(unit);
 
     return (
       <div
@@ -193,19 +210,21 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
               aria-required={isFieldRequired ? true : undefined}
             />
           </div>
-          <div className={`${block}__actions`}>
-            {canClear ? (
-              <TextfieldBtn
-                icon="clear"
-                title={clearButtonTitle}
-                onClick={onClear}
-                disabled={disabled}
-                className={`${block}__clear`}
-              />
-            ) : null}
-            {children}
-            {unit ? <span className={`${block}__unit`}>{unit}</span> : null}
-          </div>
+          {hasActions ? (
+            <div className={`${block}__actions`}>
+              {canClear ? (
+                <TextfieldBtn
+                  icon="clear"
+                  title={clearButtonTitle}
+                  onClick={onClear}
+                  disabled={disabled}
+                  className={`${block}__clear`}
+                />
+              ) : null}
+              {children}
+              {unit ? <span className={`${block}__unit`}>{unit}</span> : null}
+            </div>
+          ) : null}
         </div>
         {isInField ? null : (
           <Message

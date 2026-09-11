@@ -4,7 +4,11 @@ import { forwardRef, useState } from "react";
 import Textfield, { type TextfieldProps } from "./Textfield.js";
 import TextfieldBtn from "./TextfieldBtn.js";
 
-export type PasswordProps = Omit<TextfieldProps, "children" | "type"> & {
+export type PasswordProps = Omit<
+  TextfieldProps,
+  // `unit` 은 `children` 과 같은 자리다 (Textfield.md §3-1)
+  "children" | "type" | "unit"
+> & {
   defaultIsPasswordVisible?: boolean;
   hidePasswordTitle?: string;
   showPasswordTitle?: string;

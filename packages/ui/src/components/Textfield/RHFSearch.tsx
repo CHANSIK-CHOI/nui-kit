@@ -8,7 +8,12 @@ import TextfieldBtn from "./TextfieldBtn.js";
 export type RHFSearchProps<
   TFormValues extends FieldValues,
   TFieldName extends FieldPath<TFormValues>,
-> = Omit<RHFTextfieldProps<TFormValues, TFieldName>, "children" | "type"> & {
+  // ⚠️ 부모가 `SearchProps` 가 아니라 `RHFTextfieldProps` 라 `unit` 을 여기서 직접 빼야 한다.
+  //    `Search` 쪽을 닫아도 이 타입은 따라오지 않는다.
+> = Omit<
+  RHFTextfieldProps<TFormValues, TFieldName>,
+  "children" | "type" | "unit"
+> & {
   onSearch?: () => void;
   searchButtonTitle?: string;
   searchButtonType?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
