@@ -35,6 +35,12 @@ try {
 }
 
 const failures = [];
+// 영수증 — 어느 길로 끝나든 마지막 줄. dev server 가 없어 위에서 죽으면 이 줄이 없다 = 미실시 (2026-09-11)
+process.on("exit", (code) =>
+  console.log(
+    `RECEIPT check-select-rhf failures=${failures.length} exit=${code}`,
+  ),
+);
 const ok = (m) => console.log("  ✅", m);
 const bad = (m) => {
   console.log("  ❌", m);

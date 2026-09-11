@@ -24,6 +24,10 @@ try {
 }
 
 const failures = [];
+// 영수증 — 어느 길로 끝나든 마지막 줄. dev server 가 없어 위에서 죽으면 이 줄이 없다 = 미실시 (2026-09-11)
+process.on("exit", (code) =>
+  console.log(`RECEIPT check-popup failures=${failures.length} exit=${code}`),
+);
 const ok = (m) => console.log("  ✅", m);
 const bad = (m) => {
   console.log("  ❌", m);
@@ -52,18 +56,24 @@ await page.goto(`${BASE}/components/layer-popup`, { waitUntil: "networkidle" });
 await page.getByRole("button", { name: "약관 보기" }).click();
 await wait(500);
 (await panels()) === 1 ? ok("열린다") : bad("열리지 않는다");
-const hit = await page.evaluate(() => document.elementFromPoint(8, 8)?.className);
+const hit = await page.evaluate(
+  () => document.elementFromPoint(8, 8)?.className,
+);
 hit === "nui-popup__dim"
   ? ok("화면 구석의 클릭은 dim 이 받는다")
   : bad(`화면 구석의 클릭을 ${hit} 이 받는다 — dim 에 닿지 않는다`);
 await clickDim();
-(await panels()) === 0 ? ok("dim 을 누르면 닫힌다") : bad("dim 을 눌러도 닫히지 않는다");
+(await panels()) === 0
+  ? ok("dim 을 누르면 닫힌다")
+  : bad("dim 을 눌러도 닫히지 않는다");
 
 await page.getByRole("button", { name: "겹쳐 열기" }).click();
 await wait(500);
 await page.getByRole("button", { name: "주소 찾기" }).click();
 await wait(500);
-(await panels()) === 2 ? ok("둘이 겹쳐 열린다") : bad(`겹친 패널이 ${await panels()}`);
+(await panels()) === 2
+  ? ok("둘이 겹쳐 열린다")
+  : bad(`겹친 패널이 ${await panels()}`);
 await page.keyboard.press("Escape");
 await wait(600);
 (await panels()) === 1
@@ -83,7 +93,9 @@ await clickDim();
 (await panels()) === 1 ? ok("dim 으로 닫히지 않는다") : bad("dim 으로 닫혔다");
 await page.getByRole("button", { name: "취소" }).click();
 await wait(600);
-(await panels()) === 0 ? ok("취소 버튼으로 닫힌다") : bad("취소를 눌러도 남아 있다");
+(await panels()) === 0
+  ? ok("취소 버튼으로 닫힌다")
+  : bad("취소를 눌러도 남아 있다");
 
 console.log("");
 consoleMessages.length === 0

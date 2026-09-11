@@ -35,6 +35,10 @@ try {
 
 const browser = await chromium.launch();
 const failures = [];
+// 영수증 — 어느 길로 끝나든 마지막 줄. dev server 가 없어 위에서 죽으면 이 줄이 없다 = 미실시 (2026-09-11)
+process.on("exit", (code) =>
+  console.log(`RECEIPT check-console failures=${failures.length} exit=${code}`),
+);
 
 for (const route of routes) {
   const page = await browser.newPage();

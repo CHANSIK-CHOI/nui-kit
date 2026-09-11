@@ -37,6 +37,12 @@ try {
 }
 
 const failures = [];
+// 영수증 — 어느 길로 끝나든 마지막 줄. dev server 가 없어 위에서 죽으면 이 줄이 없다 = 미실시 (2026-09-11)
+process.on("exit", (code) =>
+  console.log(
+    `RECEIPT check-datepicker failures=${failures.length} exit=${code}`,
+  ),
+);
 const ok = (m) => console.log("  ✅", m);
 const bad = (m) => {
   console.log("  ❌", m);
@@ -257,7 +263,9 @@ await multiForm.locator(".nui-datepicker input").press("Enter");
 await page.waitForTimeout(500);
 (await openCalendars()) === 0
   ? ok("타이핑이 막힌 모드에서도 Enter 가 확정한다 (재-열기가 아니다)")
-  : bad("Multiple 에서 Enter 가 달력을 닫지 않았다 — 확정보다 여는 키가 이겼다");
+  : bad(
+      "Multiple 에서 Enter 가 달력을 닫지 않았다 — 확정보다 여는 키가 이겼다",
+    );
 const multiEnter = await readFormState(multiForm);
 multiEnter.extraDates?.length === 2
   ? ok(`Enter 로 확정한 값이 폼에 들어간다 (${multiEnter.extraDates.length}개)`)
