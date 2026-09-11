@@ -75,6 +75,8 @@ const Select: ForwardRefExoticComponent<
       placeholder,
       disabled = false,
       readOnly = false,
+      // 우리가 소비하고 react-select 에는 넘기지 않는다 — DOM 에 `size` 로 새지 않게
+      size = "medium",
       isError = false,
       infoMessage = "",
       errorMessage = "",
@@ -195,6 +197,7 @@ const Select: ForwardRefExoticComponent<
     return (
       <SelectBase
         className={className}
+        size={size}
         disabled={disabled}
         readOnly={readOnly}
         isError={resolvedIsError}

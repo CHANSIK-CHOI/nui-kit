@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Field, FieldLabel, Textfield } from "@nui-kit/react";
+import { Button, Field, FieldLabel, Textfield } from "@nui-kit/react";
 import {
   GuideHeader,
   DesignNote,
@@ -55,6 +55,45 @@ export default function TextfieldPage() {
             <FieldLabel>금액</FieldLabel>
             <Textfield type="number" placeholder="0" unit="원" />
           </Field>
+        </Case>
+      </CaseGrid>
+
+      <h2>크기</h2>
+      <p>
+        <code>size</code> 는 <code>medium</code>(48px · 기본)과{" "}
+        <code>large</code>(56px) 둘이다. <code>Button</code> 의 같은 이름과 같은
+        높이라 옆에 두면 <code>size</code> 를 안 적어도 맞는다. 바뀌는 것은
+        높이와 둥글기뿐이고 글자와 안쪽 버튼은 같다.
+      </p>
+      <CaseGrid
+        columns={2}
+        caption="size — medium(기본) · large. 옆의 Button 과 같은 높이"
+        code={`<Textfield size="large" placeholder="홍길동" />`}
+      >
+        <Case label="medium" note="48px · 기본">
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+            <Textfield
+              placeholder="검색어"
+              aria-label="검색어"
+              autoComplete="off"
+            />
+            <div style={{ flexShrink: 0, width: 120 }}>
+              <Button>검색</Button>
+            </div>
+          </div>
+        </Case>
+        <Case label="large" note="56px · 둥글기 8">
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+            <Textfield
+              size="large"
+              placeholder="검색어"
+              aria-label="검색어"
+              autoComplete="off"
+            />
+            <div style={{ flexShrink: 0, width: 120 }}>
+              <Button size="large">검색</Button>
+            </div>
+          </div>
         </Case>
       </CaseGrid>
 

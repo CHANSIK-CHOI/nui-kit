@@ -47,6 +47,37 @@ export function MultiSelectBasicDemo() {
   );
 }
 
+export function MultiSelectSizeDemo() {
+  const [medium, setMedium] = useState<MultiSelectValue>(["seoul", "busan"]);
+  const [large, setLarge] = useState<MultiSelectValue>(["seoul", "busan"]);
+
+  return (
+    <CaseGrid
+      columns={2}
+      caption="size — medium(기본) · large. 칩이 한 줄이면 높이가 그대로다"
+      code={`<MultiSelect options={OPTIONS} size="large" value={cities} onChange={setCities} />`}
+    >
+      <Case label="medium" note="48px · 기본">
+        <MultiSelect
+          options={CITIES}
+          value={medium}
+          onChange={(next) => setMedium(next)}
+          placeholder="지역을 고르세요"
+        />
+      </Case>
+      <Case label="large" note="56px · 둥글기 8">
+        <MultiSelect
+          size="large"
+          options={CITIES}
+          value={large}
+          onChange={(next) => setLarge(next)}
+          placeholder="지역을 고르세요"
+        />
+      </Case>
+    </CaseGrid>
+  );
+}
+
 export function MultiSelectMenuDemo() {
   const [kept, setKept] = useState<MultiSelectValue>([]);
   const [shown, setShown] = useState<MultiSelectValue>(["seoul"]);

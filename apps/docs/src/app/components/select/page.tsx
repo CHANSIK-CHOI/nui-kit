@@ -9,6 +9,7 @@ import {
 } from "@/components/guide";
 import {
   SelectBasicDemo,
+  SelectSizeDemo,
   SelectSearchDemo,
   SelectOptionsDemo,
   SelectPortalDemo,
@@ -51,6 +52,15 @@ export default function SelectPage() {
           라벨이 없으므로 placeholder 로 남는다.
         </p>
       </DesignNote>
+
+      <h2>크기</h2>
+      <p>
+        <code>size</code> 는 <code>medium</code>(48px · 기본)과{" "}
+        <code>large</code>(56px) 둘이다. <code>Button</code> ·{" "}
+        <code>Textfield</code> 의 같은 이름과 같은 높이라 옆에 두면{" "}
+        <code>size</code> 를 안 적어도 맞는다. 메뉴와 옵션은 크기와 무관하다.
+      </p>
+      <SelectSizeDemo />
 
       <h2>검색과 지우기</h2>
       <p>

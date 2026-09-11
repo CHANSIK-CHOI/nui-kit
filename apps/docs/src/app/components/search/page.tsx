@@ -32,6 +32,26 @@ export default function SearchPage() {
       <h2>기본</h2>
       <SearchDemo />
 
+      <h2>크기</h2>
+      <p>
+        <code>size</code> 는 <code>Textfield</code> 와 같다 —{" "}
+        <code>medium</code>
+        (48px · 기본)과 <code>large</code>(56px). 안쪽 검색 버튼은 두 단계가
+        같다.
+      </p>
+      <CaseGrid
+        columns={2}
+        caption="size — medium(기본) · large"
+        code={`<Search size="large" placeholder="검색어" />`}
+      >
+        <Case label="medium" note="48px · 기본">
+          <Search placeholder="검색어" aria-label="검색어" />
+        </Case>
+        <Case label="large" note="56px">
+          <Search size="large" placeholder="검색어" aria-label="검색어" />
+        </Case>
+      </CaseGrid>
+
       <h2>버튼이 하는 일</h2>
       <p>
         <code>onSearch</code> 를 주면 버튼이 그 콜백만 부른다. 주지 않으면{" "}

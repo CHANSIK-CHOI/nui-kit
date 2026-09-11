@@ -5,9 +5,13 @@
 // ─────────────────────────────────────────────────────────────
 // Textfield (Search / Password 파생 포함)
 //
-// 공개 훅: --nui-textfield--height / -radius / -border-width
+// 공개 훅: --nui-textfield--medium-height / --large-height
+//          --nui-textfield--medium-radius / --large-radius / --border-width
+// ⚠️ 옵션 낱말은 prop 값 그대로다(`size="large"` → `--large-`). 한 훅 이름이 두 자리를
+//    덮으면 소비자가 :root 에 값을 넣는 순간 두 단계가 같아진다 (styles.md §3-2).
 // ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 테두리·글자는 짝이라
 //    한쪽만 바꾸면 대비가 보이지 않게 깨진다. 한 개만 바꿀 때는 className 을 쓴다.
+// 크기: .nui-textfield--large (medium 은 기본이라 modifier 없음)
 // 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
@@ -17,16 +21,23 @@
     &__wrap {
       display: flex;
       align-items: center;
-      height: #{hook("textfield--height", var(#{v("size-field")}))};
+      // 기본은 medium(48). Button 의 medium 과 같은 값이라 size 없이 나란히 놓아도 맞는다.
+      height: #{hook("textfield--medium-height", var(#{v("size-control-xl")}))};
       background-color: var(#{v("control-bg")});
       border: #{hook("textfield--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border")});
-      border-radius: #{hook("textfield--radius", var(#{v("radius-2")}))};
+      // 둥글기는 KRDS 산식(높이 × ⅛, 홀수면 위 짝수) — 48 → 6
+      border-radius: #{hook("textfield--medium-radius", var(#{v("radius-2")}))};
 
-      @include motion(
-        (border-color, background-color, box-shadow),
-        "3"
-      );
+      @include motion((border-color, background-color, box-shadow), "3");
+    }
+
+    // ── size
+    // large(56)는 KRDS 산식으로 8 이다(56 × ⅛ = 7 → 8). Button large 도 같은 8.
+    // 글자 · 보조 버튼 · 좌우 여백은 두 단계가 같다 — 바뀌는 것은 높이와 둥글기뿐 (Textfield.md §9).
+    &--large &__wrap {
+      height: #{hook("textfield--large-height", var(#{v("size-field")}))};
+      border-radius: #{hook("textfield--large-radius", var(#{v("radius-3")}))};
     }
 
     &__input-box {

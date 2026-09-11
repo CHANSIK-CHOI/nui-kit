@@ -14,6 +14,7 @@ import {
 } from "@/components/guide";
 import {
   MultiSelectBasicDemo,
+  MultiSelectSizeDemo,
   MultiSelectMenuDemo,
   MultiSelectChipDemo,
 } from "./MultiSelectDemo";
@@ -55,6 +56,14 @@ export default function MultiSelectPage() {
 
       <h2>기본</h2>
       <MultiSelectBasicDemo />
+
+      <h2>크기</h2>
+      <p>
+        <code>size</code> 는 <code>Select</code> 와 같다 — <code>medium</code>
+        (48px · 기본)과 <code>large</code>(56px). 칩이 줄을 넘으면 그만큼
+        자란다.
+      </p>
+      <MultiSelectSizeDemo />
 
       <h2>연달아 고르기</h2>
       <p>

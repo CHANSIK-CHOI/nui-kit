@@ -8,6 +8,37 @@ function countOf(dates: Date[] | undefined) {
   return dates?.length ? `${dates.length}일` : "없음";
 }
 
+export function DateMultiplePickerSizeDemo() {
+  const [medium, setMedium] = useState<Date[] | undefined>();
+  const [large, setLarge] = useState<Date[] | undefined>();
+
+  return (
+    <CaseGrid
+      columns={2}
+      caption="size — medium(기본) · large. 달력은 크기와 무관하다"
+      code={`<DateMultiplePicker size="large" selected={dates} onSelectedChange={setDates} />`}
+    >
+      <Case label="medium" note="48px · 기본">
+        <DateMultiplePicker
+          selected={medium}
+          onSelectedChange={setMedium}
+          placeholder="날짜를 고르세요"
+          calendarLabel="참석 가능일 달력"
+        />
+      </Case>
+      <Case label="large" note="56px · 둥글기 8">
+        <DateMultiplePicker
+          size="large"
+          selected={large}
+          onSelectedChange={setLarge}
+          placeholder="날짜를 고르세요"
+          calendarLabel="참석 가능일 달력"
+        />
+      </Case>
+    </CaseGrid>
+  );
+}
+
 export function DateMultiplePickerBasicDemo() {
   const [dates, setDates] = useState<Date[] | undefined>();
 

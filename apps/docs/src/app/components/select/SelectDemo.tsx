@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  Button,
   Field,
   Select,
   type SelectOption,
@@ -66,6 +67,47 @@ export function SelectBasicDemo() {
         현재 값: <code>{JSON.stringify(city)}</code>
       </p>
     </Example>
+  );
+}
+
+export function SelectSizeDemo() {
+  const [medium, setMedium] = useState<SingleSelectValue>("seoul");
+  const [large, setLarge] = useState<SingleSelectValue>("seoul");
+
+  return (
+    <CaseGrid
+      columns={2}
+      caption="size — medium(기본) · large. 옆의 Button 과 같은 높이"
+      code={`<Select options={OPTIONS} size="large" value={city} onChange={setCity} />`}
+    >
+      <Case label="medium" note="48px · 기본">
+        <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+          <Select
+            options={CITIES}
+            value={medium}
+            onChange={(next) => setMedium(next)}
+            placeholder="지역을 고르세요"
+          />
+          <div style={{ flexShrink: 0, width: 120 }}>
+            <Button>적용</Button>
+          </div>
+        </div>
+      </Case>
+      <Case label="large" note="56px · 둥글기 8">
+        <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+          <Select
+            size="large"
+            options={CITIES}
+            value={large}
+            onChange={(next) => setLarge(next)}
+            placeholder="지역을 고르세요"
+          />
+          <div style={{ flexShrink: 0, width: 120 }}>
+            <Button size="large">적용</Button>
+          </div>
+        </div>
+      </Case>
+    </CaseGrid>
   );
 }
 

@@ -11,6 +11,7 @@ import {
 } from "@/components/guide";
 import {
   DatepickerBasicDemo,
+  DatepickerSizeDemo,
   DatepickerAllowedDemo,
   DatepickerPortalDemo,
 } from "./DatepickerDemo";
@@ -46,6 +47,14 @@ export default function DatepickerPage() {
         <code>shouldCloseOnSelect={"{false}"}</code> 를 준다.
       </p>
       <DatepickerBasicDemo />
+
+      <h2>크기</h2>
+      <p>
+        <code>size</code> 는 <code>Textfield</code> 의 것이 그대로 흐른다 —{" "}
+        <code>medium</code>(48px · 기본)과 <code>large</code>(56px). 입력창만
+        바뀌고 달력 · 날짜 셀 · 확정 버튼은 그대로다.
+      </p>
+      <DatepickerSizeDemo />
 
       <DesignNote title="왜 확정 버튼이 없나">
         <p>

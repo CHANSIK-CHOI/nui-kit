@@ -9,6 +9,7 @@ import {
 } from "@/components/guide";
 import {
   DateMultiplePickerBasicDemo,
+  DateMultiplePickerSizeDemo,
   DateMultiplePickerConfirmDemo,
 } from "./DateMultiplePickerDemo";
 import { RHFDateMultiplePickerDemo } from "./RHFDateMultiplePickerDemo";
@@ -53,6 +54,14 @@ export default function DateMultiplePickerPage() {
         않는다.
       </p>
       <DateMultiplePickerBasicDemo />
+
+      <h2>크기</h2>
+      <p>
+        <code>size</code> 는 <code>Textfield</code> 의 것이 그대로 흐른다 —{" "}
+        <code>medium</code>(48px · 기본)과 <code>large</code>(56px). 입력창만
+        바뀌고 달력 · 확정 버튼은 그대로다.
+      </p>
+      <DateMultiplePickerSizeDemo />
 
       <DesignNote title="왜 직접 입력이 없나">
         <p>

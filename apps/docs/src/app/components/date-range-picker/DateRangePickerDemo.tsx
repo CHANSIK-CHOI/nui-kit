@@ -12,6 +12,37 @@ function formatRange(range: DateRange | undefined) {
   return `${from} ~ ${to}`;
 }
 
+export function DateRangePickerSizeDemo() {
+  const [medium, setMedium] = useState<DateRange | undefined>();
+  const [large, setLarge] = useState<DateRange | undefined>();
+
+  return (
+    <CaseGrid
+      columns={2}
+      caption="size — medium(기본) · large. 달력은 크기와 무관하다"
+      code={`<DateRangePicker size="large" selected={range} onSelectedChange={setRange} />`}
+    >
+      <Case label="medium" note="48px · 기본">
+        <DateRangePicker
+          selected={medium}
+          onSelectedChange={setMedium}
+          placeholder="기간을 고르세요"
+          calendarLabel="숙박 기간 달력"
+        />
+      </Case>
+      <Case label="large" note="56px · 둥글기 8">
+        <DateRangePicker
+          size="large"
+          selected={large}
+          onSelectedChange={setLarge}
+          placeholder="기간을 고르세요"
+          calendarLabel="숙박 기간 달력"
+        />
+      </Case>
+    </CaseGrid>
+  );
+}
+
 export function DateRangePickerBasicDemo() {
   const [range, setRange] = useState<DateRange | undefined>();
 

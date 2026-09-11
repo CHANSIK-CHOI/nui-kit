@@ -63,6 +63,30 @@ export default function PasswordPage() {
       </p>
       <PasswordDemo />
 
+      <h2>크기</h2>
+      <p>
+        <code>size</code> 는 <code>Textfield</code> 와 같다 —{" "}
+        <code>medium</code>
+        (48px · 기본)과 <code>large</code>(56px). 안쪽 표시 토글은 두 단계가
+        같다.
+      </p>
+      <CaseGrid
+        columns={2}
+        caption="size — medium(기본) · large"
+        code={`<Password size="large" autoComplete="current-password" />`}
+      >
+        <Case label="medium" note="48px · 기본">
+          <Password aria-label="비밀번호" autoComplete="current-password" />
+        </Case>
+        <Case label="large" note="56px">
+          <Password
+            size="large"
+            aria-label="비밀번호"
+            autoComplete="current-password"
+          />
+        </Case>
+      </CaseGrid>
+
       <DesignNote title="왜 지우면 숨김으로 돌아가나">
         <p>
           보이는 상태로 지운 뒤 새로 치면 다음 비밀번호가 그대로 노출된다.

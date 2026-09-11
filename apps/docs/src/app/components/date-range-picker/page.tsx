@@ -9,6 +9,7 @@ import {
 } from "@/components/guide";
 import {
   DateRangePickerBasicDemo,
+  DateRangePickerSizeDemo,
   DateRangePickerConfirmDemo,
 } from "./DateRangePickerDemo";
 import { RHFDateRangePickerDemo } from "./RHFDateRangePickerDemo";
@@ -49,6 +50,14 @@ export default function DateRangePickerPage() {
         버튼이 잠겨 있는 동안은 키도 잠겨 있다.
       </p>
       <DateRangePickerBasicDemo />
+
+      <h2>크기</h2>
+      <p>
+        <code>size</code> 는 <code>Textfield</code> 의 것이 그대로 흐른다 —{" "}
+        <code>medium</code>(48px · 기본)과 <code>large</code>(56px). 입력창만
+        바뀌고 달력 · 확정 버튼은 그대로다.
+      </p>
+      <DateRangePickerSizeDemo />
       <div className="doc-note">
         같은 날을 두 번 누르면 하루짜리 기간이 된다. 최소 일수를 두려면{" "}
         <code>dayPickerProps={"{{ min: 2 }}"}</code> 처럼 2 이상을 준다. 기간이

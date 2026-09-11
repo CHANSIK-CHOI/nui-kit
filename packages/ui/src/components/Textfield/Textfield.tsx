@@ -18,12 +18,25 @@ const block = px("textfield");
 export type TextfieldInputType =
   "text" | "password" | "email" | "tel" | "url" | "number";
 
+/**
+ * 높이 단계. `medium` 48(`size-control-xl`) · `large` 56(`size-field`).
+ * Button 의 같은 이름과 같은 값이라 나란히 놓으면 `size` 를 안 적어도 높이가 맞는다.
+ * `small` 은 없다 — SEED `text-input` 도 두 단계이고, 입력은 컨트롤 전체가 누르는
+ * 타겟이라 KRDS 권장 44 아래로 내리지 않는다 (Textfield.md §4).
+ */
+export type TextfieldSize = "large" | "medium";
+
 type TextfieldBaseProps = {
   children?: ReactNode;
   id?: string;
   className?: string;
   placeholder?: string;
   type?: TextfieldInputType;
+  /**
+   * 높이 단계. 기본 `medium`(48) — 두 단계면 작은 쪽이 기본이다(design-system.md §7-1).
+   * HTML `size`(글자 폭)가 아니다 — 폭은 `100%` 라 그 속성이 설 자리가 없었다.
+   */
+  size?: TextfieldSize;
   /**
    * 입력값. 네이티브 타입(`string | number | readonly string[]`)에서
    * **배열을 뺐다** — React 가 `<select multiple>` 때문에 넣은 갈래라 한 줄 입력에는
@@ -58,6 +71,8 @@ export type TextfieldProps = TextfieldBaseProps &
     | "id"
     | "placeholder"
     | "readOnly"
+    // HTML 의 `size?: number` 와 이름이 겹친다 — 빼지 않으면 교집합이 `never` 다
+    | "size"
     | "type"
     | "value"
   >;
@@ -69,6 +84,7 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
       id,
       className,
       placeholder,
+      size = "medium",
       value,
       maxLength,
       counterLabel = "글자 수",
@@ -152,6 +168,8 @@ const Textfield = forwardRef<HTMLInputElement, TextfieldProps>(
     return (
       <div
         className={cn(block, className, {
+          // 기본값(medium)에는 modifier 를 붙이지 않는다 — Button 과 같은 방식
+          [`${block}--${size}`]: size !== "medium",
           [px("is-disabled")]: disabled,
           [px("is-error")]: resolvedIsError,
           [px("is-readonly")]: readOnly,

@@ -19,6 +19,12 @@ export type SingleSelectValue = SelectOptionValue | null;
 export type MultiSelectValue = SelectOptionValue[];
 
 /**
+ * 컨트롤 높이 단계. `small` 은 없다 — SEED `text-input` 도 두 단계이고, 입력 컨트롤은
+ * 컨트롤 전체가 누르는 타겟이라 KRDS 권장 44 아래로 내리지 않는다 (Select.md §4).
+ */
+export type SelectSize = "large" | "medium";
+
+/**
  * Select / MultiSelect 가 공유하는 prop.
  *
  * react-select 의 prop 중 우리가 소유하는 것들은 `Omit` 으로 걷어낸다.
@@ -65,6 +71,13 @@ export type SelectSharedProps<IsMulti extends boolean> = Omit<
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
+  /**
+   * 컨트롤의 한 줄 높이. 기본 `medium`(48) · `large`(56). Button · Textfield 의 같은
+   * 이름과 같은 값이라 `size` 를 안 적어도 나란히 놓인 것과 높이가 맞는다. 메뉴 · 옵션은
+   * 이 값과 무관하고, 다중은 칩이 줄을 넘으면 이 값보다 커진다 (Select.md §4 · §9).
+   * react-select 에 넘기지 않는다.
+   */
+  size?: SelectSize;
   isError?: boolean;
   infoMessage?: string;
   errorMessage?: string;
@@ -98,11 +111,7 @@ export type SelectSharedProps<IsMulti extends boolean> = Omit<
  *    `dayPickerProps` 와 함께 타입을 재수출한다).
  */
 export type SelectChangeAction =
-  | "select-option"
-  | "deselect-option"
-  | "remove-value"
-  | "pop-value"
-  | "clear";
+  "select-option" | "deselect-option" | "remove-value" | "pop-value" | "clear";
 
 export type SelectChangeMeta = {
   /** 무엇을 해서 값이 바뀌었나 */

@@ -1,5 +1,9 @@
 export { default as Textfield } from "./Textfield.js";
-export type { TextfieldProps, TextfieldInputType } from "./Textfield.js";
+export type {
+  TextfieldProps,
+  TextfieldInputType,
+  TextfieldSize,
+} from "./Textfield.js";
 export { default as Search } from "./Search.js";
 export type { SearchProps } from "./Search.js";
 export { default as Password } from "./Password.js";

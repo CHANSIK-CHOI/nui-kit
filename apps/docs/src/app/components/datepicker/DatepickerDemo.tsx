@@ -33,6 +33,37 @@ export function DatepickerBasicDemo() {
   );
 }
 
+export function DatepickerSizeDemo() {
+  const [medium, setMedium] = useState<Date | undefined>();
+  const [large, setLarge] = useState<Date | undefined>();
+
+  return (
+    <CaseGrid
+      columns={2}
+      caption="size — medium(기본) · large. 달력은 크기와 무관하다"
+      code={`<Datepicker size="large" selected={date} onSelectedChange={setDate} />`}
+    >
+      <Case label="medium" note="48px · 기본">
+        <Datepicker
+          selected={medium}
+          onSelectedChange={setMedium}
+          placeholder="날짜를 고르세요"
+          calendarLabel="예약일 달력"
+        />
+      </Case>
+      <Case label="large" note="56px · 둥글기 8">
+        <Datepicker
+          size="large"
+          selected={large}
+          onSelectedChange={setLarge}
+          placeholder="날짜를 고르세요"
+          calendarLabel="예약일 달력"
+        />
+      </Case>
+    </CaseGrid>
+  );
+}
+
 export function DatepickerAllowedDemo() {
   const [future, setFuture] = useState<Date | undefined>();
   const [inYear, setInYear] = useState<Date | undefined>();
