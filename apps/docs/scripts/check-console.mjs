@@ -17,7 +17,7 @@ import { fileURLToPath } from "node:url";
 const DOCS_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const BASE =
   process.argv.slice(2).find((a) => !a.startsWith("--")) ??
-  "http://localhost:3000";
+  `http://localhost:${process.env.PORT ?? 3000}`; // PORT 는 next dev 도 읽는다 — 세션마다 다른 포트 (2026-09-11)
 // --page=button,textfield — `scripts/changed-scope.mjs` 가 뽑은 슬러그만. 없으면 nav 전체 (2026-09-11)
 const pageArg = process.argv.find((a) => a.startsWith("--page="));
 const SCOPE = pageArg

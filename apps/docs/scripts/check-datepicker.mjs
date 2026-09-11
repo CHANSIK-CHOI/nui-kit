@@ -20,7 +20,7 @@
  */
 import { chromium } from "playwright";
 
-const BASE = process.argv[2] ?? "http://localhost:3000";
+const BASE = process.argv[2] ?? `http://localhost:${process.env.PORT ?? 3000}`;
 const PAGES = {
   single: `${BASE}/components/datepicker`,
   range: `${BASE}/components/date-range-picker`,
