@@ -12,17 +12,20 @@
   #{cls("textarea")} {
     width: 100%;
 
+    // ── 상태 색은 여기서 한 번만 해석한다 ★ (`_textfield.scss` 와 같은 판정)
+    // wrap 의 면 · input 의 글자 · **자동 완성이 칠하는 면**이 같은 변수를 읽는다.
+    // 상태별 값은 아래 disabled · readonly · error 블록이 덮는다(소스 순서가 우선순위다).
+    #{iv("textarea-surface")}: var(#{v("control-bg")});
+    #{iv("textarea-fg")}: var(#{v("control-text")});
+
     &__wrap {
       position: relative;
-      background-color: var(#{v("control-bg")});
+      background-color: var(#{iv("textarea-surface")});
       border: #{hook("textarea--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border")});
       border-radius: #{hook("textarea--radius", var(#{v("radius-2")}))};
 
-      @include motion(
-        (border-color, background-color, box-shadow),
-        "3"
-      );
+      @include motion((border-color, background-color, box-shadow), "3");
     }
 
     &__input {
@@ -40,10 +43,22 @@
           calc(var(#{v("size-field")}) * 2)
         )};
       padding: var(#{v("space-4")});
-      color: var(#{v("control-text")});
+      color: var(#{iv("textarea-fg")});
+      // caret 은 글자와 갈린다 — error 에서만 `control-text-error` 로 바뀐다(아래).
       caret-color: var(#{v("control-text")});
 
+      // 자동 완성 면이 wrap 과 같은 속도로 상태를 따라간다. 안 걸면 wrap 만 150ms 로
+      // 가고 면은 즉시 튄다. ⚠️ `transition` 은 한 번만 선언할 수 있다 — 이 요소에
+      // 다른 전환을 더하려면 여기 목록에 넣는다.
+      @include motion(box-shadow, "3");
       @include typo(3, "regular");
+
+      // 자동 완성 면 — UA 의 `!important` 배경·글자를 우리 색으로 되돌린다.
+      // `__input` 이 `__wrap` 의 직계 자식이라 `inherit` 하나로 네 모서리가 따라온다.
+      @include autofill-surface(
+        var(#{iv("textarea-surface")}),
+        var(#{iv("textarea-fg")})
+      );
     }
 
     &__input:focus,
@@ -76,34 +91,48 @@
     }
 
     // ── disabled
+    &#{state("disabled")} {
+      #{iv("textarea-surface")}: var(#{v("control-bg-disabled")});
+      #{iv("textarea-fg")}: var(#{v("control-text-disabled")});
+    }
+
     &#{state("disabled")} &__wrap {
-      background-color: var(#{v("control-bg-disabled")});
       border-color: var(#{v("control-border-disabled")});
     }
 
     &__input[disabled] {
-      color: var(#{v("control-text-disabled")});
       cursor: not-allowed;
     }
 
     // ── readonly
-    &#{state("readonly")} &__wrap {
-      background-color: var(#{v("control-bg-readonly")});
+    // ⚠️ **우선순위는 `:not()` 이 만든다 — 소스 순서가 아니다** (styles.md §7 · 2026-09-12).
+    //    상태 셋이 전부 같은 상세도라 예전에는 소스 순서대로 `error > readonly > disabled`
+    //    였다. `Textfield` 와 한 건이고 그쪽 주석이 자세하다.
+    &#{state("readonly")}:not(#{state("disabled")}) {
+      #{iv("textarea-surface")}: var(#{v("control-bg-readonly")});
+      #{iv("textarea-fg")}: var(#{v("control-text-muted")});
+    }
+
+    &#{state("readonly")}:not(#{state("disabled")}) &__wrap {
       border-color: var(#{v("control-border-disabled")});
     }
 
-    &#{state("readonly")} &__input {
-      color: var(#{v("control-text-muted")});
+    &#{state("readonly")}:not(#{state("disabled")}) &__input {
       cursor: default;
     }
 
     // ── error
-    &#{state("error")} &__wrap {
-      background-color: var(#{v("control-bg")});
+    // 면만 기본으로 되돌린다 — 입력값은 에러여도 빨개지지 않는다 (design-system.md §2-1).
+    // ⚠️ `fg` 를 여기서 선언하면 `readonly + error` 의 글자가 muted 에서 바뀐다.
+    &#{state("error")}:not(#{state("disabled")}) {
+      #{iv("textarea-surface")}: var(#{v("control-bg")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")}) &__wrap {
       border-color: var(#{v("control-border-error")});
     }
 
-    &#{state("error")} &__input {
+    &#{state("error")}:not(#{state("disabled")}) &__input {
       caret-color: var(#{v("control-text-error")});
     }
 
