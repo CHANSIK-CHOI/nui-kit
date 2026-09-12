@@ -15,11 +15,11 @@ const USAGE: [string, string, string][] = [
     "16px",
     "Button small 의 아이콘 · Datepicker 이전/다음 · Accordion 화살표 · Message 아이콘 · MultiSelect 칩의 ×",
   ],
-  ["2xl", "20px", "Button medium · large 의 아이콘"],
+  ["2xl", "20px", "Button medium 의 아이콘"],
   [
     "3xl",
     "24px",
-    "Textfield 안 아이콘 · Select 화살표와 지우기 · Toast 의 접두 아이콘과 닫기",
+    "Button large 의 아이콘 · Textfield 안 아이콘 · Select 화살표와 지우기 · Toast 의 접두 아이콘과 닫기",
   ],
 ];
 
@@ -99,7 +99,16 @@ export default function IconPage() {
               <td>
                 <span className="doc-token-name">size-icon-2xl</span> 20px
               </td>
-              <td className="doc-wrap">Button 기본</td>
+              <td className="doc-wrap">Button medium</td>
+            </tr>
+            <tr>
+              <td className="doc-wrap">
+                <code>font-size-4</code> (18px) — large 액션 라벨
+              </td>
+              <td>
+                <span className="doc-token-name">size-icon-3xl</span> 24px
+              </td>
+              <td className="doc-wrap">Button large</td>
             </tr>
             <tr>
               <td className="doc-wrap">

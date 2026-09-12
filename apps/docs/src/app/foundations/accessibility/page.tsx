@@ -189,7 +189,7 @@ export default function AccessibilityPage() {
               <td className="doc-wrap">
                 Button <code>variant=&quot;text&quot;</code>
               </td>
-              <td className="doc-wrap">글자 폭 × 29~32px</td>
+              <td className="doc-wrap">글자 폭 × 29~35px</td>
               <td>24px (하한)</td>
               <td className="doc-wrap">
                 문장 안 · 목록 행 안에 놓이는 variant 다. 세로 44 를 채우면 줄

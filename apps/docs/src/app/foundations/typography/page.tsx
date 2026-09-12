@@ -11,7 +11,7 @@ const SCALE: { n: number; px: number; lh: string; ls: string }[] = [
   { n: 5, px: 20, lh: "1.5", ls: "0" },
 ];
 
-/** 아홉 조합이 전부다 — design-system.md §5 와 같은 출처다. */
+/** 열 조합이 전부다 — design-system.md §5 와 같은 출처다. */
 const ROLES: [string, string, string, string][] = [
   [
     "입력값 · 본문",
@@ -24,6 +24,12 @@ const ROLES: [string, string, string, string][] = [
     "3",
     "bold",
     "Button(text 버튼 포함) · Accordion 헤더 · Datepicker 년월",
+  ],
+  [
+    "액션 라벨 (large)",
+    "4",
+    "bold",
+    'Button · IconButton · ButtonLink 의 size="large"',
   ],
   [
     "보조 텍스트",
@@ -92,9 +98,8 @@ body { font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; }`
           ))}
         </div>
         <p className="doc-example__caption">
-          번호는 1부터 5까지 순서대로다. 컴포넌트는 1 · 2 · 3 · 5를 쓰고
-          4번(18px)은 이 문서 사이트가 쓴다. 새 크기가 필요하면 끝 번호로
-          더한다.
+          번호는 1부터 5까지 순서대로다. 컴포넌트는 다섯을 다 쓴다. 4번(18px)은
+          large 버튼의 라벨이다. 새 크기가 필요하면 끝 번호로 더한다.
         </p>
       </div>
 
@@ -102,8 +107,7 @@ body { font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; }`
       <p>
         행간은 전 스케일 1.5 배수이고 자간은 0 이다. 같은 번호의 크기 · 행간 ·
         자간이 한 벌이라 <code>typo(2)</code> 처럼 번호 하나로 셋이 함께 붙는다.
-        행간이 배수(unitless)인 것은 글자 크기를 덮어도 비율이 유지되게 하기
-        위해서다.
+        글자 크기를 덮어도 비율이 유지되도록 행간은 배수(unitless)다.
       </p>
 
       <div className="doc-table-wrap">
