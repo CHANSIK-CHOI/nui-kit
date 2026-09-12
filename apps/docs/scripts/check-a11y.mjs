@@ -1146,17 +1146,36 @@ console.log(
 const INPUT_AUX_REASON =
   "입력 안에 버튼 둘이 8px 로 붙는다. 44 를 채우면 히트가 겹쳐 인접 시 38 이 상한이라 하한 24 를 쓴다";
 
+const TEXT_BUTTON_REASON =
+  "문장 안·목록 행 안에 놓이는 variant 라 세로 44 를 채우면 줄 간격이 벌어져 문단이 어긋나고, 가로는 글자 폭이 이 variant 의 정의다. 하한 24 를 쓴다";
+
 const TOUCH_TARGETS = [
   // IconButton 은 2026-09-08 에 자기 페이지로 나갔다 — Button 페이지에는 없다
   ["IconButton", "/components/icon-button", ".nui-button--icon"],
   // text 버튼은 2026-09-09 에 글자 폭이 됐다. 그 전에는 부모 폭이라 히트가 넓었고
   // 이 자리가 검사 밖이었다 — 좁아진 지금부터 재야 한다.
+  // size 셋을 따로 잰다 (2026-09-12). 하나만 재면 가장 작은 자리(small 29)가 검사 밖이고,
+  // large 는 글자가 18 로 오르며 높이가 35 가 되므로 셋이 서로 다른 값이다.
   [
-    "Button text",
+    "Button text small",
     "/components/button",
-    ".nui-button--text",
+    ".nui-button--text.nui-button--small",
     null,
-    "문장 안·목록 행 안에 놓이는 variant 라 세로 44 를 채우면 줄 간격이 벌어져 문단이 어긋나고, 가로는 글자 폭이 이 variant 의 정의다. 하한 24 를 쓴다",
+    TEXT_BUTTON_REASON,
+  ],
+  [
+    "Button text medium",
+    "/components/button",
+    ".nui-button--text:not(.nui-button--large):not(.nui-button--small)",
+    null,
+    TEXT_BUTTON_REASON,
+  ],
+  [
+    "Button text large",
+    "/components/button",
+    ".nui-button--text.nui-button--large",
+    null,
+    TEXT_BUTTON_REASON,
   ],
   [
     "Textfield 지우기",

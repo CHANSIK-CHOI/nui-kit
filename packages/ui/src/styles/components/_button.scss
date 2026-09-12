@@ -15,7 +15,17 @@
 //            --large-padding-x --medium-padding-x --small-padding-x
 //            --large-radius    --medium-radius    --small-radius   (둥글기는 크기를 따른다)
 //     모양 : --round-radius
-//     변형 : --text-padding-x --text-padding-y   (세 size 가 한 값 — 의도해서 묶었다)
+//     변형 : --text-padding-x --text-padding-y   (세 size 가 한 값 — 아래 이유)
+//
+// ⚠️ text 의 여백을 size 별로 나누지 않는 이유 (2026-09-12 재검토).
+//    tokens.md §1-3 의 「한 이름이 여러 자리에 뚫리면 variant 가 죽는다」는 **높이처럼
+//    크기를 말하는 값**의 이야기다. text 에서 크기를 말하는 것은 글자(18/16/14)와
+//    아이콘(24/20/16)이고 그것들은 훅이 아니다 — 여백을 한 값으로 덮어도 세 size 는
+//    여전히 구분된다. 이 여백이 정하는 것은 hover 면이 글자에 얼마나 가까이 오는가
+//    하나뿐이고, 그 최소 틈은 글자 크기의 함수가 아니다.
+//    면은 이미 크기를 따라간다 — 높이는 행간 + 패딩(35/32/29), 둥글기는 `--large` 의
+//    border-radius 가 text 에도 걸려 8/6/6 이다. 여백까지 묶으면 두 번 커진다.
+//    SEED `text-button.yaml` 도 padding·fontSize 에 size 축을 두지 않는다.
 //     공통 : --min-width  --gap  --border-width
 //
 //   IconButton  (`icon-button--`)
@@ -169,6 +179,19 @@
     // large 56 → 56 × ⅛ = 7 → 8. 입력 컨트롤의 large 와 같은 8 이라 나란히 놓아도 모서리가 맞는다.
     &--large {
       border-radius: #{hook("button--large-radius", var(#{v("radius-3")}))};
+    }
+
+    // ⚠️ 글자·아이콘은 `:not()` 없이 건다 — `text` 와 `icon` 에도 걸려야 한다 (2026-09-12).
+    //    그래서 IconButton large 의 아이콘도 24 가 되고(56 정사각 안의 20 은 작았다),
+    //    text 는 여기서 처음 medium 과 갈린다 — 면이 없어 크기를 말할 수단이 글자뿐이라
+    //    높이가 행간 + 패딩으로 35 가 된다. 값은 design-system.md §5 · §5-2 매트릭스가 정한다.
+    &--large &__icon {
+      width: var(#{v("size-icon-3xl")});
+      height: var(#{v("size-icon-3xl")});
+    }
+
+    &--large &__wrap {
+      @include typo(4, "bold");
     }
 
     &--small:not(#{cls("button")}--text):not(#{cls("button")}--icon) {

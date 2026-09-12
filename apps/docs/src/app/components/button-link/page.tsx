@@ -15,9 +15,9 @@ export const metadata = { title: "ButtonLink" };
 const COLORS = ["neutral", "quiet", "primary", "secondary", "danger"] as const;
 const VARIANTS = ["solid", "soft", "line", "text"] as const;
 const SIZES = [
-  ["large", "56px"],
-  ["medium", "48px"],
-  ["small", "40px"],
+  ["large", "56px · 글자 18 · 아이콘 24"],
+  ["medium", "48px · 글자 16 · 아이콘 20"],
+  ["small", "40px · 글자 14 · 아이콘 16"],
 ] as const;
 
 type Variant = (typeof VARIANTS)[number];

@@ -18,9 +18,9 @@ export const metadata = { title: "IconButton" };
 const COLORS = ["neutral", "quiet", "primary", "secondary", "danger"] as const;
 const VARIANTS = ["solid", "line"] as const;
 const SIZES = [
-  ["large", "56px"],
-  ["medium", "48px"],
-  ["small", "40px"],
+  ["large", "56px · 아이콘 24"],
+  ["medium", "48px · 아이콘 20"],
+  ["small", "40px · 아이콘 16"],
 ] as const;
 
 export default function IconButtonPage() {

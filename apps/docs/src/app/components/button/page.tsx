@@ -26,9 +26,9 @@ export const metadata = { title: "Button" };
 const COLORS = ["neutral", "quiet", "primary", "secondary", "danger"] as const;
 const VARIANTS = ["solid", "soft", "line", "text"] as const;
 const SIZES = [
-  ["large", "56px"],
-  ["medium", "48px"],
-  ["small", "40px"],
+  ["large", "56px · 글자 18 · 아이콘 24"],
+  ["medium", "48px · 글자 16 · 아이콘 20"],
+  ["small", "40px · 글자 14 · 아이콘 16"],
 ] as const;
 
 /** `variant="text"` 는 shape 를 `never` 로 닫는다. 전개할 때 갈라 준다 */
@@ -112,7 +112,8 @@ export default function ButtonPage() {
 
       <h2>크기</h2>
       <p>
-        기본은 <code>medium</code> 이다. 위아래로 하나씩 있다.
+        기본은 <code>medium</code> 이다. 위아래로 하나씩 있다. 높이만 바뀌는
+        것이 아니라 글자와 아이콘, 둥글기가 함께 따라온다.
       </p>
       <CaseGrid
         columns={3}
@@ -147,21 +148,27 @@ export default function ButtonPage() {
       <h2>text 의 크기</h2>
       <p>
         <code>variant=&quot;text&quot;</code> 도 <code>size</code> 를 받는다.
-        바뀌는 것은 글자와 아이콘뿐이고 높이는 잡지 않는다 — 그래서{" "}
-        <code>large</code> 와 <code>medium</code> 은 같은 모양이다. 문장 안에 둘
-        때는 주변 글자 크기에 맞춘다(14px 문단이면 <code>small</code>).{" "}
-        <code>shape</code> 는 받지 않는다.
+        바뀌는 것은 글자와 아이콘뿐이고 높이는 잡지 않는다. 보이는 높이는 글자의
+        행간에 위아래 여백이 더해진 결과다. 문장 안에 둘 때는 주변 글자 크기에
+        맞춘다(14px 문단이면 <code>small</code>). <code>shape</code> 는 받지
+        않는다.
       </p>
       <CaseGrid
         columns={3}
-        caption="variant=text × size 3 — large 와 medium 은 같다"
+        caption="variant=text × size 3 — 높이는 글자가 만든다"
         code={`<Button variant="text" size="small">더 보기</Button>`}
       >
         {SIZES.map(([size]) => (
           <Case
             key={size}
             label={size}
-            note={size === "small" ? "14px · 아이콘 16" : "16px · 아이콘 20"}
+            note={
+              size === "small"
+                ? "14px · 아이콘 16 · 높이 29"
+                : size === "medium"
+                  ? "16px · 아이콘 20 · 높이 32"
+                  : "18px · 아이콘 24 · 높이 35"
+            }
           >
             <Button variant="text" size={size} icon={<DelIcon />}>
               더 보기
