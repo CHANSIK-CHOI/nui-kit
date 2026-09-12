@@ -159,30 +159,41 @@ export default function ElevationPage() {
               <th scope="row">
                 <span className="doc-token-name">--nui-shadow-1</span>
               </th>
-              <td className="doc-wrap">낮게 뜸 — 카드, 인라인 드롭다운</td>
+              <td className="doc-wrap">낮게 뜸. 쓰는 컴포넌트가 없다</td>
             </tr>
             <tr>
               <th scope="row">
                 <span className="doc-token-name">--nui-shadow-2</span>
               </th>
-              <td className="doc-wrap">중간 — 팝오버, 메뉴, 달력</td>
+              <td className="doc-wrap">중간 — 팝오버, 메뉴, 달력. 두 겹이다</td>
             </tr>
             <tr>
               <th scope="row">
                 <span className="doc-token-name">--nui-shadow-3</span>
               </th>
-              <td className="doc-wrap">최상단 — 모달, 토스트</td>
+              <td className="doc-wrap">최상단 — 모달, 토스트. 두 겹이다</td>
             </tr>
             <tr>
               <th scope="row">
                 <span className="doc-token-name">--nui-shadow-press</span>
               </th>
-              <td className="doc-wrap">눌렸을 때 — 아래로 내려간 느낌</td>
+              <td className="doc-wrap">
+                눌림. 쓰는 컴포넌트가 없다 — 눌림은 배율로 표현한다
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
       <TokenTable group="shadow" swatch={false} />
+
+      <p>
+        떠 있는 것(Popup · Select 메뉴 · Datepicker)은{" "}
+        <code>border-floating</code> 1px 링과 두 겹 그림자를 함께 쓴다. 가까운
+        짧은 그림자가 가장자리를 붙들고 먼 부드러운 그림자가 거리를 만든다. 놓여
+        있는 것(카드 · Accordion box)은 테두리만이고 그림자가 없다. 반전
+        표면(Toast · Tooltip)은 링 없이 그림자만이고, 다크에서는 위쪽에 밝은 1px
+        이 얹힌다.
+      </p>
 
       <div className="doc-note">
         <strong>
@@ -262,7 +273,7 @@ export default function ElevationPage() {
       </div>
 
       <div className="doc-note">
-        <strong>팝업끼리는 나중에 연 것이 위다.</strong> 값을 나누지 않는다.
+        <strong>팝업끼리는 나중에 연 것이 위다.</strong> 값이 나뉘어 있지 않다.
         Alert 이 열린 BottomSheet 위에 오는 것은 이 순서의 결과다. 반대로 Alert
         위로 시트를 여는 것은 흐름 오류다.
       </div>
@@ -272,14 +283,13 @@ export default function ElevationPage() {
         열리면 배경을 격리하려고 <code>body</code> 의 직계 자식을 전부{" "}
         <code>inert</code> 처리한다. 토스트 · 툴팁 · 로딩 알림 컨테이너도{" "}
         <code>body</code> 의 직계 자식이라, 표시가 없으면{" "}
-        <strong>z 는 팝업 위인데 눌리지도 읽히지도 않는</strong> 상태가 된다.
-        우리 컨테이너에는 <code>data-nui-portal-root</code> 가 붙어 격리에서
-        빠진다.
+        <strong>z 는 팝업 위인데 눌리지도 읽히지도 않는</strong> 상태가 된다. 이
+        컨테이너에는 <code>data-nui-portal-root</code> 가 붙어 격리에서 빠진다.
       </div>
 
       <div className="doc-note">
-        <strong>겹친다고 값을 올리지 않는다.</strong> 새 값이 필요해 보이면
-        대개는 쌓임 맥락(stacking context)이 잘못 잡힌 것이다. 부모에{" "}
+        <strong>겹친다고 값을 올려도 해결되지 않는다.</strong> 새 값이 필요해
+        보이면 대개는 쌓임 맥락(stacking context)이 잘못 잡힌 것이다. 부모에{" "}
         <code>transform</code> 이나 <code>opacity</code> 가 걸려 있으면 자식의{" "}
         <code>z-index</code> 는 그 맥락 안에 갇힌다. 숫자를 키워도 소용없다.
       </div>

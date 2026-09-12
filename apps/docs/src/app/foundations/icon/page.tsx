@@ -9,14 +9,18 @@ const DATA = tokens as unknown as Record<string, Token[]>;
 
 /** 실제 컴포넌트가 어느 크기를 쓰는지 — 코드에서 확인한 현행이다. */
 const USAGE: [string, string, string][] = [
-  ["md", "14px", "Select 태그 제거(×) 버튼"],
+  ["md", "14px", "컴포넌트가 쓰는 자리 없음"],
   [
     "lg",
     "16px",
-    "Button small 의 아이콘 · Datepicker 이전/다음 · Accordion 화살표 · Message 아이콘",
+    "Button small 의 아이콘 · Datepicker 이전/다음 · Accordion 화살표 · Message 아이콘 · MultiSelect 칩의 ×",
   ],
-  ["2xl", "20px", "Button 기본 크기의 아이콘 · Switch 썸"],
-  ["3xl", "24px", "Textfield 안 아이콘 · Select 드롭다운 표시"],
+  ["2xl", "20px", "Button medium · large 의 아이콘"],
+  [
+    "3xl",
+    "24px",
+    "Textfield 안 아이콘 · Select 화살표와 지우기 · Toast 의 접두 아이콘과 닫기",
+  ],
 ];
 
 export default function IconPage() {
@@ -61,15 +65,14 @@ export default function IconPage() {
       </div>
 
       <p>
-        값이 14 · 16 · 20 · 24px 로 등간격이 아니다. 값이 불규칙해서 숫자가
-        아니라 역할 이름을 쓴다(
-        <Link href="/foundations/tokens">디자인 토큰</Link>). <code>xl</code> 은
-        쓰이지 않아서 만들지 않았다.
+        값이 14 · 16 · 20 · 24px 로 등간격이 아니다. 불규칙해서 숫자가 아니라
+        역할 이름을 쓴다(
+        <Link href="/foundations/tokens">디자인 토큰</Link>).
       </p>
       <div className="doc-note">
         <strong>점과 표시는 아이콘이 아니다.</strong> 라디오 점(8) · 체크
         표시(6×10) · 토스트 표시점(10) · 툴팁 화살표(10)는{" "}
-        <code>size-dot-xs / sm / md</code> 다. 10px 아이콘은 하나도 없었다.
+        <code>size-dot-xs / sm / md</code> 다.
       </div>
 
       <h2>어느 크기를 고르나</h2>
@@ -109,7 +112,7 @@ export default function IconPage() {
             </tr>
             <tr>
               <td className="doc-wrap">
-                <code>font-size-1</code> (12px) — 캡션 · 메시지
+                <code>font-size-1</code> (13px) — 캡션 · 메시지
               </td>
               <td>
                 <span className="doc-token-name">size-icon-lg</span> 16px
@@ -130,9 +133,18 @@ export default function IconPage() {
                 <strong>태그 제거</strong>
               </td>
               <td>
-                <span className="doc-token-name">size-icon-md</span> 14px
+                <span className="doc-token-name">size-icon-lg</span> 16px
               </td>
-              <td className="doc-wrap">MultiSelect 태그의 × 버튼</td>
+              <td className="doc-wrap">MultiSelect 칩의 × 버튼</td>
+            </tr>
+            <tr>
+              <td className="doc-wrap">
+                <strong>반전 표면 위에 홀로</strong>
+              </td>
+              <td>
+                <span className="doc-token-name">size-icon-3xl</span> 24px
+              </td>
+              <td className="doc-wrap">Toast 의 tone 아이콘</td>
             </tr>
           </tbody>
         </table>
@@ -161,6 +173,12 @@ export default function IconPage() {
           </tbody>
         </table>
       </div>
+
+      <p>
+        아이콘 스케일 밖의 값이 하나 있다. <code>Alert</code> 와{" "}
+        <code>Confirm</code> 의 tone 아이콘은 <code>size-field</code>(56px) 다.
+        면 없이 글리프만 그 자리를 차지한다.
+      </p>
 
       <h2>보이는 크기와 누를 수 있는 크기는 다르다</h2>
       <div className="doc-note doc-note--warn">
@@ -234,10 +252,10 @@ export default function IconPage() {
       <h2>아이콘 세트</h2>
       <p>
         아이콘은 <code>lucide-react</code> 다. 24px 격자에 stroke 2 인 line
-        아이콘이고, 크기에 비례해 선이 가늘어진다. 컴포넌트가 쓰는 아홉
+        아이콘이고, 크기에 비례해 선이 가늘어진다. 컴포넌트가 쓰는 열한
         개(지우기 · 닫기 · 검색 · 비밀번호 보기/숨기기 · 달력 · 주의 · 성공 ·
-        로딩)는 <Link href="/components/icon">Icon</Link> 페이지에 있고{" "}
-        <code>@nui-kit/react/icon</code> 에서 가져온다. Select 의 화살표와
+        안내 · 경고 · 로딩)는 <Link href="/components/icon">Icon</Link> 페이지에
+        있고 <code>@nui-kit/react/icon</code> 에서 가져온다. Select 의 화살표와
         지우기, Datepicker 의 이전/다음, Accordion 의 화살표도 같은{" "}
         <code>Icon</code> 을 지난다.
       </p>

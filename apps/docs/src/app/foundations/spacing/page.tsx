@@ -16,7 +16,7 @@ export default function SpacingPage() {
   );
   const sizes = DATA.size ?? [];
   const controls = sizes.filter((t) =>
-    /--nui-size-(control|field)/.test(t.name),
+    /--nui-size-(control-(sm|md|lg|xl)|field)$/.test(t.name),
   );
 
   return (
@@ -178,8 +178,10 @@ export default function SpacingPage() {
         <br />
         <br />
         자기 치수를 갖는 선택 컨트롤(Checkbox · Radio 24px, Switch 40×24)은
-        컨트롤 자체가 44px 보다 작다. 라벨을 포함한 클릭 영역이 44px 을 채우고,
-        라벨이 <code>&lt;label&gt;</code> 로 연결돼 있으면 자동으로 확보된다.
+        보이지 않는 input 이 44×44 를 누른다. 라벨을 <code>
+          &lt;label&gt;
+        </code>{" "}
+        로 연결하면 가로가 그만큼 더 넓어진다.
       </div>
 
       <h2 id="size">전체 토큰</h2>

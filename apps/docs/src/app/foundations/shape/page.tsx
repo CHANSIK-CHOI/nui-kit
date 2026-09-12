@@ -9,12 +9,23 @@ const DATA = tokens as unknown as Record<string, Token[]>;
 
 /** [역할, 토큰, 빈도, 예] */
 const STROKE: [string, string, string, string][] = [
-  ["형태선", "border-form", "한 요소에 하나", "카드 · 패널 · 팝업의 외곽"],
+  [
+    "형태선",
+    "border-form",
+    "한 요소에 하나",
+    "카드 · 패널의 외곽, Accordion box 항목",
+  ],
   [
     "의미경계선",
     "border-section",
     "한 화면에 한두 번",
     "섹션 사이, 헤더와 본문 경계",
+  ],
+  [
+    "떠 있는 것의 가장자리",
+    "border-floating",
+    "그림자와 한 벌",
+    "Popup · Select 메뉴 · Datepicker 팝업",
   ],
   ["구분선", "border-divider", "한 화면에 여러 번", "리스트 행, 아코디언 항목"],
 ];
@@ -125,8 +136,10 @@ export default function ShapePage() {
       </div>
 
       <p>
-        뒤의 둘은 반투명이다. 구분선은 어떤 배경 위에 놓일지 모른다. 불투명
-        회색은 배경에 따라 튀지만 반투명은 아래 색과 섞인다.
+        뒤의 셋은 반투명이다. 구분선은 어떤 배경 위에 놓일지 모른다. 불투명
+        회색은 배경에 따라 튀지만 반투명은 아래 색과 섞인다. 떠 있는 것의
+        가장자리는 그림자와 함께 층을 만들므로 형태선보다 연하다. 그림자는{" "}
+        <Link href="/foundations/elevation">깊이</Link> 문서에 있다.
       </p>
 
       <div className="doc-note">

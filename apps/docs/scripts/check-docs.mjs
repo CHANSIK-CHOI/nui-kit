@@ -245,6 +245,202 @@ console.log("\n■ 폭 규칙의 예외에 배지가 있나");
   console.log(`  ${n}개 페이지`);
 }
 
+console.log("\n■ 문서가 적은 토큰 · 값 · export 가 생성물과 같은가");
+// 2026-09-12 — Foundations 전수에서 여덟 페이지가 사실 오류였다. `font-size-1 (12px)` · `duration-7` ·
+// `PopupBase` 처럼 전부 grep 한 번이면 잡히는 종류였는데 사람이 읽어서 찾았다.
+// 정본은 생성물(tokens.json · hooks.json)과 컴포넌트 index.ts 다 — 손으로 적은 표를 믿지 않는다.
+// 도입 전 실측: 첫 실행 헛짚기 5 (접두만 적은 `--nui-size-icon` · CSS 속성 `z-index` ×3 · JS 가 세우는
+// `--nui-field-grid-columns`) → 셋을 좁혀 0. 합성 시험(위반 4 · 통과 3 · 함정 3) 통과. `--selftest` 로 다시 돈다.
+{
+  const tokens = JSON.parse(read(join(DOCS, "src/generated/tokens.json")));
+  const hooks = JSON.parse(read(join(DOCS, "src/generated/hooks.json")));
+  const tokenValue = new Map();
+  for (const list of Object.values(tokens))
+    for (const t of list)
+      tokenValue.set(t.name.replace(/^--nui-/, ""), t.value);
+  const known = new Set(tokenValue.keys());
+  for (const g of Object.values(hooks.groups ?? {}))
+    for (const h of g.hooks ?? g)
+      if (h?.name) known.add(String(h.name).replace(/^--nui-/, ""));
+  // 컴포넌트가 JS 로 세우는 변수(`pv("field-grid-columns")`)도 실재한다 — SCSS 훅 목록에는 없다
+  for (const p of globSync("../../packages/ui/src/components/**/*.tsx", {
+    cwd: DOCS,
+  }))
+    for (const m of read(join(DOCS, p)).matchAll(/\bpv\("([a-z0-9-]+)"\)/g))
+      known.add(m[1]);
+  // 접두만 적은 것(`startsWith("--nui-size-icon")`)은 이름이 아니다
+  const isPrefixOnly = (name) => {
+    for (const k of known) if (k.startsWith(name + "-")) return true;
+    return false;
+  };
+  // 토큰처럼 생긴 CSS 속성 이름 — `<code>z-index</code>`
+  const CSS_PROPS = new Set([
+    "z-index",
+    "text-align",
+    "text-decoration",
+    "border-color",
+    "border-width",
+    "border-radius",
+    "color-scheme",
+  ]);
+  // 토큰 이름의 첫 마디 — 이것으로 시작하는 <code> · doc-token-name 만 토큰으로 본다
+  const PREFIX =
+    /^(space|radius|font-size|line-height|letter-spacing|font-weight|font-family|size|duration|easing|shadow|focus|z|layer|surface|text|border|control|action|status|color|scale)-[a-z0-9-]+$/;
+  const pxOf = (name) => {
+    const v = tokenValue.get(name);
+    if (!v) return null;
+    const m = v.match(/^([\d.]+)(rem|px)$/);
+    if (!m) return null;
+    return m[2] === "rem"
+      ? Math.round(Number(m[1]) * 16 * 100) / 100
+      : Number(m[1]);
+  };
+  // 서브패스 → 컴포넌트 폴더. get-started 의 export 표가 이것을 본다
+  const SUBPATH_DIR = {
+    button: "Button",
+    field: "Field",
+    textfield: "Textfield",
+    textarea: "Textarea",
+    checkbox: "Checkbox",
+    radio: "Radio",
+    switch: "Switch",
+    popup: "Popup",
+    toast: "Toast",
+    tooltip: "Tooltip",
+    accordion: "Accordion",
+    select: "Select",
+    datepicker: "Datepicker",
+    icon: "Icon",
+  };
+  const exportsOf = (dir) => {
+    const src = read(
+      join(
+        DOCS,
+        "..",
+        "..",
+        "packages",
+        "ui",
+        "src",
+        "components",
+        dir,
+        "index.ts",
+      ),
+    ).replace(/export\s+type\s*\{[^}]*\}[^;]*;/g, ""); // 타입은 값이 아니다
+    const names = new Set();
+    for (const m of src.matchAll(/export\s*\{([^}]*)\}/g))
+      for (const raw of m[1].split(",")) {
+        const n = raw
+          .trim()
+          .replace(/^default as /, "")
+          .replace(/^type /, "");
+        if (n) names.add(n);
+      }
+    return names;
+  };
+
+  /** 한 파일의 위반을 돌려준다 — --selftest 가 합성 문자열로 같은 함수를 부른다 */
+  const checkText = (s, rel) => {
+    const out = [];
+    const body = s.replace(/^\s*\/\/.*$/gm, ""); // 주석은 화면이 아니다
+    // (a) --nui-… 전체 이름. 뒤가 잘린 것(동적 조립 · replace 접두)은 판정하지 않는다
+    for (const m of body.matchAll(/--nui-([a-z0-9-]+)/g)) {
+      const name = m[1];
+      if (name.startsWith("_") || name.endsWith("-") || isPrefixOnly(name))
+        continue;
+      out.push([
+        "tokens",
+        `${rel} — \`--nui-${name}\` 은 토큰에도 훅에도 없다`,
+        known.has(name),
+      ]);
+    }
+    // (b) <code>·doc-token-name·백틱 안의 토큰 이름
+    const spans = [
+      ...[...body.matchAll(/<code>([^<]+)<\/code>/g)].map((m) => m[1]),
+      ...[...body.matchAll(/doc-token-name">([^<]+)<\/span>/g)].map(
+        (m) => m[1],
+      ),
+      ...[...body.matchAll(/`([^`\n]+)`/g)].map((m) => m[1]),
+    ];
+    for (const raw of spans) {
+      const name = raw.trim().replace(/^--nui-/, "");
+      if (!PREFIX.test(name) || CSS_PROPS.has(name)) continue;
+      out.push([
+        "tokens",
+        `${rel} — \`${name}\` 은 토큰에도 훅에도 없다`,
+        known.has(name),
+      ]);
+    }
+    // (c) 토큰 옆에 적은 px — `font-size-1</code> (13px)` · `size-icon-lg</span> 16px`
+    for (const m of body.matchAll(
+      /(?:<code>|doc-token-name">)(?:--nui-)?([a-z0-9-]+)<\/(?:code|span)>\s*\(?\s*(\d+(?:\.\d+)?)px/g,
+    )) {
+      const real = pxOf(m[1]);
+      if (real === null) continue;
+      out.push([
+        "tokens",
+        `${rel} — \`${m[1]}\` 은 ${real}px 인데 ${m[2]}px 라고 적혀 있다`,
+        real === Number(m[2]),
+      ]);
+    }
+    // (d) 서브패스 export 표 — | `/button` | `Button` `IconButton` … |
+    for (const m of body.matchAll(/^\|\s*`\/([a-z-]+)`\s*\|([^|\n]*)\|/gm)) {
+      const dir = SUBPATH_DIR[m[1]];
+      if (!dir) continue;
+      const have = exportsOf(dir);
+      for (const n of [...m[2].matchAll(/`([A-Za-z][A-Za-z0-9]*)`/g)].map(
+        (x) => x[1],
+      ))
+        out.push([
+          "export 표",
+          `${rel} — \`/${m[1]}\` 에 \`${n}\` 이 없다 (index.ts)`,
+          have.has(n),
+        ]);
+    }
+    return out;
+  };
+
+  if (process.argv.includes("--selftest")) {
+    // 검출력 시험 — 위반 4 · 통과 3 · 함정 3. 0건 통과는 증거가 아니다 (scripts.md §4)
+    const cases = [
+      ["<code>duration-7</code>", 1], // 위반 — 지운 토큰
+      ["<code>font-size-1</code> (12px)", 1], // 위반 — 값이 틀렸다
+      ["| `/popup` | `PopupBase` `Alert` |", 1], // 위반 — 없는 export
+      ["var(--nui-radius-sm)", 1], // 위반 — 옛 이름
+      ["<code>font-size-1</code> (13px)", 0], // 통과
+      ['<span className="doc-token-name">size-icon-lg</span> 16px', 0], // 통과
+      ["| `/select` | `Select` `MultiSelect` |", 0], // 통과
+      ["var(--nui-font-size-${s.n})", 0], // 함정 — 동적 조립은 판정 안 함
+      ['<code>variant="text"</code>', 0], // 함정 — 토큰 모양이 아니다
+      ["<code>z-index</code> 를 직접 쓰지 않는다", 0], // 함정 — CSS 속성이지 토큰이 아니다
+    ];
+    let bad = 0;
+    for (const [text, expect] of cases) {
+      const got = checkText(text, "selftest").filter(([, , ok]) => !ok).length;
+      if (got !== expect) {
+        bad++;
+        console.log(`  ❌ selftest: ${text} → 위반 ${got} (기대 ${expect})`);
+      }
+    }
+    console.log(
+      bad ? `  selftest 실패 ${bad}건` : `  selftest 통과 ${cases.length}건`,
+    );
+    if (bad) process.exit(1);
+  }
+
+  let n = 0;
+  for (const p of [...glob("src/app/**/*.tsx"), ...glob("src/app/**/*.mdx")]) {
+    const rel = relative(APP, p);
+    for (const [rule, detail, ok] of checkText(read(p), rel)) {
+      checked++;
+      n++;
+      if (!ok) fail(rule, detail);
+    }
+  }
+  if (n === 0)
+    fail("tokens", "토큰 언급을 하나도 못 읽었다 — 정규식을 확인하라");
+  console.log(`  토큰 · 값 · export 언급 ${n}개`);
+}
+
 console.log(`\n검사 ${checked}건`);
 // 영수증 — 마지막 줄. 없으면 끝까지 안 돈 것이다. 호출자는 이 줄로 완주를 판정한다 (2026-09-11).
 const receipt = (exit) =>
