@@ -27,6 +27,15 @@
     // SEED 도 `radiomark` 의 `selected,pressed` 를 `bg.brand-solid-pressed` 로 둔다.
     #{iv("selector-accent-active")}: var(#{v("action-neutral-active")});
     #{iv("selector-accent-fg")}: var(#{v("control-accent-fg")});
+    // 선택된 채로 누를 때 칠하는 면. 보통은 위의 다음 단계 그대로지만, **채움이 없는
+    // 모양**(Checkbox `shape="ghost"`)은 알파 면으로 갈아끼운다 — 안 그러면 면 없던
+    // 자리에 진한 상자가 튀어나온다.
+    //
+    // ⚠️ 이름을 `selector-accent-active` 와 나눈 이유는 상세도다. 에러는 루트에
+    //    `.nui-is-error`(클래스 둘)로 앉는데 모양 modifier 는 하나라, 같은 변수를
+    //    쓰면 ghost 가 에러를 못 이겨 **빨간 상자**가 남는다. 자리를 나누면 겨룰 일이
+    //    없다 (styles.md §7).
+    #{iv("selector-press-fill")}: var(#{iv("selector-accent-active")});
 
     position: relative;
     display: inline-flex;
@@ -96,10 +105,13 @@
       height: 100%;
       color: var(#{iv("selector-accent-fg")});
       background-color: var(#{v("control-bg")});
-      // 세 컨트롤이 이 __control 골격을 함께 쓴다. selector-size 와 같은 이유로
-      // 두께도 하나로 묶는다 — 컴포넌트별로 쪼개면 같은 골격이 서로 다른 두께가 된다.
-      border: #{hook("selector--border-width", var(#{v("border-width-1")}))}
-        solid var(#{v("control-border")});
+      // 세 컨트롤이 이 __control 골격을 함께 쓴다. 우리에게는 한 벌이지만
+      // **소비자에게는 셋**이다 — 이 파일은 셀렉터 목록 하나로 셋을 그리므로
+      // `hook()` 을 부를 수 없고(이름이 하나가 된다), 내부 배선을 읽는다.
+      // 값은 `_checkbox.scss` · `_radio.scss` · `_switch.scss` 가 각자의 공개 훅으로
+      // 채운다 (styles.md §3 · tokens.md §1-3).
+      border: var(#{iv("selector-border-width")}) solid
+        var(#{v("control-border")});
 
       // 눌림은 배율·시간·곡선 세 축을 함께 써야 한 인터랙션이 된다 —
       // `transition` 은 한 번만 선언할 수 있으므로 `motion-press` 로 묶는다
@@ -150,8 +162,8 @@
     &:not(#{state("disabled")}):not(#{state("readonly")})
       &__input:indeterminate:active
       + &__control {
-      background-color: var(#{iv("selector-accent-active")});
-      border-color: var(#{iv("selector-accent-active")});
+      background-color: var(#{iv("selector-press-fill")});
+      border-color: var(#{iv("selector-press-fill")});
     }
 
     &#{state("error")} &__control {
@@ -166,12 +178,5 @@
     &#{state("readonly")} &__control {
       background-color: var(#{v("control-bg-readonly")});
     }
-  }
-
-  // 사각/원형 선택자는 같은 치수를 쓴다 (Switch 는 자체 치수).
-  #{cls("checkbox")},
-  #{cls("radio")} {
-    width: #{hook("selector--size", var(#{v("size-selector")}))};
-    height: #{hook("selector--size", var(#{v("size-selector")}))};
   }
 }

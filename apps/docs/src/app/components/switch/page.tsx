@@ -110,12 +110,15 @@ export default function SwitchPage() {
 
       <h2>커스터마이징</h2>
       <p>
-        트랙 너비와 높이가 열려 있다. 자기 치수를 갖는 컴포넌트라 라벨이
-        길어져도 찌그러지지 않는다. 테두리 두께는 <code>Checkbox</code> ·{" "}
-        <code>Radio</code> 와 함께 쓰는 변수다.
+        트랙 너비와 높이, 테두리 두께가 열려 있다. 자기 치수를 갖는 컴포넌트라
+        라벨이 길어져도 찌그러지지 않는다.
+      </p>
+      <p>
+        둥글기는 열지 않는다. 양끝이 반원인 트랙을 <code>50%</code> 로 바꾸면
+        40×24 가 타원이 되고, 0 으로 내리면 트랙이 체크박스처럼 읽힌다. 썸과
+        짝을 이뤄 움직여야 해서 변수 하나로는 성립하지 않는다.
       </p>
       <HookTable group="switch" />
-      <HookTable group="selector" />
 
       <h2>API</h2>
       <PropsTable of="Switch" />

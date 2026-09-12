@@ -144,11 +144,17 @@ export default function RadioPage() {
 
       <h2>커스터마이징</h2>
       <p>
-        크기와 테두리 두께를 연다. 아래 변수는 <code>Checkbox</code> ·{" "}
-        <code>Switch</code> 와 함께 쓴다. 색을 바꾸는 창구는{" "}
+        크기와 테두리 두께를 연다. <code>Checkbox</code> · <code>Switch</code>{" "}
+        는 각자의 변수를 가지므로 라디오만 손봐도 옆이 따라 움직이지 않는다.
+        색을 바꾸는 창구는{" "}
         <Link href="/design-system/color">프리셋과 className</Link> 뿐이다.
       </p>
-      <HookTable group="selector" />
+      <p>
+        둥글기는 열지 않는다. 0 으로 내리면 라디오가 네모가 되어 체크박스와
+        구분되지 않는다 — 「하나만 고른다」와 「여럿 고른다」를 가르는 것이 이
+        모양이다.
+      </p>
+      <HookTable group="radio" />
 
       <h2>API</h2>
       <h3>Radio</h3>

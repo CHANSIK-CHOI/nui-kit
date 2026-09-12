@@ -1029,6 +1029,138 @@ for (const theme of inScope("/components/checkbox") ? ["light", "dark"] : []) {
   await ctx.close();
 }
 
+// ── 2-c-2) Checkbox shape="ghost" — 면이 없는 모양 (2026-09-12)
+//
+// 위 절은 **채움 위의 표시**를 잰다. ghost 에는 채움이 없으므로 표시를 **표면과 직접**
+// 재야 하고, 미선택에도 체크가 보이므로 **선택 여부 두 벌을 다** 재야 한다.
+//
+// ⚠️ 선택 여부를 색이 말하지 않는다 — brand · danger 로 칠한 체크는 미선택 회색과
+//    1.4:1 이라 색만으로는 WCAG 1.4.1 을 못 넘는다. 그래서 **획 두께가 실제로 갈리는지**를
+//    함께 본다. 색 대비만 재면 그 채널이 사라져도 통과한다.
+//
+// 검출력 시험 (2026-09-12 · scripts.md §4) — 실제 SCSS 를 한 줄씩 망가뜨려 재확인했다.
+//   · 선택 시 획을 `border-width-1` 로 되돌린다  → 「획 1 → 1」 **16건 검출**
+//   · ghost 의 면을 `control-bg-subtle` 로 남긴다 → 「면이 남아 있다」 **16건 검출**
+//   둘 다 되돌린 뒤 0건. 현재 트리에서 헛짚기 0 · 통과 48건.
+console.log(
+  "\n■ Checkbox shape=ghost — 선택여부 × tone × 상태 (라이트 · 다크)",
+);
+
+/** [라벨, 상태 클래스, input 속성] — 위 절과 달리 읽기 전용도 잰다(ghost 는 표시색이 바뀐다) */
+const GHOST_STATES = [
+  ["기본", "", ""],
+  ["에러", "nui-is-error", ""],
+  ["비활성", "nui-is-disabled", "disabled"],
+  ["읽기전용", "nui-is-readonly", ""],
+];
+
+let ghostChecks = 0;
+
+const GHOST_PROBE = ({ tones, states }) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 1;
+  const cx = canvas.getContext("2d", { willReadFrequently: true });
+  const flatten = (layers) => {
+    cx.clearRect(0, 0, 1, 1);
+    cx.fillStyle = "#fff";
+    cx.fillRect(0, 0, 1, 1);
+    for (const layer of layers) {
+      if (!layer || /rgba\(0, 0, 0, 0\)|transparent/.test(layer)) continue;
+      cx.fillStyle = layer;
+      cx.fillRect(0, 0, 1, 1);
+    }
+    const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
+    return [r, g, b];
+  };
+
+  let cur = document.querySelector(".nui-checkbox")?.parentElement;
+  let surface = "rgb(255, 255, 255)";
+  while (cur) {
+    const value = getComputedStyle(cur).backgroundColor;
+    if (value && !/rgba\(0, 0, 0, 0\)|transparent/.test(value)) {
+      surface = value;
+      break;
+    }
+    cur = cur.parentElement;
+  }
+
+  const host = document.createElement("div");
+  host.style.cssText = `position:fixed;left:24px;top:24px;z-index:99999;padding:8px;background:${surface}`;
+  document.body.appendChild(host);
+
+  const rows = [];
+  for (const [tone, toneMod] of tones) {
+    for (const [state, stateClass, inputAttr] of states) {
+      for (const checked of [false, true]) {
+        host.innerHTML =
+          `<span class="nui-checkbox nui-checkbox--ghost${toneMod ? " nui-checkbox" + toneMod : ""}${stateClass ? " " + stateClass : ""}">` +
+          `<input type="checkbox" class="nui-checkbox__input" ${checked ? "checked" : ""} ${inputAttr}>` +
+          `<span class="nui-checkbox__control"><span class="nui-checkbox__indicator"></span></span>` +
+          `</span>`;
+        const control = host.querySelector(".nui-checkbox__control");
+        const mark = host.querySelector(".nui-checkbox__indicator");
+        const markStyle = getComputedStyle(mark);
+        const face = getComputedStyle(control).backgroundColor;
+        rows.push({
+          tone,
+          state,
+          checked,
+          surface: flatten([surface]),
+          // 면을 함께 깔아 「정말로 투명한가」가 수치에 드러나게 한다
+          mark: flatten([surface, face, markStyle.borderRightColor]),
+          face,
+          stroke: parseFloat(markStyle.borderRightWidth),
+        });
+      }
+    }
+  }
+  host.remove();
+  return rows;
+};
+
+for (const theme of inScope("/components/checkbox") ? ["light", "dark"] : []) {
+  const ctx = await browser.newContext({
+    viewport: VIEWPORT,
+    colorScheme: theme,
+  });
+  const page = await ctx.newPage();
+  await page.goto(BASE + "/components/checkbox", { waitUntil: "networkidle" });
+  const rows = await page.evaluate(GHOST_PROBE, {
+    tones: SELECTION_TONES,
+    states: GHOST_STATES,
+  });
+  if (rows.length === 0) {
+    bad(`ghost(${theme}): 잰 것이 하나도 없다 — 셀렉터가 늙었다`);
+  }
+  const strokes = new Map();
+  for (const { tone, state, checked, surface, mark, face, stroke } of rows) {
+    const where = `${theme} ghost/${tone} ${state} ${checked ? "선택" : "미선택"}`;
+    // 표시는 도형이다 — 비텍스트 3:1. 비활성은 하한 2.0
+    const markMin = state === "비활성" ? 2 : 3;
+    const m = ratio(mark, surface);
+    const line = `${where} 표시 ${m.toFixed(2)}:1`;
+    m >= markMin ? ok(line) : bad(`${line} — 기준 ${markMin}:1 미달`);
+    ghostChecks += 1;
+    // ghost 는 지속적인 면을 갖지 않는다 — hover · 눌림에만 나타난다
+    if (!/rgba\(0, 0, 0, 0\)|transparent/.test(face)) {
+      bad(`${where} — 면이 남아 있다(${face}). ghost 는 상자를 그리지 않는다`);
+    }
+    strokes.set(`${tone}/${state}/${checked}`, stroke);
+  }
+  for (const [tone] of SELECTION_TONES) {
+    for (const [state] of GHOST_STATES) {
+      const off = strokes.get(`${tone}/${state}/false`);
+      const on = strokes.get(`${tone}/${state}/true`);
+      const line = `${theme} ghost/${tone} ${state} 획 ${off} → ${on}`;
+      on > off
+        ? ok(line)
+        : bad(`${line} — 선택 여부를 색 말고 말하는 것이 없다 (WCAG 1.4.1)`);
+      ghostChecks += 1;
+    }
+  }
+  await ctx.close();
+}
+
 // ── 2-d) placeholder — placeholder 도 글자다 (06 D14)
 //
 // `::placeholder` 는 의사요소라 요소 순회로는 안 잡힌다. 그래서 검사 밖에 있었다.
@@ -1256,6 +1388,12 @@ const TOUCH_TARGETS = [
   ],
   // 선택 컨트롤은 투명 input 을 44 로 키워 누르는 범위를 확보한다 (KRDS D2)
   ["Checkbox", "/components/checkbox", ".nui-checkbox__input"],
+  // ghost 는 상자가 없지만 누르는 범위는 그대로 44 다 — 투명 input 이 히트를 소유한다
+  [
+    "Checkbox ghost",
+    "/components/checkbox",
+    ".nui-checkbox--ghost .nui-checkbox__input",
+  ],
   [
     "Radio",
     "/components/radio",
@@ -1418,7 +1556,7 @@ await browser.close();
 
 // 영수증 — 마지막 줄. 없으면 끝까지 안 돈 것이다 (tail 로 잘라 읽다가 대비 절을 놓친 적이 있다 · 2026-09-10).
 const receipt = (exit) =>
-  `RECEIPT check-a11y scope=${SCOPE ? [...SCOPE].join(",") : "all"} contrast=${CONTRAST_TARGETS.filter((t) => inScope(t[1])).length}×2 touch=${TOUCH_TARGETS.filter((t) => inScope(t[1])).length} failures=${failures.length} warnings=${warnings.length} exit=${exit}`;
+  `RECEIPT check-a11y scope=${SCOPE ? [...SCOPE].join(",") : "all"} contrast=${CONTRAST_TARGETS.filter((t) => inScope(t[1])).length}×2 ghost=${ghostChecks} touch=${TOUCH_TARGETS.filter((t) => inScope(t[1])).length} failures=${failures.length} warnings=${warnings.length} exit=${exit}`;
 
 if (warnings.length > 0) {
   console.warn(`\n⚠️  경고 ${warnings.length}건 — 실패는 아니다`);

@@ -156,7 +156,13 @@ import "../nui-theme.css";
 | Field | `-gap` · `-grid-gap` · `-row-label-width` |
 | Toast | `-width` · `-radius` |
 | Tooltip | `-max-width` · `-radius` |
-| Checkbox · Radio · Switch | `--nui-selector--size` · `--nui-selector--border-width` · `--nui-switch--width` `--nui-switch--height` |
+| Checkbox | `--nui-checkbox--size` · `--nui-checkbox--square-radius` · `--nui-checkbox--border-width` |
+| Radio | `--nui-radio--size` · `--nui-radio--border-width` |
+| Switch | `--nui-switch--width` `--nui-switch--height` · `--nui-switch--border-width` (**2px 까지**) |
+
+`--nui-switch--border-width` 에는 상한이 있습니다. 썸과 트랙 사이 여백이 2px 뿐이라
+3px 이상을 주면 썸이 한쪽으로 밀립니다. 더 두꺼운 테두리가 필요하면
+`--nui-switch--height` 를 함께 키우세요.
 
 크기 옵션이 있는 것은 옵션별로 이름이 나뉩니다. `--nui-button--medium-height` 하나만 두면
 `:root` 에 값을 넣는 순간 large·medium·small 이 전부 같은 높이가 되어 크기 variant 가
@@ -177,7 +183,7 @@ import "../nui-theme.css";
 | 컴포넌트 | 서브패스 | 온디맨드 CSS |
 | --- | --- | --- |
 | `Button` · `IconButton` · `ButtonGroup`(`.Item`) · `ButtonLink` | `/button` | `button.css` |
-| `Field`(`.Item` `.Grid` `.Label` `.Description` `.Message`) | `/field` | `field.css` |
+| `Field`(`.Item` `.Grid` `.Header` `.Label` `.Message`) | `/field` | `field.css` |
 | `Textfield` · `Search` · `Password` · `Message` | `/textfield` | `textfield.css` |
 | `Textarea` | `/textarea` | `textarea.css` |
 | `Checkbox` · `CheckboxGroup` | `/checkbox` | `checkbox.css` |
@@ -186,7 +192,7 @@ import "../nui-theme.css";
 | `Select` · `MultiSelect` | `/select` | `select.css` |
 | `Datepicker` · `DateRangePicker` · `DateMultiplePicker` | `/datepicker` | `datepicker.css` |
 | `Accordion`(`.Item` `.Head` `.Button` `.Panel`) | `/accordion` | `accordion.css` |
-| `PopupBase` · `Alert` · `Confirm` · `LayerPopup` · `BottomSheet` · `FullPopup` · `PopupHost` | `/popup` | `popup.css` |
+| `Alert` · `Confirm` · `LayerPopup` · `BottomSheet` · `FullPopup` · `PopupHost` | `/popup` | `popup.css` |
 | `Toast` · `ToastHost` | `/toast` | `toast.css` |
 | `Tooltip` | `/tooltip` | `tooltip.css` |
 | `Icon` | `/icon` | `icon.css` |
@@ -356,6 +362,33 @@ import { RHFTextfield } from "@nui-kit/react/rhf";
   onChange={toggleAll}
 />
 ```
+
+### 체크박스의 두 가지 모양
+
+`shape` 이 상자를 그릴지 체크만 둘지 정합니다. 기본은 `square` 입니다.
+
+```tsx
+<Checkbox checked={agreed} onChange={toggle} />                  // square — 상자 안에 체크
+<Checkbox shape="ghost" checked={agreed} onChange={toggle} />    // 체크만
+```
+
+`ghost` 는 필수 선택이 아니고 항목이 셋 이하인 자리에 씁니다. 상자가 없어 외곽선
+대비 요건(3:1)을 만족하지 못하므로, 공공 서비스처럼 KRDS 준수가 요구되는 화면에서는
+`square` 를 씁니다. 상자가 없으니 「일부」를 그릴 자리도 없어 `ghost` 에는
+`indeterminate` 를 줄 수 없습니다 — 타입이 막습니다.
+
+⚠️ **`CheckboxProps` 를 감쌀 때는 `Omit` 이 아니라 `DistributiveOmit` 을 씁니다.**
+`shape` 으로 갈리는 유니온이라 평범한 `Omit` 은 갈래를 접습니다. 접히면 감싼 타입을 다시
+`<Checkbox>` 에 넘길 수 없고, 막아 둔 `ghost` + `indeterminate` 조합이 통과합니다.
+
+```tsx
+import type { CheckboxProps, DistributiveOmit } from "@nui-kit/react";
+
+type MyCheckboxProps = DistributiveOmit<CheckboxProps, "className">;   // ✅
+// type MyCheckboxProps = Omit<CheckboxProps, "className">;            // ❌ 갈래가 접힌다
+```
+
+갈래가 없는 다른 컴포넌트의 props 에는 `Omit` 과 결과가 같으므로 아무 데나 써도 됩니다.
 
 ### 여러 줄 입력의 글자 수
 

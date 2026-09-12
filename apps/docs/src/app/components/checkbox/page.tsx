@@ -73,6 +73,64 @@ export default function CheckboxPage() {
         </Case>
       </CaseGrid>
 
+      <h2>모양 — shape</h2>
+      <p>
+        상자를 그릴지, 체크만 둘지 정한다. 기본은 <code>square</code> 다.{" "}
+        <code>ghost</code> 는 필수 선택이 아니고 항목이 셋 이하인 자리에 쓴다.
+      </p>
+      <CaseGrid
+        columns={4}
+        caption="ghost 는 미선택에도 체크가 보인다. 상자가 없는데 표시까지 사라지면 누를 것이 있다는 사실이 화면에서 사라진다"
+        code={`<Checkbox shape="ghost" checked={agreed} onChange={toggle} />`}
+      >
+        <Case label="square" note="기본">
+          <Checkbox />
+        </Case>
+        <Case label="square + checked">
+          <Checkbox defaultChecked />
+        </Case>
+        <Case label="ghost" note="연한 체크">
+          <Checkbox shape="ghost" />
+        </Case>
+        <Case label="ghost + checked" note="획이 굵어지고 커진다">
+          <Checkbox shape="ghost" defaultChecked />
+        </Case>
+      </CaseGrid>
+
+      <div className="doc-note doc-note--warn">
+        <code>ghost</code> 에는 외곽선이 없어 KRDS 의 체크박스 외곽선 대비
+        요건(3:1)을 만족하지 못한다. 공공 서비스처럼 KRDS 준수가 요구되는
+        화면에서는 <code>square</code> 를 쓴다. 상자가 없으니 「일부」를 그릴
+        자리도 없어 <code>ghost</code> 에는 <code>indeterminate</code> 를 줄 수
+        없다 — 타입이 막는다.
+      </div>
+
+      <h3>ghost 의 상태</h3>
+      <p>
+        면도 테두리도 그리지 않는다. 에러 · 비활성 · 읽기 전용은 전부 체크 색이
+        말하고, 면은 마우스를 올리거나 누르는 동안에만 나타난다.
+      </p>
+      <ChoiceStateCases
+        columns={4}
+        caption="선택 여부는 색이 아니라 획 두께와 크기가 말한다"
+        code={`<Checkbox shape="ghost" checked={v} onChange={onChange} isError={hasError} />`}
+        render={(p) => <Checkbox shape="ghost" {...p} />}
+      />
+
+      <DesignNote title="ghost 에서 선택 여부를 색으로만 말하지 않는 이유">
+        <p>
+          칠해진 체크와 미선택 회색은 밝기가 거의 같다. 라이트에서{" "}
+          <code>brand</code> 는 1.38:1, <code>danger</code> 는 1.36:1 이다.
+          밝기가 아니라 색상만 다른 쌍이라 색각 이상이 있거나 고대비 모드를 쓰면
+          상태가 사라진다.
+        </p>
+        <p>
+          <code>square</code> 에서는 체크의 <strong>유무</strong>가 상태를
+          말하지만 ghost 는 체크가 늘 있어 그 채널이 없다. 그래서 획 두께(1 →
+          2)와 크기가 상태를 말하고 색은 보조 채널이다.
+        </p>
+      </DesignNote>
+
       <h2>강조 — tone</h2>
       <p>
         기본 채움은 검정에 가까운 중립색이다. 약관 동의처럼{" "}
@@ -81,7 +139,7 @@ export default function CheckboxPage() {
       </p>
       <CaseGrid
         columns={4}
-        caption="tone 은 checked · indeterminate 의 채움만 바꾼다. 에러 · 비활성은 tone 과 무관하게 그려진다"
+        caption="tone 은 선택됐을 때만 나타난다 — square 는 채움을, ghost 는 체크 색을 바꾼다. 에러 · 비활성은 tone 과 무관하게 그려진다"
         code={`<Checkbox tone="brand" checked={agreed} onChange={toggle} />`}
       >
         <Case label="neutral" note="기본">
@@ -95,6 +153,9 @@ export default function CheckboxPage() {
         </Case>
         <Case label="brand + isError" note="빨강 — tone 무관">
           <Checkbox tone="brand" defaultChecked isError />
+        </Case>
+        <Case label="ghost + brand" note="체크 색이 바뀐다">
+          <Checkbox shape="ghost" tone="brand" defaultChecked />
         </Case>
       </CaseGrid>
 
@@ -145,11 +206,19 @@ export default function CheckboxPage() {
 
       <h2>커스터마이징</h2>
       <p>
-        크기와 테두리 두께가 열려 있다. 아래 변수는 <code>Radio</code> ·{" "}
-        <code>Switch</code> 와 함께 쓴다. 색이 바뀌는 창구는{" "}
+        크기 · 둥글기 · 테두리 두께가 열려 있다. <code>Radio</code> ·{" "}
+        <code>Switch</code> 는 각자의 변수를 가지므로 체크박스만 손봐도 옆이
+        따라 움직이지 않는다. 색이 바뀌는 창구는{" "}
         <Link href="/design-system/color">프리셋과 className</Link> 둘뿐이다.
       </p>
-      <HookTable group="selector" />
+      <p>
+        둥글기는 <code>square</code> 의 상자에 걸린다. 24×24 정사각이라{" "}
+        <code>50%</code> 를 주면 타원이 아니라 <strong>원</strong>이 된다.
+      </p>
+      <pre className="doc-code">
+        <code>{`:root { --nui-checkbox--square-radius: 50%; }   /* 동그란 체크박스 */`}</code>
+      </pre>
+      <HookTable group="checkbox" />
 
       <h2>API</h2>
       <h3>Checkbox</h3>

@@ -42,12 +42,13 @@ const LABEL = {
   accordion: "Accordion",
   button: "Button · ButtonLink",
   "button-group": "ButtonGroup",
+  checkbox: "Checkbox",
   datepicker: "Datepicker 계열",
   field: "Field",
   "icon-button": "IconButton",
   popup: "Popup 계열",
+  radio: "Radio",
   select: "Select · MultiSelect",
-  selector: "Checkbox · Radio · Switch",
   switch: "Switch",
   textarea: "Textarea",
   textfield: "Textfield · Search · Password",
@@ -143,11 +144,10 @@ const byComponent = new Map();
 /** 훅 이름 → 항목. 한 훅이 여러 자리·여러 파일에 걸치면 `places` 만 는다. */
 const byName = new Map();
 
-// ⚠️ 한 훅이 **여러 파일**에 걸치는 경우가 있다. `selector--border-width` 는 셋이
-//    공유하는 골격의 두께라 `_choice-base.scss` 가 소유하는데, `_switch.scss` 도
-//    여백을 그 값에서 역산하느라 함께 읽는다. 파일별로만 걸러내면 목록에 두 번
-//    올라가고, 소비자는 스위치 전용 훅이 따로 있는 줄 안다.
-//    이제 접두어로 묶으므로 이름이 같으면 처음 만난 자리가 소유자다.
+// ⚠️ 한 훅이 **한 파일 안에서 여러 자리**에 걸치는 경우가 있다. `switch--height` 는
+//    트랙 높이이면서 썸의 이동 거리 계산에도 들어간다. 자리별로 세면 목록에 두 번
+//    올라가고, 소비자는 같은 이름의 훅이 둘 있는 줄 안다.
+//    접두어로 묶으므로 이름이 같으면 처음 만난 자리가 소유자다.
 for (const file of files.sort()) {
   const scss = readFileSync(join(COMPONENTS_DIR, file), "utf8");
 

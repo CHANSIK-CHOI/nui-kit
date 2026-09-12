@@ -399,7 +399,7 @@
   //    를 덮으면 옆의 `Button` 까지 따라 움직인다.
   //
   // ⚠️ 한 이름이 width 와 height 를 함께 먹인다. **정사각을 보장하는 자리**라
-  //    의도해서 묶은 것이다 (tokens.md §1-3 · `selector--size` 와 같은 형태).
+  //    의도해서 묶은 것이다 (tokens.md §1-3 · `checkbox--size` 와 같은 형태).
   #{cls("button")}--icon {
     min-width: auto;
     min-height: auto;

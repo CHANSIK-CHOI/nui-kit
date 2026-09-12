@@ -50,7 +50,7 @@ export function RHFCheckboxDemo() {
               <Field.Label>이용약관에 동의합니다</Field.Label>
             </Field.Item>
             <Field.Item>
-              <RHFCheckbox control={control} name="marketing" />
+              <RHFCheckbox control={control} name="marketing" shape="ghost" />
               <Field.Label>마케팅 정보 수신</Field.Label>
             </Field.Item>
           </div>

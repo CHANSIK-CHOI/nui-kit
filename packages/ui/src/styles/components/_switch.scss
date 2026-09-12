@@ -7,10 +7,17 @@
 // 공통 골격은 `_choice-base.scss` 가 담당한다.
 // Checkbox / Radio 와 달리 그룹 컴포넌트가 없어 `_choice-group.scss` 는 쓰지 않는다.
 //
-// 공개 훅: --nui-switch--width / --nui-switch--height
+// 공개 훅: --nui-switch--width / --nui-switch--height / --nui-switch--border-width
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("switch")} {
+    // base 가 읽는 배선을 자기 훅으로 채운다. 아래 여백 계산식도 **같은 배선**을
+    // 읽는다 — 훅을 두 번 부르면 목록에 두 번 올라가고, 값이 갈릴 여지가 생긴다.
+    #{iv("selector-border-width")}: #{hook(
+        "switch--border-width",
+        var(#{v("border-width-1")})
+      )};
+
     width: #{hook("switch--width", var(#{v("size-switch-track-w")}))};
     height: #{hook("switch--height", var(#{v("size-switch-track-h")}))};
 
@@ -21,15 +28,31 @@
       //    맞으려면 **썸 = 트랙 높이 − 좌우 여백 × 2 − 테두리 × 2** 가 성립해야 한다.
       //    상수 4px 이던 시절 이 등식이 깨져서 켜짐일 때 썸이 오른쪽으로 2px 밀려
       //    나갔다(왼쪽 여백 5 · 오른쪽 3). 여백을 썸에서 역산해 등식을 강제한다.
+      //
+      // ⚠️ **이 식에는 상한이 있다 — 테두리 2px 까지다.** 여백의 여유가
+      //    `(24 − 20) / 2 = 2px` 뿐이라 `--nui-switch--border-width` 가 3px 이상이면
+      //    calc 가 음수가 되고, 브라우저가 그것을 0 으로 클램프해도 **테두리는 그대로
+      //    남아** 위 등식이 깨진다(썸이 다시 밀린다). `max(0px, …)` 는 그 클램프를
+      //    눈에 보이게 적어둔 것이지 비대칭을 고치지는 못한다 — 상한은 README 훅 표에
+      //    적는다. 고치려면 썸 크기도 함께 열어야 하고, 그건 이 판의 범위가 아니다.
       padding: 0
-        calc(
-          (
-              #{hook("switch--height", var(#{v("size-switch-track-h")}))} -
-                var(#{v("size-switch-thumb")})
-            ) / 2 - #{hook("selector--border-width", var(#{v("border-width-1")}))}
+        max(
+          0px,
+          calc(
+            (
+                #{hook(
+                    "switch--height",
+                    var(#{v("size-switch-track-h")})
+                  )} - var(#{v("size-switch-thumb")})
+              ) /
+              2 - var(#{iv("selector-border-width")})
+          )
         );
       background-color: var(#{v("control-track")});
       border-color: var(#{v("control-track")});
+      // 둥글기 훅을 열지 않는다 — pill 을 `50%` 로 바꾸면 40×24 가 **타원**이 되고
+      // (tokens.md §3-2), 0 으로 내리면 트랙이 체크박스처럼 읽힌다. 썸(`radius-circle`)과
+      // 짝으로 움직여야 해서 훅 하나로는 성립하지 않는다.
       border-radius: var(#{v("radius-full")});
     }
 
