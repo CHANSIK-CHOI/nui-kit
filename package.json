@@ -29,6 +29,7 @@
     "verify:popup": "npm run verify:popup -w docs",
     "verify:feedback": "npm run verify:feedback -w docs",
     "verify:a11y": "npm run verify:a11y -w docs",
+    "verify:press": "npm run verify:press -w docs",
     "verify:docs": "npm run verify:docs -w docs"
   },
   "devDependencies": {
