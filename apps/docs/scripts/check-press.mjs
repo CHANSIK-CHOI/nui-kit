@@ -18,8 +18,9 @@
  * ⚠️ 첫 실행에서 Switch 의 첫 매치가 **보이지 않는 요소**라 스크롤 대기 30초 뒤 영수증 없이
  *    죽었다. 보이는 것만 고르고(`>> visible=true`), 한 대상이 실패해도 다음으로 간다 —
  *    어느 길로 끝나든 영수증을 찍는다(`scripts.md §1`).
- * 검출력 — `--selftest` 가 기대값을 일부러 틀리게 두어(배율 0.5 · square 면 없음) 둘 다
- * 잡히는지 본다. 첫 실행 검출 2/2.
+ * 검출력 — `--selftest` 가 기대값을 일부러 틀리게 두어(배율 0.5 · square 면 없음 · 버튼 전체가
+ * 줄어드는 자리에 `still` · root 에 면이 있는 자리에 `faceFrom: root` + `face: none`) 넷 다
+ * 잡히는지 본다. 첫 실행 검출 2/2 (대상 8) · Accordion 을 더한 2026-09-13 부터 4/4 (대상 10).
  *
  * 사용:
  *   node scripts/check-press.mjs                 전체
@@ -60,6 +61,9 @@ try {
  * read       transform 을 읽는 요소. 없으면 root 자신
  * scale      기대 배율
  * face       "none" 누르는 동안 면이 없어야 한다 · "yes" 있어야 한다 · "any" 안 본다
+ * faceFrom   면을 읽는 요소 — "read"(기본) · "root". 「내용만 줄어든다」 자리는 배율은 `read` 에,
+ *            면은 `root` 에 있다 (Accordion 모드 A · design-system.md §2-3-1)
+ * still      true 면 root 의 transform 이 **없어야** 한다 — 면이 제자리인지 (Accordion 모드 A)
  *
  * 아직 안 재는 것 — Popup 닫기(0.96) · Toast 닫기(0.94) · Select 지우기(0.94). 셋 다 열어야
  * 보이는 자리라 opener 가 필요하다. 다음 판에서 더한다 — 여기 적어 두는 것은 「통과」가 그 셋을
@@ -130,12 +134,44 @@ const TARGETS = [
     scale: 0.98,
     face: "any",
   },
+  // Accordion (2026-09-13 · spec Accordion.md §9 「눌림 자리」) — 모드 A 는 내용만, 모드 B 는 버튼 전체
+  {
+    label: "Accordion 헤더 (모드 A · 내용만)",
+    page: "/components/accordion",
+    root: ".nui-accordion__button:not(.nui-accordion__button--icon):not([disabled])",
+    read: ".nui-accordion__head",
+    scale: 0.98,
+    face: "yes",
+    faceFrom: "root",
+    still: true,
+  },
+  {
+    label: "Accordion 화살표 (모드 B · 버튼 전체)",
+    page: "/components/accordion",
+    root: ".nui-accordion__button--icon:not([disabled])",
+    read: null,
+    scale: 0.96,
+    face: "yes",
+  },
 ];
 
 /* 검출력 시험 — 기대값을 일부러 틀리게 둔다. 둘 다 잡혀야 한다 */
 const SELFTEST_TARGETS = [
   { ...TARGETS[0], label: "[selftest] ghost 배율 0.5 기대", scale: 0.5 },
   { ...TARGETS[3], label: "[selftest] square 면 없음 기대", face: "none" },
+  // 모드 B 화살표는 버튼 전체가 줄어든다 — `still` 을 걸면 잡혀야 한다
+  {
+    ...TARGETS[TARGETS.length - 1],
+    label: "[selftest] 화살표에 still 기대",
+    still: true,
+  },
+  // 모드 A 의 면은 root(`__button`)에 있다 — `faceFrom: root` 로 읽으면 「면 없음」 기대가 잡혀야 한다.
+  // read(`__head`)에서 읽으면 투명이라 조용히 통과한다 — 그 구멍을 이 사례가 본다
+  {
+    ...TARGETS[TARGETS.length - 2],
+    label: "[selftest] 헤더 면 none 기대 (faceFrom root)",
+    face: "none",
+  },
 ];
 
 const TRANSPARENT = /rgba\(0, 0, 0, 0\)|transparent/;
@@ -165,17 +201,25 @@ async function pressAndRead(t) {
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
     await page.waitForTimeout(220);
-    const r = await root.evaluate((el, readSel) => {
-      const target = readSel ? el.querySelector(readSel) : el;
-      const cs = getComputedStyle(target);
-      const m = cs.transform.match(/matrix\(([-\d.]+),/);
-      const activeEl = el.querySelector("input") ?? el;
-      return {
-        active: activeEl.matches(":active"),
-        scale: m ? Number(m[1]) : 1,
-        bg: cs.backgroundColor,
-      };
-    }, t.read);
+    const r = await root.evaluate(
+      (el, { readSel, faceFrom }) => {
+        const target = readSel ? el.querySelector(readSel) : el;
+        const scaleOf = (node) => {
+          const m =
+            getComputedStyle(node).transform.match(/matrix\(([-\d.]+),/);
+          return m ? Number(m[1]) : 1;
+        };
+        const activeEl = el.querySelector("input") ?? el;
+        return {
+          active: activeEl.matches(":active"),
+          scale: scaleOf(target),
+          rootScale: scaleOf(el),
+          bg: getComputedStyle(faceFrom === "root" ? el : target)
+            .backgroundColor,
+        };
+      },
+      { readSel: t.read, faceFrom: t.faceFrom ?? "read" },
+    );
     return r;
   } catch (e) {
     return { error: String(e.message ?? e).split("\n")[0] };
@@ -226,6 +270,13 @@ async function run(targets) {
     const scaleOk = Math.abs(r.scale - t.scale) < 0.005;
     const line = `${t.label} 배율 ${r.scale}`;
     scaleOk ? ok(line) : bad(`${line} — 기대 ${t.scale}`);
+    if (t.still) {
+      Math.abs(r.rootScale - 1) < 0.005
+        ? ok(`${t.label} 면은 제자리`)
+        : bad(
+            `${t.label} 면까지 줄었다 (root 배율 ${r.rootScale}) — 내용만 줄어야 한다`,
+          );
+    }
     if (t.face === "none") {
       TRANSPARENT.test(r.bg)
         ? ok(`${t.label} 면 없음`)
@@ -246,7 +297,7 @@ if (SELFTEST) {
   const before = failures.length;
   await run(SELFTEST_TARGETS);
   const detected = failures.length - before;
-  const want = 2;
+  const want = 4;
   console.log(`\n  검출 ${detected}/${want}`);
   exit = detected === want ? 0 : 1;
   failures.length = 0; // 시험에서 난 실패는 진짜가 아니다

@@ -78,7 +78,9 @@
       text-align: left;
       border-radius: inherit;
 
-      @include motion((background-color, color));
+      // 눌림은 배율·시간·곡선 세 축이 한 세트다 — `transition` 은 한 번만 선언되므로
+      // `motion-press` 로 묶는다 (design-system.md §6-3). `--icon` 도 이 요소라 물려받는다.
+      @include motion-press((background-color, color));
 
       // `overflow: hidden` 항목 안이라 바깥 offset 이 잘린다. 안쪽으로 그리는
       // 문서화된 유일한 예외다 — design-system.md §4-1. 숫자를 적지 않는다.
@@ -87,16 +89,24 @@
         outline-offset: calc(-1 * var(#{v("focus-width")}));
       }
 
+      // 모드 A — hover · active 면의 소유자는 버튼 자신이다 (2026-09-13 · spec §9 「눌림 자리」).
+      // `__head` 에 두면 눌림 배율이 면까지 줄여 카드 테두리와 헤더 사이에 틈이 생긴다.
+      // `:not(--icon)` 을 빼면 모드 B 에서 화살표 버튼 뒤에 헤더 폭 면이 깔린다.
       @include hoverable {
-        &:not(#{cls("accordion")}__button--icon):not(:disabled):hover
-          #{cls("accordion")}__head {
+        &:not(#{cls("accordion")}__button--icon):not(:disabled):hover {
           background-color: var(#{v("control-bg-hover")});
         }
       }
 
+      &:not(#{cls("accordion")}__button--icon):not(:disabled):active {
+        background-color: var(#{v("control-bg-active")});
+      }
+
+      // 줄어드는 것은 내용(`__head`)뿐이다 — 헤더가 카드 테두리에 딱 붙어 폭을 채우므로
+      // 면은 제자리에 둔다 (design-system.md §2-3-1 · SEED accordion-item `scaleScope: content`)
       &:not(#{cls("accordion")}__button--icon):not(:disabled):active
         #{cls("accordion")}__head {
-        background-color: var(#{v("control-bg-active")});
+        transform: scale(var(#{v("scale-98")}));
       }
     }
 
@@ -134,7 +144,10 @@
       width: 100%;
       padding: var(#{v("space-panel-compact")}) var(#{v("space-panel-card")});
 
-      @include motion(background-color, "3");
+      // 배경은 `__button` 이 칠한다. 여기는 눌림의 `transform` 축 하나뿐이다 —
+      // 시간·곡선은 눌림 세트(tokens.md §3-11)에서 온다
+      transition: transform var(#{v("duration-pressed")})
+        var(#{v("easing-pressed")});
     }
 
     &__title-box {
@@ -180,8 +193,12 @@
       background: var(#{v("control-bg-hover")});
     }
 
+    // 모드 B — 자기 경계가 있는 개별 버튼이라 버튼 전체가 줄어든다 (design-system.md §2-3-1).
+    // 36px 짜리 중간 요소라 `scale-96` (tokens.md §3-10). 히트 영역(::before)도 함께
+    // 줄지만 타겟 도달은 누르기 전이라 역보정하지 않는다
     &__button--icon:not(:disabled):active {
       background: var(#{v("control-bg-active")});
+      transform: scale(var(#{v("scale-96")}));
     }
 
     // lucide ChevronDown. 상태·안내 아이콘 자리라 16px 이다 — design-system.md §5-2
