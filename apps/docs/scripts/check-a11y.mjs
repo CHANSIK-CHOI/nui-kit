@@ -181,6 +181,20 @@ const CONTRAST_TARGETS = [
     2.0,
   ],
   ["입력 글자", "/components/textfield", ".nui-textfield__input", 4.5],
+  // 열린 항목의 제목 — `text-brand`(brand-11) 가 `layer-default` 위에 서는 유일한 자리 (2026-09-13).
+  // 데모의 첫 아코디언이 defaultActiveIndices={[0]} 이라 열려 있다
+  [
+    "Accordion 열린 제목",
+    "/components/accordion",
+    ".nui-accordion__item.nui-is-active .nui-accordion__button:not(.nui-accordion__button--icon) .nui-accordion__title",
+    4.5,
+  ],
+  [
+    "Accordion 닫힌 제목",
+    "/components/accordion",
+    ".nui-accordion__item:not(.nui-is-active) .nui-accordion__button:not(.nui-accordion__button--icon) .nui-accordion__title",
+    4.5,
+  ],
   ["에러 메시지", "/components/textfield", ".nui-message__msg--error", 4.5],
   // 도움말은 Footer 의 Message 다 — Field.Description 은 없다 (2026-09-11)
   [

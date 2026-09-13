@@ -89,6 +89,9 @@ const OPTION_LABEL = {
   square: { label: "square (기본)", kind: "모양" },
   round: { label: "round", kind: "모양" },
   text: { label: "text", kind: "변형" },
+  // Accordion (2026-09-13)
+  box: { label: "box (기본)", kind: "변형" },
+  separated: { label: "separated", kind: "변형" },
   row: { label: "row", kind: "방향" },
   // Popup 이행 대기
   lg: { label: "large", kind: "크기" },

@@ -44,13 +44,15 @@ const AXES: [AccordionType, AccordionVariant][] = [
   ["single", "box"],
   ["multiple", "line"],
   ["single", "line"],
+  ["multiple", "separated"],
+  ["single", "separated"],
 ];
 
 export function AccordionAxesDemo() {
   return (
     <CaseGrid
       columns={2}
-      caption="type × variant. 둘 다 처음 두 항목을 열어 두었다"
+      caption="type × variant. 전부 처음 두 항목을 열어 두었다"
       code={`<Accordion type="single" variant="line" defaultActiveIndices={[0]}>…</Accordion>`}
     >
       {AXES.map(([type, variant]) => (

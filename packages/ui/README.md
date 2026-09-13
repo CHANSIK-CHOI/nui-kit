@@ -152,7 +152,7 @@ import "../nui-theme.css";
 | Popup | `-lg-width` `-md-width` `-sm-width` · `-radius` · `-border-width` |
 | Textarea | `-min-height` · `-radius` · `-border-width` |
 | Datepicker | `-dropdown-radius` · `-day-size` `-day-button-size` `-day-radius` · `-border-width` |
-| Accordion | `-gap` · `-radius` · `-border-width` |
+| Accordion | `-box-radius` · `-separated-radius` `-separated-gap` · `-border-width` |
 | Field | `-gap` · `-grid-gap` · `-row-label-width` |
 | Toast | `-width` · `-radius` |
 | Tooltip | `-max-width` · `-radius` |

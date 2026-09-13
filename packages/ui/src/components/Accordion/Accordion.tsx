@@ -12,7 +12,11 @@ import AccordionPanel from "./AccordionPanel.js";
 const block = px("accordion");
 
 export type AccordionType = "single" | "multiple";
-export type AccordionVariant = "box" | "line";
+/**
+ * box — 목록 전체가 카드 하나 · line — 구분선만 · separated — 항목마다 카드.
+ * 열림 표시는 셋 다 같다(제목 색·굵기 + 화살표 회전).
+ */
+export type AccordionVariant = "box" | "line" | "separated";
 
 export type AccordionProps = {
   children: ReactNode;

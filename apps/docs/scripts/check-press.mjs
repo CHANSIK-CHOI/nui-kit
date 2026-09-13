@@ -145,13 +145,14 @@ const TARGETS = [
     faceFrom: "root",
     still: true,
   },
+  // 모드 B 는 면이 없다(2026-09-13) — 배율이 유일한 신호라 scale-90 · Checkbox ghost 와 같은 줄
   {
-    label: "Accordion 화살표 (모드 B · 버튼 전체)",
+    label: "Accordion 화살표 (모드 B · 버튼 전체 · 면 없음)",
     page: "/components/accordion",
     root: ".nui-accordion__button--icon:not([disabled])",
     read: null,
-    scale: 0.96,
-    face: "yes",
+    scale: 0.9,
+    face: "none",
   },
 ];
 

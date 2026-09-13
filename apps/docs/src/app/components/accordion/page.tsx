@@ -53,8 +53,10 @@ export default function AccordionPage() {
       <p>
         <code>type</code> 은 <code>multiple</code>(기본)이면 여러 개가 함께
         열리고 <code>single</code> 이면 하나를 열면 다른 것이 닫힌다.{" "}
-        <code>variant</code> 는 <code>box</code>(기본)가 항목마다 카드,{" "}
-        <code>line</code> 이 구분선이다.
+        <code>variant</code> 는 <code>box</code>(기본)가 목록 전체를 카드
+        하나로, <code>line</code> 이 구분선만으로, <code>separated</code> 가
+        항목마다 카드로 그린다. 항목마다 독립돼 보여야 하거나 항목의 중요도가
+        같으면 <code>separated</code> 를 쓴다.
       </p>
       <AccordionAxesDemo />
       <div className="doc-note">
@@ -96,8 +98,7 @@ export default function AccordionPage() {
         <p>
           헤더는 배경이 없는 버튼이라 바꿀 면이 없다. 투명도로 흐리게 하는 대신
           색으로만 표현한다. 투명도를 곱하면 그 조합에서 맞춰 둔 대비 계산이
-          무효가 된다. 눌러도 줄어들지 않는 것도 같은 무리의 규칙이다. 헤더는
-          세로로 쌓이는 칸이라 하나만 줄면 그 줄만 흔들리는 것으로 읽힌다.
+          무효가 된다.
         </p>
       </DesignNote>
 
