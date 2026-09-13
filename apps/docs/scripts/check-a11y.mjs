@@ -1141,7 +1141,8 @@ for (const theme of inScope("/components/checkbox") ? ["light", "dark"] : []) {
     const line = `${where} 표시 ${m.toFixed(2)}:1`;
     m >= markMin ? ok(line) : bad(`${line} — 기준 ${markMin}:1 미달`);
     ghostChecks += 1;
-    // ghost 는 지속적인 면을 갖지 않는다 — hover · 눌림에만 나타난다
+    // ghost 는 어떤 상태에서도 면을 갖지 않는다 — hover · 눌림에도 (2026-09-13). 이 절은 정적
+    // 상태만 재고 `:active` 는 재지 않는다. 눌림 면과 배율은 `check-press.mjs` 가 누른 채로 잰다
     if (!/rgba\(0, 0, 0, 0\)|transparent/.test(face)) {
       bad(`${where} — 면이 남아 있다(${face}). ghost 는 상자를 그리지 않는다`);
     }

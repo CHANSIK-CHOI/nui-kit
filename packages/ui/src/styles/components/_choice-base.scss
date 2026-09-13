@@ -28,8 +28,8 @@
     #{iv("selector-accent-active")}: var(#{v("action-neutral-active")});
     #{iv("selector-accent-fg")}: var(#{v("control-accent-fg")});
     // 선택된 채로 누를 때 칠하는 면. 보통은 위의 다음 단계 그대로지만, **채움이 없는
-    // 모양**(Checkbox `shape="ghost"`)은 알파 면으로 갈아끼운다 — 안 그러면 면 없던
-    // 자리에 진한 상자가 튀어나온다.
+    // 모양**(Checkbox `shape="ghost"`)은 투명으로 되돌린다 — 안 그러면 면 없던
+    // 자리에 진한 상자가 튀어나온다. ghost 의 눌림은 배율만이다.
     //
     // ⚠️ 이름을 `selector-accent-active` 와 나눈 이유는 상세도다. 에러는 루트에
     //    `.nui-is-error`(클래스 둘)로 앉는데 모양 modifier 는 하나라, 같은 변수를

@@ -12,8 +12,8 @@
 //          --nui-checkbox--border-width
 //
 // 모양(`shape`)이 둘이다 — `square`(기본, 상자 안에 체크) · `ghost`(체크만).
-// ghost 는 상자가 없으므로 면도 테두리도 그리지 않고, 지속 상태(error · disabled ·
-// readonly)를 전부 **표시색**으로 말한다. 면은 hover · 눌림의 순간 표현뿐이다.
+// ghost 는 상자가 없으므로 면도 테두리도 그리지 않는다 — hover · 눌림에도. 상태(error ·
+// disabled · readonly)는 전부 **표시색**으로, 눌림은 **배율** 하나로 말한다.
 //
 // 중간(indeterminate) 상태는 `.nui-is-*` 클래스가 아니라 네이티브 `:indeterminate`
 // 의사 클래스로 그린다 — DOM 프로퍼티가 진실이고, 사용자가 클릭해 브라우저가
@@ -134,9 +134,10 @@
     //    비활성 ghost 에 회색 상자가 돌아온다. Switch 의 readonly 사고와 같은 종류다.
     // ─────────────────────────────────────────────────────────
     &#{cls("checkbox")}--ghost {
-      // 선택돼도 면을 칠하지 않는다. 눌림 면도 알파로 되돌린다 (`_choice-base.scss`)
+      // 선택돼도, 선택된 채로 눌러도 면을 칠하지 않는다 (`_choice-base.scss` 의 두 변수).
+      // 「배경 없이 체크만」이 이 모양의 정의다 — 순간 표현도 예외가 아니다 (spec §5-2).
       #{iv("checkbox-fill")}: transparent;
-      #{iv("selector-press-fill")}: var(#{v("control-bg-active")});
+      #{iv("selector-press-fill")}: transparent;
       // 표시색은 루트에서 정한다. `checked` 는 input 에 붙어 루트로 못 올라오므로
       // 그것만 아래에서 따로 덮는다.
       #{iv("ghost-mark")}: var(#{v("control-icon")});
@@ -171,9 +172,28 @@
       color: var(#{iv("ghost-mark")});
       background-color: transparent;
       border-width: 0;
-      // hover · 눌림 면과 포커스 outline 이 이 값을 쓴다. 훅을 열지 않는다 —
+      // 둥글기가 보이는 자리는 포커스 outline 하나다. 훅을 열지 않는다 —
       // 여는 것은 non-breaking 이라 수요가 생기면 그때 더한다.
       border-radius: var(#{v("radius-1")});
+    }
+
+    // 눌림 — 면 없이 배율만. base 의 **미선택** `:active` 는 `control-bg-active` 를 리터럴로
+    // 적어 위 변수가 닿지 않으므로 여기서 되돌린다(선택·중간 눌림은 `selector-press-fill` 이
+    // 맡는다). 눌림의 세 축(design-system §6-3)에 면은 없고, motion.md §2 「피드백」의 예가
+    // 「버튼 눌림 scale」이다.
+    //
+    // ⚠️ 배율은 `scale-90` — base 의 `scale-94` 보다 한 단계 더 줄인다. 면이 없어 눌림 신호가
+    //    배율 하나뿐이라 1.44px 로는 읽히지 않았다(qa). 0.94 · 0.92 · 0.90 · 0.88 을 눌러 비교해
+    //    24px 의 10% 를 골랐다 (2026-09-13 · prototype · tokens.md §3-10).
+    //    시간·곡선은 base 의 transition 그대로다 — 세 축 중 배율만 바꾼다.
+    // 블록 클래스를 한 번 더 붙여 base(클래스 여섯)보다 한 단계 높다.
+    &#{cls("checkbox")}--ghost:not(#{state("disabled")}):not(
+        #{state("readonly")}
+      )
+      &__input:active
+      + &__control {
+      background-color: transparent;
+      transform: scale(var(#{v("scale-90")}));
     }
 
     // 선택 — 색은 채움색으로 가되 **보조 채널**이다. 상태가 있으면 위 `ghost-mark` 가
@@ -215,16 +235,7 @@
       box-shadow: none;
     }
 
-    @include hoverable {
-      // ghost 의 hover 는 「손이 닿고 있다」를 말하는 **면**이다.
-      // ⚠️ base 와 달리 error 를 제외하지 않는다. base 가 error 를 뺀 이유는 hover 가
-      //    에러 **테두리를 덮기** 때문인데, ghost 의 에러는 표시색이라 겹치지 않는다.
-      &#{cls("checkbox")}--ghost:not(#{state("disabled")}):not(
-          #{state("readonly")}
-        ):hover
-        &__control {
-        background-color: var(#{v("control-bg-hover")});
-      }
-    }
+    // hover 규칙은 없다. base 의 hover 는 `border-color` 만 건드리고 ghost 는 두께가 0 이라
+    // 보이지 않는다 — 남는 hover 신호는 커서뿐이다 (spec §5-2 · 사용자 결정 2026-09-13).
   }
 }
