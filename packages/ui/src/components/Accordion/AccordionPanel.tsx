@@ -76,11 +76,20 @@ export default function AccordionPanel({
         id={panelId}
         role="region"
         aria-labelledby={buttonId}
-        aria-hidden={!isItemOpen}
-        // ⚠️ `aria-hidden` 만으로는 부족하다. 닫힌 패널 안의 버튼·입력이 **Tab 에 그대로
-        //    잡히고**, "aria-hidden 인데 포커스 가능한 자손"은 전형적인 접근성 위반이다.
-        //    `pointer-events: none` 은 마우스만 막는다. `inert` 가 키보드까지 막는다.
-        inert={!isItemOpen}
+        // ⚠️ **감추는 수단은 `inert` 하나다. `aria-hidden` 을 겹쳐 걸지 않는다** (2026-09-14).
+        //    `inert` 가 셋을 한 번에 한다 — 접근성 트리에서 빼고(패널과 그 안의 입력 둘 다
+        //    `ignored: true` · `ignoredReasons: [inertElement]` · CDP 실측), 포커스를 막고
+        //    (`focus()` 를 불러도 안 잡힌다), 포인터를 막는다.
+        //
+        //    `aria-hidden` 은 첫째만 하고 **Tab 은 못 막는다** — 둘을 함께 걸면 `inert` 가 그
+        //    위반("aria-hidden 인데 포커스 가능한 자손")을 가려줄 뿐이다. 게다가 패널 안 입력이
+        //    포커스를 쥔 채 접히면 브라우저가 그 속성을 거부한다(`Blocked aria-hidden on an
+        //    element because its descendant retained focus`). 되돌리면 그 경고가 돌아온다.
+        //
+        // ⚠️ **열렸을 때는 속성을 아예 뺀다** — `inert={false}` 로 넘기지 않는다. peer 가
+        //    `react@^18 || ^19` 인데 **18 은 `inert="false"` 를 내보내고 브라우저는 값과 무관하게
+        //    존재만 보고 참으로 읽는다.** 열린 패널이 통째로 죽는다.
+        {...(isItemOpen ? {} : { inert: true })}
         className={cn(`${block}__panel`, className)}
         variants={panelVariants}
         transition={reducedTransition}
