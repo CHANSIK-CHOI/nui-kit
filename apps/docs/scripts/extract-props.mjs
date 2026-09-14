@@ -279,20 +279,32 @@ function docOf(symbol) {
 }
 
 /**
- * 문자열 리터럴 유니온이면 값을 **전부 펼친 문자열**을, 아니면 null 을 돌려준다.
+ * 리터럴 유니온이면 값을 **전부 펼친 문자열**을, 아니면 null 을 돌려준다.
  *
  * ⚠️ 왜 필요한가 (2026-09-09) — 표에 `ButtonShape` 라고만 찍히면 소비자는 무엇을
  *    넣을 수 있는지 모른다. 별칭 이름은 우리 사정이고 소비자가 쓰는 것은 값이다.
  *    실제로 27자리가 그랬다 — `ButtonSize` · `SelectionTone` · `TooltipPlacement` …
  *
+ * ⚠️ **숫자 리터럴도 편다** (2026-09-14). `AccordionHeadingLevel` 이 표에 이름으로만
+ *    찍혀 `2`~`6` 을 받는다는 사실이 문서에서 사라졌다. 문자열일 때와 같은 이유다 —
+ *    가르는 것은 리터럴이냐이지 무슨 리터럴이냐가 아니다.
+ *
+ *    넓히기 전후로 `props.json` 을 전량 대조했다 — **438자리 중 둘**이 바뀐다
+ *    (scripts.md §3). 하나는 위 `Accordion.headingLevel`, 다른 하나는
+ *    **`Field.Grid.columns` 가 `1 | 2 | 3 | 4` → `1 | 2 | 3 | 4 | undefined`** 다.
+ *    그 자리는 인라인으로 적혀 있어 아래 `decl.type.getText()` 경로를 타느라 혼자
+ *    `| undefined` 가 없었다 — 다른 optional 유니온(`"multiple" | "single" | undefined`)과
+ *    표기가 같아지는 방향이라 그대로 받는다.
+ *
  * ⚠️ 별칭을 무조건 풀지는 않는다. `ToastAction` 같은 객체 타입은 펼치면 표가
  *    터지고, `boolean` 은 `false | true` 가 되어 오히려 나빠진다. 그래서 **모든
- *    갈래가 문자열 리터럴일 때만** 편다.
+ *    갈래가 문자열 · 숫자 리터럴일 때만** 편다. `boolean` 의 갈래는 `BooleanLiteral`
+ *    이라 둘 다 아니어서 지금처럼 걸러진다.
  *
  * ⚠️ `undefined` 는 맨 뒤로 보낸다. checker 가 앞에 두는데, 손으로 쓴 표기
  *    (`"a" | "b" | undefined`)와 순서가 어긋나면 같은 뜻이 두 꼴로 보인다.
  */
-function expandStringUnion(type) {
+function expandLiteralUnion(type) {
   if (!type.isUnion()) return null;
 
   const literals = [];
@@ -302,8 +314,15 @@ function expandStringUnion(type) {
       hasUndefined = true;
       continue;
     }
-    if (!member.isStringLiteral()) return null;
-    literals.push(`"${member.value}"`);
+    if (member.isStringLiteral()) {
+      literals.push(`"${member.value}"`);
+      continue;
+    }
+    if (member.isNumberLiteral()) {
+      literals.push(String(member.value));
+      continue;
+    }
+    return null;
   }
   if (literals.length === 0) return null;
   return [...literals, ...(hasUndefined ? ["undefined"] : [])].join(" | ");
@@ -314,10 +333,10 @@ function expandStringUnion(type) {
  * 단 선언이 여럿이면(판별 유니온의 각 갈래 등) 한 갈래만 보여주게 되므로
  * checker 가 합성한 타입 문자열을 쓴다.
  *
- * 문자열 리터럴 유니온은 **별칭 이름 대신 값**을 보여준다 (`expandStringUnion`).
+ * 리터럴 유니온은 **별칭 이름 대신 값**을 보여준다 (`expandLiteralUnion`).
  */
 function typeTextOf(symbol, fallbackType) {
-  const expanded = expandStringUnion(fallbackType);
+  const expanded = expandLiteralUnion(fallbackType);
   if (expanded) return expanded;
 
   const decls = symbol.getDeclarations() ?? [];

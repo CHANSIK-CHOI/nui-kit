@@ -117,14 +117,15 @@
     "build:themes": "node scripts/color/build-themes.mjs",
     "dev:styles": "sass --watch --no-source-map --load-path=src/styles src/styles/entries:styles",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run verify:css && npm run verify:tokens && npm run verify:themes && publint --strict && attw --pack . --profile esm-only",
+    "verify": "npm run verify:css && npm run verify:tokens && npm run verify:themes && npm run verify:accordion-index && publint --strict && attw --pack . --profile esm-only",
     "prepublishOnly": "npm run build",
     "verify:css": "node scripts/check-css-isolation.mjs",
     "verify:tokens": "node scripts/check-token-layers.mjs",
     "verify:themes": "node scripts/color/verify-themes.mjs",
     "color:presets": "node scripts/color/build-presets.mjs",
     "color:generate": "node scripts/color/generate.mjs",
-    "color:verify": "node scripts/color/verify.mjs"
+    "color:verify": "node scripts/color/verify.mjs",
+    "verify:accordion-index": "node scripts/check-accordion-index.mjs"
   },
   "peerDependencies": {
     "lucide-react": "^1.39.0",

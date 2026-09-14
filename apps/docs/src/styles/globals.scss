@@ -128,20 +128,23 @@ body {
 }
 
 // ─── 타이포
-.doc-main h1 {
+// ⚠️ heading 도 `.nui-` 를 뺀다 (2026-09-14). `Accordion` 의 `headingLevel` 이 생기면서
+//    라이브러리가 `h2`~`h6` 를 만들기 시작했다 — 아래 `p` 와 같은 길이다. 빼기 전 실측:
+//    아코디언 항목이 `24px + 8px` 를 받아 닫힌 항목 69 → 101px 였다.
+.doc-main h1:not([class^="nui-"]) {
   font-size: var(--nui-font-size-5);
   letter-spacing: var(--nui-letter-spacing-5);
   margin: 0 0 8px;
 }
 
-.doc-main h2 {
+.doc-main h2:not([class^="nui-"]) {
   font-size: var(--nui-font-size-4);
   margin: 40px 0 12px;
   padding-top: 12px;
   border-top: 1px solid var(--doc-border);
 }
 
-.doc-main h3 {
+.doc-main h3:not([class^="nui-"]) {
   font-size: var(--nui-font-size-3);
   margin: 24px 0 8px;
 }

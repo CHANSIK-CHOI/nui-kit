@@ -39,6 +39,28 @@ function WholeHeaderItems({ count = FAQ.length }: { count?: number }) {
   ));
 }
 
+/** 헤더 전체가 버튼 · index 는 Item 에만 */
+function CompactItems({ count = FAQ.length }: { count?: number }) {
+  return FAQ.slice(0, count).map((item, index) => (
+    <Accordion.Item key={item.title} index={index}>
+      <Accordion.Button>
+        <Accordion.Head>{item.title}</Accordion.Head>
+      </Accordion.Button>
+      <Accordion.Panel>{item.body}</Accordion.Panel>
+    </Accordion.Item>
+  ));
+}
+
+/** 화살표만 버튼 · index 는 Item 에만 */
+function ArrowOnlyItems({ count = FAQ.length }: { count?: number }) {
+  return FAQ.slice(0, count).map((item, index) => (
+    <Accordion.Item key={item.title} index={index}>
+      <Accordion.Head buttonIndex={index}>{item.title}</Accordion.Head>
+      <Accordion.Panel>{item.body}</Accordion.Panel>
+    </Accordion.Item>
+  ));
+}
+
 const AXES: [AccordionType, AccordionVariant][] = [
   ["multiple", "box"],
   ["single", "box"],
@@ -108,6 +130,86 @@ export function AccordionToggleDemo() {
               <Accordion.Panel index={index}>{item.body}</Accordion.Panel>
             </Accordion.Item>
           ))}
+        </Accordion>
+      </Case>
+    </CaseGrid>
+  );
+}
+
+export function AccordionIndexDemo() {
+  return (
+    <CaseGrid
+      columns={2}
+      caption="둘의 화면과 동작이 같다"
+      code={`// Item 에만
+<Accordion.Item index={0}>
+  <Accordion.Button>
+    <Accordion.Head>제목</Accordion.Head>
+  </Accordion.Button>
+  <Accordion.Panel>본문</Accordion.Panel>
+</Accordion.Item>
+
+// 세 곳 모두 — 명시한 값이 이긴다
+<Accordion.Item index={0}>
+  <Accordion.Button index={0}>…</Accordion.Button>
+  <Accordion.Panel index={0}>본문</Accordion.Panel>
+</Accordion.Item>`}
+    >
+      <Case label="Item 에만" note="Button · Panel 은 비운다">
+        <Accordion type="single" defaultActiveIndices={[0]}>
+          <CompactItems count={2} />
+        </Accordion>
+      </Case>
+      <Case label="세 곳 모두" note="명시한 값이 이긴다">
+        <Accordion type="single" defaultActiveIndices={[0]}>
+          <WholeHeaderItems count={2} />
+        </Accordion>
+      </Case>
+    </CaseGrid>
+  );
+}
+
+export function AccordionHeadingDemo() {
+  return (
+    <CaseGrid
+      columns={2}
+      caption="첫 칸과 둘째 칸의 높이 · 제목 크기가 같다"
+      code={`<Accordion headingLevel={3}>…</Accordion>`}
+    >
+      <Case label="주지 않는다 (기본)" note="heading 요소가 없다">
+        <Accordion type="single" defaultActiveIndices={[0]}>
+          <CompactItems count={2} />
+        </Accordion>
+      </Case>
+      <Case label="headingLevel={3} · 헤더 전체" note="h3 가 버튼을 감싼다">
+        <Accordion type="single" defaultActiveIndices={[0]} headingLevel={3}>
+          <CompactItems count={2} />
+        </Accordion>
+      </Case>
+      <Case label="headingLevel={3} · 화살표만" note="제목 상자가 h3 다">
+        <Accordion type="single" defaultActiveIndices={[0]} headingLevel={3}>
+          <ArrowOnlyItems count={2} />
+        </Accordion>
+      </Case>
+      <Case
+        label="headingLevel={3} · separated"
+        note="hover 면이 항목 모서리를 따른다"
+      >
+        <Accordion
+          type="single"
+          variant="separated"
+          defaultActiveIndices={[0]}
+          headingLevel={3}
+        >
+          <CompactItems count={2} />
+        </Accordion>
+      </Case>
+      <Case label="제목이 없으면" note="heading 을 만들지 않는다">
+        <Accordion type="single" headingLevel={3}>
+          <Accordion.Item index={0}>
+            <Accordion.Head buttonIndex={0} toggleLabel="배송 안내 펼치기" />
+            <Accordion.Panel>{FAQ[0]?.body}</Accordion.Panel>
+          </Accordion.Item>
         </Accordion>
       </Case>
     </CaseGrid>

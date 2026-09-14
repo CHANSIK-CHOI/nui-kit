@@ -9,6 +9,8 @@ import {
 import {
   AccordionAxesDemo,
   AccordionToggleDemo,
+  AccordionIndexDemo,
+  AccordionHeadingDemo,
   AccordionStateDemo,
   AccordionControlDemo,
   AccordionKeepMountedDemo,
@@ -35,16 +37,16 @@ export default function AccordionPage() {
 
       <p>
         항목을 접고 펴는 목록이다. 루트 아래에 <code>Item</code> 을 두고 그 안에
-        헤더와 <code>Panel</code> 을 넣는다. 셋을 같은 <code>index</code> 로
-        잇는다.
+        헤더와 <code>Panel</code> 을 넣는다. 자리 번호는 <code>Item</code> 의{" "}
+        <code>index</code> 하나다.
       </p>
       <pre className="doc-code">
         <code>{`<Accordion type="single">
   <Accordion.Item index={0}>
-    <Accordion.Button index={0}>
+    <Accordion.Button>
       <Accordion.Head>배송은 얼마나 걸리나요?</Accordion.Head>
     </Accordion.Button>
-    <Accordion.Panel index={0}>영업일 2~3일이 걸립니다.</Accordion.Panel>
+    <Accordion.Panel>영업일 2~3일이 걸립니다.</Accordion.Panel>
   </Accordion.Item>
 </Accordion>`}</code>
       </pre>
@@ -85,6 +87,38 @@ export default function AccordionPage() {
           요소를 두는 것도 같은 이유로 화살표만 버튼일 때만 된다.
         </p>
       </DesignNote>
+
+      <h2>자리 번호</h2>
+      <p>
+        <code>Button</code> 과 <code>Panel</code> 은 감싼 <code>Item</code> 에서{" "}
+        <code>index</code> 를 받아 간다. 직접 줄 수도 있고, 그때는 준 값이
+        이긴다. <code>Item</code> 밖에 두면서 <code>index</code> 도 빼면 콘솔에
+        메시지가 뜬다.
+      </p>
+      <AccordionIndexDemo />
+      <div className="doc-note">
+        <code>Head</code> 의 <code>buttonIndex</code> 는 자리 번호가 아니라 모드
+        스위치다. 주면 화살표만 버튼이 되고, 안 주면 화살표는 장식이다.
+      </div>
+
+      <h2>제목의 heading 수준</h2>
+      <p>
+        <code>headingLevel</code> 을 주면 제목이 그 수준의 heading 안에
+        들어간다. 헤더 전체가 버튼이면 <code>h2</code>~<code>h6</code> 가 버튼을
+        감싸고, 화살표만 버튼이면 제목 상자가 그 태그가 된다. 안 주면 heading 을
+        만들지 않는다. 페이지의 제목 계층은 쓰는 쪽이 안다.
+      </p>
+      <AccordionHeadingDemo />
+      <div className="doc-note">
+        받는 값은 <code>2</code>~<code>6</code> 이다. 페이지의 <code>h1</code>{" "}
+        은 아코디언 바깥에 있다.
+      </div>
+      <div className="doc-note doc-note--warn">
+        앱이 <code>h2</code>~<code>h6</code> 에 여백을 주고 있으면 그 여백이
+        여기에도 온다. 라이브러리 스타일은 레이어 안이라 앱의 태그 규칙에 진다.
+        항목 사이가 벌어지면 그 규칙에서 <code>.nui-accordion__heading</code> 과{" "}
+        <code>.nui-accordion__title-box</code> 를 뺀다.
+      </div>
 
       <h2>상태</h2>
       <p>
@@ -131,6 +165,10 @@ export default function AccordionPage() {
         <li>
           화살표만 버튼일 때 그 버튼은 36px 로 보이고 44px 을 누른다. 헤더
           전체가 버튼일 때는 헤더가 곧 누르는 범위다
+        </li>
+        <li>
+          <code>headingLevel</code> 을 주면 제목이 heading 으로 나가
+          스크린리더의 제목 목록에 잡힌다. 한 항목에 heading 은 하나다
         </li>
         <li>
           <code>prefers-reduced-motion</code> 에서는 펼침이 움직이지 않고 바로

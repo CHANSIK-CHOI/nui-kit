@@ -140,6 +140,54 @@ else {
   await ctx.close();
 }
 
+// 1-c) Accordion 패널 — 이 라이브러리에서 **높이가 움직이는 유일한 자리**라 위 둘처럼
+//      `transform` 으로는 보이지 않는다. **높이를 두 번 읽어** 전환 중인지 본다.
+//
+//      ⚠️ `will-change` 를 보지 않는 이유 (2026-09-14). 그 값은 `useReducedMotion()` 에서
+//         나오는데 framer-motion 이 그것을 `useState` **초기값으로만** 읽고(소스 주석:
+//         "TODO See if people miss automatically updating"), SSR 은 사용자의 OS 설정을 모른다.
+//         그래서 서버가 이미 열어 보낸 패널은 hydration 직후 `height, opacity` 인 채로 남고
+//         리렌더된 뒤에야 `auto` 가 된다. 성능 힌트라 동작에는 영향이 없다 — 접근성이
+//         보장해야 하는 것은 **움직이지 않는 것**이다.
+//
+//      이 검사가 실제로 잡은 것 — `transition` 을 prop 으로 주면 variant 안의 것이 이겨
+//      **모션 감소가 통째로 무력화**된다. 실측 120ms 사이 74 → 7px (Accordion.md spec §6-3).
+if (!inScope("/components/accordion")) skipped("Accordion 패널 모션 감소");
+else {
+  const ctx = await browser.newContext({
+    reducedMotion: "reduce",
+    viewport: VIEWPORT,
+  });
+  const page = await ctx.newPage();
+  await page.goto(BASE + "/components/accordion", { waitUntil: "networkidle" });
+
+  // 열려 있는 항목을 닫는다 — 닫힘도 같은 variant 를 탄다
+  const opened = page
+    .locator(".nui-accordion__item.nui-is-active .nui-accordion__button")
+    .first();
+  if ((await opened.count()) === 0) {
+    bad("Accordion 패널: 열려 있는 항목을 찾지 못했다");
+  } else {
+    const panelHeight = () =>
+      page.evaluate(() => {
+        const el = document.querySelector(
+          ".nui-accordion__item.nui-is-active .nui-accordion__panel",
+        );
+        return el ? Math.round(el.getBoundingClientRect().height) : 0;
+      });
+    await opened.click();
+    const immediately = await panelHeight();
+    await page.waitForTimeout(120);
+    const later = await panelHeight();
+    immediately === later
+      ? ok(`Accordion 패널 — reduce 에서 높이가 즉시 정착 (${immediately}px)`)
+      : bad(
+          `Accordion 패널: reduce 인데 높이가 움직인다 (${immediately} → ${later}px)`,
+        );
+  }
+  await ctx.close();
+}
+
 // ── 2) 명도 대비 — 라이트 · 다크
 /** sRGB 상대 휘도 */
 function luminance([r, g, b]) {
