@@ -71,7 +71,12 @@ export default function ColorPage() {
       <h3 id="control">입력 컨트롤</h3>
       <p>
         입력 컨트롤 색은 <code>Textfield</code> 와 <code>Select</code>,{" "}
-        <code>Checkbox</code> 처럼 값을 받는 것들이 공유한다.
+        <code>Checkbox</code> 처럼 값을 받는 것들이 공유한다. hover·누름 면 (
+        <code>control-bg-hover</code> · <code>control-bg-active</code>)은
+        아코디언 헤더나 메뉴 항목처럼 면이 통째로 반응하는 자리도 함께 쓴다.
+        이름이 <code>-on-inverse</code> 로 끝나는 짝은 토스트 닫기처럼 반전 표면
+        위에 올라가는 자리라 얹는 방향이 반대다 — 라이트에서 흰색, 다크에서
+        검정이다.
       </p>
       <TokenTable group="control" />
 
@@ -98,8 +103,8 @@ export default function ColorPage() {
 
       <div className="doc-note">
         라이트에서 1번부터 7번까지는 어두운 글자를, 8번부터 12번까지는 밝은
-        글자를 얹도록 되어 있다. 다크에서는 스케일 전체가 뒤집혀 같은 번호가
-        반대 밝기가 된다. 그래서{" "}
+        글자를 얹는다. 다크에서는 스케일 전체가 뒤집혀 같은 번호가 반대 밝기가
+        된다. 그래서{" "}
         <strong>
           같은 번호를 쓰면 어느 테마에서든 대비가 자동으로 확보된다.
         </strong>
@@ -114,12 +119,13 @@ export default function ColorPage() {
       </p>
       <p>
         바뀌는 것은 12단계 값뿐이다. <code>action-primary</code> 같은 역할
-        이름은 그대로라 컴포넌트 CSS 는 고칠 것이 없다. 예외는 셋이다. 층(
+        이름은 그대로라 컴포넌트 CSS 는 고칠 것이 없다. 예외는 넷이다. 층(
         <code>layer-*</code>)은 &quot;위가 밝다&quot;를 지키려고 순서를 바꾸고,
         토스트·툴팁의 반전 표면(<code>layer-inverse</code>)은 라이트에서 검정,
-        다크에서 밝은 회색이라 그 위 글자(<code>text-on-inverse</code>)가 함께
-        뒤집힌다. 그림자는 다크에서 검정을 진하게 쓰고 위쪽에 밝은 1px 을
-        얹는다.
+        다크에서 밝은 회색이라 그 위 글자(<code>text-on-inverse</code>)와 얹는
+        면(
+        <code>control-bg-hover-on-inverse</code>)이 함께 뒤집힌다. 그림자는
+        다크에서 검정을 진하게 쓰고 위쪽에 밝은 1px 을 얹는다.
       </p>
       <div className="doc-note doc-note--warn">
         <strong>다크는 옵션이 아니라 두 번째 정본이다.</strong> 라이트에서
