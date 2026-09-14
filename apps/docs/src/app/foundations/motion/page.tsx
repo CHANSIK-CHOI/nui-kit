@@ -103,7 +103,7 @@ export default function MotionPage() {
 
       <h2>무엇이 얼마나</h2>
       <p>
-        UI 는 300ms 아래다. 퇴장이 등장보다 짧다. 지연을 갖는 것은 툴팁뿐이다 —
+        UI 는 300ms 아래다. 퇴장이 등장보다 짧다. 지연이 있는 것은 툴팁뿐이다 —
         열기 400ms, 닫기 100ms, 하나가 열린 뒤 300ms 안의 이웃은 지연도 모션도
         없이 즉시. 키보드와 터치로 연 툴팁은 지연이 0 이다.
       </p>
@@ -259,8 +259,9 @@ export default function MotionPage() {
             <tr>
               <th scope="row">변형량</th>
               <td className="doc-wrap">
-                <span className="doc-token-name">--nui-scale-94</span> 작은 요소
-                · <span className="doc-token-name">-96</span> 중간 ·{" "}
+                <span className="doc-token-name">--nui-scale-90</span> 면이 없는
+                요소 · <span className="doc-token-name">-94</span> 작은 요소 ·{" "}
+                <span className="doc-token-name">-96</span> 중간 ·{" "}
                 <span className="doc-token-name">-98</span> 큰 요소
               </td>
             </tr>
@@ -282,6 +283,12 @@ export default function MotionPage() {
       <p>
         큰 요소일수록 덜 줄여야 같은 정도로 눌린 느낌이 난다. 전면 버튼을 0.94
         로 줄이면 과하게 움츠러들고 작은 버튼을 0.98 로 줄이면 티가 안 난다.
+      </p>
+      <p>
+        면이 없는 요소는 한 단계 더 줄인다. 보통은 면과 배율이 함께 눌림을
+        말하는데, 배경 없이 그리는 것은 남는 신호가 배율뿐이다.{" "}
+        <code>Checkbox</code> 의 <code>shape=&quot;ghost&quot;</code> 와
+        화살표만 버튼인 <code>Accordion</code> 헤더가 그 자리다.
       </p>
       <TokenTable group="etc" only="scale-" swatch={false} />
 
