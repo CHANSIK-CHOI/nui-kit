@@ -188,10 +188,50 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 // 셀렉터가 늙었을 때 30초씩 기다리지 않는다 — 한 대상 8초 안에 답이 안 나오면 실패다
 page.setDefaultTimeout(8000);
 
+/** 누른 상태의 배율·면을 한 번 읽는다. */
+async function readPressed(root, t) {
+  return root.evaluate(
+    (el, { readSel, faceFrom }) => {
+      const target = readSel ? el.querySelector(readSel) : el;
+      const scaleOf = (node) => {
+        const m = getComputedStyle(node).transform.match(/matrix\(([-\d.]+),/);
+        return m ? Number(m[1]) : 1;
+      };
+      const activeEl = el.querySelector("input") ?? el;
+      return {
+        active: activeEl.matches(":active"),
+        scale: scaleOf(target),
+        rootScale: scaleOf(el),
+        bg: getComputedStyle(faceFrom === "root" ? el : target).backgroundColor,
+      };
+    },
+    { readSel: t.read, faceFrom: t.faceFrom ?? "read" },
+  );
+}
+
+/** 배율이 안 멈춘 채 읽힌 대상 — 영수증에 수로 남긴다 */
+let unstable = 0;
+
 /**
- * 가운데를 누른 채 220ms(duration-pressed 150 보다 넉넉히) 뒤에 읽는다. 토큰 계산으로
- * 흉내내지 않는다. 어떤 예외도 밖으로 던지지 않는다 — 한 대상이 실패해도 영수증까지 간다.
+ * 가운데를 누른 채 **배율이 멈출 때까지** 읽는다. 토큰 계산으로 흉내내지 않는다.
+ * 어떤 예외도 밖으로 던지지 않는다 — 한 대상이 실패해도 영수증까지 간다.
+ *
+ * ⚠️ **고정 대기(220ms)를 쓰지 않는다** (2026-09-14). `duration-pressed` 가 150 이라 넉넉해
+ *    보였지만, 메인 스레드가 바쁘면 전환이 제때 시작하지 못해 **도중을 잡는다.** 실제로
+ *    `verify:a11y`(3~4분) 직후와 연속 실행에서 4회 중 2회가 같은 자리에서 틀렸다 —
+ *    `Checkbox ghost 미선택 배율 0.963895 — 기대 0.9`. 0.96 은 1 → 0.9 로 가는 중간값이고,
+ *    같은 검사가 나머지 2회는 정확히 0.9 를 읽었다. **컴포넌트가 아니라 검사가 흔들렸다.**
+ *
+ *    헛짚는 검사는 사람이 무시하기 시작하고, 무시하면 진짜를 놓친다 (scripts.md §3).
+ *
+ * 첫 읽기를 `duration-pressed` 뒤로 미루는 이유 — 그 전에는 전환이 시작도 안 해 `1` 이 두 번
+ * 연속 읽히고 **멈춘 것으로 오인**된다. 그 뒤부터 같은 값이 두 번 나오면 확정하고, 끝내 안
+ * 멈추면 마지막 값으로 판정하되 `unstable` 에 센다.
  */
+const SETTLE_FIRST_MS = 170; // duration-pressed(150) + 여유
+const SETTLE_STEP_MS = 60;
+const SETTLE_TRIES = 8; // 최대 170 + 480 = 650ms
+
 async function pressAndRead(t) {
   const root = page.locator(`${t.root} >> visible=true`).first();
   try {
@@ -201,27 +241,22 @@ async function pressAndRead(t) {
     if (!box) return { missing: true };
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
-    await page.waitForTimeout(220);
-    const r = await root.evaluate(
-      (el, { readSel, faceFrom }) => {
-        const target = readSel ? el.querySelector(readSel) : el;
-        const scaleOf = (node) => {
-          const m =
-            getComputedStyle(node).transform.match(/matrix\(([-\d.]+),/);
-          return m ? Number(m[1]) : 1;
-        };
-        const activeEl = el.querySelector("input") ?? el;
-        return {
-          active: activeEl.matches(":active"),
-          scale: scaleOf(target),
-          rootScale: scaleOf(el),
-          bg: getComputedStyle(faceFrom === "root" ? el : target)
-            .backgroundColor,
-        };
-      },
-      { readSel: t.read, faceFrom: t.faceFrom ?? "read" },
+
+    await page.waitForTimeout(SETTLE_FIRST_MS);
+    let prev = await readPressed(root, t);
+    for (let i = 0; i < SETTLE_TRIES; i += 1) {
+      await page.waitForTimeout(SETTLE_STEP_MS);
+      const next = await readPressed(root, t);
+      if (next.scale === prev.scale && next.rootScale === prev.rootScale) {
+        return next;
+      }
+      prev = next;
+    }
+    unstable += 1;
+    console.log(
+      `  ⚠️  ${t.label} — ${SETTLE_FIRST_MS + SETTLE_STEP_MS * SETTLE_TRIES}ms 안에 배율이 멈추지 않았다 (마지막 ${prev.scale})`,
     );
-    return r;
+    return prev;
   } catch (e) {
     return { error: String(e.message ?? e).split("\n")[0] };
   } finally {
@@ -332,6 +367,6 @@ console.log(
     : `\n✅ 눌림 검사 통과 — ${pressed}곳을 눌렀다`,
 );
 console.log(
-  `RECEIPT check-press scope=${SCOPE ? [...SCOPE].join(",") : "all"} targets=${targetsInScope} pressed=${pressed} failures=${failures.length} exit=${exit}`,
+  `RECEIPT check-press scope=${SCOPE ? [...SCOPE].join(",") : "all"} targets=${targetsInScope} pressed=${pressed} unstable=${unstable} failures=${failures.length} exit=${exit}`,
 );
 process.exit(exit);
