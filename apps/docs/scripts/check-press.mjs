@@ -70,10 +70,16 @@ try {
  *            면은 `root` 에 있다 (Accordion 모드 A · design-system.md §2-3-1)
  * still      true 면 root 의 transform 이 **없어야** 한다 — 면이 제자리인지 (Accordion 모드 A)
  *
- * 아직 안 재는 것 — Popup 닫기(0.96) · Toast 닫기(0.94) · Select 지우기(0.94) · 달력 날짜(0.96) ·
- * 달력 이전/다음(0.94). 앞 셋은 `opener` 로 열 수 있게 됐지만 이번 판의 범위가 아니고, 뒤 둘은
- * **코드에 아직 눌림이 없다**(`HANDOFF.md §13` 의 3번 — 다음 판). 여기 적어 두는 것은 「통과」가
- * 그 다섯을 빼고 한 말임을 남기기 위해서다(`scripts.md §9`).
+ * 아직 안 재는 것 — Popup 닫기(0.96) · Toast 닫기(0.94) · Select 지우기(0.94). `opener` 로 열 수
+ * 있게 됐지만 아직 범위에 넣지 않았다. 여기 적어 두는 것은 「통과」가 그 셋을 빼고 한 말임을
+ * 남기기 위해서다(`scripts.md §9`).
+ *
+ * **잴 수 없는 것 둘** (2026-09-14 · 달력) — 이유가 다르다.
+ *  · **비활성 날짜**는 진짜 `disabled` 속성이라 **브라우저가 `:active` 를 걸지 않는다.** 면도
+ *    배율도 구조적으로 닿지 않으므로 잴 것이 없다. 여기서 재면 `active` 판정에 걸려 늘 실패한다
+ *  · **월 경계의 이전/다음**(`aria-disabled` 뿐이라 `:active` 가 걸리는 **진짜 위험한 자리**)은
+ *    `opener` 가 클릭 하나라 그 달까지 옮기지 못한다. `Datepicker.md §10` 이 「브라우저로 본다」로
+ *    넘긴다. `opener` 를 체인으로 넓히면 여기서 잡을 수 있다
  */
 const TARGETS = [
   {
@@ -194,6 +200,38 @@ const TARGETS = [
     scale: 1,
     face: "none",
   },
+  // 달력 (2026-09-14 · spec Datepicker.md §9 「눌림 자리」) — 보이는 버튼(36)이 셀(44) 안에
+  // 여백을 가져 누르는 것 전체가 줄어든다. 달력을 열어야 날짜가 존재한다
+  {
+    label: "달력 날짜 (달력을 연다 · 버튼 전체)",
+    page: "/components/datepicker",
+    opener: '.doc-case:has-text("칠 수 있다") .nui-textfield__btn--date',
+    root: ".nui-daypicker__day:not(.nui-daypicker__selected) .nui-daypicker__day-button:not(:disabled)",
+    read: null,
+    scale: 0.96,
+    face: "yes",
+  },
+  // 선택된 날짜도 눌린다 — 면은 `control-accent` 그대로고 배율만 말한다 (2026-09-14 결정).
+  // 값이 있는 Datepicker 를 열어야 `__selected` 가 존재한다
+  {
+    label: "달력 선택된 날짜 (면은 그대로 · 배율만)",
+    page: "/components/datepicker",
+    opener: '.doc-case:has-text("달력으로만 고른다") .nui-textfield__btn--date',
+    root: ".nui-daypicker__selected .nui-daypicker__day-button",
+    read: null,
+    scale: 0.96,
+    face: "yes",
+  },
+  // 32px 짜리 작은 아이콘 버튼 — 히트는 `hit-area` 로 44 지만 둘레가 비어 있다
+  {
+    label: "달력 이전 (작은 아이콘 버튼)",
+    page: "/components/datepicker",
+    opener: '.doc-case:has-text("칠 수 있다") .nui-textfield__btn--date',
+    root: '.nui-daypicker__button-previous:not([aria-disabled="true"])',
+    read: null,
+    scale: 0.94,
+    face: "yes",
+  },
 ];
 
 /**
@@ -246,6 +284,20 @@ const SELFTEST_TARGETS = [
     ...from("Select 비활성 옵션"),
     label: "[selftest] 비활성 옵션에 면 있음 기대",
     face: "yes",
+  },
+  // 달력 날짜의 배율이 죽는 것(=`motion()` 으로 되돌아가 `transform` 이 전환에서 빠지는 것)을
+  // 잡는 자리 — 「배율 없음」 기대로 뒤집는다
+  {
+    ...from("달력 날짜"),
+    label: "[selftest] 달력 날짜 배율 1 기대",
+    scale: 1,
+  },
+  // 선택된 날짜의 배율은 **면 규칙과 따로** 걸린다 — `:not(__selected)` 안으로 되돌아가면
+  // 배율이 사라진다. 「버튼만 줄고 면은 제자리」 기대로 뒤집어 그 자리를 본다
+  {
+    ...from("달력 선택된 날짜"),
+    label: "[selftest] 선택된 날짜에 still 기대",
+    still: true,
   },
 ];
 
