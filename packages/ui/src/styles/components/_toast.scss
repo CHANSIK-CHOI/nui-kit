@@ -142,15 +142,17 @@
         outline-offset: var(#{v("focus-offset")});
       }
 
-      // 표면 hover 부류 — design-system.md §2-3. 반전 표면이라 흰 알파를 얹는다.
+      // 표면 hover 부류 — design-system.md §2-3. 반전 표면이라 `control-bg-hover`(라이트 검정 알파)가
+      // `#000` 위에서 사라지고 다크의 흰 알파는 밝은 표면에서 사라진다 — 반전 짝을 쓴다
+      // (tokens.md §4-1-2 · 2026-09-14. 예전 주석은 「흰 알파를 얹는다」였지만 코드는 라이트에서도 검정이었다).
       @include hoverable {
         &:hover {
-          background-color: var(#{v("control-bg-hover")});
+          background-color: var(#{v("control-bg-hover-on-inverse")});
         }
       }
 
       &:active {
-        background-color: var(#{v("control-bg-active")});
+        background-color: var(#{v("control-bg-active-on-inverse")});
         transform: scale(var(#{v("scale-94")}));
       }
     }

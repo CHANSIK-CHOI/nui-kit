@@ -424,6 +424,26 @@ const TOKEN_PAIRS = [
   ["토스트 success 아이콘", "text-success-on-inverse", "layer-inverse", 3],
   ["토스트 error 아이콘", "text-danger-on-inverse", "layer-inverse", 3],
   ["토스트 액션 라벨", "text-brand-on-inverse", "layer-inverse", 4.5],
+  // 반전 표면 위의 hover·active **면** — 알파 토큰이라 표면을 먼저 칠하고 그 위에 얹어 읽는다("over").
+  // 그냥 읽으면 rgba 의 rgb 만 남아 흰 7.8% 가 흰색(21:1)으로 **통과해 버린다** — 헛통과다.
+  // 하한 1.1 은 AA 가 아니라 「보임」 — 라이트 투명 요소의 hover(a3)가 흰 위 1.15 다. 예전 값
+  // (`control-bg-hover` 검정 알파를 `#000` 위에)은 ≈1.00 이라 두 테마 모두 안 보였다 (2026-09-14)
+  [
+    "토스트 닫기 hover 면 (보임 하한)",
+    "control-bg-hover-on-inverse",
+    "layer-inverse",
+    1.1,
+    "over",
+  ],
+  [
+    "토스트 닫기 active 면 (보임 하한)",
+    "control-bg-active-on-inverse",
+    "layer-inverse",
+    1.1,
+    "over",
+  ],
+  // 검출력 시험(2026-09-14) — 옛 값(`control-bg-hover` 를 반전 표면에 "over")을 넣으면 1.01 · 1.00 으로
+  // 실패했다. 합성 없이 읽으면 같은 쌍이 21:1 로 통과한다 — "over" 를 빼면 검사가 눈을 감는다.
   // 비활성 선도 배경에 녹으면 "없음"으로 읽힌다 — 하한 2.0 (design-system.md §2)
   [
     "비활성 입력 테두리 (하한)",
@@ -506,17 +526,23 @@ for (const theme of inScope("/components/button") ? ["light", "dark"] : []) {
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 1;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    const read = (token) => {
-      probe.style.backgroundColor = `var(--nui-${token})`;
+    // `under` 를 주면 그 토큰을 먼저 칠하고 위에 얹는다 — 알파 면(hover·active)은 표면과 합성해야 값이 나온다
+    const read = (token, under) => {
       ctx.clearRect(0, 0, 1, 1);
+      if (under) {
+        probe.style.backgroundColor = `var(--nui-${under})`;
+        ctx.fillStyle = getComputedStyle(probe).backgroundColor;
+        ctx.fillRect(0, 0, 1, 1);
+      }
+      probe.style.backgroundColor = `var(--nui-${token})`;
       ctx.fillStyle = getComputedStyle(probe).backgroundColor;
       ctx.fillRect(0, 0, 1, 1);
       const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
       return a === 0 ? "" : `rgb(${r}, ${g}, ${b})`;
     };
-    const out = pairs.map(([label, fg, bg, min]) => [
+    const out = pairs.map(([label, fg, bg, min, mode]) => [
       label,
-      read(fg),
+      read(fg, mode === "over" ? bg : undefined),
       read(bg),
       min,
     ]);
