@@ -248,6 +248,66 @@ const DEPRECATED_SCALE = {
   motion: { quick: "2", fast: "3", base: "4", slow: "5", deliberate: "6" },
 };
 
+/**
+ * 6-i) 전환 목록의 layout 속성 (motion.md §4) — `transform` 과 `opacity` 만 움직인다.
+ * width · height · margin · padding · top · left 는 layout + paint 를 부른다. Accordion 의 height 는
+ * framer 가 맡아 SCSS 에는 없다. `transition:` 과 `motion(…)` · `motion-press(…)` 의 속성 목록을 본다 —
+ * Prettier 가 여러 줄로 접으므로 공백을 접어서 읽는다. `border-width` · `background-color` 는
+ * 낱말 앞에 `-` 가 있어 걸리지 않는다(토큰 시작을 `[\s(,]` 로 요구). 도입 전 실측 0건 (2026-09-14).
+ */
+const LAYOUT_PROP =
+  /(^|[\s(,])(min-|max-)?(width|height|margin|padding|top|left|right|bottom|inset)(-[a-z]+)?(?=[\s,)]|$)/;
+function layoutTransitions(code) {
+  const flat = code.replace(/\s+/g, " ");
+  const out = [];
+  for (const m of flat.matchAll(
+    /(transition\s*:|@include motion(?:-press)?\()([^;]*?)(;|\)\s*;)/g,
+  )) {
+    const list = m[2].replace(/"[^"]*"/g, ""); // duration · easing 문자열 인자를 뺀다
+    const hit = LAYOUT_PROP.exec(list);
+    if (hit) out.push(hit[0].trim());
+  }
+  return out;
+}
+
+// 검출력 시험 — `--selftest` (scripts.md §4). 위반 2 · 함정 1 · 통과 2. 하나라도 어긋나면 exit 1.
+if (process.argv.includes("--selftest")) {
+  const cases = [
+    ["위반 transition height", "a { transition: height 1s; }", 1],
+    [
+      "위반 motion width (여러 줄)",
+      'a {\n  @include motion(\n    (width, color),\n    "3"\n  );\n}',
+      1,
+    ],
+    [
+      "함정 border-width · background-color",
+      "a { transition: border-width 1s, background-color 1s; }",
+      0,
+    ],
+    [
+      "통과 transform · opacity",
+      "a { @include motion-press((background-color, color)); transition: transform 1s, opacity 1s; }",
+      0,
+    ],
+    [
+      "통과 motion 색만",
+      'a { @include motion((background-color, border-color, color), "3"); }',
+      0,
+    ],
+  ];
+  let bad = 0;
+  for (const [label, code, want] of cases) {
+    const got = layoutTransitions(code).length;
+    const ok = got === want;
+    if (!ok) bad += 1;
+    console.log(`  ${ok ? "✅" : "❌"} ${label} — 검출 ${got} (기대 ${want})`);
+  }
+  console.log(
+    `RECEIPT check-token-layers selftest cases=${cases.length} failed=${bad} exit=${bad ? 1 : 0}`,
+  );
+  process.exit(bad ? 1 : 0);
+}
+
 const problems = [];
 let ruleChecks = 0; // 영수증용 — 파일마다 적용한 규칙 수
 
@@ -410,6 +470,14 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
   for (const m of code.matchAll(/\b([0-9]+)ms\b/g)) {
     problems.push(
       `${file}: 시간 하드코딩 '${m[1]}ms' — duration 토큰이나 motion() 을 쓴다 (a11y.md §6)`,
+    );
+  }
+
+  // 6-i) 전환 목록의 layout 속성 금지 (motion.md §4) — 위 layoutTransitions() 와 --selftest
+  ruleChecks += 1;
+  for (const prop of layoutTransitions(code)) {
+    problems.push(
+      `${file}: '${prop}' 을 전환한다 — transform · opacity 만 움직인다. layout 속성은 매 프레임 재배치를 부른다 (motion.md §4)`,
     );
   }
 }
