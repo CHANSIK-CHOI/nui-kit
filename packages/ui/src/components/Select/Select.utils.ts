@@ -13,6 +13,7 @@ import type {
   ActionMeta,
   CSSObjectWithLabel,
   GroupBase,
+  MenuPlacement,
   OptionsOrGroups,
   SelectComponentsConfig,
   StylesConfig,
@@ -26,11 +27,12 @@ import {
   NuiMultiValueRemove,
 } from "./SelectIndicators.js";
 import { getMergedAriaIds } from "../Field/Field.context.js";
-import { pv } from "../../internal/prefix.js";
+import { px, pv } from "../../internal/prefix.js";
 import SelectAriaContext from "./Select.context.js";
 import type {
   MultiSelectValue,
   SelectChangeMeta,
+  SelectMenuPosition,
   SelectOption,
   SingleSelectValue,
 } from "./Select.types.js";
@@ -50,6 +52,64 @@ declare const process: { env: { NODE_ENV?: string } };
 const MENU_PORTAL_Z_INDEX = `var(${pv("z-portal-menu")})`;
 
 /**
+ * 메뉴가 나가는 `body` 컨테이너의 id. Tooltip · Datepicker 와 같은 규칙으로
+ * `data-nui-portal-root` 를 달아 팝업의 inert 루프에서 빠진다
+ * (design-system.md §10-1).
+ */
+export const SELECT_PORTAL_ROOT_ID = px("select-root");
+
+/**
+ * 메뉴 배치 세 prop 을 한자리에서 해석한다 — `Select` 와 `MultiSelect` 가 같이 쓴다.
+ *
+ * **두 컴포넌트에 복제하지 않는다.** 한쪽만 고쳐지는 자리가 된다 (`getReadOnlyGuardedProps`
+ * 와 같은 이유).
+ *
+ * ⚠️ **`menuPortalTarget={null}` 은 「안 준 것」과 다르다.** `??` 로 기본값을 주면 `null` 이
+ *    삼켜져 **타입은 통과하는데 끌 수 없는** prop 이 된다.
+ *
+ *    그렇다고 `"menuPortalTarget" in rest` 로 가르지도 않는다 — `undefined` 를 **명시한**
+ *    것도 키를 만들기 때문이다. `menuPortalTarget={isInModal ? modalEl : undefined}` 가
+ *    modal 밖에서 portal 을 통째로 잃고, 화면에는 「팝업 안에서 메뉴가 잘린다」로만
+ *    드러난다 — 이 변경이 없애려던 바로 그 증상이다. `exactOptionalPropertyTypes` 가
+ *    꺼져 있어 타입도 통과한다. **가르는 경계는 키의 유무가 아니라 `undefined` 냐다.**
+ *
+ * ⚠️ **`"static"` 은 react-select 에 넘기지 않는다.** 공식 값이 `absolute | fixed` 둘뿐이라
+ *    (react-select 공식 문서의 `menuPosition`) 그 값을 넘기면 라이브러리 계약을 깬다.
+ *    흐름 배치는 우리 CSS(루트 modifier)가 그리고, 그때 portal 과 뒤집기는 해제된다 —
+ *    흐름 안에는 「위」가 없다 (Select.md §6-7).
+ */
+export function resolveMenuPlacementProps(
+  menuPosition: SelectMenuPosition,
+  portalRoot: HTMLElement | null,
+  rest: {
+    menuPortalTarget?: HTMLElement | null;
+    menuPlacement?: MenuPlacement;
+  },
+): {
+  menuPosition: "absolute" | "fixed";
+  menuPlacement: MenuPlacement;
+  menuPortalTarget: HTMLElement | null;
+} {
+  const isStatic = menuPosition === "static";
+
+  if (isStatic) {
+    return {
+      menuPosition: "absolute",
+      menuPlacement: "bottom",
+      menuPortalTarget: null,
+    };
+  }
+
+  const hasConsumerTarget = rest.menuPortalTarget !== undefined;
+
+  return {
+    menuPosition,
+    menuPlacement: rest.menuPlacement ?? "auto",
+    menuPortalTarget: hasConsumerTarget ? rest.menuPortalTarget! : portalRoot,
+  };
+}
+
+/**
  * `unstyled` 여도 react-select 이 emotion 클래스로 남기는 속성 중
  * **우리 CSS 가 책임지는 것들.**
  *
@@ -65,11 +125,18 @@ const MENU_PORTAL_Z_INDEX = `var(${pv("z-portal-menu")})`;
  *   - option   `display: 'block'` / `cursor: 'default'` → 옵션 정렬·커서 깨짐
  *   - option   `fontSize: 'inherit'` → 타이포 토큰 대신 **소비자 body 글꼴**을
  *              따라가, 메뉴와 컨트롤의 글자 크기가 어긋난다
- *   - menu     `zIndex: 1` → `--nui-z-tooltip` 무시
+ *
+ * ⚠️ **`menu` 는 여기 없다** (2026-09-14). `Menu` 를 `NuiMenu` 로 **통째로 대체**했고
+ *    그 컴포넌트가 `getStyleProps` 를 부르지 않아 **emotion 이 아예 닿지 않는다** —
+ *    `unstyled` 에서도 살아남는 `position` `top` `width` `zIndex` 넷이 DOM 에 오지
+ *    않는다. 그래서 제자리 메뉴의 배치는 **우리 CSS 가 소유한다**(`_select.scss` ·
+ *    Select.md §6-5 · §6-7). 여기 두면 다음 사람이 「emotion 이 menu 를 그린다」고
+ *    다시 읽는다 — 실제로 그 오해가 메뉴를 `position: static` 으로 두었다.
  *
  * ⚠️ 목록에 없는 것은 **일부러** 남긴 것이다. 크게 두 부류다.
  *   1) react-select 의 기능 스타일 — 지우면 동작이 깨진다
- *      · menu/menuPortal 의 `position` `top` `width` — 메뉴 배치 계산
+ *      · menuPortal 의 `position` `left` `top` `width` — portal 래퍼의 배치 계산.
+ *        이쪽은 대체하지 않아 emotion 이 그대로 돌고 `zIndex` 만 우리가 얹는다
  *      · menuList 의 `maxHeight` — `maxMenuHeight` prop 이 소유한다
  *      · valueContainer 의 `display` — 단일=grid / 다중=flex 전환에 의존
  *      · indicatorsContainer 의 `alignSelf` — 컨트롤 높이 추종
@@ -88,7 +155,6 @@ const CSS_OWNED_PROPERTIES: Record<string, readonly string[]> = {
   multiValueRemove: ["display"],
   clearIndicator: ["display", "transition"],
   dropdownIndicator: ["display", "transition"],
-  menu: ["zIndex"],
 };
 
 /** react-select 이 검색 input 에 붙이는 role. 이 자식만 골라 aria 를 보강한다. */

@@ -48,10 +48,9 @@ export default function MultiSelectPage() {
 
       <p>
         목록에서 여러 개를 고르는 입력이다. 값은 옵션 <code>value</code> 의
-        배열이고 고른 것은 칩으로 보인다. 검색 · 옵션 묶음 · 상태 ·{" "}
-        <code>hasPortal</code> · 접근성은{" "}
-        <Link href="/components/select">Select</Link> 와 같다. 이 페이지는 여러
-        개에서 달라지는 것만 적는다.
+        배열이고 고른 것은 칩으로 보인다. 검색 · 옵션 묶음 · 상태 · 메뉴 배치 ·
+        접근성은 <Link href="/components/select">Select</Link> 와 같다. 이
+        페이지는 여러 개에서 달라지는 것만 적는다.
       </p>
 
       <h2>기본</h2>

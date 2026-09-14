@@ -154,7 +154,7 @@ export function NuiMultiValueRemove<IsMulti extends boolean>({
  *    모양이 된다. 면 자체가 움직여야 한다.
  *
  * ⚠️ 클래스는 `cx` 로 **기본 Menu 와 똑같이** 만든다 — `classNamePrefix` 가
- *    만드는 `nui-select__menu` 가 우리 SCSS 의 유일한 진입점이다.
+ *    만드는 블록 클래스(`SELECT_BLOCK` + `__menu`)가 우리 SCSS 의 유일한 진입점이다.
  *
  * ⚠️ **퇴장은 없다.** `AnimatePresence` 가 필요한데 react-select 이 메뉴를
  *    언마운트하므로 그 경계를 우리가 쥐려면 `menuIsOpen` 을 제어해야 한다 —
@@ -183,21 +183,33 @@ export function NuiMenu<IsMulti extends boolean>({
     ...restInnerProps
   } = innerProps ?? {};
 
+  // 위로 뒤집히면 **배치 · 간격 · 모션 원점** 셋이 함께 뒤집힌다 (Select.md §6-7).
+  // 앞의 둘은 `--top` modifier 를 받은 CSS 가, 원점은 여기가 한다.
+  const isTop = placement === "top";
+
   return (
     <motion.div
       {...restInnerProps}
       ref={innerRef}
-      className={cx({ menu: true }, className)}
+      // `cx` 가 키마다 프리픽스를 붙인다 — `menu--top` → `…__menu--top`
+      className={cx({ menu: true, "menu--top": isTop }, className)}
       // 트리거에서 자란다 — 위로 뒤집히면 아래 모서리에서 (motion.md §6)
       style={{
-        transformOrigin: placement === "top" ? "bottom left" : "top left",
+        transformOrigin: isTop ? "bottom left" : "top left",
       }}
+      // ⚠️ **방향은 `transform-origin` 하나가 말한다 — `translateY` 를 쓰지 않는다**
+      //    (2026-09-14). framer 의 `initial` 은 **마운트 때 한 번만** 읽히는데,
+      //    react-select 의 `MenuPlacer` 는 placement 를 언제나 `"bottom"` 으로 먼저
+      //    넘기고 `"top"` 은 layout effect 뒤에 준다. 그래서 `isTop` 으로 부호를
+      //    뒤집어도 **뒤집힌 메뉴까지 `-4px` 로 등장**했다 — 트리거 반대편에서 오는
+      //    모양이라 motion.md §6 을 어긴다(실측 `matrix(0.97,0,0,0.97,0,-4)` ·
+      //    `origin: left bottom`). 원점은 재렌더로 따라오므로 그쪽에 맡긴다.
       initial={reduceMotion(
-        { opacity: 0, transform: "translateY(-4px) scale(0.97)" },
+        { opacity: 0, transform: "scale(0.97)" },
         shouldReduceMotion,
       )}
       animate={reduceMotion(
-        { opacity: 1, transform: "translateY(0px) scale(1)" },
+        { opacity: 1, transform: "scale(1)" },
         shouldReduceMotion,
       )}
       transition={reduceMotionTransition(

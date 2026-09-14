@@ -100,13 +100,23 @@ export default function SelectPage() {
         )}
       />
 
-      <h2>잘리는 상자 안에서</h2>
+      <h2>메뉴는 어디에 뜨나</h2>
       <p>
-        메뉴는 제자리에 뜬다. 조상에 <code>overflow: hidden</code> 이 있으면
-        잘려서 값을 고를 수 없다. 카드나 팝업 안에 넣을 때{" "}
-        <code>hasPortal</code> 을 켜면 메뉴가 <code>body</code> 로 나가 잘리지
-        않는다. <code>Datepicker</code> · <code>Tooltip</code> 의 같은 이름 prop
-        과 한 규칙이다.
+        메뉴는 <code>body</code> 로 나가서 뜬다. 조상에{" "}
+        <code>overflow: hidden</code> 이 있어도 잘리지 않고, 아래 공간이
+        모자라면 위로 뒤집히거나 높이를 줄여 화면에 맞춘다. 카드 · 팝업 안에서도
+        그대로 쓴다.
+      </p>
+      <p>
+        <code>menuPosition=&quot;absolute&quot;</code> 는 화면 대신 문서를 기준
+        삼는다. 아래 공간이 모자라면 뒤집는 대신 페이지를 스크롤해서 메뉴를
+        아래로 펼친다 — 긴 폼에서 목록을 최대한 보여주고 싶을 때 고른다.
+      </p>
+      <p>
+        메뉴를 문서 흐름 안에 두려면{" "}
+        <code>menuPosition=&quot;static&quot;</code> 을 준다 — 메뉴가 열리는
+        만큼 아래 내용이 밀린다. 뜬 채로 두되 <code>body</code> 로만 내보내지
+        않으려면 <code>menuPortalTarget={"{null}"}</code> 이다.
       </p>
       <SelectPortalDemo />
 

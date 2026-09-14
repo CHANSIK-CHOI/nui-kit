@@ -24,12 +24,23 @@
 //    한쪽만 바꾸면 대비가 보이지 않게 깨진다. 하나만 바꿀 때는 className 을 쓴다.
 // 크기: .nui-select--large (medium 은 기본이라 modifier 없음) — 루트에 붙는다
 // 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
+//
+// ⚠️ **메뉴 면의 배치는 우리가 소유한다** (2026-09-14 · Select.md §6-7).
+//   `Menu` 를 `NuiMenu` 로 통째로 대체해 **emotion 이 메뉴에 아예 닿지 않는다** —
+//   `unstyled` 에서도 살아남는 `position`·`top`·`width` 가 DOM 에 오지 않아, 예전에는
+//   메뉴가 `position: static` 으로 렌더되어 **아래 콘텐츠를 밀어냈다.** `Datepicker` 의
+//   `__dropdown` 과 같은 방식으로 여기서 그린다.
+//   modifier 둘이 짝이다 — `NuiMenu` 가 붙이는 `__menu--top`(위로 뒤집힘)과
+//   `SelectBase` 가 붙이는 루트의 `--menu-static`(흐름 배치).
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("select")} {
     width: 100%;
 
     &__container {
+      // 제자리 메뉴(`menuPortalTarget={null}`)의 기준 상자다. emotion 도 같은 값을
+      // 주지만 그쪽이 사라져도 배치가 서게 여기서 명시한다 — 배치는 우리 것이다(머리 주석)
+      position: relative;
       width: 100%;
     }
 
@@ -160,10 +171,18 @@
     }
 
     // ── menu
-    //   position / top / width 는 react-select 이 소유한다 (배치 계산).
-    //   max-height 도 react-select 이 `maxMenuHeight` prop 으로 소유한다 —
+    //   `max-height` 는 react-select 이 `maxMenuHeight` prop 으로 소유한다 —
     //   여기서 덮으면 메뉴 위치 계산과 어긋난다.
+    //
+    //   배치는 우리 것이다(머리 주석). portal 래퍼 안에서도 제자리에서도 같은 규칙이
+    //   맞는 이유 — 래퍼는 높이 0 에 컨트롤의 rect 를 입고 그 윗변(위로 뒤집힐 때) 또는
+    //   아랫변(아래로 펼칠 때)에 앉으므로, `top: 100%` 와 `bottom: 100%` 가 제자리일
+    //   때와 똑같은 자리를 가리킨다. 좌표 계산을 CSS 와 JS 두 벌로 만들지 않는다.
     &__menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
       margin-top: var(#{v("space-2")});
       padding: var(#{v("space-2")});
       // 메뉴는 컨트롤이 아니라 떠 있는 컨테이너다 — design-system.md §2-5-1.
@@ -174,7 +193,35 @@
       border-radius: var(#{v("radius-5")});
       background-color: var(#{v("layer-floating")});
       box-shadow: var(#{v("shadow-2")});
+      // 흐름 배치(`static`)일 때의 층. 그 밖에는 react-select 의 `MenuPortal` 래퍼가
+      // `z-portal-menu`(1031)를 갖는다 — `menuPortalTarget={null}` 이어도 기본 `fixed`
+      // 에서는 래퍼가 남는다(`body` 로 안 나갈 뿐) · design-system.md §10
       z-index: var(#{v("z-tooltip")});
+    }
+
+    // 위로 뒤집혔다. 배치와 간격이 함께 뒤집힌다 — 원점은 `NuiMenu` 가 인라인으로
+    // 뒤집는다 (Select.md §6-7 · motion.md §6)
+    &__menu--top {
+      top: auto;
+      bottom: 100%;
+      margin-top: 0;
+      margin-bottom: var(#{v("space-2")});
+    }
+
+    // 흐름 배치(`menuPosition="static"`) — 메뉴가 아래 콘텐츠를 밀어낸다.
+    // 이 모드에서만 portal 이 없어 메뉴가 루트 안에 있다 (Select.md §6-7).
+    //
+    // ⚠️ `position: static` 이 아니라 `relative` 다. 흐름에 남는 것은 같은데,
+    //    `static` 이면 `z-index` 가 먹지 않아 **메뉴의 그림자가 다음 형제 아래로
+    //    깔린다.** 위로 뒤집히지 않으므로 `--top` 은 이 모드에서 붙지 않는다.
+    &--menu-static &__menu {
+      position: relative;
+      top: auto;
+      bottom: auto;
+      left: auto;
+      width: auto;
+      margin-top: var(#{v("space-2")});
+      margin-bottom: 0;
     }
 
     &__menu-list {

@@ -477,8 +477,24 @@ emotion 쪽에서 걷어내** CSS 가 책임지게 합니다.
   `--border-width`). 옵션 낱말은 `size` 값 그대로입니다. 색은 `className` 으로 씁니다
 - `styles` prop 을 직접 넘기면 그 정리된 값 위에 얹히므로 의도대로 덧칠됩니다
 - 다만 **메뉴 최대 높이는 CSS 가 아니라 `maxMenuHeight` prop** 으로 조정합니다.
-  `react-select` 이 메뉴 배치를 계산할 때 이 값을 참조하므로, CSS 로 덮으면
-  실제 높이와 계산이 어긋납니다 (기본값 `240`)
+  `react-select` 이 메뉴를 어디에 펼칠지 계산할 때 이 값을 참조하므로, CSS 로 덮으면
+  실제 높이와 계산이 어긋납니다 (기본값 `480`)
+
+**메뉴는 `body` 로 나가서 뜹니다.** `overflow: hidden` 인 조상 안에서도 잘리지 않고,
+아래 공간이 모자라면 위로 뒤집히거나 높이를 줄여 화면에 맞춥니다
+(`menuPlacement` 기본값 `"auto"`).
+
+```tsx
+<Select options={OPTIONS} />                           // 화면에 맞춰 뒤집힌다 — 기본
+<Select options={OPTIONS} menuPosition="absolute" />   // 뒤집는 대신 페이지를 스크롤해 펼친다
+<Select options={OPTIONS} menuPosition="static" />     // 문서 흐름 안. 아래 내용을 밀어낸다
+<Select options={OPTIONS} menuPortalTarget={null} />   // 뜨되 body 로 내보내지 않는다
+```
+
+`menuPosition` 은 `react-select` 의 prop 이름 그대로이고, 값 `"static"` 만 이 라이브러리가
+더한 것입니다. **감싼 라이브러리에만 있는 prop 은 이름을 바꾸지 않습니다** —
+`menuPlacement` · `maxMenuHeight` · `menuPortalTarget` · `filterOption` 모두 `react-select`
+문서의 이름 그대로 넘깁니다.
 
 **칩의 × 는 Tab 으로 닿는 버튼입니다.** 칩이 여럿이면 앞에서부터 하나씩 잡히고 그다음이
 입력창입니다. <kbd>Enter</kbd>·<kbd>Space</kbd> 로 지우고, 지운 뒤 포커스는 이전 칩(없으면
@@ -546,8 +562,8 @@ import { DateRangePicker, type DateRange } from "@nui-kit/react";
 
 **알려진 제약**
 - 기간(`DateRangePicker`)은 최소 2일입니다 — 하루짜리 기간은 만들 수 없습니다
-- 캘린더 팝업은 portal 을 쓰지 않으므로 `overflow: hidden` 인 조상 안에서 잘릴 수
-  있습니다 (`Select` 의 메뉴도 같습니다)
+- 캘린더 팝업은 기본으로 portal 을 쓰지 않으므로 `overflow: hidden` 인 조상 안에서
+  잘릴 수 있습니다 — `hasPortal` 로 내보냅니다
 - 월 전환 애니메이션(`animate`)은 지원하지 않습니다
 - 달력 컨트롤의 접근 이름은 한국어가 기본입니다. 다른 언어를 쓰려면
   `dayPickerProps.labels` 와 `calendarLabel` 을 함께 넘깁니다

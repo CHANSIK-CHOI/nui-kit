@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useId, useMemo } from "react";
+import { forwardRef, useEffect, useId, useMemo, useState } from "react";
 import type { ForwardRefExoticComponent, RefAttributes } from "react";
 import type {
   ActionMeta,
@@ -10,6 +10,7 @@ import type {
 } from "react-select";
 import ReactSelect from "react-select";
 import { getMergedAriaIds, useFieldContext } from "../Field/Field.context.js";
+import { acquirePortalRoot } from "../../internal/portal.js";
 import SelectAriaContext, {
   DEFAULT_REMOVE_BUTTON_LABEL,
 } from "./Select.context.js";
@@ -26,6 +27,8 @@ import {
   getResolvedMultiValue,
   getResolvedSelectComponents,
   getResolvedSelectStyles,
+  resolveMenuPlacementProps,
+  SELECT_PORTAL_ROOT_ID,
   toSelectChangeMeta,
 } from "./Select.utils.js";
 import type {
@@ -91,15 +94,18 @@ const MultiSelect: ForwardRefExoticComponent<
       styles,
       isSearchable = false,
       isClearable = false,
-      hasPortal = false,
       removeButtonLabel = DEFAULT_REMOVE_BUTTON_LABEL,
       // 라벨·안내 문구에는 마침표를 붙이지 않는다 (SEED writing 규칙과 같다)
       noOptionsMessage = DEFAULT_NO_OPTIONS_MESSAGE,
       // 메뉴 최대 높이는 react-select 이 소유한다 (배치 계산이 이 값을 참조하므로
-      // CSS 의 max-height 로 덮지 않는다). 기본값만 우리 치수에 맞춘다.
-      maxMenuHeight = 240,
+      // CSS 의 max-height 로 덮지 않는다). 기본값만 우리가 정한다 — SEED `select.yaml`
+      // 의 `maxHeight` 와 같은 480 이고, `menuPlacement="auto"` 의 뒤집기 판정도
+      // 이 값을 본다 (Select.md §6-7).
+      maxMenuHeight = 480,
       menuIsOpen,
-      menuPosition,
+      // 메뉴는 기본으로 떠 있다. `"static"` 이면 흐름에 들어가고 portal 도 풀린다.
+      // 기본이 `"fixed"` 인 이유는 뒤집기 판정 때문이다 — Select.md §6-7.
+      menuPosition = "fixed",
       openMenuOnClick,
       openMenuOnFocus,
       backspaceRemovesValue,
@@ -172,9 +178,40 @@ const MultiSelect: ForwardRefExoticComponent<
         }),
       [components, AriaValueContainer, readOnly],
     );
+    const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
     const resolvedStyles = useMemo(
       () => getResolvedSelectStyles<true>(styles),
       [styles],
+    );
+
+    // ── portal 컨테이너 (Tooltip · Datepicker · ToastHost 와 같은 규칙)
+    //
+    // ⚠️ 마운트 이후에 잡는다. 렌더 중 `document` 를 읽으면 하이드레이션이 어긋난다.
+    //    첫 프레임에는 `portalRoot` 가 없어 메뉴가 제자리로 그려지는데, 메뉴는 열려야
+    //    보이고 그전에 이 effect 가 돈다.
+    //
+    // 흐름 배치(`static`)이거나 소비자가 `menuPortalTarget` 을 직접 줬으면 잡지 않는다.
+    // ⚠️ `in` 으로 가르지 않는다 — `undefined` 를 명시한 것도 키를 만든다
+    //    (`resolveMenuPlacementProps` 주석).
+    const needsPortalRoot =
+      menuPosition !== "static" && rest.menuPortalTarget === undefined;
+
+    useEffect(() => {
+      if (!needsPortalRoot) {
+        setPortalRoot(null);
+        return;
+      }
+
+      const { root, release } = acquirePortalRoot(SELECT_PORTAL_ROOT_ID);
+      setPortalRoot(root);
+
+      return release;
+    }, [needsPortalRoot]);
+
+    const menuPlacementProps = resolveMenuPlacementProps(
+      menuPosition,
+      portalRoot,
+      rest,
     );
     const ariaContextValue = useMemo(
       () => ({
@@ -212,6 +249,7 @@ const MultiSelect: ForwardRefExoticComponent<
         errorMessage={errorMessage}
         messageId={hasOwnMessage ? generatedMessageId : undefined}
         hasMessage={!isInField}
+        isMenuStatic={menuPosition === "static"}
       >
         <SelectAriaContext.Provider value={ariaContextValue}>
           <ReactSelect<SelectOption, true, GroupBase<SelectOption>>
@@ -250,15 +288,10 @@ const MultiSelect: ForwardRefExoticComponent<
             }
             loadingMessage={rest.loadingMessage ?? selectLoadingMessage}
             maxMenuHeight={maxMenuHeight}
-            menuPosition={menuPosition}
-            // 잘리는 조상을 탈출한다. 소비자가 직접 준 값이 우리 기본을 이긴다.
+            // 배치 세 prop 은 한자리에서 해석한다 (Select.md §6-7).
+            // 기본으로 body 를 탈출하고, `menuPortalTarget={null}` 이면 제자리로 돌아온다.
             // z 는 `getResolvedSelectStyles` 가 `z-portal-menu` 로 올린다.
-            menuPortalTarget={
-              rest.menuPortalTarget ??
-              (hasPortal && typeof document !== "undefined"
-                ? document.body
-                : undefined)
-            }
+            {...menuPlacementProps}
             aria-invalid={ariaInvalid ?? (resolvedIsError || undefined)}
             aria-errormessage={
               resolvedIsError && errorMessage ? errorMessageId : undefined

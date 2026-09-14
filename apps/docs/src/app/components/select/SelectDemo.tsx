@@ -191,32 +191,59 @@ const CLIP_BOX = {
 } as const;
 
 export function SelectPortalDemo() {
-  const [clipped, setClipped] = useState<SingleSelectValue>(null);
-  const [portaled, setPortaled] = useState<SingleSelectValue>(null);
+  const [floating, setFloating] = useState<SingleSelectValue>(null);
+  const [absolute, setAbsolute] = useState<SingleSelectValue>(null);
+  const [inFlow, setInFlow] = useState<SingleSelectValue>(null);
+  const [inPlace, setInPlace] = useState<SingleSelectValue>(null);
 
   return (
     <CaseGrid
       columns={2}
-      code={`<Select options={OPTIONS} hasPortal />   // 잘리는 상자 안에서`}
+      code={`<Select options={OPTIONS} />                           // 화면에 맞춰 뒤집힌다
+<Select options={OPTIONS} menuPosition="absolute" />  // 페이지를 스크롤해 펼친다
+<Select options={OPTIONS} menuPosition="static" />    // 흐름 안
+<Select options={OPTIONS} menuPortalTarget={null} />  // 뜨되 제자리`}
     >
-      <Case label="기본" note="상자에 잘린다">
+      <Case label="기본" note="화면에 맞춰 뒤집힌다">
         <div style={CLIP_BOX}>
           <Select
             options={CITIES}
-            value={clipped}
-            onChange={(next) => setClipped(next)}
-            placeholder="메뉴가 잘린다"
+            value={floating}
+            onChange={(next) => setFloating(next)}
+            placeholder="지역"
           />
         </div>
       </Case>
-      <Case label="hasPortal" note="상자를 벗어난다">
+      <Case label={`menuPosition="absolute"`} note="페이지를 스크롤해 펼친다">
         <div style={CLIP_BOX}>
           <Select
-            hasPortal
+            menuPosition="absolute"
             options={CITIES}
-            value={portaled}
-            onChange={(next) => setPortaled(next)}
-            placeholder="잘리지 않는다"
+            value={absolute}
+            onChange={(next) => setAbsolute(next)}
+            placeholder="지역"
+          />
+        </div>
+      </Case>
+      <Case label={`menuPosition="static"`} note="상자에 잘린다">
+        <div style={CLIP_BOX}>
+          <Select
+            menuPosition="static"
+            options={CITIES}
+            value={inFlow}
+            onChange={(next) => setInFlow(next)}
+            placeholder="지역"
+          />
+        </div>
+      </Case>
+      <Case label={`menuPortalTarget={null}`} note="뜨되 body 로 안 나간다">
+        <div style={CLIP_BOX}>
+          <Select
+            menuPortalTarget={null}
+            options={CITIES}
+            value={inPlace}
+            onChange={(next) => setInPlace(next)}
+            placeholder="지역"
           />
         </div>
       </Case>

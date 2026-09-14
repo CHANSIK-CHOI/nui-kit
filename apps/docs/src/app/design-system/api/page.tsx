@@ -33,8 +33,8 @@ const NAMES = [
   {
     concept: "잘림에서 벗어남",
     name: "hasPortal",
-    where: "Tooltip · Select · MultiSelect · Datepicker 계열",
-    note: "켜면 body 로 나가 잘리지 않는다",
+    where: "Tooltip · Datepicker 계열",
+    note: "켜면 body 로 나가 잘리지 않는다. Select 는 감싼 라이브러리가 menuPortalTarget 을 갖고 있어 그 이름을 쓴다",
   },
   {
     concept: "값을 가진 입력",
@@ -91,6 +91,24 @@ export default function ApiPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <h2>감싼 라이브러리의 prop 은 이름을 바꾸지 않는다</h2>
+      <p>
+        <code>Select</code> 는 <code>react-select</code> 을,{" "}
+        <code>Datepicker</code> 는 <code>react-day-picker</code> 를 감싼다. 그
+        라이브러리에만 있는 prop 은 원래 이름 그대로 받는다 — 원본 문서에서 읽은
+        것을 그대로 넘길 수 있다.
+      </p>
+      <pre className="doc-code">
+        <code>{`<Select menuPlacement="auto" maxMenuHeight={480} filterOption={fn} />`}</code>
+      </pre>
+      <div className="doc-note">
+        <strong>여러 컴포넌트에 걸치는 개념은 반대다.</strong>{" "}
+        <code>disabled</code> · <code>readOnly</code> · <code>size</code> ·{" "}
+        <code>isError</code> 는 어느 컴포넌트에서나 같은 이름이다.{" "}
+        <code>react-select</code> 은 <code>isDisabled</code> 라고 부르지만
+        여기서는 <code>disabled</code> 다.
       </div>
 
       <h2>참 · 거짓 prop 은 접두어로 뜻을 밝힌다</h2>

@@ -21,6 +21,14 @@ export type SelectBaseProps = {
   messageId?: string;
   /** Field 안에서는 `Select`/`MultiSelect` 가 Footer 로 올리므로 여기서 그리지 않는다 (Field.md §6) */
   hasMessage?: boolean;
+  /**
+   * `menuPosition="static"` — 메뉴가 흐름에 들어가 아래를 밀어낸다 (Select.md §6-7).
+   *
+   * 루트 modifier 로 내려보내는 이유는 **그 모드에서는 portal 이 없어 메뉴가 언제나
+   * 이 루트 안**이기 때문이다. 배치를 메뉴 자신이 아니라 조상이 말하게 두면
+   * `NuiMenu` 에 배치 정보를 또 흘려보내지 않아도 된다.
+   */
+  isMenuStatic?: boolean;
   children: ReactNode;
 };
 
@@ -34,6 +42,7 @@ export default function SelectBase({
   errorMessage = "",
   messageId,
   hasMessage = true,
+  isMenuStatic = false,
   children,
 }: SelectBaseProps) {
   const resolvedIsError = isError || Boolean(errorMessage);
@@ -44,6 +53,8 @@ export default function SelectBase({
         // 컨트롤 높이는 루트 modifier 가 정한다. 메뉴는 portal 로 나가면 이 클래스가
         // 닿지 않는데, 메뉴는 size 와 무관하므로 문제가 없다 (Select.md §4)
         [`${SELECT_BLOCK}--${size}`]: size !== "medium",
+        // 흐름 배치. 이 모드에서만 메뉴가 루트 안에 있다 (Select.md §6-7)
+        [`${SELECT_BLOCK}--menu-static`]: isMenuStatic,
         [px("is-disabled")]: disabled,
         [px("is-error")]: resolvedIsError,
         [px("is-readonly")]: readOnly,
