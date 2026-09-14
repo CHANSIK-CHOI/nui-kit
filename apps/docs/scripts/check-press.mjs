@@ -20,7 +20,9 @@
  *    어느 길로 끝나든 영수증을 찍는다(`scripts.md §1`).
  * 검출력 — `--selftest` 가 기대값을 일부러 틀리게 두어(배율 0.5 · square 면 없음 · 버튼 전체가
  * 줄어드는 자리에 `still` · root 에 면이 있는 자리에 `faceFrom: root` + `face: none`) 넷 다
- * 잡히는지 본다. 첫 실행 검출 2/2 (대상 8) · Accordion 을 더한 2026-09-13 부터 4/4 (대상 10).
+ * 잡히는지 본다. 첫 실행 검출 2/2 (대상 8) · Accordion 을 더한 2026-09-13 부터 4/4 (대상 10) ·
+ * Select 셋을 더한 2026-09-14 부터 6/6 (대상 13). **기대 수는 사례 수에서 센다** — 적어 두면
+ * 사례를 더할 때마다 낡는다.
  *
  * 사용:
  *   node scripts/check-press.mjs                 전체
@@ -58,6 +60,9 @@ try {
  *
  * root       마우스가 누르는 요소(가운데를 누른다). 보이는 첫 매치. 실제 `:active` 는
  *            `input` 이 받으면 그것을 본다
+ * opener     누르기 전에 클릭해 **대상을 화면에 띄우는** 요소 (2026-09-14). 메뉴 · 팝업처럼
+ *            열어야 존재하는 자리를 잰다. opener 가 있으면 **페이지를 매번 새로 연다** —
+ *            앞 대상이 열어 둔 것을 다시 클릭하면 닫히기 때문이다
  * read       transform 을 읽는 요소. 없으면 root 자신
  * scale      기대 배율
  * face       "none" 누르는 동안 면이 없어야 한다 · "yes" 있어야 한다 · "any" 안 본다
@@ -65,9 +70,10 @@ try {
  *            면은 `root` 에 있다 (Accordion 모드 A · design-system.md §2-3-1)
  * still      true 면 root 의 transform 이 **없어야** 한다 — 면이 제자리인지 (Accordion 모드 A)
  *
- * 아직 안 재는 것 — Popup 닫기(0.96) · Toast 닫기(0.94) · Select 지우기(0.94). 셋 다 열어야
- * 보이는 자리라 opener 가 필요하다. 다음 판에서 더한다 — 여기 적어 두는 것은 「통과」가 그 셋을
- * 빼고 한 말임을 남기기 위해서다(`scripts.md §9`).
+ * 아직 안 재는 것 — Popup 닫기(0.96) · Toast 닫기(0.94) · Select 지우기(0.94) · 달력 날짜(0.96) ·
+ * 달력 이전/다음(0.94). 앞 셋은 `opener` 로 열 수 있게 됐지만 이번 판의 범위가 아니고, 뒤 둘은
+ * **코드에 아직 눌림이 없다**(`HANDOFF.md §13` 의 3번 — 다음 판). 여기 적어 두는 것은 「통과」가
+ * 그 다섯을 빼고 한 말임을 남기기 위해서다(`scripts.md §9`).
  */
 const TARGETS = [
   {
@@ -154,24 +160,92 @@ const TARGETS = [
     scale: 0.9,
     face: "none",
   },
+  // Select 옵션 (2026-09-14 · spec Select.md §9 「눌림 자리」) — 메뉴 여백 안쪽에서 끝나
+  // 둘레가 비므로 누르는 것 전체가 줄어든다. 열어야 존재하는 첫 `opener` 대상이다
+  {
+    label: "Select 옵션 (메뉴를 연다 · 칸 전체)",
+    page: "/components/select",
+    opener: ".nui-select__control",
+    root: ".nui-select__option:not(.nui-select__option--is-disabled)",
+    read: null,
+    scale: 0.98,
+    face: "yes",
+  },
+  // 선택된 옵션도 눌린다 — 면은 `control-accent-soft` 그대로고 배율만 말한다
+  // (2026-09-14 사용자 결정). 값이 있는 Select 를 열어야 `--is-selected` 가 존재한다
+  {
+    label: "Select 선택된 옵션 (면은 그대로 · 배율만)",
+    page: "/components/select",
+    opener: ".nui-select:has(.nui-select__single-value) .nui-select__control",
+    root: ".nui-select__option--is-selected",
+    read: null,
+    scale: 0.98,
+    face: "yes",
+  },
+  // 비활성 옵션은 **아무것도 하지 않는다** (design-system.md §3-2). 옵션이 `<div>` 라
+  // 브라우저가 `:active` 는 걸지만 배율도 면도 없어야 한다 — 면 규칙이 `:not(--is-disabled)`
+  // 밖에 있던 시절에는 눌러도 면이 깔렸다(2026-09-14 수정). 되돌아오면 여기가 잡는다
+  {
+    label: "Select 비활성 옵션 (배율 없음 · 면 없음)",
+    page: "/components/select",
+    opener: '.doc-case:has-text("세종은 고를 수 없다") .nui-select__control',
+    root: ".nui-select__option--is-disabled",
+    read: null,
+    scale: 1,
+    face: "none",
+  },
 ];
 
-/* 검출력 시험 — 기대값을 일부러 틀리게 둔다. 둘 다 잡혀야 한다 */
+/**
+ * 검출력 시험 — 기대값을 일부러 틀리게 둔다. 사례마다 적어도 하나는 잡혀야 한다.
+ *
+ * ⚠️ **원본을 인덱스로 집지 않는다** (2026-09-14). `TARGETS[TARGETS.length - 1]` 로 쓰고
+ *    있었는데 대상을 셋 더하자 「화살표에 still」이 **비활성 옵션**을 가리켰다 — 그 자리는
+ *    배율 1 · 면 없음이라 `still` 이 참이 되어 **조용히 통과**했고, 「헤더 면 none」은
+ *    Select 옵션을 가리켰는데 면 색(`control-bg-active`)과 배율(0.98)이 우연히 같아
+ *    잡히기는 했다. 검출력 시험이 스스로 늙은 셈이다. 라벨로 찾는다.
+ */
+const from = (prefix) => {
+  const t = TARGETS.find((x) => x.label.startsWith(prefix));
+  if (!t) throw new Error(`selftest 원본을 못 찾았다 — "${prefix}"`);
+  return t;
+};
+
 const SELFTEST_TARGETS = [
-  { ...TARGETS[0], label: "[selftest] ghost 배율 0.5 기대", scale: 0.5 },
-  { ...TARGETS[3], label: "[selftest] square 면 없음 기대", face: "none" },
+  {
+    ...from("Checkbox ghost 미선택"),
+    label: "[selftest] ghost 배율 0.5 기대",
+    scale: 0.5,
+  },
+  {
+    ...from("Checkbox square"),
+    label: "[selftest] square 면 없음 기대",
+    face: "none",
+  },
   // 모드 B 화살표는 버튼 전체가 줄어든다 — `still` 을 걸면 잡혀야 한다
   {
-    ...TARGETS[TARGETS.length - 1],
+    ...from("Accordion 화살표"),
     label: "[selftest] 화살표에 still 기대",
     still: true,
   },
   // 모드 A 의 면은 root(`__button`)에 있다 — `faceFrom: root` 로 읽으면 「면 없음」 기대가 잡혀야 한다.
   // read(`__head`)에서 읽으면 투명이라 조용히 통과한다 — 그 구멍을 이 사례가 본다
   {
-    ...TARGETS[TARGETS.length - 2],
+    ...from("Accordion 헤더"),
     label: "[selftest] 헤더 면 none 기대 (faceFrom root)",
     face: "none",
+  },
+  // opener 로 연 대상도 기대값을 틀리게 두면 잡혀야 한다 — 축이 새로 생긴 자리다
+  {
+    ...from("Select 옵션"),
+    label: "[selftest] Select 옵션 배율 0.5 기대",
+    scale: 0.5,
+  },
+  // 비활성 옵션에 면이 깔리던 결함이 되돌아오는 것을 잡는 자리 — 「면 있음」 기대로 뒤집는다
+  {
+    ...from("Select 비활성 옵션"),
+    label: "[selftest] 비활성 옵션에 면 있음 기대",
+    face: "yes",
   },
 ];
 
@@ -276,7 +350,8 @@ async function run(targets) {
       );
       continue;
     }
-    if (current !== t.page) {
+    // opener 가 있으면 매번 새로 연다 — 앞 대상이 열어 둔 것을 다시 클릭하면 닫힌다
+    if (current !== t.page || t.opener) {
       try {
         await page.goto(BASE + t.page, { waitUntil: "networkidle" });
       } catch (e) {
@@ -284,6 +359,19 @@ async function run(targets) {
         continue;
       }
       current = t.page;
+    }
+    if (t.opener) {
+      try {
+        await page.locator(`${t.opener} >> visible=true`).first().click();
+        // 대상이 화면에 설 때까지. 등장 모션이 있으면 그 끝까지 기다린다
+        await page.waitForSelector(`${t.root} >> visible=true`);
+        await page.waitForTimeout(250);
+      } catch (e) {
+        bad(
+          `${t.label}: 열지 못했다 — opener 가 늙었거나 대상이 안 뜬다 (${t.opener}) · ${String(e.message ?? e).split("\n")[0]}`,
+        );
+        continue;
+      }
     }
     const r = await pressAndRead(t);
     if (r.missing) {
@@ -333,9 +421,11 @@ if (SELFTEST) {
   const before = failures.length;
   await run(SELFTEST_TARGETS);
   const detected = failures.length - before;
-  const want = 4;
+  // 사례마다 **적어도 하나**는 잡혀야 한다. 수를 적어 두면 사례를 더할 때마다 낡는다 —
+  // 실제로 Select 옵션을 더했을 때 5 를 잡고도 `4` 와 달라 실패로 판정했다 (2026-09-14)
+  const want = SELFTEST_TARGETS.filter((t) => inScope(t.page)).length;
   console.log(`\n  검출 ${detected}/${want}`);
-  exit = detected === want ? 0 : 1;
+  exit = detected >= want ? 0 : 1;
   failures.length = 0; // 시험에서 난 실패는 진짜가 아니다
   console.log(
     exit
