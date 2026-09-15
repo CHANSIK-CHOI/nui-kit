@@ -8,7 +8,7 @@ Next.js 와 React 를 위한 UI 컴포넌트 시스템.
 [![license](https://img.shields.io/npm/l/@nui-kit/react)](./packages/ui/LICENSE)
 
 ```bash
-npm i @nui-kit/react
+npm i @nui-kit/react lucide-react
 ```
 
 ```tsx
@@ -16,12 +16,13 @@ import { Button, Field, FieldLabel, Textfield } from "@nui-kit/react";
 import "@nui-kit/react/styles/index.css";
 ```
 
-**사용법·API·커스터마이징은 [`packages/ui/README.md`](./packages/ui/README.md) 가 정본입니다.**
+**컴포넌트별 예제와 props 표는 [문서 사이트](https://nui-kit-docs.vercel.app) 에 있고,
+사용법·API·커스터마이징은 [`packages/ui/README.md`](./packages/ui/README.md) 가 정본입니다.**
 이 문서는 저장소 구조와 개발 방법을 다룹니다.
 
 ## 무엇이 들어 있나
 
-컴포넌트 **40종**과 react-hook-form 래퍼 **13종**. 계열별 목록은 패키지 README 에 있습니다.
+컴포넌트 **41종**(합성의 부속과 Host 포함)과 react-hook-form 래퍼 **12종**. 계열별 목록은 패키지 README 에 있습니다.
 
 | 계열 | |
 | --- | --- |
@@ -40,7 +41,7 @@ nui-kit/
 │  ├─ src/          컴포넌트 · SCSS · 내부 유틸
 │  ├─ scripts/      품질 검사 · 브랜드 색 생성기
 │  └─ presets.json  브랜드 색 프리셋 185색
-└─ apps/docs        문서 사이트 (Next.js App Router · 배포 대상 아님)
+└─ apps/docs        문서 사이트 (Next.js App Router · Vercel 배포)
    └─ scripts/      props·토큰·훅 추출기 + 실동작 검사
 ```
 
@@ -81,8 +82,8 @@ npm run dev          # 문서 사이트 개발 서버
 - **토큰 규율** — 색 primitive 직접 참조, 색에 공개 훅 부여, 역할군↔속성 불일치를 소스에서 검사
 - **접근성** — WCAG 비텍스트 대비 3:1 을 라이트·다크 두 테마에서 재고, 히트 영역을
   `elementFromPoint` 로 실측합니다. 모션 감소 설정 대응도 함께 봅니다
-- **실동작** — 36개 문서 페이지의 콘솔 에러·경고, 달력 개폐·클리핑, react-hook-form
-  연동 회귀를 Playwright 로 확인합니다
+- **실동작** — 문서 사이트 전 페이지의 콘솔 에러·경고, 달력 개폐·클리핑, 팝업 개폐,
+  토스트·툴팁, 눌림 배율, react-hook-form 연동 회귀를 Playwright 로 확인합니다
 - **배포 정합성** — `publint` · `attw` 로 exports 맵과 타입 해석을 검증합니다
 
 ## 브랜치와 기여

@@ -163,10 +163,17 @@ console.log("\n■ 설치 안내가 required peer 를 전부 담았나");
   const required = Object.keys(pkg.peerDependencies ?? {}).filter(
     (name) => !optional.has(name),
   );
-  // 설치 명령을 담은 페이지 — 여기가 늘면 목록에 더한다
-  const INSTALL_PAGES = ["get-started/page.mdx", "page.tsx"];
-  for (const rel of INSTALL_PAGES) {
-    const file = join(APP, rel);
+  // 설치 명령을 담은 페이지 — 여기가 늘면 목록에 더한다.
+  // README 둘도 본다 (2026-09-15) — 루트 README 의 `npm i @nui-kit/react` 가 lucide-react 를 빠뜨린 채
+  // 석 달 있었다. 루트는 GitHub 첫 화면, packages/ui 는 npm 에 실리는 것(package.json `files`)이다.
+  const ROOT = join(DOCS, "..", "..");
+  const INSTALL_PAGES = [
+    ["get-started/page.mdx", join(APP, "get-started/page.mdx")],
+    ["page.tsx", join(APP, "page.tsx")],
+    ["README.md", join(ROOT, "README.md")],
+    ["packages/ui/README.md", join(ROOT, "packages", "ui", "README.md")],
+  ];
+  for (const [rel, file] of INSTALL_PAGES) {
     if (!existsSync(file)) {
       fail("설치 안내", `${rel} — 파일이 없다. 목록을 고친다`);
       continue;
@@ -183,6 +190,39 @@ console.log("\n■ 설치 안내가 required peer 를 전부 담았나");
   console.log(
     `  required peer ${required.length}개 × 페이지 ${INSTALL_PAGES.length}`,
   );
+
+  // 루트 README 가 손으로 적은 수 — 컴포넌트 N종 ↔ props.json · 래퍼 N종 ↔ rhf.ts (2026-09-15 · 40/13 이 41/12 였다)
+  {
+    const readme = read(join(ROOT, "README.md"));
+    const props = JSON.parse(read(join(DOCS, "src/generated/props.json")));
+    const rhf = read(join(ROOT, "packages", "ui", "src", "rhf.ts"));
+    const rhfCount = (rhf.match(/export \{ default as RHF/g) ?? []).length;
+    const claims = [
+      [
+        /컴포넌트 \*\*(\d+)종\*\*/,
+        Object.keys(props).length,
+        "컴포넌트 (props.json)",
+      ],
+      [/래퍼 \*\*(\d+)종\*\*/, rhfCount, "RHF 래퍼 (rhf.ts)"],
+    ];
+    let n = 0;
+    for (const [re, real, what] of claims) {
+      const m = readme.match(re);
+      checked++;
+      n++;
+      if (!m)
+        fail(
+          "README 수",
+          `README.md — 「${what}」 문장을 못 읽었다. 정규식을 확인하라`,
+        );
+      else if (Number(m[1]) !== real)
+        fail(
+          "README 수",
+          `README.md — ${what} 이 ${real} 인데 ${m[1]} 이라고 적혀 있다`,
+        );
+    }
+    console.log(`  README 의 수 ${n}개`);
+  }
 }
 
 console.log("\n■ 도움말·에러 문구가 다음 행동을 지시하나");
