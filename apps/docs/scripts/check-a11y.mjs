@@ -12,7 +12,7 @@
  *    비활성은 AA 에서 빠지지만 하한 2.0:1 을 둔다 (design-system.md §2).
  * 2-b. 글자가 아닌 것의 대비 3:1(테두리 · 트랙 · 포커스)과 버튼 hover·pressed 의 글자 대비 —
  *    토큰 계산값으로 두 테마에서 잰다 (KRDS A4 · A5).
- * 2-c. 버튼 **조합 전수** — variant(solid·soft·line·text) × color(넷) × 상태(기본·비활성).
+ * 2-c. 버튼 **조합 전수** — variant(solid·soft·line·text) × color(다섯 · `BUTTON_COLORS`) × 상태(기본·비활성).
  *    예전에는 셋만 재고 있었고, 실제로 나온 위반 둘이 그 목록 밖이었다 (06 D10).
  * 2-e. soft · line · text 의 hover · active 글자 — 2-b 의 hover 항목은 solid 만 잰다.
  * 2-f. 선택 컨트롤 **전수** — tone × 상태 × 테마. 채움과 그 위 표시의 반전 짝.
@@ -611,7 +611,7 @@ for (const theme of inScope("/components/button") ? ["light", "dark"] : []) {
   await ctx.close();
 }
 
-// ── 2-c) 버튼 조합 전수 — variant 4 × color 4 × 상태 2, 두 테마 (06 D10)
+// ── 2-c) 버튼 조합 전수 — variant 4 × color 5 × 상태 2, 두 테마 (06 D10 · quiet 은 2026-09-11 에 늘었다)
 //
 // 예전에는 기본·primary·비활성 **셋만** 재고 있었다. D9(warning line·text 글자 1.5) ·
 // D12(비활성 line 테두리 1.38)는 전부 그 목록 **밖**에서 났다.

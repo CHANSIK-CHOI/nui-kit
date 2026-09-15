@@ -250,10 +250,34 @@ console.log("\n■ 문서가 적은 토큰 · 값 · export 가 생성물과 같
 // `PopupBase` 처럼 전부 grep 한 번이면 잡히는 종류였는데 사람이 읽어서 찾았다.
 // 정본은 생성물(tokens.json · hooks.json)과 컴포넌트 index.ts 다 — 손으로 적은 표를 믿지 않는다.
 // 도입 전 실측: 첫 실행 헛짚기 5 (접두만 적은 `--nui-size-icon` · CSS 속성 `z-index` ×3 · JS 가 세우는
-// `--nui-field-grid-columns`) → 셋을 좁혀 0. 합성 시험(위반 4 · 통과 3 · 함정 3) 통과. `--selftest` 로 다시 돈다.
+// `--nui-field-grid-columns`) → 셋을 좁혀 0. 합성 시험(위반 6 · 통과 5 · 함정 4) 통과. `--selftest` 로 다시 돈다.
+// (e) 2026-09-15 — 문서가 적은 `@nui-kit/react/styles/…` 경로. `styles/presets/42.css` 가 두 페이지에 살아
+//     있었다(실재는 `styles/themes/preset-42.css`). 정본은 `src/styles/entries/*.scss`(→ `styles/<name>.css`)와
+//     presets.json 의 번호(→ `styles/themes/preset-<n>.css`). 도입 전 실측: 현재 트리 15건 · 헛짚기 0.
 {
   const tokens = JSON.parse(read(join(DOCS, "src/generated/tokens.json")));
   const hooks = JSON.parse(read(join(DOCS, "src/generated/hooks.json")));
+  const presets = JSON.parse(read(join(DOCS, "src/generated/presets.json")));
+  const presetNumbers = new Set(presets.presets.map((p) => p.n));
+  const cssEntries = new Set(
+    globSync("../../packages/ui/src/styles/entries/*.scss", { cwd: DOCS }).map(
+      (p) => p.replace(/^.*\//, "").replace(/\.scss$/, ""),
+    ),
+  );
+  if (cssEntries.size === 0)
+    fail(
+      "styles 경로",
+      "src/styles/entries 를 하나도 못 읽었다 — 경로를 확인하라",
+    );
+  /** `styles/<entry>.css` 또는 `styles/themes/preset-<n>.css` 만 실재한다. `*` 가 든 글로브는 판정하지 않는다 */
+  const stylePathOk = (path) => {
+    if (path.includes("*")) return null;
+    const entry = path.match(/^([a-z]+)\.css$/);
+    if (entry) return cssEntries.has(entry[1]);
+    const theme = path.match(/^themes\/preset-(\d+)\.css$/);
+    if (theme) return presetNumbers.has(Number(theme[1]));
+    return false;
+  };
   const tokenValue = new Map();
   for (const list of Object.values(tokens))
     for (const t of list)
@@ -396,22 +420,39 @@ console.log("\n■ 문서가 적은 토큰 · 값 · export 가 생성물과 같
           have.has(n),
         ]);
     }
+    // (e) `@nui-kit/react/styles/…` 경로 — 코드 샘플 안도 본다. 소비자가 그대로 베끼는 줄이다
+    for (const m of body.matchAll(
+      /@nui-kit\/react\/styles\/([A-Za-z0-9/._*-]+)/g,
+    )) {
+      const ok = stylePathOk(m[1]);
+      if (ok === null) continue;
+      out.push([
+        "styles 경로",
+        `${rel} — \`styles/${m[1]}\` 은 패키지에 없다 (entries/*.scss · themes/preset-<n>.css)`,
+        ok,
+      ]);
+    }
     return out;
   };
 
   if (process.argv.includes("--selftest")) {
-    // 검출력 시험 — 위반 4 · 통과 3 · 함정 3. 0건 통과는 증거가 아니다 (scripts.md §4)
+    // 검출력 시험 — 위반 6 · 통과 5 · 함정 4. 0건 통과는 증거가 아니다 (scripts.md §4)
     const cases = [
       ["<code>duration-7</code>", 1], // 위반 — 지운 토큰
       ["<code>font-size-1</code> (12px)", 1], // 위반 — 값이 틀렸다
       ["| `/popup` | `PopupBase` `Alert` |", 1], // 위반 — 없는 export
       ["var(--nui-radius-sm)", 1], // 위반 — 옛 이름
+      ['import "@nui-kit/react/styles/presets/42.css";', 1], // 위반 — 없는 경로 (2026-09-15 실제 사례)
+      ['import "@nui-kit/react/styles/themes/preset-999.css";', 1], // 위반 — 없는 프리셋 번호
       ["<code>font-size-1</code> (13px)", 0], // 통과
       ['<span className="doc-token-name">size-icon-lg</span> 16px', 0], // 통과
       ["| `/select` | `Select` `MultiSelect` |", 0], // 통과
+      ['import "@nui-kit/react/styles/index.css";', 0], // 통과 — 엔트리
+      ['import "@nui-kit/react/styles/themes/preset-42.css";', 0], // 통과 — 프리셋
       ["var(--nui-font-size-${s.n})", 0], // 함정 — 동적 조립은 판정 안 함
       ['<code>variant="text"</code>', 0], // 함정 — 토큰 모양이 아니다
       ["<code>z-index</code> 를 직접 쓰지 않는다", 0], // 함정 — CSS 속성이지 토큰이 아니다
+      ["`@nui-kit/react/styles/*.css` 로 열려 있다", 0], // 함정 — 글로브는 경로가 아니다
     ];
     let bad = 0;
     for (const [text, expect] of cases) {
