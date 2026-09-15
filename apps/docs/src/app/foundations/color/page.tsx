@@ -26,9 +26,10 @@ export default function ColorPage() {
       </p>
 
       <p>
-        색을 바꾸는 길은 둘이다. 화면 전체는 브랜드 프리셋, 한 컴포넌트는{" "}
-        <code>className</code>. 왜 그 둘뿐인지는{" "}
-        <Link href="/design-system/color">색은 고르는 것이다</Link> 에 있다.
+        색을 바꾸는 길은 둘이다. 화면 전체는 브랜드 색 하나(프리셋 또는{" "}
+        <code>npx nui-theme</code>), 한 컴포넌트는 <code>className</code>. 왜 그
+        둘뿐인지는 <Link href="/design-system/color">색은 고르는 것이다</Link>{" "}
+        에 있다.
       </p>
 
       <h2>역할별 색</h2>

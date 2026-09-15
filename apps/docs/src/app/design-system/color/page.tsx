@@ -1,7 +1,16 @@
 import Link from "next/link";
+import presets from "@/generated/presets.json";
 import { DesignNote } from "@/components/guide";
 
 export const metadata = { title: "색은 고르는 것이다" };
+
+/** 테마 파일 하나에 든 변수 수 — 12단계 셋 + 반투명 + 채움 위 글자색 둘. 라이트·다크 각각 */
+const PER_THEME =
+  presets.steps.length * 3 +
+  presets.alpha.brand.length +
+  presets.alpha.secondary.length +
+  presets.alpha.gray.length +
+  2;
 
 /** 자리마다 요구하는 대비가 다르다 — packages/ui/scripts/color/contrast.mjs 가 검사한다 */
 const CONTRAST = [
@@ -16,11 +25,13 @@ export default function ColorPage() {
       <h1>색은 고르는 것이다</h1>
 
       <p>
-        브랜드 색을 직접 조합하지 않는다. 준비된 <strong>185색</strong> 중
-        하나를 고르면 화면에 필요한 색이 전부 따라온다.
+        브랜드 색을 직접 조합하는 자리는 없다. 고르는 것은 색 하나다. 준비된{" "}
+        <strong>{presets.count}색</strong> 중 하나를 고르거나 목록에 없는 색을{" "}
+        <code>npx nui-theme --accent</code> 로 넘기면 화면에 필요한 색이 전부
+        따라온다.
       </p>
 
-      <h2>한 색에서 98개가 나온다</h2>
+      <h2>한 색에서 {PER_THEME}개가 나온다</h2>
       <p>고른 색 하나가 아래를 만든다.</p>
       <ul>
         <li>
@@ -39,15 +50,17 @@ export default function ColorPage() {
           <strong>각 단계 위에서 읽히는 글자색</strong>
         </li>
       </ul>
-      <p>라이트와 다크가 각각 만들어지므로 합해서 98개다.</p>
+      <p>
+        라이트와 다크가 각각 만들어지므로 파일 하나에 {PER_THEME * 2}개가 든다.
+      </p>
 
       <pre className="doc-code">
         <code>{`import "@nui-kit/react/styles/index.css";
-import "@nui-kit/react/styles/presets/42.css";   // 고른 색 하나`}</code>
+import "@nui-kit/react/styles/themes/preset-42.css";   // 고른 색 하나`}</code>
       </pre>
       <p>
         어떤 색이 있는지는 <Link href="/brand-colors">브랜드 색 고르기</Link>{" "}
-        에서 눈으로 고른다.
+        에서 눈으로 고른다. 목록에 없는 색은 같은 페이지의 명령으로 만든다.
       </p>
 
       <h2>185색은 어떻게 추려졌나</h2>
@@ -125,7 +138,10 @@ import "@nui-kit/react/styles/presets/42.css";   // 고른 색 하나`}</code>
                 화면 전체
               </th>
               <td className="doc-wrap">
-                <Link href="/brand-colors">프리셋 185색</Link> 중 하나를 고른다
+                <Link href="/brand-colors">프리셋 {presets.count}색</Link> 중
+                하나를 고른다. 목록에 없으면{" "}
+                <code>npx nui-theme --accent &quot;#b1002a&quot;</code> 로
+                만든다
               </td>
             </tr>
             <tr>

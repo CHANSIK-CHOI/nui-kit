@@ -32,9 +32,9 @@ export default function Page() {
 
       <h2>설치해도 기존 화면이 달라지지 않는다</h2>
       <p>
-        라이브러리 CSS 는 전부 <code>@layer nui.*</code> 안에 있어 프로젝트
-        CSS 가 항상 이기고, 클래스는 <code>nui-</code> 로 시작해 부딪히지
-        않으며, 전역 reset 을 깔지 않는다.{" "}
+        라이브러리 CSS 는 전부 <code>@layer nui.*</code> 안에 있어 프로젝트 CSS
+        가 항상 이기고, 클래스는 <code>nui-</code> 로 시작해 부딪히지 않으며,
+        전역 reset 을 깔지 않는다.{" "}
         <Link href="/design-system/isolation">오염시키지 않는다</Link> 참조.
       </p>
       <pre className="doc-code">
@@ -53,7 +53,8 @@ export default function Page() {
         </li>
         <li>
           <Link href="/brand-colors">브랜드 색 고르기</Link> — 준비된 185색 중
-          하나를 고르면 화면 전체 색이 바뀐다
+          하나를 고르거나 <code>npx nui-theme</code> 로 만들면 화면 전체 색이
+          바뀐다
         </li>
         <li>
           <Link href="/foundations">Foundations</Link> — 쓸 수 있는 값과 바꿀 수

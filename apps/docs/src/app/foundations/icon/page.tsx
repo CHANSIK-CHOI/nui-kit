@@ -13,9 +13,9 @@ const USAGE: [string, string, string][] = [
   [
     "lg",
     "16px",
-    "Button small 의 아이콘 · Datepicker 이전/다음 · Accordion 화살표 · Message 아이콘 · MultiSelect 칩의 ×",
+    "Button small 의 아이콘 · Datepicker 이전/다음 · Message 아이콘 · MultiSelect 칩의 ×",
   ],
-  ["2xl", "20px", "Button medium 의 아이콘"],
+  ["2xl", "20px", "Button medium 의 아이콘 · Accordion 화살표"],
   [
     "3xl",
     "24px",
@@ -71,8 +71,7 @@ export default function IconPage() {
       </p>
       <div className="doc-note">
         <strong>점과 표시는 아이콘이 아니다.</strong> 라디오 점(8) · 체크
-        표시(6×10) · 토스트 표시점(10) · 툴팁 화살표(10)는{" "}
-        <code>size-dot-xs / sm / md</code> 다.
+        표시(6×10) · 툴팁 화살표(10)는 <code>size-dot-xs / sm / md</code> 다.
       </div>
 
       <h2>어느 크기를 고르나</h2>

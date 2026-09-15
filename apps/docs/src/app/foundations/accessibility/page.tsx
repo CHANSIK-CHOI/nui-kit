@@ -19,6 +19,10 @@ const CHECKS: [string, string][] = [
     "실제로 마우스를 올리고 눌러서 잰 글자 대비",
   ],
   ["선택 컨트롤 전수", "tone × 상태 × 두 테마 — 채움 위 표시의 대비"],
+  [
+    "Checkbox shape=ghost",
+    "선택 여부 × tone × 상태 × 두 테마 — 면 없는 체크 표시의 대비",
+  ],
   ["placeholder", "4.5:1 — placeholder 도 글자다"],
   ["포커스", "포커스 전후 안쪽 글자의 좌표가 같은가"],
   [
@@ -26,7 +30,10 @@ const CHECKS: [string, string][] = [
     "실제로 눌리는 범위. 24px 미만 실패 · 이유 없는 44px 미만 경고",
   ],
   ["글자 최소", "13px 아래가 없는가"],
-  ["모션 감소", "prefers-reduced-motion 에서 duration 이 1ms 인가"],
+  [
+    "모션 감소",
+    "prefers-reduced-motion 에서 연 직후의 transform 이 정지해 있고 스피너 회전이 꺼지는가",
+  ],
 ];
 
 export default function AccessibilityPage() {
@@ -273,7 +280,9 @@ export default function AccessibilityPage() {
         색으로 바꾸고 위 표의 링을 더한다. 테두리 없이 누르는 것(Button ·
         IconButton · 닫기 버튼 · Accordion 헤더)은 <code>outline</code> 하나만
         그린다. 링을 겹치지 않는다. offset 은 <code>--nui-focus-offset</code>{" "}
-        토큰이다.
+        토큰이고, <code>overflow: hidden</code> 안에 있어 바깥이 잘리는 자리
+        (Accordion 헤더 · MultiSelect 칩의 ×)만 <code>--nui-focus-width</code>{" "}
+        만큼 안쪽으로 넣는다.
       </p>
       <p>
         <strong>테두리 두께는 어떤 상태에서도 바뀌지 않는다.</strong> 포커스도
@@ -393,10 +402,11 @@ export default function AccessibilityPage() {
                 아이콘 전용 버튼
               </th>
               <td className="doc-wrap">
-                라이브러리 안의 버튼(지우기 · 닫기 · 달력 열기)은 sr-only 문구로
-                이름을 갖는다. <code>IconButton</code> 은{" "}
-                <code>aria-label</code> 또는 <code>aria-labelledby</code> 를
-                타입으로 요구한다
+                입력 안의 버튼(지우기 · 달력 열기)은 sr-only 문구로, 팝업과
+                토스트의 닫기 버튼은 <code>closeLabel</code> 이{" "}
+                <code>aria-label</code> 로 이름을 갖는다.{" "}
+                <code>IconButton</code> 은 <code>aria-label</code> 또는{" "}
+                <code>aria-labelledby</code> 를 타입으로 요구한다
               </td>
             </tr>
             <tr>
@@ -415,8 +425,10 @@ export default function AccessibilityPage() {
                 그룹 컨트롤
               </th>
               <td className="doc-wrap">
-                <code>fieldset</code> + <code>legend</code> 또는{" "}
-                <code>role=&quot;group&quot;</code>
+                <code>CheckboxGroup</code> 은{" "}
+                <code>role=&quot;group&quot;</code>, <code>RadioGroup</code> 은{" "}
+                <code>role=&quot;radiogroup&quot;</code> 이고 <code>Field</code>{" "}
+                라벨이 <code>aria-labelledby</code> 로 이어진다
               </td>
             </tr>
           </tbody>

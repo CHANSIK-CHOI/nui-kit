@@ -59,7 +59,9 @@ export default function CustomizingPage() {
                 색
               </th>
               <td className="doc-wrap">
-                <Link href="/design-system/color">프리셋 또는 className</Link>
+                <Link href="/design-system/color">
+                  프리셋 · <code>npx nui-theme</code> 또는 className
+                </Link>
               </td>
               <td className="doc-wrap">화면 전체 또는 그 요소만</td>
             </tr>

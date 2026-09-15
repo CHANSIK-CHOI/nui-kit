@@ -121,10 +121,10 @@ export default function LabelPage() {
       <h2>에러는 다음에 할 일을 말한다</h2>
       <pre className="doc-code">
         <code>{`// ❌ 무엇이 문제인지만 말한다
-<Textfield isError errorMessage="번호가 잘못됐습니다" />
+<Textfield errorMessage="번호가 잘못됐습니다" />
 
 // ✅ 무엇을 하면 되는지 말한다
-<Textfield isError errorMessage="10-11자리 숫자로 입력해 주세요" />`}</code>
+<Textfield errorMessage="10-11자리 숫자로 입력해 주세요" />`}</code>
       </pre>
 
       <h2>라벨 대신 placeholder 를 쓰지 않는다</h2>

@@ -65,8 +65,9 @@ import "@nui-kit/react/styles/themes/preset-42.css";`}</code>
 
       <div className="doc-note doc-note--warn">
         <p>
-          <strong>화면 전체의 색을 바꾸는 길은 이것 하나다.</strong> 한
-          컴포넌트만 바꾸려면 <code>className</code> 을 쓴다. 둘뿐인 이유는{" "}
+          <strong>화면 전체의 색은 브랜드 색 하나로만 바뀐다</strong> — 프리셋
+          번호를 고르거나 아래 명령으로 만든다. 한 컴포넌트만 바꾸려면{" "}
+          <code>className</code> 을 쓴다. 둘뿐인 이유는{" "}
           <Link href="/design-system/color">색은 고르는 것이다</Link> 에 있다.
         </p>
       </div>

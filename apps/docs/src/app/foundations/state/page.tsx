@@ -268,9 +268,10 @@ export default function StatePage() {
         <code>{`disabled   >   error   >   readonly`}</code>
       </pre>
       <p>
-        셋은 CSS 상세도가 같아서 소스에 나중에 쓴 규칙이 이긴다. 파일 안에서
-        순서만 바꿔도 색이 조용히 뒤바뀐다. 우선순위를 <code>:not()</code> 으로
-        명시해 순서에 의존하지 않게 했다.
+        셋은 CSS 상세도가 같아서 소스에 나중에 쓴 규칙이 이긴다. 그래서{" "}
+        <code>disabled</code> 가 최우선인 것은 <code>:not()</code> 으로
+        명시했다. error 와 readonly 는 겹치면 속성별로 합성된다 — 테두리는
+        error, 글자는 readonly 다.
       </p>
       <h3>함께 그린다</h3>
       <div className="doc-table-wrap">
@@ -361,7 +362,7 @@ export default function StatePage() {
                 <code>disabled</code>
               </th>
               <td className="doc-wrap">지금은 안 되지만 조건이 맞으면 된다</td>
-              <td className="doc-wrap">필수 항목 미입력 시의 제출 버튼</td>
+              <td className="doc-wrap">필수 항목이 비어 있을 때의 제출 버튼</td>
             </tr>
             <tr>
               <th scope="row">

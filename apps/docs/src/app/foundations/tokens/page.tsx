@@ -32,7 +32,7 @@ const GROUPS: [string, string, string, string][] = [
   ["shadow", "그림자", "/foundations/elevation#shadow", "떠 있는 것의 두 겹"],
   ["focus", "포커스", "/foundations/accessibility#focus", "링 셋과 색"],
   ["motion", "모션", "/foundations/motion#motion", "시간과 곡선"],
-  ["etc", "배율", "/foundations/motion#scale", "눌림 배율 셋"],
+  ["etc", "배율", "/foundations/motion#scale", "눌림 배율 넷"],
   ["z-index", "쌓임 순서", "/foundations/elevation#z-index", "층의 계약"],
 ];
 

@@ -13,7 +13,7 @@ const STROKE: [string, string, string, string][] = [
     "형태선",
     "border-form",
     "한 요소에 하나",
-    "카드 · 패널의 외곽, Accordion box 항목",
+    "카드 · 패널의 외곽, Accordion box 카드와 separated 항목",
   ],
   [
     "의미경계선",
@@ -27,7 +27,12 @@ const STROKE: [string, string, string, string][] = [
     "그림자와 한 벌",
     "Popup · Select 메뉴 · Datepicker 팝업",
   ],
-  ["구분선", "border-divider", "한 화면에 여러 번", "리스트 행, 아코디언 항목"],
+  [
+    "구분선",
+    "border-divider",
+    "한 화면에 여러 번",
+    "리스트 행, Accordion box · line 의 항목 사이",
+  ],
 ];
 
 export default function ShapePage() {

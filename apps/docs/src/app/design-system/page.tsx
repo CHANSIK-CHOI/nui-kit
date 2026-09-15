@@ -1,7 +1,12 @@
 import Link from "next/link";
+import tokens from "@/generated/tokens.json";
 import { HOOK_COUNT } from "@/components/guide";
 
 export const metadata = { title: "무엇을 토대로 만들었나" };
+
+const TOKEN_COUNT = Object.values(
+  tokens as unknown as Record<string, unknown[]>,
+).reduce((n, list) => n + list.length, 0);
 
 /** 항목마다 정본이 다르다 — 그것 자체가 이 라이브러리의 성격이다 */
 const SOURCES = [
@@ -79,14 +84,15 @@ export default function DesignSystemPage() {
 
       <h2>색은 만드는 것이 아니라 고르는 것이다</h2>
       <p>
-        브랜드 색을 직접 조합하는 창구는 없다.{" "}
-        <Link href="/brand-colors">준비된 185색</Link> 중 하나를 고르면 화면에
-        필요한 색 <strong>98개</strong>가 따라온다 — 밝기 12단계, 그와 짝이 되는
-        회색 12단계, 반투명, 그리고 각 단계 위에서 읽히는 글자색까지.
+        브랜드 색을 직접 조합하지 않는다. 고르는 것은 <strong>색 하나</strong>다
+        — <Link href="/brand-colors">준비된 185색</Link> 중 하나거나{" "}
+        <code>npx nui-theme --accent</code> 로 넘긴 hex 하나. 화면에 필요한
+        나머지 색은 그 색에서 만들어진다 — 밝기 12단계, 짝이 되는 보조와 회색
+        12단계, 반투명, 각 단계 위에서 읽히는 글자색까지.
       </p>
       <pre className="doc-code">
         <code>{`import "@nui-kit/react/styles/index.css";
-import "@nui-kit/react/styles/presets/42.css";   // 고른 색 하나`}</code>
+import "@nui-kit/react/styles/themes/preset-42.css";   // 고른 색 하나`}</code>
       </pre>
       <p>
         색을 만드는 것은 Radix 의 공식 생성기다. 따로 정한 것은 둘뿐이다 —
@@ -167,7 +173,7 @@ import "@nui-kit/react/styles/presets/42.css";   // 고른 색 하나`}</code>
         </li>
         <li>
           <Link href="/foundations">Foundations</Link> — 어떤 값이 있나. 토큰{" "}
-          308개
+          {TOKEN_COUNT}개
         </li>
         <li>
           <Link href="/components">Components</Link> — 하나씩 어떻게 쓰나
