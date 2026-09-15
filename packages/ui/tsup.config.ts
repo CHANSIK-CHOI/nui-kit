@@ -4,6 +4,8 @@ export default defineConfig({
   entry: {
     index: "src/index.ts",
     rhf: "src/rhf.ts",
+    // Next 전용 — `next/link` 를 쓰는 ButtonLink. optional peer 라 배럴에서 분리한다
+    next: "src/next.ts",
     // 컴포넌트별 서브패스 — 트리셰이킹 + 'use client' 경계 최소화
     button: "src/button.ts",
     field: "src/field.ts",
@@ -34,7 +36,8 @@ export default defineConfig({
   treeshake: false,
   splitting: true,
   target: "es2022",
-  // 모든 컴포넌트를 클라이언트 컴포넌트로 배포한다.
+  // 모든 컴포넌트를 클라이언트 컴포넌트로 배포한다 — App Router 가 이 지시어로 경계를 만들고,
+  // Pages Router · 순수 React 번들러는 무시한다(Vite/rollup 은 경고만 낸다).
   // tsup 은 기본적으로 'use client' 지시어를 제거하므로 banner 로 강제 보존한다.
   banner: { js: '"use client";' },
   // peer 는 절대 번들에 인라인하지 않는다 (React/RHF 인스턴스 싱글톤 보장)
@@ -43,7 +46,7 @@ export default defineConfig({
     "react-dom",
     "react/jsx-runtime",
     "react-hook-form",
-    // ButtonLink 가 next/link 를 쓰고 그것이 배럴로 나간다. required peer 다.
+    // ButtonLink 가 next/link 를 쓴다. `/next` 서브패스로만 나가는 optional peer 다.
     "next",
     "next/link",
     // 소비자와 한 벌을 공유해야 한다 — `Icon` 이 소비자의 lucide 컴포넌트를

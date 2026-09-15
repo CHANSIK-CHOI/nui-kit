@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s · nui-kit",
   },
   description:
-    "Next.js App Router 전용 React UI 컴포넌트 시스템 — 디자인 파운데이션과 컴포넌트 API 문서",
+    "Next.js 와 React 를 위한 UI 컴포넌트 시스템 — 디자인 파운데이션과 컴포넌트 API 문서",
 };
 
 // 첫 페인트 전에 테마를 확정한다. React 가 마운트된 뒤에 칠하면

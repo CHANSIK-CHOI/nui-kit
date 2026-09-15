@@ -47,9 +47,9 @@ export type ButtonDesignProps =
       /** 면이 없어 둥글기가 닿을 곳이 없다 */
       shape?: never;
       /**
-       * text 도 받는다(2026-09-11). 바뀌는 것은 글자 · 아이콘 · 스피너뿐이고 높이는
-       * 없다 — 내용 폭 · `min-height: auto` 예외(design-system.md §7-2)는 그대로다.
-       * 그래서 `large` 와 `medium` 은 같은 모양이다.
+       * text 도 받는다. 바뀌는 것은 글자 · 아이콘 · 스피너뿐이고 높이는 잡지 않는다 —
+       * 내용 폭 · `min-height: auto` 예외(design-system.md §7-2)는 그대로다.
+       * 글자는 large 18 · medium 16 · small 14, 아이콘은 24 · 20 · 16 이다.
        */
       size?: ButtonSize;
     };

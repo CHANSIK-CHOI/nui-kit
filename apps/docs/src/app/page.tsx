@@ -5,7 +5,7 @@ export default function HomePage() {
     <>
       <h1>nui-kit</h1>
       <p className="doc-lead">
-        Next.js App Router 용 React 컴포넌트 라이브러리. 폼, 팝업, 달력, 선택
+        Next.js 와 React 에서 쓰는 컴포넌트 라이브러리. 폼, 팝업, 달력, 선택
         컨트롤을 제공한다.
       </p>
 
@@ -15,11 +15,12 @@ export default function HomePage() {
       </pre>
       <p>
         peer dependency 는 <code>react</code> · <code>react-dom</code> ·{" "}
-        <code>next</code> · <code>lucide-react</code> 넷이다. <code>next</code>{" "}
-        는 <code>ButtonLink</code> 가 <code>next/link</code> 를 쓰고 그것이
-        배럴로 나가므로 필수다. <code>lucide-react</code> 는 아이콘 세트이고
-        소비자 프로젝트와 한 벌을 나눠 쓴다. <code>react-hook-form</code> 만{" "}
-        <code>optional</code> 이고 RHF 래퍼를 쓸 때 설치한다.
+        <code>lucide-react</code> 셋이다. <code>lucide-react</code> 는 아이콘
+        세트이고 소비자 프로젝트와 한 벌을 나눠 쓴다. <code>next</code> 와{" "}
+        <code>react-hook-form</code> 은 <code>optional</code> 이다 —{" "}
+        <code>next</code> 는 <code>ButtonLink</code>(
+        <code>@nui-kit/react/next</code>
+        )를, <code>react-hook-form</code> 은 RHF 래퍼를 쓸 때 설치한다.
       </p>
       <pre className="doc-code">
         <code>{`import "@nui-kit/react/styles/index.css";

@@ -319,9 +319,12 @@ console.log("\n■ 문서가 적은 토큰 · 값 · export 가 생성물과 같
       ? Math.round(Number(m[1]) * 16 * 100) / 100
       : Number(m[1]);
   };
-  // 서브패스 → 컴포넌트 폴더. get-started 의 export 표가 이것을 본다
+  // 서브패스 → 컴포넌트 폴더. get-started 의 export 표가 이것을 본다.
+  // 폴더 index.ts 가 아니라 엔트리 파일에서만 나가는 것(`/next` · `/rhf`)은 `{ entry }` 로 적는다
   const SUBPATH_DIR = {
     button: "Button",
+    next: { entry: "next.ts" },
+    rhf: { entry: "rhf.ts" },
     field: "Field",
     textfield: "Textfield",
     textarea: "Textarea",
@@ -337,19 +340,12 @@ console.log("\n■ 문서가 적은 토큰 · 값 · export 가 생성물과 같
     icon: "Icon",
   };
   const exportsOf = (dir) => {
-    const src = read(
-      join(
-        DOCS,
-        "..",
-        "..",
-        "packages",
-        "ui",
-        "src",
-        "components",
-        dir,
-        "index.ts",
-      ),
-    ).replace(/export\s+type\s*\{[^}]*\}[^;]*;/g, ""); // 타입은 값이 아니다
+    const UI_SRC = join(DOCS, "..", "..", "packages", "ui", "src");
+    const file =
+      typeof dir === "string"
+        ? join(UI_SRC, "components", dir, "index.ts")
+        : join(UI_SRC, dir.entry);
+    const src = read(file).replace(/export\s+type\s*\{[^}]*\}[^;]*;/g, ""); // 타입은 값이 아니다
     const names = new Set();
     for (const m of src.matchAll(/export\s*\{([^}]*)\}/g))
       for (const raw of m[1].split(",")) {

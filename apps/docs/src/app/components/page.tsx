@@ -24,7 +24,7 @@ const GROUPS = [
       {
         name: "ButtonLink",
         href: "/components/button-link",
-        desc: "버튼 모양의 링크 (next/link)",
+        desc: "버튼 모양의 링크. Next.js 전용 — @nui-kit/react/next",
       },
     ],
   },

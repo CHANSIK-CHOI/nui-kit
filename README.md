@@ -1,6 +1,6 @@
 # nui-kit
 
-Next.js **App Router 전용** React UI 컴포넌트 시스템.
+Next.js 와 React 를 위한 UI 컴포넌트 시스템.
 컴포넌트 라이브러리와 API 문서 사이트를 하나의 모노레포에서 관리합니다.
 
 [![npm](https://img.shields.io/npm/v/@nui-kit/react?color=16815a)](https://www.npmjs.com/package/@nui-kit/react)
@@ -25,7 +25,7 @@ import "@nui-kit/react/styles/index.css";
 
 | 계열 | |
 | --- | --- |
-| 액션 | `Button` · `IconButton` · `ButtonGroup` · `ButtonLink` |
+| 액션 | `Button` · `IconButton` · `ButtonGroup` · `ButtonLink`(Next.js 전용 · `/next`) |
 | 폼 | `Field` · `Textfield` · `Textarea` · `Search` · `Password` |
 | 선택 | `Checkbox` · `Radio` · `Switch` · `Select` · `MultiSelect` |
 | 날짜 | `Datepicker` · `DateRangePicker` · `DateMultiplePicker` |

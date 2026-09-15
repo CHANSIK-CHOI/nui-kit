@@ -4,6 +4,7 @@
 //    (붙이지 않으면 .d.ts 의 상대 경로가 ESM 에서 해석되지 않는다 — attw 로 검출됨)
 //
 // react-hook-form 래퍼는 `@nui-kit/react/rhf` 서브패스에 있다.
+// `ButtonLink`(next/link) 는 `@nui-kit/react/next` 서브패스에 있다 — 둘 다 optional peer 를 쓴다.
 
 // 커스텀 스타일링 시 소비자가 클래스/변수 이름을 조립할 수 있도록 프리픽스를 공개한다.
 export { PREFIX } from "./internal/prefix.js";

@@ -1,4 +1,4 @@
-import { ButtonLink } from "@nui-kit/react";
+import { ButtonLink } from "@nui-kit/react/next";
 import {
   GuideHeader,
   ExceptionBadges,
@@ -27,7 +27,15 @@ const asVariant = (v: Variant) =>
 export default function ButtonLinkPage() {
   return (
     <>
-      <GuideHeader title="ButtonLink" named={["ButtonLink"]} subpath="button" />
+      <GuideHeader
+        title="ButtonLink"
+        named={["ButtonLink"]}
+        subpath="next"
+        subpathOnly
+        css="button"
+      />
+
+      <ExceptionBadges items={[{ kind: "nextOnly", target: "ButtonLink" }]} />
 
       <p>
         생김새는 <code>Button</code> 과 같고 누르는 대신 이동한다.{" "}
@@ -36,10 +44,17 @@ export default function ButtonLinkPage() {
       </p>
 
       <div className="doc-note">
-        <code>next</code> 는 required peer 다. <code>ButtonLink</code> 가{" "}
-        <code>next/link</code> 를 쓰고 그것이 배럴로 나가므로, 이 컴포넌트를
-        쓰지 않더라도 설치되어 있어야 한다.
+        <strong>Next.js 전용이다.</strong> <code>next/link</code> 를 쓰므로 배럴이
+        아니라 <code>@nui-kit/react/next</code> 에서 가져오고, <code>next</code>{" "}
+        는 이 서브패스를 쓸 때만 설치한다(optional peer). Next 가 아닌 환경에서
+        버튼 모양의 링크가 필요하면 <code>getButtonClassName</code> 으로 자기
+        라우터의 Link 에 같은 클래스를 붙인다.
       </div>
+      <pre className="doc-code">
+        <code>{`import { getButtonClassName } from "@nui-kit/react";
+
+<Link to="/orders" className={getButtonClassName({ color: "primary" })}>주문 내역</Link>`}</code>
+      </pre>
 
       <h2>위계</h2>
       <p>

@@ -6,11 +6,18 @@ export const metadata = { title: "설치와 사용" };
 npm install @nui-kit/react lucide-react
 ```
 
-peer dependency 는 `react` · `react-dom` · `next` · `lucide-react` 넷이다. `next` 는
-`ButtonLink` 가 `next/link` 를 쓰고 그것이 배럴로 나가므로 필수다 — 그 컴포넌트를 쓰지
-않아도 설치되어 있어야 한다. `lucide-react` 는 아이콘 세트이고, 소비자 프로젝트와 한 벌을
-나눠 써야 한 화면의 아이콘이 한 세트가 된다. `react-hook-form` 만 optional 이고 RHF 래퍼를
-쓸 때 설치한다. Node 는 18.18.0 이상이다.
+peer dependency 는 `react` · `react-dom` · `lucide-react` 셋이다. `lucide-react` 는 아이콘
+세트이고, 소비자 프로젝트와 한 벌을 나눠 써야 한 화면의 아이콘이 한 세트가 된다. `next` 와
+`react-hook-form` 은 optional 이다 — `next` 는 `ButtonLink`(`@nui-kit/react/next`)를,
+`react-hook-form` 은 RHF 래퍼를 쓸 때 설치한다. Node 는 18.18.0 이상이다.
+
+## 어디서 쓸 수 있나
+
+| 환경 | 상태 |
+| --- | --- |
+| Next.js App Router | 이 문서 사이트와 검사가 여기서 돈다 |
+| Next.js Pages Router | 같은 `next/link` · 같은 클라이언트 API 라 막지 않는다. 전역 CSS 는 `_app` 에서 불러온다 |
+| 순수 React (Vite 등) | 배럴과 컴포넌트 서브패스는 `next` 없이 설치 · 타입체크된다. `ButtonLink` 만 Next 전용이다. 번들러가 `"use client"` 지시어에 경고를 낼 수 있는데 무시해도 된다 |
 
 ## 스타일 불러오기
 
@@ -98,6 +105,9 @@ import { Button } from "@nui-kit/react/button";
 
 // react-hook-form 래퍼
 import { RHFTextfield } from "@nui-kit/react/rhf";
+
+// Next.js 전용 — next/link 를 쓰는 ButtonLink
+import { ButtonLink } from "@nui-kit/react/next";
 ```
 
 배럴과 서브패스 중 어느 쪽으로 가져와도 React Context 를 공유한다. `Field` 와
@@ -108,7 +118,8 @@ import { RHFTextfield } from "@nui-kit/react/rhf";
 
 | 서브패스      | 들어 있는 것                                                                                                                        |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `/button`     | `Button` `IconButton` `ButtonGroup` `ButtonGroupItem` `ButtonLink`                                                                  |
+| `/button`     | `Button` `IconButton` `ButtonGroup` `ButtonGroupItem`                                                                               |
+| `/next`       | `ButtonLink` — Next.js 전용                                                                                                          |
 | `/field`      | `Field` `FieldItem` `FieldGrid` `FieldHeader` `FieldLabel` `FieldMessage` `useFieldContext` `getMergedAriaIds`                      |
 | `/textfield`  | `Textfield` `Search` `Password` `Message`                                                                                           |
 | `/textarea`   | `Textarea`                                                                                                                          |
@@ -126,7 +137,8 @@ import { RHFTextfield } from "@nui-kit/react/rhf";
 
 ## Server Component
 
-모든 컴포넌트가 `"use client"` 로 배포된다. Server Component 안에서는
+모든 컴포넌트가 `"use client"` 로 배포된다. App Router 는 이 지시어로 서버/클라이언트 경계를
+만들고, Pages Router 와 순수 React 번들러는 무시한다. Server Component 안에서는
 `Field.Label` 같은 dot notation 대신 `FieldLabel` 같은 named export 를 쓴다 —
 타입 검사와 빌드는 통과하고 렌더할 때만 깨지는 종류다.
 

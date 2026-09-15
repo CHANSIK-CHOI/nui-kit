@@ -1,7 +1,14 @@
 # @nui-kit/react
 
-Next.js **App Router 전용** React UI 컴포넌트 라이브러리.
-모든 컴포넌트는 클라이언트 컴포넌트(`"use client"`)로 배포된다.
+Next.js 와 React 를 위한 UI 컴포넌트 라이브러리.
+모든 컴포넌트는 클라이언트 컴포넌트(`"use client"`)로 배포된다 — App Router 가 이 지시어로
+서버/클라이언트 경계를 만들고, Pages Router 와 순수 React 번들러는 무시한다.
+
+| 환경 | 상태 |
+| --- | --- |
+| Next.js App Router | 문서 사이트와 검사 스크립트가 여기서 돈다 |
+| Next.js Pages Router | 같은 `next/link` · 같은 클라이언트 API 라 막지 않는다. 전역 CSS 는 `_app` 에서 불러온다 |
+| 순수 React (Vite 등) | 배럴과 컴포넌트 서브패스는 `next` 없이 설치·타입체크된다. `ButtonLink` 만 Next 전용이라 `/next` 서브패스에 있다 |
 
 ## 설치
 
@@ -13,14 +20,15 @@ npm install @nui-kit/react lucide-react
 직접 설치합니다 — 그래야 `<Icon icon={Star} />` 로 넘긴 아이콘과 라이브러리 안의
 아이콘이 한 세트가 됩니다.
 
-`react-hook-form` 은 RHF 래퍼(`/rhf`)를 사용할 때만 필요합니다.
+`react-hook-form` 은 RHF 래퍼(`/rhf`)를 사용할 때만, `next` 는 `ButtonLink`(`/next`)를
+사용할 때만 필요합니다. 둘 다 optional peer 입니다.
 
 ```jsonc
 "peerDependencies": {
   "react": "^18 || ^19",
   "react-dom": "^18 || ^19",
   "lucide-react": "^1.39.0",
-  "next": ">=14",
+  "next": ">=14",                // optional — /next 사용 시에만
   "react-hook-form": ">=7.50.0"  // optional — /rhf 사용 시에만
 }
 ```
@@ -182,7 +190,8 @@ import "../nui-theme.css";
 
 | 컴포넌트 | 서브패스 | 온디맨드 CSS |
 | --- | --- | --- |
-| `Button` · `IconButton` · `ButtonGroup`(`.Item`) · `ButtonLink` | `/button` | `button.css` |
+| `Button` · `IconButton` · `ButtonGroup`(`.Item`) | `/button` | `button.css` |
+| `ButtonLink` — **Next.js 전용** (`next/link`) | `/next` | `button.css` |
 | `Field`(`.Item` `.Grid` `.Header` `.Label` `.Message`) | `/field` | `field.css` |
 | `Textfield` · `Search` · `Password` · `Message` | `/textfield` | `textfield.css` |
 | `Textarea` | `/textarea` | `textarea.css` |
@@ -442,10 +451,26 @@ import { Field, FieldLabel } from "@nui-kit/react";
 | `Accordion.Button` | `AccordionButton` |
 | `Accordion.Panel` | `AccordionPanel` |
 
-### ButtonLink 와 `next`
+### ButtonLink 는 Next.js 전용 — `@nui-kit/react/next`
 
-`ButtonLink` 만 `next/link` 를 사용하고 그것이 배럴로 나갑니다. 이 라이브러리는
-App Router 전용이므로 `next` 는 required peer 입니다.
+`ButtonLink` 만 `next/link` 를 사용합니다. 그래서 배럴이 아니라 `/next` 서브패스로만
+나가고, `next` 는 optional peer 입니다 — `/next` 를 가져오지 않으면 `next` 가 없어도
+설치 · 타입체크 · 번들이 됩니다.
+
+```tsx
+import { ButtonLink } from "@nui-kit/react/next";
+
+<ButtonLink href="/orders" color="primary">주문 내역</ButtonLink>
+```
+
+Next 가 아닌 환경에서 버튼 모양의 링크가 필요하면 `getButtonClassName` 으로 자기 라우터의
+Link 에 같은 클래스를 붙입니다.
+
+```tsx
+import { getButtonClassName } from "@nui-kit/react";
+
+<Link to="/orders" className={getButtonClassName({ color: "primary" })}>주문 내역</Link>
+```
 
 ### Select / MultiSelect 와 `react-select`
 

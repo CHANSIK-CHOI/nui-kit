@@ -21,5 +21,4 @@ export type {
   ButtonGroupRatio,
 } from "./ButtonGroup.js";
 
-export { default as ButtonLink } from "./ButtonLink.js";
-export type { ButtonLinkProps } from "./ButtonLink.js";
+// `ButtonLink` 는 여기서 나가지 않는다 — `next/link` 를 쓰므로 `src/next.ts` 로만 나간다.

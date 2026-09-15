@@ -37,6 +37,11 @@ const KIND = {
     href: "/design-system/size",
     hint: "size · shape 를 받지 않는다",
   },
+  nextOnly: {
+    label: "Next.js 전용",
+    href: "/get-started",
+    hint: "next/link 를 쓴다. 배럴이 아니라 @nui-kit/react/next 에서 가져온다",
+  },
 } as const;
 
 export type ExceptionKind = keyof typeof KIND;
