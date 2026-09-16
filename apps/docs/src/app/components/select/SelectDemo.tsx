@@ -191,36 +191,37 @@ const CLIP_BOX = {
 } as const;
 
 export function SelectPortalDemo() {
-  const [floating, setFloating] = useState<SingleSelectValue>(null);
-  const [absolute, setAbsolute] = useState<SingleSelectValue>(null);
-  const [inFlow, setInFlow] = useState<SingleSelectValue>(null);
   const [inPlace, setInPlace] = useState<SingleSelectValue>(null);
+  const [portaled, setPortaled] = useState<SingleSelectValue>(null);
+  const [inFlow, setInFlow] = useState<SingleSelectValue>(null);
+  const [portaledDoc, setPortaledDoc] = useState<SingleSelectValue>(null);
 
   return (
     <CaseGrid
       columns={2}
-      code={`<Select options={OPTIONS} />                           // 화면에 맞춰 뒤집힌다
-<Select options={OPTIONS} menuPosition="absolute" />  // 페이지를 스크롤해 펼친다
-<Select options={OPTIONS} menuPosition="static" />    // 흐름 안
-<Select options={OPTIONS} menuPortalTarget={null} />  // 뜨되 제자리`}
+      code={`<Select options={OPTIONS} />                                  // 제자리 — 상자에 잘린다
+<Select options={OPTIONS} hasPortal />                        // body 로 나가 잘리지 않는다. 화면에 맞춰 뒤집힌다
+<Select options={OPTIONS} menuPosition="static" />           // 흐름 안 — 아래를 민다
+<Select options={OPTIONS} hasPortal menuPosition="absolute" /> // body 로 나가되 문서 기준 — 뒤집지 않는다`}
     >
-      <Case label="기본" note="화면에 맞춰 뒤집힌다">
+      <Case label="기본" note="상자에 잘린다">
         <div style={CLIP_BOX}>
           <Select
             options={CITIES}
-            value={floating}
-            onChange={(next) => setFloating(next)}
+            value={inPlace}
+            onChange={(next) => setInPlace(next)}
             placeholder="지역"
           />
         </div>
       </Case>
-      <Case label={`menuPosition="absolute"`} note="페이지를 스크롤해 펼친다">
-        <div style={CLIP_BOX}>
+      {/* `data-demo` — `check-menu-motion` 의 뒤집힘 절이 이 케이스를 집는다 */}
+      <Case label="hasPortal" note="상자를 벗어난다">
+        <div style={CLIP_BOX} data-demo="has-portal">
           <Select
-            menuPosition="absolute"
+            hasPortal
             options={CITIES}
-            value={absolute}
-            onChange={(next) => setAbsolute(next)}
+            value={portaled}
+            onChange={(next) => setPortaled(next)}
             placeholder="지역"
           />
         </div>
@@ -236,13 +237,17 @@ export function SelectPortalDemo() {
           />
         </div>
       </Case>
-      <Case label={`menuPortalTarget={null}`} note="뜨되 body 로 안 나간다">
+      <Case
+        label={`hasPortal · menuPosition="absolute"`}
+        note="상자를 벗어나고 뒤집지 않는다"
+      >
         <div style={CLIP_BOX}>
           <Select
-            menuPortalTarget={null}
+            hasPortal
+            menuPosition="absolute"
             options={CITIES}
-            value={inPlace}
-            onChange={(next) => setInPlace(next)}
+            value={portaledDoc}
+            onChange={(next) => setPortaledDoc(next)}
             placeholder="지역"
           />
         </div>

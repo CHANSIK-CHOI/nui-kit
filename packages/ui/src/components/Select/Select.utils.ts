@@ -25,6 +25,7 @@ import {
   NuiDropdownIndicator,
   NuiMenu,
   NuiMultiValueRemove,
+  NuiSelectContainer,
 } from "./SelectIndicators.js";
 import { getMergedAriaIds } from "../Field/Field.context.js";
 import { px, pv } from "../../internal/prefix.js";
@@ -58,41 +59,69 @@ const MENU_PORTAL_Z_INDEX = `var(${pv("z-portal-menu")})`;
  */
 export const SELECT_PORTAL_ROOT_ID = px("select-root");
 
+/** 메뉴 배치를 정하는 소비자 prop — `Select` · `MultiSelect` 가 같은 모양으로 넘긴다. */
+export type MenuPlacementInput = {
+  hasPortal: boolean;
+  menuPosition?: SelectMenuPosition;
+  menuPlacement?: MenuPlacement;
+  menuPortalTarget?: HTMLElement | null;
+};
+
 /**
- * 메뉴 배치 세 prop 을 한자리에서 해석한다 — `Select` 와 `MultiSelect` 가 같이 쓴다.
+ * 우리 portal 컨테이너(`#nui-select-root`)를 잡아야 하는가.
+ *
+ * **`hasPortal` 이 켜져 있고, 소비자가 `menuPortalTarget` 을 안 줬고, 흐름 배치가 아닐 때만.**
+ * 두 컴포넌트가 이 판정을 복제하지 않는다 — 아래 해석과 어긋나면 메뉴는 portal 로 가는데
+ * 컨테이너가 없어 제자리로 떨어진다.
+ */
+export function needsSelectPortalRoot({
+  hasPortal,
+  menuPosition,
+  menuPortalTarget,
+}: MenuPlacementInput): boolean {
+  return (
+    hasPortal && menuPosition !== "static" && menuPortalTarget === undefined
+  );
+}
+
+/**
+ * 메뉴 배치 prop 을 한자리에서 해석한다 — `Select` 와 `MultiSelect` 가 같이 쓴다 (Select.md §6-7 「해석 순서」).
  *
  * **두 컴포넌트에 복제하지 않는다.** 한쪽만 고쳐지는 자리가 된다 (`getReadOnlyGuardedProps`
  * 와 같은 이유).
  *
+ * 1. `menuPosition === "static"` — 흐름 · portal 없음 · 언제나 아래. `hasPortal` 과
+ *    `menuPortalTarget` 은 무시한다
+ * 2. `menuPortalTarget` 을 **`undefined` 가 아닌 값으로** 줬으면 그 값이 portal 을 정하고
+ *    **`hasPortal` 은 통째로 무시된다** — 위치 기본도 `absolute` 로 남는다
+ * 3. 아니면 `hasPortal` — 켜면 우리 컨테이너 + 위치 기본 `fixed`, 끄면 제자리 + `absolute`
+ *
+ * ⚠️ **`fixed` 로 따라가는 기준은 `hasPortal` 하나다** (2026-09-17 사용자 결정). 「실제로
+ *    portal 이 생겼는가」로 넓히면 `menuPortalTarget={요소}` 만 준 소비자가 조용히 `fixed` 로
+ *    바뀐다 — 0.1.2 에서 그 조합은 `absolute` 였다.
+ *
  * ⚠️ **`menuPortalTarget={null}` 은 「안 준 것」과 다르다.** `??` 로 기본값을 주면 `null` 이
- *    삼켜져 **타입은 통과하는데 끌 수 없는** prop 이 된다.
+ *    삼켜져 **타입은 통과하는데 끌 수 없는** prop 이 된다. 그렇다고 `"menuPortalTarget" in rest`
+ *    로 가르지도 않는다 — `undefined` 를 **명시한** 것도 키를 만든다. **가르는 경계는 키의
+ *    유무가 아니라 `undefined` 냐다.** `undefined` 면 `hasPortal` 에 맡긴다.
  *
- *    그렇다고 `"menuPortalTarget" in rest` 로 가르지도 않는다 — `undefined` 를 **명시한**
- *    것도 키를 만들기 때문이다. `menuPortalTarget={isInModal ? modalEl : undefined}` 가
- *    modal 밖에서 portal 을 통째로 잃고, 화면에는 「팝업 안에서 메뉴가 잘린다」로만
- *    드러난다 — 이 변경이 없애려던 바로 그 증상이다. `exactOptionalPropertyTypes` 가
- *    꺼져 있어 타입도 통과한다. **가르는 경계는 키의 유무가 아니라 `undefined` 냐다.**
+ * ⚠️ **`"static"` 은 react-select 에 넘기지 않는다.** 공식 값이 `absolute | fixed` 둘뿐이다.
  *
- * ⚠️ **`"static"` 은 react-select 에 넘기지 않는다.** 공식 값이 `absolute | fixed` 둘뿐이라
- *    (react-select 공식 문서의 `menuPosition`) 그 값을 넘기면 라이브러리 계약을 깬다.
- *    흐름 배치는 우리 CSS(루트 modifier)가 그리고, 그때 portal 과 뒤집기는 해제된다 —
- *    흐름 안에는 「위」가 없다 (Select.md §6-7).
+ * ⚠️ **`menuPlacement` 기본은 `"bottom"`** — 뒤집지 않는다. `Datepicker` 에 자동 뒤집기가
+ *    없어서 둘을 맞췄다. 그래도 `fixed`(`hasPortal`)에서는 react-select 가 `menuPlacement` 와
+ *    상관없이 뷰포트 기준으로 줄이거나 뒤집는다 — 넘침 처리는 Datepicker 와 함께 다음 작업이다.
  */
 export function resolveMenuPlacementProps(
-  menuPosition: SelectMenuPosition,
+  input: MenuPlacementInput,
   portalRoot: HTMLElement | null,
-  rest: {
-    menuPortalTarget?: HTMLElement | null;
-    menuPlacement?: MenuPlacement;
-  },
 ): {
   menuPosition: "absolute" | "fixed";
   menuPlacement: MenuPlacement;
   menuPortalTarget: HTMLElement | null;
 } {
-  const isStatic = menuPosition === "static";
+  const { hasPortal, menuPosition, menuPlacement, menuPortalTarget } = input;
 
-  if (isStatic) {
+  if (menuPosition === "static") {
     return {
       menuPosition: "absolute",
       menuPlacement: "bottom",
@@ -100,12 +129,17 @@ export function resolveMenuPlacementProps(
     };
   }
 
-  const hasConsumerTarget = rest.menuPortalTarget !== undefined;
+  const hasConsumerTarget = menuPortalTarget !== undefined;
+  const usesOurPortal = !hasConsumerTarget && hasPortal;
 
   return {
-    menuPosition,
-    menuPlacement: rest.menuPlacement ?? "auto",
-    menuPortalTarget: hasConsumerTarget ? rest.menuPortalTarget! : portalRoot,
+    menuPosition: menuPosition ?? (usesOurPortal ? "fixed" : "absolute"),
+    menuPlacement: menuPlacement ?? "bottom",
+    menuPortalTarget: hasConsumerTarget
+      ? menuPortalTarget!
+      : usesOurPortal
+        ? portalRoot
+        : null,
   };
 }
 
@@ -332,8 +366,13 @@ export function getResolvedSelectComponents<IsMulti extends boolean>(
     DropdownIndicator: NuiDropdownIndicator,
     ClearIndicator: NuiClearIndicator,
     MultiValueRemove: NuiMultiValueRemove,
-    // 메뉴에 등장 모션을 준다 (07 M4). 소비자가 갈아끼울 수 있다 — 기본값이다.
+    // 메뉴의 등장·퇴장 모션 (07 M4). 소비자가 갈아끼울 수 있다 — 기본값이다.
     Menu: NuiMenu,
+    // 퇴장의 경계. react-select 이 메뉴를 즉시 언마운트하므로 `AnimatePresence` 가
+    // 메뉴보다 **위**에 있어야 한다 (Select.md §6-6). 역시 기본값이다 — 소비자가
+    // 갈아끼우면 퇴장 모션을 잃지만 그것은 **화면에 보인다**(tokens.md §1-2).
+    // `ValueContainer` 를 감싸는 것과 갈리는 자리다: aria 는 조용히 깨진다.
+    SelectContainer: NuiSelectContainer,
     ...components,
     ...overrides,
   };

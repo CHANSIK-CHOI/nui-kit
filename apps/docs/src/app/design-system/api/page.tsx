@@ -33,8 +33,8 @@ const NAMES = [
   {
     concept: "잘림에서 벗어남",
     name: "hasPortal",
-    where: "Tooltip · Datepicker 계열",
-    note: "켜면 body 로 나가 잘리지 않는다. Select 는 감싼 라이브러리가 menuPortalTarget 을 갖고 있어 그 이름을 쓴다",
+    where: "Tooltip · Datepicker 계열 · Select 계열",
+    note: "켜면 body 로 나가 잘리지 않는다. 기본은 제자리다",
   },
   {
     concept: "값을 가진 입력",

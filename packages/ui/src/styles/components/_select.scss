@@ -38,7 +38,7 @@
     width: 100%;
 
     &__container {
-      // 제자리 메뉴(`menuPortalTarget={null}`)의 기준 상자다. emotion 도 같은 값을
+      // 제자리 메뉴(기본 · `hasPortal` 없음)의 기준 상자다. emotion 도 같은 값을
       // 주지만 그쪽이 사라져도 배치가 서게 여기서 명시한다 — 배치는 우리 것이다(머리 주석)
       position: relative;
       width: 100%;
@@ -193,9 +193,9 @@
       border-radius: var(#{v("radius-5")});
       background-color: var(#{v("layer-floating")});
       box-shadow: var(#{v("shadow-2")});
-      // 흐름 배치(`static`)일 때의 층. 그 밖에는 react-select 의 `MenuPortal` 래퍼가
-      // `z-portal-menu`(1031)를 갖는다 — `menuPortalTarget={null}` 이어도 기본 `fixed`
-      // 에서는 래퍼가 남는다(`body` 로 안 나갈 뿐) · design-system.md §10
+      // 제자리 메뉴(기본 `absolute` · `static`)의 층 — `Datepicker.__dropdown` 과 같은 값.
+      // portal 래퍼가 생기는 자리(`hasPortal` · `menuPosition="fixed"`)에서는 래퍼가
+      // `z-portal-menu`(1031)를 갖는다 · design-system.md §10
       z-index: var(#{v("z-tooltip")});
     }
 

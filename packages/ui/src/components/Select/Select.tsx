@@ -26,6 +26,7 @@ import {
   getReadOnlyGuardedProps,
   getResolvedSelectComponents,
   getResolvedSelectStyles,
+  needsSelectPortalRoot,
   resolveMenuPlacementProps,
   SELECT_PORTAL_ROOT_ID,
   getResolvedSingleValue,
@@ -92,13 +93,17 @@ const Select: ForwardRefExoticComponent<
       noOptionsMessage = DEFAULT_NO_OPTIONS_MESSAGE,
       // 메뉴 최대 높이는 react-select 이 소유한다 (배치 계산이 이 값을 참조하므로
       // CSS 의 max-height 로 덮지 않는다). 기본값만 우리가 정한다 — SEED `select.yaml`
-      // 의 `maxHeight` 와 같은 480 이고, `menuPlacement="auto"` 의 뒤집기 판정도
-      // 이 값을 본다 (Select.md §6-7).
+      // 의 `maxHeight` 와 같은 480 이다 (Select.md §6-7).
       maxMenuHeight = 480,
       menuIsOpen,
-      // 메뉴는 기본으로 떠 있다. `"static"` 이면 흐름에 들어가고 portal 도 풀린다.
-      // 기본이 `"fixed"` 인 이유는 뒤집기 판정 때문이다 — Select.md §6-7.
-      menuPosition = "fixed",
+      // 배치 넷 — 기본은 제자리 `absolute` · 뒤집지 않음 · 페이지를 스크롤하지 않음.
+      // `Datepicker` 와 같은 기본이다. 해석은 `resolveMenuPlacementProps` 한 곳 (Select.md §6-7).
+      hasPortal = false,
+      menuPosition,
+      menuPlacement,
+      menuPortalTarget,
+      // react-select 기본(`true`)을 뒤집었다 — 열 때 페이지가 저절로 움직이지 않게
+      menuShouldScrollIntoView = false,
       openMenuOnClick,
       openMenuOnFocus,
       backspaceRemovesValue,
@@ -182,11 +187,14 @@ const Select: ForwardRefExoticComponent<
     //    첫 프레임에는 `portalRoot` 가 없어 메뉴가 제자리로 그려지는데, 메뉴는 열려야
     //    보이고 그전에 이 effect 가 돈다.
     //
-    // 흐름 배치(`static`)이거나 소비자가 `menuPortalTarget` 을 직접 줬으면 잡지 않는다.
-    // ⚠️ `in` 으로 가르지 않는다 — `undefined` 를 명시한 것도 키를 만든다
-    //    (`resolveMenuPlacementProps` 주석).
-    const needsPortalRoot =
-      menuPosition !== "static" && rest.menuPortalTarget === undefined;
+    // `hasPortal` 일 때만 잡는다 — 판정은 `needsSelectPortalRoot` 한 곳.
+    const placementInput = {
+      hasPortal,
+      menuPosition,
+      menuPlacement,
+      menuPortalTarget,
+    };
+    const needsPortalRoot = needsSelectPortalRoot(placementInput);
 
     useEffect(() => {
       if (!needsPortalRoot) {
@@ -201,9 +209,8 @@ const Select: ForwardRefExoticComponent<
     }, [needsPortalRoot]);
 
     const menuPlacementProps = resolveMenuPlacementProps(
-      menuPosition,
+      placementInput,
       portalRoot,
-      rest,
     );
     // 단일 Select 에는 칩이 없다. context 모양을 맞추려고 기본값만 넣는다.
     const ariaContextValue = useMemo(
@@ -281,9 +288,10 @@ const Select: ForwardRefExoticComponent<
             }
             loadingMessage={rest.loadingMessage ?? selectLoadingMessage}
             maxMenuHeight={maxMenuHeight}
-            // 배치 세 prop 은 한자리에서 해석한다 (Select.md §6-7).
-            // 기본으로 body 를 탈출하고, `menuPortalTarget={null}` 이면 제자리로 돌아온다.
-            // z 는 `getResolvedSelectStyles` 가 `z-portal-menu` 로 올린다.
+            // 배치 prop 은 한자리에서 해석한다 (Select.md §6-7). 기본은 제자리이고
+            // `hasPortal` 이면 body 로 나간다. portal 래퍼의 z 는 `getResolvedSelectStyles` 가
+            // `z-portal-menu` 로 올린다.
+            menuShouldScrollIntoView={menuShouldScrollIntoView}
             {...menuPlacementProps}
             aria-invalid={ariaInvalid ?? (resolvedIsError || undefined)}
             aria-errormessage={

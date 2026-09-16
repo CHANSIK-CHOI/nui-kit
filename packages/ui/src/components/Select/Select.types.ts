@@ -25,17 +25,16 @@ export type MultiSelectValue = SelectOptionValue[];
 export type SelectSize = "large" | "medium";
 
 /**
- * 메뉴가 **떠 있는가.**
+ * 메뉴의 **배치 기준.** 안 주면 `hasPortal` 이 정한다 — 켜면 `fixed`, 끄면 `absolute`.
  *
  * `absolute` · `fixed` 는 react-select 의 값 그대로이고 **`static` 만 우리 확장**이다
  * (components.md §9-1 — 이름은 라이브러리 것을 쓰고 값만 넓힌다).
  *
- * - `fixed` (기본) — `body` 의 portal 컨테이너에 뜬다. **뷰포트를 기준으로** 자리를
- *   잡으므로 아래 공간이 모자라면 위로 뒤집히거나 높이가 줄어든다. 조상이 스크롤되면
- *   react-select 의 `autoUpdate` 가 컨트롤을 따라간다
- * - `absolute` — 같은 컨테이너. react-select 의 기본 판정이라 **아래 공간이 모자라면
- *   페이지를 스크롤해서** 아래에 펼친다 (Select.md §6-7)
- * - `static` — **제자리.** 문서 흐름 안이라 아래 콘텐츠를 밀어낸다. portal 은 해제된다
+ * - `absolute` (기본) — 컨트롤 아래 **제자리.** 스크롤을 CSS 가 따라간다. 잘리는 조상
+ *   안에서는 잘린다 — 그때는 `hasPortal`
+ * - `fixed` (`hasPortal` 의 기본) — **뷰포트를 기준으로** 자리를 잡아 아래가 모자라면
+ *   높이를 줄이거나 위로 뒤집는다. 조상 스크롤은 react-select 의 `autoUpdate` 가 따라간다
+ * - `static` — 문서 흐름 안이라 아래 콘텐츠를 밀어낸다. portal 은 언제나 해제된다
  */
 export type SelectMenuPosition = "absolute" | "fixed" | "static";
 
@@ -98,7 +97,16 @@ export type SelectSharedProps<IsMulti extends boolean> = Omit<
   infoMessage?: string;
   errorMessage?: string;
   /**
-   * 메뉴가 **떠 있는가.** 기본 `"fixed"` — `body` 의 portal 컨테이너에 뜬다.
+   * 메뉴를 `body` 로 내보내 **잘리는 조상을 탈출한다.** 기본 `false` — 컨트롤 아래 제자리에 뜬다.
+   * 카드 · 팝업처럼 `overflow` 로 잘리는 곳 안에 넣을 때 켠다. `Tooltip` · `Datepicker` 와
+   * 같은 이름 · 같은 기본값이다 (components.md §9).
+   *
+   * 켜면 `menuPosition` 기본이 `"fixed"` 가 된다. `menuPortalTarget` 을 `undefined` 가 아닌
+   * 값으로 주면(`null` 포함) 그 값이 이기고 이 prop 은 무시된다 (Select.md §6-7).
+   */
+  hasPortal?: boolean;
+  /**
+   * 메뉴의 배치 기준. 안 주면 `hasPortal` 이 정한다 — 켜면 `"fixed"`, 끄면 `"absolute"`.
    *
    * `"static"` 이면 문서 흐름에 들어가 아래 콘텐츠를 밀어내고, portal 도 해제된다.
    * 그 값은 react-select 에 넘기지 않는다 — 공식 값이 아니다 (Select.md §6-7).

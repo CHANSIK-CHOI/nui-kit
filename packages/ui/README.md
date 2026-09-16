@@ -521,19 +521,21 @@ emotion 쪽에서 걷어내** CSS 가 책임지게 합니다.
   `react-select` 이 메뉴를 어디에 펼칠지 계산할 때 이 값을 참조하므로, CSS 로 덮으면
   실제 높이와 계산이 어긋납니다 (기본값 `480`)
 
-**메뉴는 `body` 로 나가서 뜹니다.** `overflow: hidden` 인 조상 안에서도 잘리지 않고,
-아래 공간이 모자라면 위로 뒤집히거나 높이를 줄여 화면에 맞춥니다
-(`menuPlacement` 기본값 `"auto"`).
+**메뉴는 컨트롤 바로 아래 제자리에 뜹니다.** 스크롤하면 컨트롤과 함께 움직이고, 아래 공간이
+모자라도 페이지를 스크롤하지 않습니다. `overflow: hidden` 인 조상(카드 · 팝업) 안에서는 잘리므로
+그때 `hasPortal` 을 켭니다 — `Datepicker` · `Tooltip` 과 같은 이름입니다.
 
 ```tsx
-<Select options={OPTIONS} />                           // 화면에 맞춰 뒤집힌다 — 기본
-<Select options={OPTIONS} menuPosition="absolute" />   // 뒤집는 대신 페이지를 스크롤해 펼친다
-<Select options={OPTIONS} menuPosition="static" />     // 문서 흐름 안. 아래 내용을 밀어낸다
-<Select options={OPTIONS} menuPortalTarget={null} />   // 뜨되 body 로 내보내지 않는다
+<Select options={OPTIONS} />                          // 제자리 — 기본
+<Select options={OPTIONS} hasPortal />                // body 로 나가 잘리지 않는다. 화면에 맞춰 위로 뒤집힌다
+<Select options={OPTIONS} menuPosition="static" />    // 문서 흐름 안. 아래 내용을 밀어낸다
+<Select options={OPTIONS} menuPortalTarget={modalEl} /> // 특정 요소로 내보낸다 — hasPortal 보다 우선
 ```
 
-`menuPosition` 은 `react-select` 의 prop 이름 그대로이고, 값 `"static"` 만 이 라이브러리가
-더한 것입니다. **감싼 라이브러리에만 있는 prop 은 이름을 바꾸지 않습니다** —
+`hasPortal` 은 여러 컴포넌트에 걸친 이 라이브러리의 이름이고, **어느 요소로** 내보낼지는
+`react-select` 의 `menuPortalTarget` 그대로입니다. `menuPosition` 도 `react-select` 의 prop
+이름 그대로이고, 값 `"static"` 만 이 라이브러리가 더한 것입니다. **감싼 라이브러리에만 있는
+prop 은 이름을 바꾸지 않습니다** —
 `menuPlacement` · `maxMenuHeight` · `menuPortalTarget` · `filterOption` 모두 `react-select`
 문서의 이름 그대로 넘깁니다.
 

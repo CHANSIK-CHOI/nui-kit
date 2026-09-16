@@ -771,17 +771,29 @@ export default function DatepickerBase<
               ? { opacity: 0 }
               : { opacity: 0, transform: "translateY(-8px) scale(0.97)" }
           }
+          // `pointerEvents` 를 여기서도 **명시**한다 — 퇴장이 끊기고 다시 열릴 때 `exit` 이
+          // 심은 `none` 을 되돌리는 일을 framer 의 폴백에 맡기지 않는다. `Select` 메뉴와
+          // 같은 모양이다 (Select.md §6-7).
           animate={
             shouldReduceMotion
-              ? { opacity: 1 }
-              : { opacity: 1, transform: "translateY(0px) scale(1)" }
+              ? { opacity: 1, pointerEvents: "auto" }
+              : {
+                  opacity: 1,
+                  transform: "translateY(0px) scale(1)",
+                  pointerEvents: "auto",
+                }
           }
+          // ⚠️ **퇴장에 `pointerEvents: "none"` 을 함께 준다** (2026-09-16).
+          //    없으면 닫히는 동안 날짜가 눌린다 — 닫은 뒤 150ms 안에 같은 자리를
+          //    클릭하면 값이 바뀐다(`check-menu-motion` 이 잡았다). `Select` 메뉴와
+          //    같은 규칙이다 (Select.md §6-7 · Datepicker.md §6-6).
           exit={
             shouldReduceMotion
               ? { opacity: 0 }
               : {
                   opacity: 0,
                   transform: "translateY(-8px) scale(0.97)",
+                  pointerEvents: "none",
                   transition: motionTransition.popoverExit,
                 }
           }
