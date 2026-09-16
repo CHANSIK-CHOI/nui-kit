@@ -413,11 +413,15 @@
     #{v("layer-overlay")}: rgb(0 0 0 / 50%);
 
     // ── semantic / surface — layer 가 아니라 콘텐츠 위에 얹는 톤
-    // soft 는 카드 위의 은은한 **정적인** 면이다 — 지금 컴포넌트 참조는 없고 문서 사이트가 쓴다 (tokens.md §5-3).
+    // soft · subtle 은 카드 위의 은은한 **정적인** 면이다 — 컴포넌트 참조는 없고 문서 사이트가 쓴다 (tokens.md §5-3).
     // control-bg-hover(a3) · -active(a4) 와 값이 같지만 hover 자리에 쓰지 않는다 — 역할이 다르다 (design-system.md §2-3).
     // 그라디언트는 두지 않는다 — 고도는 표면색·그림자·선 셋으로 표현한다 (design-system.md §2-5).
     #{v("surface-neutral-soft")}: var(#{v("color-gray-a3")});
     #{v("surface-neutral-subtle")}: var(#{v("color-gray-a4")});
+    // 시트 손잡이 막대 — 컴포넌트가 쓰는 첫 surface 다 (2026-09-15 · Popup.md §9). 알파가 아니라
+    // gray-8 인 이유: 실측 대비 라이트 1.68 · 다크 2.48. a4 는 1.23 으로 거의 안 보였다. `control-*`
+    // 는 입력 컨트롤 본체 전용이라 여기 못 쓴다 (design-system.md §2-5-1). 다크는 primitive 가 뒤집힌다.
+    #{v("surface-handle")}: var(#{v("color-gray-8")});
 
     // ── semantic / border ★
     //

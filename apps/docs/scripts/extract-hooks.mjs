@@ -40,6 +40,8 @@ const OUT = join(HERE, "..", "src", "generated", "hooks.json");
  */
 const LABEL = {
   accordion: "Accordion",
+  // `_popup.scss` 가 내는 둘째 접두어 — 손잡이 훅 (2026-09-15 · G1). 소비자가 import 하는 이름을 따른다
+  "bottom-sheet": "BottomSheet",
   button: "Button · ButtonLink",
   "button-group": "ButtonGroup",
   checkbox: "Checkbox",

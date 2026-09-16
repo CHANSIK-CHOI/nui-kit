@@ -1,7 +1,14 @@
 import Link from "next/link";
-import { GuideHeader, ExceptionBadges, DesignNote, PropsTable } from "@/components/guide";
+import {
+  GuideHeader,
+  ExceptionBadges,
+  DesignNote,
+  HookTable,
+  PropsTable,
+} from "@/components/guide";
 import {
   BottomSheetDeclarativeDemo,
+  BottomSheetDragDemo,
   BottomSheetImperativeDemo,
   BottomSheetOptionsDemo,
 } from "./BottomSheetDemo";
@@ -17,7 +24,9 @@ export default function BottomSheetPage() {
         subpath="popup"
       />
 
-      <ExceptionBadges items={[{ kind: "cappedWidth", target: "BottomSheet" }]} />
+      <ExceptionBadges
+        items={[{ kind: "cappedWidth", target: "BottomSheet" }]}
+      />
 
       <p>
         화면 아래에서 올라오는 시트다. 공유하기 · 정렬 방식처럼 선택지 몇 개를
@@ -64,6 +73,13 @@ export default function BottomSheetPage() {
               <td>small · medium · large</td>
               <td>받지 않는다. 화면 폭을 채운다</td>
             </tr>
+            <tr>
+              <th scope="row">끌어서 닫기</th>
+              <td>없다</td>
+              <td>
+                <code>shouldCloseOnDrag</code> 로 켠다
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -78,12 +94,52 @@ export default function BottomSheetPage() {
       </p>
       <BottomSheetOptionsDemo />
 
+      <h2>끌어서 닫기</h2>
+      <p>
+        <code>shouldCloseOnDrag</code> 를 주면 시트 위에 손잡이가 생긴다. 끄는
+        면은 <strong>위쪽 44px 띠</strong> 하나다. 그 띠를 아래로 끌면 시트가
+        손가락을 따라오고, 놓았을 때 시트 높이의 40% 를 넘게 내려왔거나 빠르게
+        튕겼으면 닫힌다. 아니면 제자리로 돌아온다. 기본은 꺼져 있다.
+      </p>
+      <p>
+        제목과 본문은 끄는 면이 아니다. 제목은 긁을 수 있고 본문은 스크롤한다.
+        끌어서 닫는 것도 <code>onRequestClose</code> 를 부른다. 그 prop 이
+        없으면 끌려도 제자리로 돌아온다. dim 과 <kbd>Esc</kbd> 가 그렇듯 닫는
+        주체는 쓰는 쪽이다.
+      </p>
+      <p>
+        <strong>켜면 × 가 기본으로 사라진다.</strong> 손잡이가 닫는 자리라 × 는
+        중복이다. 둘을 함께 두려면 <code>hasCloseButton</code> 을 적는다. 막대만
+        감추는 <code>hasDragHandle={"{false}"}</code> 도 있는데, 띠는 남아
+        끌리지만 끌 수 있다는 것을 알릴 길이 없어져 권하지 않는다.
+      </p>
+      <BottomSheetDragDemo />
+
       <DesignNote title="왜 시트만 스프링인가">
         <p>
-          시트는 손으로 끌 수 있다. 끌어서 닫는 제스처가 붙으면 열릴 때와 놓았을
-          때가 한 물리로 움직여야 한다. 그래서 다섯 중 시트만 스프링이고 튐은
-          없다. 버튼으로 여는 등장이 튀면 어색하다. 끌 수 없는 FullPopup 은
-          곡선으로 움직인다.
+          시트는 손으로 끌 수 있다. 열릴 때, 끌다 놓았을 때, 끌어서 닫힐 때가 한
+          물리로 움직여야 한다. 그래서 다섯 중 시트만 스프링이고 튐은 없다.
+          버튼으로 여는 등장이 튀면 어색하고, 끌어서 닫힐 때는 목표가 화면
+          밖이라 튐이 되돌아온 것처럼 읽힌다. 끌 수 없는 FullPopup 은 곡선으로
+          움직인다.
+        </p>
+      </DesignNote>
+
+      <DesignNote title="왜 끌어서 닫기가 기본이 아닌가">
+        <p>
+          이미 배포된 시트에 손잡이가 생기고, dim 과 Esc 를 막아 둔 시트가 끌면
+          닫힌다. 켜는 쪽이 고르는 것이 안전하다.
+        </p>
+      </DesignNote>
+
+      <DesignNote title="왜 끄는 면이 헤더가 아니라 띠인가">
+        <p>
+          헤더 전체가 끌리면 끄는 면의 크기가 제목 길이에 따라 달라진다. 제목이
+          두 줄인 시트는 끄는 면이 두 배다. 끄는 면에는 손가락 조작을 가로채는
+          설정이 걸려 있어 제목 글자도 긁히지 않고, 헤더에 버튼을 넣으면
+          그때마다 예외 목록에 기대게 된다. 그래서 끄는 면은 위쪽 44px 로 고정돼
+          있다. 보이는 막대는 36×4 이고 누르는 범위만 44 다. 닫기 버튼이 40 으로
+          보이면서 44 를 누르는 것과 같다.
         </p>
       </DesignNote>
 
@@ -95,7 +151,12 @@ export default function BottomSheetPage() {
         </li>
         <li>
           <code>prefers-reduced-motion</code> 에서는 올라오지 않고 페이드만
-          남는다
+          남는다. 끌기는 그대로 되고, 놓으면 즉시 제자리이거나 즉시 닫힌다
+        </li>
+        <li>
+          끄는 띠는 컨트롤이 아니다. 탭 순서에 없고 스크린리더도 읽지 않는다.
+          끌어서 닫기를 켠 시트에서 닫기 버튼 · dim · <kbd>Esc</kbd> 를 전부
+          막지 않는다. 드래그를 못 하는 사용자에게 다른 길이 하나는 있어야 한다
         </li>
         <li>
           포커스 트랩 · 배경 inert · 쌓임은{" "}
@@ -103,9 +164,17 @@ export default function BottomSheetPage() {
         </li>
       </ul>
 
+      <h2>공개 훅</h2>
+      <p>
+        손잡이 막대의 크기다. 나머지 치수는{" "}
+        <Link href="/components/popup">Popup</Link> 의 훅을 따른다.
+      </p>
+      <HookTable group="bottom-sheet" />
+
       <h2>API</h2>
       <p>
-        <code>LayerPopup</code> 의 prop 에서 <code>size</code> 가 빠진다.
+        <code>LayerPopup</code> 의 prop 에서 <code>size</code> 가 빠지고{" "}
+        <code>shouldCloseOnDrag</code> 가 더해진다.
       </p>
       <PropsTable of="BottomSheet" />
     </>

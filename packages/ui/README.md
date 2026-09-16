@@ -158,6 +158,7 @@ import "../nui-theme.css";
 | Select · MultiSelect | `--nui-select--medium-height` `-large-height` · `-medium-radius` `-large-radius` · `-border-width` |
 | ButtonGroup | `--nui-button-group--gap` |
 | Popup | `-lg-width` `-md-width` `-sm-width` · `-radius` · `-border-width` |
+| BottomSheet | `--nui-bottom-sheet--handle-width` `-handle-height` (손잡이 막대) |
 | Textarea | `-min-height` · `-radius` · `-border-width` |
 | Datepicker | `-dropdown-radius` · `-day-size` `-day-button-size` `-day-radius` · `-border-width` |
 | Accordion | `-box-radius` · `-separated-radius` `-separated-gap` · `-border-width` |
@@ -267,6 +268,21 @@ export default function RootLayout({
 **Host 가 없으면 명령형 팝업·토스트는 조용히 렌더되지 않습니다** — 에러도 경고도
 나지 않습니다. `<LayerPopup open={...} />` 처럼 선언형으로 직접 렌더할 때는 Host 가
 필요 없지만, 그 경우 배경 스크롤 잠금과 배경 `inert` 도 걸리지 않습니다.
+
+`BottomSheet` 는 `shouldCloseOnDrag` 를 주면 위에 손잡이가 생기고, **위쪽 44px 띠**를 아래로
+끌어 닫을 수 있습니다. 제목과 본문은 끄는 면이 아니라 글을 긁고 스크롤하는 데 지장이 없습니다.
+기본은 꺼져 있고, 끌어서 닫는 것도 `onRequestClose` 를 부르므로 그 prop 이 있어야 닫힙니다.
+
+```tsx
+<BottomSheet open={isOpen} onRequestClose={close} shouldCloseOnDrag title="정렬">
+  …
+</BottomSheet>
+```
+
+**끌어서 닫기를 켜면 닫기 버튼이 기본으로 사라집니다.** 손잡이가 닫는 자리라 × 가 중복이기
+때문입니다. 둘을 함께 두려면 `hasCloseButton` 을 명시합니다. 손잡이 막대만 감추는
+`hasDragHandle={false}` 도 있지만, 띠가 24px 로 줄고 끌 수 있다는 것을 알릴 길도 없어져
+권하지 않습니다.
 
 토스트는 **읽는 동안 사라지지 않습니다.** 마우스가 올라가 있거나, 포커스가 안에
 있거나, 다른 탭에 가 있으면 시간이 멈추고 돌아오면 남은 시간부터 다시 갑니다.

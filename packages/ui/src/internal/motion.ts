@@ -35,6 +35,19 @@ export const motionEase = {
   exitEmphasized: [0.16, 1, 0.3, 1],
   expand: [0.5, 1, 0.89, 1],
   pressed: [0, 0, 0.15, 1],
+  // ── 큰 면이 한 방향으로 미끄러질 때 ★ (2026-09-15 · FullPopup)
+  //
+  // Emil 의 `--ease-drawer` 그대로다 (`review-animations/STANDARDS.md:34` · 드로어 레시피가 쓰는 곡선).
+  // 예전에는 「시트를 스프링으로 열기로 해서 쓸 자리가 없다」며 안 들였는데, **풀팝업이 원래
+  // 이 곡선의 자리**였다.
+  //
+  // 왜 필요한가 — `enterEmphasized` 는 420px 을 300ms 에 건널 때 **첫 프레임에 130px** 을 뛰고
+  // 31ms 에 절반이 끝난다. 나머지 270ms 는 거의 멈춘 채 붙는 시간이라 「너무 빠르다」로 읽힌다.
+  // 이 곡선은 같은 300ms 에 첫 프레임 58px · 절반 49ms 다 (실측 · spec §5).
+  //
+  // ⚠️ **SCSS 짝이 없다.** CSS 로 이 곡선을 쓰는 자리가 아직 없어서다 — 안 쓰는 토큰을 선언하면
+  //    죽은 토큰이 된다(tokens.md §5-3). CSS 에서 쓸 자리가 생기면 그때 `_seed.scss` 에 더한다.
+  drawer: [0.32, 0.72, 0, 1],
 } as const;
 
 export const motionTransition = {
@@ -53,53 +66,76 @@ export const motionTransition = {
   // 시트는 **손으로 끌 수 있는 것**이다. Apple 이 `Drawer / sheet` 를 스프링 표에
   // 이름으로 올려 두고(damping 0.8 · response 0.3), Emil 도 "끊고 되돌릴 수 있는
   // 것은 스프링"이라고 한다. 값은 motion.md §8 이 되돌아감에 적어 둔 것과 같다 —
-  // **등장과 놓았을 때가 한 물리가 된다.** G1(끌어서 닫기)이 붙는 순간 드러난다.
+  // **등장과 놓았을 때가 한 물리다.** G1(2026-09-15)이 이 값 하나를 세 자리에 쓴다 —
+  // 등장 · 끌다 놓았을 때의 되돌아감 · 끌어서 닫힐 때(+ 놓은 `velocity`). 여기를 고치면
+  // 셋이 같이 움직인다. 따로 `panelSheetDrag*` 를 두지 않는 이유다 (`PopupBase.tsx`).
   //
   // `bounce: 0` 인 이유 — 튐은 **던졌을 때만**이다. 버튼으로 여는 등장이 튀면 어색하다.
+  // 끌어서 닫힐 때도 0 이다 — 목표가 화면 밖이라 튐이 되돌아온 것처럼 읽힌다.
   // `visualDuration` 은 "눈에 보이는 시간" 이라 duration 스케일과 같은 뜻으로 읽힌다.
   //
   // ⚠️ 예전에는 `d8`(400)이었다. Emil 의 **"UI animations stay under 300ms"** 규칙에
   //    걸렸고, 그 규칙의 반례가 정확히 400ms 였다. SEED 도 300 이다.
+  // ⚠️ **0.3 에서 0.25 로 당겼다** (2026-09-15 · 실기기). 시트는 팝업 중 가장 멀리 움직이는데
+  //    (704px · 다이얼로그는 24px) 스프링의 꼬리가 길어 「아직 안 끝났다」가 남았다. 실측 —
+  //    0.3 은 97% 에 307ms · 마지막 1px 까지 530ms, 0.25 는 256ms · 441ms.
   panelSheet: {
     type: "spring",
     bounce: 0,
-    visualDuration: 0.3,
+    visualDuration: 0.25,
   } satisfies Transition,
+  // 등장(0.25)보다 짧다 — 퇴장은 등장보다 짧다 (design-system.md §6-2). d5(250)였을 때는 둘이 같았다.
   panelSheetExit: {
-    duration: motionDuration.d5,
+    duration: motionDuration.d4,
     ease: motionEase.exit,
+  } satisfies Transition,
+
+  // ── 끌어서 닫힐 때만 ★ (2026-09-15 · G1 실기기 측정)
+  //
+  // 등장값(`panelSheet` 0.25)으로 나가면 **버튼으로 닫을 때(d4 200)보다 느리다.** 손으로 민 쪽이
+  // 더 느린 것은 거꾸로다 — 퇴장은 등장보다 짧다(tokens.md §3-6 · design-system.md §6-2).
+  //
+  // 등장 · 되돌아감은 `panelSheet`(0.25) 그대로다. 놓았을 때 제자리로 돌아오는 것은 「퇴장」이
+  // 아니라 취소라, 등장과 같은 물리여야 손에 붙는다.
+  //
+  // ⚠️ 딤과 견주지 않는다 — 딤은 전용 값 없이 **이 값을 그대로 따라온다**(위 dim 절).
+  panelSheetDragExit: {
+    type: "spring",
+    bounce: 0,
+    visualDuration: 0.2,
   } satisfies Transition,
 
   // fullPopup — 전체 화면 슬라이드.
   // ⚠️ `d7`(350)이었다. 같은 "300ms 아래" 규칙에 걸려 내렸다. 끌 수 없는 것이라
   //    스프링은 쓰지 않는다 — 스프링은 손으로 만질 수 있는 것의 도구다.
+  //
+  // ⚠️ **곡선이 `enterEmphasized` 에서 `drawer` 로 바뀌었다** (2026-09-15 · 실기기에서 「너무
+  //    빠르다」). 시간은 300 그대로다 — 문제는 길이가 아니라 첫 프레임이었다(위 `drawer` 주석).
   panelFull: {
     duration: motionDuration.d6,
-    ease: motionEase.enterEmphasized,
+    ease: motionEase.drawer,
   } satisfies Transition,
   panelFullExit: {
     duration: motionDuration.d4,
     ease: motionEase.exit,
   } satisfies Transition,
 
-  // ── dim ★ 팝업 **세 변형이 함께 쓴다** (dialog · bottomSheet · full).
+  // ── dim ★ **딤 전용 값이 없다** (2026-09-15).
   //
-  // 딤은 전환이 아니라 **상태 선언**이다 — "뒤는 이제 못 만진다". 그래서 빠르다.
-  // 예전에는 d5(250)이라 패널(300)과 거의 같이 움직였고, 둘이 동시에 움직여 눈이
-  // 갈렸다. 먼저 앉혀 두면 패널 착지만 보게 된다 — motion.md §2 「상태 표시」 ·
-  // §7 「시스템이 답할 때는 즉시」. (2026-09-08 · prototype AL2)
+  // 딤은 패널의 트랜지션을 **그대로** 쓴다 — 같은 시간 · 같은 곡선 · 같은 스프링. 그래서
+  // 여기에 `overlay` · `overlayExit` 토큰이 없다. 자리는 `PopupBase` 의 `panelMotion` 하나다.
   //
-  // ⚠️ 이름에 `Dialog` 를 붙이지 않는다. 붙어 있던 시절 실제로 "다이얼로그만
-  //    바뀐다"고 잘못 읽었다 — 시트와 풀팝업도 이 값으로 어두워진다.
-  overlay: {
-    duration: motionDuration.d2,
-    ease: motionEase.standard,
-  } satisfies Transition,
-  // 퇴장은 패널과 같이 간다. 딤이 먼저 걷히면 패널이 밝은 배경 위에 잠깐 뜬다.
-  overlayExit: {
-    duration: motionDuration.d4,
-    ease: motionEase.exit,
-  } satisfies Transition,
+  // 정본이 그렇게 말한다 — Emil `animate/RECIPES.md` 의 모달 레시피가 패널 250 · 백드롭 250 을
+  // 같이 두고 *"Animate the backdrop's opacity **alongside** it so they read as **one surface**"*
+  // 라고 적는다. 딤과 패널은 두 개가 아니라 **한 면**이다.
+  //
+  // ⚠️ 예전에는 딤을 먼저 앉혔다 — d5(250) → d2(100) → d4(200). 「딤은 전환이 아니라 상태
+  //    선언이라 먼저 앉는다」는 2026-09-08 prototype AL2 의 결정이었는데, **정본에서 벗어난
+  //    것이면서 대장에 이탈로 적히지 않았다.** 2026-09-15 에 사용자가 정본으로 돌아가기로
+  //    정하면서 그 결정과 미기록 이탈이 함께 사라졌다. 이력은 `decisions/motion.md`.
+  //
+  //    딤이 패널마다 다른 값을 갖게 되므로 「팝업 셋이 한 값을 공유한다」도 함께 끝났다 —
+  //    dialog 는 d6/d4 곡선, 시트는 스프링, 풀팝업은 drawer 곡선으로 각자 따라간다.
 
   // 레이아웃 전환
   panel: {

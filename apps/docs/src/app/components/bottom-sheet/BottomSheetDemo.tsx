@@ -140,8 +140,105 @@ export function BottomSheetOptionsDemo() {
         onConfirm={close}
       >
         <p style={{ color: "var(--nui-text-secondary)" }}>
-          × 가 없어도 dim 과 Esc 로 닫힙니다.
+          × 가 없어도 dim 과 Esc 로 닫힌다.
         </p>
+      </BottomSheet>
+    </>
+  );
+}
+
+// 본문이 시트 높이(88dvh)를 넘도록 넉넉히 둔다 — 「본문을 끌면 스크롤하고 시트는
+// 안 움직인다」를 보이는 자리다. `verify:popup` 시트 절도 이 넘침을 전제한다.
+const SORT_OPTIONS = [
+  "최신순",
+  "인기순",
+  "낮은 가격순",
+  "높은 가격순",
+  "리뷰 많은 순",
+  "평점 높은 순",
+  "할인율 높은 순",
+  "배송 빠른 순",
+  "가까운 순",
+  "이름순",
+  "등록 오래된 순",
+  "재고 많은 순",
+  "찜 많은 순",
+  "판매량순",
+  "조회수순",
+  "추천순",
+];
+
+type DragKey = "basic" | "withClose" | "noHandle";
+
+function SortList({ onPick }: { onPick: () => void }) {
+  return (
+    <div style={{ display: "grid", gap: 8 }}>
+      {SORT_OPTIONS.map((label) => (
+        <Button key={label} variant="line" size="medium" onClick={onPick}>
+          {label}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
+export function BottomSheetDragDemo() {
+  const [open, setOpen] = useState<DragKey | null>(null);
+  const close = () => setOpen(null);
+
+  return (
+    <>
+      <Example
+        caption="위쪽 띠를 아래로 끈다. 제목과 본문은 그대로다"
+        code={`<BottomSheet open={isOpen} onRequestClose={close} shouldCloseOnDrag title="정렬">…</BottomSheet>`}
+      >
+        <Button size="medium" variant="line" onClick={() => setOpen("basic")}>
+          끌어서 닫는 시트 열기
+        </Button>
+      </Example>
+
+      <CaseGrid
+        columns={2}
+        code={`<BottomSheet shouldCloseOnDrag hasCloseButton />
+<BottomSheet shouldCloseOnDrag hasDragHandle={false} />`}
+      >
+        <Case label="hasCloseButton" note="× 를 함께 둘 때">
+          <Button variant="line" onClick={() => setOpen("withClose")}>
+            닫기 버튼도 함께 열기
+          </Button>
+        </Case>
+        <Case label="hasDragHandle={false}" note="막대 없이 끌기">
+          <Button variant="line" onClick={() => setOpen("noHandle")}>
+            막대 없는 시트 열기
+          </Button>
+        </Case>
+      </CaseGrid>
+
+      <BottomSheet
+        open={open === "basic"}
+        onRequestClose={close}
+        shouldCloseOnDrag
+        title="정렬"
+      >
+        <SortList onPick={close} />
+      </BottomSheet>
+      <BottomSheet
+        open={open === "withClose"}
+        onRequestClose={close}
+        shouldCloseOnDrag
+        hasCloseButton
+        title="정렬"
+      >
+        <SortList onPick={close} />
+      </BottomSheet>
+      <BottomSheet
+        open={open === "noHandle"}
+        onRequestClose={close}
+        shouldCloseOnDrag
+        hasDragHandle={false}
+        title="정렬"
+      >
+        <SortList onPick={close} />
       </BottomSheet>
     </>
   );

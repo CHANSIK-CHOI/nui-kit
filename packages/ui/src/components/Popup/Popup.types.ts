@@ -83,6 +83,28 @@ type PopupBaseOwnProps = {
   /** dim 클릭으로 닫히는가 */
   shouldCloseOnBackdrop?: boolean;
   shouldCloseOnEscape?: boolean;
+  /**
+   * 들어온 방향으로 끌어서 닫는가. 기본 `false` — opt-in 이다 (spec §6-7 · 2026-09-15).
+   *
+   * **방향이 있는 variant 만 읽는다.** 지금 문을 연 것은 `bottomSheet`(아래 · `y`) 하나이고
+   * `full`(오른쪽 · `x`) 은 배선 자리만 있다. `dialog` 는 방향이 없어 참이어도 아무 일도
+   * 하지 않는다. 참이면 **손잡이(`__handle`)도 함께 그린다** — 제스처의 유일한 힌트라
+   * 따로 끄는 축을 두지 않는다.
+   *
+   * 드래그도 `onRequestClose` 를 부른다 — 닫기 요청이고 닫는 주체는 소비자다.
+   * 없으면 끌려도 제자리로 돌아온다(`shouldCloseOnBackdrop` 과 같은 성질).
+   */
+  shouldCloseOnDrag?: boolean;
+  /**
+   * 끄는 띠 안에 **손잡이 막대를 그리나.** 기본 `true`.
+   * `shouldCloseOnDrag` 가 참일 때만 읽는다 — 끌리지 않는데 손잡이만 보이는 거짓 힌트를
+   * 만들지 않는다.
+   *
+   * ⚠️ **끄는 것을 권하지 않는다.** 끄는 면(위쪽 44px 띠)은 그대로 남지만 끌 수 있다는 것을
+   *    알릴 길이 사라진다 — 힌트 없는 제스처다(Apple §8). SEED 도 손잡이를 없앨 때는
+   *    드래그로 닫는 것 자체를 함께 거둔다. 그 경우엔 `shouldCloseOnDrag` 를 끄는 것이 맞다.
+   */
+  hasDragHandle?: boolean;
   onRequestClose?: () => void;
   onClickClose?: () => void;
   /** 닫힘 애니메이션까지 끝난 뒤 호출된다 */
@@ -147,11 +169,23 @@ type PopupSharedShellProps = Omit<
   | "cancelLabel"
   | "onConfirm"
   | "onCancel"
+  // 방향이 있는 variant 만 되돌린다 — 아래 `BottomSheetProps` (spec §3-1)
+  | "shouldCloseOnDrag"
+  | "hasDragHandle"
 > &
   PopupAccessibleName &
   PopupFooterProps;
 type PopupSizedShellProps = PopupSharedShellProps &
   Pick<PopupBaseOwnProps, "size">;
+/**
+ * `shouldCloseOnDrag` 는 여기서만 되돌아온다 — `PopupSizedShellProps` 가 `size` 를
+ * 되돌리는 것과 같은 모양이다. `FullPopup` 은 골격의 축 표(`DRAG_AXIS.full = "x"`)에
+ * 배선이 있으나 문을 안 열었다 — 열려면 타입 한 줄 · `getPanelMotion` 의 `x` 키 전환 ·
+ * 끄는 면(헤더) 셋이 함께 간다. `LayerPopup` · `Alert` · `Confirm` 은 방향이 없다
+ * (spec §3-1 받지 않는 prop · §6-7).
+ */
+type PopupDraggableShellProps = PopupSharedShellProps &
+  Pick<PopupBaseOwnProps, "shouldCloseOnDrag" | "hasDragHandle">;
 
 export type PopupRuntimeProps = PopupInstanceProps &
   Pick<PopupBaseOwnProps, "onRequestClose">;
@@ -213,7 +247,7 @@ type PopupRegistrationOptions = {
 };
 
 export type LayerPopupProps = PopupSizedShellProps;
-export type BottomSheetProps = PopupSharedShellProps;
+export type BottomSheetProps = PopupDraggableShellProps;
 export type FullPopupProps = PopupSharedShellProps;
 
 export type LayerPopupComponentProps = PopupRuntimeProps;
