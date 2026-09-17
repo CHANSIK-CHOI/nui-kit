@@ -33,10 +33,12 @@ const failures = [];
 let sheetChecks = 0;
 // 스크롤 잠금 절이 본 수 — 0 이면 실패 (2026-09-17 · 다섯 종 전부)
 let lockChecks = 0;
+// 주소가 바뀐 채 닫기 절이 본 수 — 0 이면 실패 (2026-09-17). 영수증 콜백이 읽으므로 여기서 선언한다
+let routeChecks = 0;
 // 영수증 — 어느 길로 끝나든 마지막 줄. dev server 가 없어 위에서 죽으면 이 줄이 없다 = 미실시 (2026-09-11)
 process.on("exit", (code) =>
   console.log(
-    `RECEIPT check-popup failures=${failures.length} sheet=${sheetChecks} lock=${lockChecks} selftest=${SELFTEST ? "on" : "off"} exit=${code}`,
+    `RECEIPT check-popup failures=${failures.length} sheet=${sheetChecks} lock=${lockChecks} route=${routeChecks} selftest=${SELFTEST ? "on" : "off"} exit=${code}`,
   ),
 );
 const ok = (m) => console.log("  ✅", m);
@@ -150,6 +152,136 @@ for (const [label, url, opener, closer] of [
     ? lockOk(`${label}: 닫히면 잠금이 풀린다`)
     : lockBad(`${label}: 닫혔는데 잠금이 남아 있다`);
 }
+
+// ── 주소가 바뀐 채 닫기 (2026-09-17 · spec LayerPopup.md §6 「스크롤 잠금과 주소」 · §10)
+//
+// 팝업 안 링크로 이동하면 잠금 해제가 **새 페이지에서** 이전 위치로 되돌렸다 — 문서 사이트 모바일
+// 목차에서 3000 내린 페이지의 링크를 누르면 새 페이지가 3000 에서 열렸다. 지금은 pathname 이
+// 다르면 되돌리지 않고, search · hash 만 바뀌면 되돌린다(필터 시트의 `?color=` 가 맨 위로 튀지 않게).
+// 라우터를 거치지 않는 경로(`history.pushState`)와 실제 목차 링크 둘 다 잰다. 수(`route=`)가 0 이면 실패.
+// `--selftest` 는 pathname 을 **바꾸지 않은 채** 「되돌리지 않는다」를 기대해 실패가 나는지 본다.
+console.log("\n■ 주소가 바뀐 채 닫기");
+const routeFailuresBefore = failures.length;
+const routeOk = (m) => {
+  routeChecks += 1;
+  ok(m);
+};
+const routeBad = (m) => {
+  routeChecks += 1;
+  bad(m);
+};
+const LOCK_Y = 600;
+/** 스크롤을 내리고 팝업을 연 뒤 주소를 바꾸고 Esc 로 닫아 scrollY 를 돌려준다 */
+const closeAfterUrlChange = async (nextUrl) => {
+  await page.goto(`${BASE}/components/layer-popup`, {
+    waitUntil: "networkidle",
+  });
+  await page.evaluate((y) => window.scrollTo(0, y), LOCK_Y);
+  await wait(150);
+  // ⚠️ 측정 조건을 **측정하는 페이지에서** 확인한다 (2026-09-17 리뷰). 잠금 중에는 body 가 고정돼
+  //    scrollY 가 늘 0 이라, 600 까지 못 내렸거나 · 팝업이 안 열렸거나 · 안 닫혔으면 「되돌리지 않는다」
+  //    기대가 조용히 통과한다. 셋 다 직접 보고 아니면 그 측정을 실패로 둔다(null)
+  const startY = await page.evaluate(() => Math.round(window.scrollY));
+  if (Math.abs(startY - LOCK_Y) > 2) {
+    routeBad(
+      `layer-popup 을 ${LOCK_Y} 까지 못 내렸다 (${startY}) — 페이지가 짧아졌다. 측정 조건이 늙었다`,
+    );
+    return null;
+  }
+  // locator.click 은 버튼을 화면 안으로 스크롤한다 — 잠그기 전 위치가 바뀌므로 DOM 으로 누른다
+  await page.evaluate(() =>
+    [...document.querySelectorAll("button")]
+      .find((b) => b.textContent?.trim() === "약관 보기")
+      ?.click(),
+  );
+  await wait(500);
+  if (!(await isLocked())) {
+    routeBad(
+      "「약관 보기」로 팝업이 열리지 않았다(잠금 없음) — 버튼 이름이 늙었다",
+    );
+    return null;
+  }
+  if (nextUrl) {
+    await page.evaluate((u) => history.pushState(null, "", u), nextUrl);
+  }
+  await page.keyboard.press("Escape");
+  await wait(700);
+  if (await isLocked()) {
+    routeBad(
+      "Esc 로 팝업이 닫히지 않았다(잠금이 남음) — 닫힌 뒤의 위치를 잴 수 없다",
+    );
+    return null;
+  }
+  return page.evaluate(() => Math.round(window.scrollY));
+};
+{
+  // 1) pathname 이 바뀌면 되돌리지 않는다 — selftest 는 바꾸지 않은 채 같은 기대로 잰다
+  const y1 = await closeAfterUrlChange(
+    SELFTEST ? null : "/components/__nui-route-probe",
+  );
+  // null 이면 closeAfterUrlChange 가 측정 조건 실패를 이미 적었다
+  if (y1 !== null) {
+    y1 < 50
+      ? routeOk(
+          `pathname 이 바뀐 채 닫으면 이전 위치(${LOCK_Y})로 되돌리지 않는다 (scrollY ${y1})`,
+        )
+      : routeBad(
+          `pathname 이 바뀌었는데 scrollY ${y1} 로 되돌렸다 — 새 페이지가 이전 위치로 튄다`,
+        );
+  }
+  // 2) search 만 바뀌면 되돌린다
+  const y2 = await closeAfterUrlChange("/components/layer-popup?probe=1");
+  if (y2 !== null) {
+    Math.abs(y2 - LOCK_Y) < 5
+      ? routeOk(`search 만 바뀌면 되돌린다 (scrollY ${y2})`)
+      : routeBad(
+          `search 만 바뀌었는데 ${y2} — 기대 ${LOCK_Y} (주소와 동기화되는 팝업이 맨 위로 튄다)`,
+        );
+  }
+  // 3) hash 만 바뀌면 되돌린다
+  const y3 = await closeAfterUrlChange("/components/layer-popup#probe");
+  if (y3 !== null) {
+    Math.abs(y3 - LOCK_Y) < 5
+      ? routeOk(`hash 만 바뀌면 되돌린다 (scrollY ${y3})`)
+      : routeBad(`hash 만 바뀌었는데 ${y3} — 기대 ${LOCK_Y}`);
+  }
+  // 4) 실제 경로 — 문서 사이트 모바일 목차(FullPopup) 링크로 이동
+  if (!SELFTEST) {
+    const mobileCtx = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      hasTouch: true,
+      isMobile: true,
+    });
+    const m = await mobileCtx.newPage();
+    await m.goto(`${BASE}/components/select`, { waitUntil: "networkidle" });
+    await m.evaluate(() => window.scrollTo(0, 3000));
+    await m.waitForTimeout(200);
+    const startY = await m.evaluate(() => Math.round(window.scrollY));
+    await m.getByRole("button", { name: "문서 목차 열기" }).click();
+    await m.waitForTimeout(500);
+    await m
+      .locator('a[href="/components/button"] >> visible=true')
+      .first()
+      .click();
+    await m.waitForURL("**/components/button");
+    await m.waitForTimeout(900);
+    const y4 = await m.evaluate(() => Math.round(window.scrollY));
+    startY < 1000
+      ? routeBad(
+          `목차 절: select 페이지를 ${startY} 까지만 내렸다 — 측정 조건이 늙었다`,
+        )
+      : y4 < 50
+        ? routeOk(
+            `모바일 목차 링크로 이동하면 새 페이지가 맨 위다 (${startY} → ${y4})`,
+          )
+        : routeBad(
+            `모바일 목차 링크로 이동했는데 새 페이지가 scrollY ${y4} — 이전 위치(${startY})로 튀었다`,
+          );
+    await mobileCtx.close();
+  }
+}
+routeChecks > 0 || bad("주소 절이 아무것도 보지 않았다");
+const routeDetected = failures.length - routeFailuresBefore;
 
 // ── BottomSheet 끌어서 닫기 (G1 · 2026-09-15 · spec Popup.md §6-7 · §10)
 //
@@ -499,13 +631,16 @@ if (SELFTEST) {
   const detected = failures.length - sheetFailuresBefore;
   console.log("\n■ 자기 시험 — 드래그 없는 시트에서 절이 실패를 내는가");
   await browser.close();
-  const passed = detected >= 3;
+  // 주소 절은 pathname 을 안 바꾼 채 「되돌리지 않는다」를 기대했으니 그 한 줄이 실패해야 한다
+  const passed = detected >= 3 && routeDetected >= 1;
   console.log(
     passed
-      ? `  ✅ 검출 ${detected}건 (기대 3 이상) — 절이 실제로 본다`
-      : `  ❌ 검출 ${detected}건 — 절이 아무것도 못 본다`,
+      ? `  ✅ 검출 시트 ${detected}건 (기대 3 이상) · 주소 ${routeDetected}건 (기대 1 이상) — 절이 실제로 본다`
+      : `  ❌ 검출 시트 ${detected}건 · 주소 ${routeDetected}건 — 절이 아무것도 못 본다`,
   );
-  console.log(`RECEIPT check-popup selftest=on detected=${detected}`);
+  console.log(
+    `RECEIPT check-popup selftest=on detected=${detected} route-detected=${routeDetected}`,
+  );
   process.exit(passed ? 0 : 1);
 }
 
