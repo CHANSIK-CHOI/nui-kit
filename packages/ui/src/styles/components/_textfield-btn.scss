@@ -20,6 +20,8 @@
     font: inherit;
     font-family: var(#{v("font-family-base")});
     cursor: pointer;
+    // 터치의 눌림 표시는 우리 면·배율뿐 — 브라우저 하이라이트·글자 선택을 끈다 (Textfield.md §9)
+    @include pressable;
 
     display: inline-flex;
     align-items: center;

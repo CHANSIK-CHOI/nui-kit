@@ -41,6 +41,9 @@
     display: inline-flex;
     flex-shrink: 0;
     cursor: pointer;
+    // 하이라이트가 라벨 span 박스(44 히트 포함) 전체에 회색으로 덮이던 것을 끈다 (spec §9).
+    // `__input` 은 투명이라 건드리지 않는다
+    @include pressable;
 
     // 브랜드로 강조하는 자리. 기본은 조용하고 여기만 색이 온다
     &--brand {

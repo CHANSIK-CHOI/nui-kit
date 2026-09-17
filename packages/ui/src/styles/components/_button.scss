@@ -101,6 +101,8 @@
     // 인디케이터를 생략할 수 있다고 한다. <button> 은 원래 밑줄이 없어 한 줄로 둘이 같아진다.
     text-decoration: none;
     cursor: pointer;
+    // 터치의 눌림 표시는 우리 면·배율뿐 — 브라우저 하이라이트·글자 선택을 끈다 (spec §9)
+    @include pressable;
 
     display: flex;
     align-items: center;

@@ -89,6 +89,8 @@
       font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
+      // 터치의 눌림 표시는 우리 면·배율뿐 (Toast.md §9). 루트에는 걸지 않는다 — 메시지는 소비자 글
+      @include pressable;
 
       display: inline-flex;
       flex-shrink: 0;
@@ -119,6 +121,7 @@
       font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
+      @include pressable;
 
       display: inline-flex;
       flex-shrink: 0;

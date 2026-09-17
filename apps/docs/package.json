@@ -16,6 +16,7 @@
     "verify:feedback": "node scripts/check-feedback.mjs",
     "verify:a11y": "node scripts/check-a11y.mjs",
     "verify:press": "node scripts/check-press.mjs",
+    "verify:touch": "node scripts/check-touch.mjs",
     "verify:menu-motion": "node scripts/check-menu-motion.mjs",
     "verify:docs": "node scripts/check-docs.mjs"
   },

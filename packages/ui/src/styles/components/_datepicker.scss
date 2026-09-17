@@ -148,6 +148,8 @@
       width: 100%;
       opacity: 0;
       cursor: pointer;
+      // 터치의 눌림 표시는 우리 면·배율뿐 (Datepicker.md §9)
+      @include pressable;
     }
 
     &__dropdown-root {
@@ -222,6 +224,7 @@
       font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
+      @include pressable;
 
       display: inline-flex;
       align-items: center;
@@ -311,6 +314,7 @@
       font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
+      @include pressable;
 
       display: inline-flex;
       align-items: center;

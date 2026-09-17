@@ -102,6 +102,19 @@ body {
   color: var(--nui-text-disabled);
 }
 
+// 사이트의 누르는 것 — 라이브러리의 `pressable` 믹스인과 같은 네 줄 (styles.md §9-1).
+// 패키지 내부 믹스인이라 여기서는 못 쓰고 인라인으로 둔다. `verify:touch` 가 `.doc-*` 도 잰다
+.doc-nav-link,
+.doc-badge__label,
+.doc-brand,
+.doc-why__summary,
+.doc-theme-toggle__label {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .doc-nav-link {
   display: block;
   padding: 5px 8px;
@@ -111,9 +124,13 @@ body {
   font-size: var(--nui-font-size-2);
 }
 
-.doc-nav-link:hover {
-  background: var(--nui-control-bg-hover);
-  color: var(--nui-text-primary);
+// hover 는 hover 가 있는 기기에서만 — 터치는 탭한 뒤 :hover 가 남아 회색이 다음 탭까지 붙는다
+// (styles.md §9 · 2026-09-17 모바일 에뮬레이션 실측)
+@media (hover: hover) and (pointer: fine) {
+  .doc-nav-link:hover {
+    background: var(--nui-control-bg-hover);
+    color: var(--nui-text-primary);
+  }
 }
 
 .doc-nav-link[aria-current="page"] {
@@ -418,9 +435,11 @@ body {
   white-space: nowrap;
 }
 
-.doc-badge__label:hover {
-  border-color: var(--nui-action-border-hover);
-  color: var(--nui-text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .doc-badge__label:hover {
+    border-color: var(--nui-action-border-hover);
+    color: var(--nui-text-primary);
+  }
 }
 
 .doc-badge__label:focus-visible {

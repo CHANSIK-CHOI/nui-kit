@@ -100,6 +100,8 @@
       font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
+      // 터치의 눌림 표시는 우리 면·배율뿐 (Accordion.md §9). 패널에는 걸지 않는다 — 소비자 본문
+      @include pressable;
 
       display: block;
       width: 100%;

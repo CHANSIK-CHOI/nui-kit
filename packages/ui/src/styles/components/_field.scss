@@ -100,9 +100,13 @@
       @include typo(1, "regular");
     }
 
-    label#{cls("field")}__label {
+    // ⚠️ `@at-root` — 중첩된 채로 두면 `.nui-field label.nui-field__label`(자손)로 풀려
+    //    **`Field` 없이 단독으로 쓴 `Field.Item`**(체크박스 · 스위치의 흔한 꼴)의 라벨에 닿지 않는다.
+    //    `verify:touch` 첫 실행이 체크박스 · 라디오 · 스위치 · field 네 페이지에서 잡았다 (2026-09-17)
+    @at-root label#{cls("field")}__label {
       cursor: pointer;
-      user-select: none;
+      // 글자 선택 금지 + 탭 하이라이트 끄기 (Field.md §9 · styles.md §9-1)
+      @include pressable;
     }
 
     // Header 안 라벨도 같은 색 — 직계 규율은 유지한다(Item 은 Context 로 자기 is-error 를 받는다)

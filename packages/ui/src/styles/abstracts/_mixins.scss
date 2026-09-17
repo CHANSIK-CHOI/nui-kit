@@ -111,6 +111,25 @@
   }
 }
 
+// 터치 기기의 눌림 표시는 우리 것뿐이다 — 누르는 요소의 **루트**에 건다 (2026-09-17).
+//
+// 브라우저 기본 탭 하이라이트(Chromium `rgba(51,181,229,.4)` · iOS 회색)가 우리
+// `:active` 면·배율 위에 겹쳐 눌림이 두 번 보였다 — 모바일 에뮬레이션 실측에서 뗀 직후
+// 스크린샷 평균색이 기준에서 71~125 벗어났다가 70ms 뒤 복귀했고, 누르는 요소 전 그룹
+// 44개가 기본값이었다. 꾹 누를 때의 글자 선택·콜아웃도 같은 자리에서 막는다 — 버튼과
+// 라벨 글자는 복사 대상이 아니다.
+//
+// ⚠️ **상속되는 속성이라 컨테이너에 걸지 않는다.** Popup·Toast 루트에 걸면 소비자가 그
+//    안에 넣은 링크·본문까지 하이라이트와 선택이 사라진다. 누르는 요소 자신에만 건다.
+// ⚠️ **입력칸을 품은 요소에는 걸지 않는다.** iOS 는 조상의 `user-select: none` 아래에서
+//    input 의 입력·커서 이동이 막히는 경우가 있다 — Select 컨트롤 · Textfield wrap 은 대상이 아니다.
+@mixin pressable {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 // duration/easing 토큰 기반 transition.
 // 기본 duration 은 색·테두리·배경 전환의 값 `duration-3`(150ms) 이다 —
 // 호출부 대부분이 색 전환이고, 눌림(`duration-pressed`)과 같은 시계로 맞춘다.

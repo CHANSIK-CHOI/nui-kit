@@ -152,6 +152,8 @@
       border-radius: var(#{v("radius-circle")});
       color: var(#{v("control-icon")});
       cursor: pointer;
+      // 터치의 눌림 표시는 우리 면·배율뿐 (Select.md §9). `__control` 에는 걸지 않는다 — input 을 품는다
+      @include pressable;
       @include motion-press((color, background-color, opacity), "3");
     }
 
@@ -253,6 +255,7 @@
       border-radius: var(#{v("radius-2")});
       color: var(#{v("text-primary")});
       cursor: pointer;
+      @include pressable;
 
       // 눌림은 배율·시간·곡선 세 축이 한 세트다 — `transition` 은 한 번만 선언되므로
       // `motion-press` 로 묶는다 (design-system.md §6-3 · Select.md §9 「눌림 자리」)
@@ -346,6 +349,7 @@
         var(#{v("space-1")});
       color: var(#{v("text-secondary")});
       cursor: pointer;
+      @include pressable;
 
       // `:active` 에 `scale-94` 를 거는 자리다 — `transform` 이 전환 목록에 없으면
       // 눌림이 전환 없이 튀어 들어갔다 나온다. 세 축을 `motion-press` 로 묶는다
