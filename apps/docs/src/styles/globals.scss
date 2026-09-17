@@ -103,16 +103,26 @@ body {
 }
 
 // 사이트의 누르는 것 — 라이브러리의 `pressable` 믹스인과 같은 네 줄 (styles.md §9-1).
-// 패키지 내부 믹스인이라 여기서는 못 쓰고 인라인으로 둔다. `verify:touch` 가 `.doc-*` 도 잰다
+// 패키지 내부 믹스인이라 여기서는 못 쓰고 인라인으로 둔다. `verify:touch` 가 사이트 전부를 잰다
 .doc-nav-link,
 .doc-badge__label,
 .doc-brand,
 .doc-why__summary,
-.doc-theme-toggle__label {
+.doc-theme-toggle__label,
+.doc-demo-label,
+.preset-group,
+.preset-jump a {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+// 본문 글 안의 링크 — **하이라이트만** 끄고 선택은 막지 않는다 (styles.md §9-1 「걸지 않는 자리」).
+// `user-select: none` 을 걸면 문단을 드래그로 복사할 때 링크 글자만 빠진다.
+.doc-shell a:not([class]) {
+  -webkit-tap-highlight-color: transparent;
+  border-radius: var(--nui-radius-1);
 }
 
 .doc-nav-link {
@@ -1034,4 +1044,23 @@ body {
 // 쓰지 않는 문구다.
 .doc-label-no {
   color: var(--nui-text-disabled);
+}
+
+// ─── 누르는 것의 눌림 — 파일 끝에 둔다
+// 하이라이트를 끈 자리의 눌림은 우리 것이 말한다 — 표면 눌림 면 (design-system.md §2-3 · styles.md §9-1).
+// 안 두면 탭해도 아무 반응이 없다. 로고 · 테마 토글은 자기 면이 따로 있어 뺀다.
+// ⚠️ **hover 규칙보다 뒤에 있어야 한다.** 상세도가 같아(클래스 + 의사클래스) 소스 순서가 이긴다 —
+//    위쪽에 두었을 때 `.doc-nav-link:hover` 가 누르는 동안의 면을 덮었다 (2026-09-17 실측)
+.doc-nav-link,
+.doc-badge__label,
+.doc-why__summary,
+.preset-group,
+.preset-jump a,
+.doc-shell a:not([class]) {
+  transition: background-color var(--nui-duration-pressed)
+    var(--nui-easing-pressed);
+
+  &:active {
+    background-color: var(--nui-control-bg-active);
+  }
 }

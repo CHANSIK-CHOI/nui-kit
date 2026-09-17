@@ -11,8 +11,9 @@
  *
  * 재는 것 — 모바일 컨텍스트(iPhone 13 · hasTouch)에서
  *   A  누르는 요소(button · a · label · role · input[checkbox|radio] · select · 바깥쪽 `cursor: pointer`)를
- *      전 페이지에서 긁어 첫 `nui-` / `doc-` 클래스로 묶고, 그룹마다 tap-highlight 투명 · `user-select: none`
- *      — **누르는 조상 안의 것은 뺀다**(상속으로 따라온다) · 클래스 없는 요소(문서 산문의 `<a>`)는 세지만 판정하지 않는다
+ *      전 페이지에서 긁어 첫 `nui-` / `doc-` 클래스(없으면 첫 클래스)로 묶고, 그룹마다 tap-highlight 투명 ·
+ *      `user-select: none` — **누르는 조상 안의 것은 뺀다**(상속으로 따라온다) · **본문 링크(클래스 없는 `<a>`)는
+ *      하이라이트만 투명이고 선택은 `auto`** 가 기대값이다(문단 복사에서 링크 글자가 빠지지 않게)
  *   B  §9-1 표의 자리는 **`user-select: auto` 여야** 한다 — 믹스인이 새면 여기서 잡힌다
  *   C  열어야 존재하는 자리(메뉴 옵션 · 달력 · 토스트 · 팝업)는 `opener` 로 연 뒤 A · B 와 같이 잰다
  *   D  문서 사이트 `globals.scss` 의 `:hover` 가 `@media (hover: hover)` 밖에 있나 — 패키지 쪽은 `check-token-layers` 6-a 가 본다
@@ -167,32 +168,34 @@ function collectGroups({ pressableSel, skipSel, onlySel }) {
     }
   }
   const groups = {};
-  let unclassed = 0;
+  // 클래스 없는 요소도 판정한다 (2026-09-17). 첫 판은 세기만 해서 본문 링크 172개 ·
+  // 데모 label 2 · 프리셋 카드 12(`preset-` 접두)가 검사 밖이었다 — 「검사한 것만 통과」였다.
+  // **본문 링크(클래스 없는 `<a>`)는 기대가 다르다** — 하이라이트만 투명이고 선택은 `auto` 로 남는다
+  // (styles.md §9-1 · 문단을 드래그로 복사할 때 링크 글자가 빠지지 않게)
+  let prose = 0;
   for (const el of set) {
     if (skip(el)) continue;
     const cls = [...el.classList];
-    const key =
-      cls.find((c) => c.startsWith("nui-")) ??
-      cls.find((c) => c.startsWith("doc-"));
-    if (!key) {
-      unclassed += 1;
-      continue;
-    }
+    const tag = el.tagName.toLowerCase();
+    const isProseLink = tag === "a" && cls.length === 0;
+    const key = isProseLink
+      ? "a (본문 링크)"
+      : (cls.find((c) => c.startsWith("nui-")) ??
+        cls.find((c) => c.startsWith("doc-")) ??
+        cls[0] ??
+        `<${tag}> (클래스 없음)`);
+    if (isProseLink) prose += 1;
     const c = getComputedStyle(el);
-    const g = (groups[key] ??= {
-      n: 0,
-      badTap: 0,
-      badSel: 0,
-      tag: el.tagName.toLowerCase(),
-    });
+    const g = (groups[key] ??= { n: 0, badTap: 0, badSel: 0, tag });
     g.n += 1;
     if (
       c.getPropertyValue("-webkit-tap-highlight-color") !== "rgba(0, 0, 0, 0)"
     )
       g.badTap += 1;
-    if (c.getPropertyValue("user-select") !== "none") g.badSel += 1;
+    const wantSel = isProseLink ? "auto" : "none";
+    if (c.getPropertyValue("user-select") !== wantSel) g.badSel += 1;
   }
-  return { groups, unclassed };
+  return { groups, unclassed: prose };
 }
 
 /** B · 표의 자리가 `auto` 인지. 없으면 `missing` */
@@ -264,7 +267,7 @@ async function judgeGroups(where, onlySel) {
     if (key.startsWith("doc-")) counts.docs += 1;
     if (g.badTap || g.badSel) {
       bad(
-        `${where} · ${key} <${g.tag}> ×${g.n} — 탭 하이라이트 기본값 ${g.badTap} · user-select≠none ${g.badSel}`,
+        `${where} · ${key} <${g.tag}> ×${g.n} — 탭 하이라이트 기본값 ${g.badTap} · user-select 기대와 다름 ${g.badSel}`,
       );
     }
   }
@@ -293,7 +296,7 @@ let exit = 0;
 if (SELFTEST) {
   console.log("\n■ 검출력 시험 — 기본값을 되돌린 채 잡히는지");
   let detected = 0;
-  const want = 3;
+  const want = 4;
   // A — .nui-button 을 브라우저 기본값으로 되돌린다
   await gotoPage("/components/button");
   await page.addStyleTag({
@@ -311,6 +314,14 @@ if (SELFTEST) {
   const before2 = failures.length;
   await judgeStayAuto("[selftest] select", MUST_STAY_AUTO[0]);
   if (failures.length > before2) detected += 1;
+  // A' — 본문 링크에 none 이 새면 잡혀야 한다 (본문 링크만 기대가 auto 다)
+  await gotoPage("/foundations");
+  await page.addStyleTag({
+    content: ".doc-shell a:not([class]){user-select:none !important}",
+  });
+  const before3 = failures.length;
+  await judgeGroups("[selftest] 본문 링크", ".doc-shell a:not([class])");
+  if (failures.length > before3) detected += 1;
   // D — 밖 1 · 안 1 (함정)
   const out = hoverOutsideMedia(
     ".x:hover { color: red } @media (hover: hover) and (pointer: fine) { .y:hover { color: blue } } /* .z:hover { } */",
@@ -352,7 +363,7 @@ if (counts.pages === 0)
   bad("A: 본 페이지가 0 — nav.ts 를 못 읽었거나 --page 가 틀렸다");
 if (counts.groups === 0) bad("A: 판정한 그룹이 0 — 셀렉터가 늙었다");
 console.log(
-  `  · pages=${counts.pages} groups=${counts.groups} elements=${counts.judged} docs-groups=${counts.docs} unclassed(판정 안 함)=${counts.unclassed}`,
+  `  · pages=${counts.pages} groups=${counts.groups} elements=${counts.judged} docs-groups=${counts.docs} prose-links(하이라이트만 · 선택 auto)=${counts.unclassed}`,
 );
 
 // B · 정적 자리 요약
@@ -421,7 +432,13 @@ if (openedInScope === 0) {
 console.log("\n■ D · 문서 사이트 :hover — @media (hover: hover) 밖");
 const scss = readFileSync(join(DOCS_ROOT, "src/styles/globals.scss"), "utf8");
 const outside = hoverOutsideMedia(scss);
-counts.hover = (scss.match(/:hover/g) ?? []).length;
+// 수는 주석을 걷은 뒤 센다 — 주석 속 `:hover` 언급이 「본 규칙 수」로 들어가지 않게 (scripts.md §1)
+counts.hover = (
+  scss
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/[^\n]*/g, "")
+    .match(/:hover/g) ?? []
+).length;
 if (counts.hover === 0) bad("D: globals.scss 에 :hover 가 0 — 파일이 바뀌었나");
 outside.length
   ? bad(`hover 미디어 밖 :hover ${outside.length} — ${outside.join(" | ")}`)
@@ -435,6 +452,6 @@ console.log(
     : "\n✅ 터치 눌림 검사 통과",
 );
 console.log(
-  `RECEIPT check-touch pages=${counts.pages} groups=${counts.groups} elements=${counts.judged} allowed=${counts.allowed} opened=${counts.opened}/${OPENED.filter((c) => inScope(c.page)).length} docs=${counts.docs} hover=${counts.hover} scope=${SCOPE ? [...SCOPE].join(",") : "all"} failures=${failures.length} exit=${exit}`,
+  `RECEIPT check-touch pages=${counts.pages} groups=${counts.groups} elements=${counts.judged} allowed=${counts.allowed} opened=${counts.opened}/${OPENED.filter((c) => inScope(c.page)).length} docs=${counts.docs} prose=${counts.unclassed} hover=${counts.hover} scope=${SCOPE ? [...SCOPE].join(",") : "all"} failures=${failures.length} exit=${exit}`,
 );
 process.exit(exit);

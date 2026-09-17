@@ -121,6 +121,7 @@ export function AccordionToggleDemo() {
             <Accordion.Item key={item.title} index={index}>
               <Accordion.Head buttonIndex={index}>
                 <label
+                  className="doc-demo-label"
                   style={{ display: "flex", alignItems: "center", gap: 8 }}
                 >
                   <Checkbox />
