@@ -73,9 +73,10 @@ export default function RootLayout({
 
 ### Host
 
-`useToast()` · `useAlert()` · `useConfirm()` 같은 명령형 훅은 `PopupHost` · `ToastHost` 안에서만
-뜬다. Host 가 없으면 에러 없이 조용히 렌더되지 않는다. `<LayerPopup open={…} />` 처럼 선언형으로
-직접 렌더할 때는 Host 가 없어도 된다. 상세는 [Popup 개요](/components/popup) 에 있다.
+팝업은 훅으로만 연다(`useAlert()` · `useConfirm()` · `useLayerPopup()` · `useBottomSheet()` ·
+`useFullPopup()`). `PopupHost` 가 그리고, 열려 있는 동안 배경 스크롤이 잠긴다. `useToast()` 도
+`ToastHost` 안에서 뜬다. Host 가 없으면 그려지지 않고 개발 모드에서 콘솔에 한 줄이 난다. 상세는
+[Popup 개요](/components/popup) 에 있다.
 
 ### 브랜드 색
 
@@ -126,7 +127,7 @@ import { ButtonLink } from "@nui-kit/react/next";
 | `/checkbox`   | `Checkbox` `CheckboxGroup` `useCheckboxGroupContext`                                                                                |
 | `/radio`      | `Radio` `RadioGroup` `useRadioGroupContext`                                                                                         |
 | `/switch`     | `Switch`                                                                                                                            |
-| `/popup`      | `Alert` `Confirm` `LayerPopup` `BottomSheet` `FullPopup` `PopupHost` · 여는 훅 5종(`useAlert` 등) · `usePopupStack` `usePopupStore` |
+| `/popup`      | `LayerPopup` `BottomSheet` `FullPopup` `PopupHost` · 여는 훅 5종(`useAlert` `useConfirm` `useLayerPopup` `useBottomSheet` `useFullPopup`) · `usePopupStack` `usePopupStore` |
 | `/toast`      | `Toast` `ToastHost` `useToast` `useToastStack` `useToastStore`                                                                      |
 | `/tooltip`    | `Tooltip`                                                                                                                           |
 | `/accordion`  | `Accordion` `AccordionItem` `AccordionButton` `AccordionHead` `AccordionPanel` `useAccordionContext`                                |

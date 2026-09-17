@@ -31,10 +31,12 @@ try {
 const failures = [];
 // 시트 드래그 절이 본 수 — 0 이면 실패 (scripts.md §2). 아래 절이 올린다
 let sheetChecks = 0;
+// 스크롤 잠금 절이 본 수 — 0 이면 실패 (2026-09-17 · 다섯 종 전부)
+let lockChecks = 0;
 // 영수증 — 어느 길로 끝나든 마지막 줄. dev server 가 없어 위에서 죽으면 이 줄이 없다 = 미실시 (2026-09-11)
 process.on("exit", (code) =>
   console.log(
-    `RECEIPT check-popup failures=${failures.length} sheet=${sheetChecks} selftest=${SELFTEST ? "on" : "off"} exit=${code}`,
+    `RECEIPT check-popup failures=${failures.length} sheet=${sheetChecks} lock=${lockChecks} selftest=${SELFTEST ? "on" : "off"} exit=${code}`,
   ),
 );
 const ok = (m) => console.log("  ✅", m);
@@ -105,6 +107,49 @@ await wait(600);
 (await panels()) === 0
   ? ok("취소 버튼으로 닫힌다")
   : bad("취소를 눌러도 남아 있다");
+
+// ── 스크롤 잠금 — 다섯 종 전부 (2026-09-17 · spec Popup.md §6-2 · §10)
+//
+// 팝업을 여는 길이 Host 하나가 되면서 「어느 길로 열어도 배경이 잠긴다」가 계약이 됐다.
+// 예전에는 선언형으로 연 팝업이 잠기지 않았고 검사가 그것을 재지 못했다. 종류마다 열어
+// `body.nui-is-prevent-scroll` 이 붙는지, 닫힌 뒤(퇴장 끝) 떨어지는지 본다.
+// 절 안의 수(`lock=`)가 0 이면 실패다. `--selftest` 는 열지 않고 재서 붙지 않았을 때 실패를
+// 내는지 본다 — 이 절이 실제 클래스를 읽는다는 증거다.
+console.log("\n■ 스크롤 잠금 (다섯 종)");
+const LOCK_CLASS = "nui-is-prevent-scroll";
+const isLocked = () =>
+  page.evaluate((c) => document.body.classList.contains(c), LOCK_CLASS);
+const lockOk = (m) => {
+  lockChecks += 1;
+  ok(m);
+};
+const lockBad = (m) => {
+  lockChecks += 1;
+  bad(m);
+};
+for (const [label, url, opener, closer] of [
+  ["Alert", "/components/alert", "저장", "확인"],
+  ["Confirm", "/components/confirm", "발송", "취소"],
+  ["LayerPopup", "/components/layer-popup", "약관 보기", "동의합니다"],
+  ["BottomSheet", "/components/bottom-sheet", "정렬 바꾸기", "최신순"],
+  ["FullPopup", "/components/full-popup", "상품 상세 보기", "장바구니 담기"],
+]) {
+  await page.goto(`${BASE}${url}`, { waitUntil: "networkidle" });
+  if (!SELFTEST) {
+    await page.getByRole("button", { name: opener }).first().click();
+    await wait(500);
+  }
+  (await isLocked())
+    ? lockOk(`${label}: 열리면 body 스크롤이 잠긴다`)
+    : lockBad(`${label}: 열렸는데 body.${LOCK_CLASS} 가 없다`);
+  if (!SELFTEST) {
+    await page.getByRole("button", { name: closer }).first().click();
+    await wait(700);
+  }
+  !(await isLocked())
+    ? lockOk(`${label}: 닫히면 잠금이 풀린다`)
+    : lockBad(`${label}: 닫혔는데 잠금이 남아 있다`);
+}
 
 // ── BottomSheet 끌어서 닫기 (G1 · 2026-09-15 · spec Popup.md §6-7 · §10)
 //

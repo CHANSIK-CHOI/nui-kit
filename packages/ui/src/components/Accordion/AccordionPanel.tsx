@@ -50,18 +50,32 @@ const panelVariants = {
  *
  * 높이를 빼지 않는 것은 Accordion 만의 사정이다 — 다른 컴포넌트는 `reduceMotion()` 으로 이동·
  * 확대를 빼고 페이드만 남기지만, 여기서는 **높이 변화가 곧 기능**이라 빼면 닫혀도 자리를
- * 차지한다. 그래서 값은 그대로 두고 시간만 0 으로 만든다.
+ * 차지한다. 그래서 값은 그대로 두고 **속성마다 시간을 가른다** (2026-09-17 사용자 결정 · not zero).
+ *
+ * - **높이는 0ms** — 늘고 주는 동안 아래 항목이 밀리는 것이 곧 움직임이다
+ * - **투명도는 페이드** — 시간은 모션을 켰을 때와 같다(펼침 `collapse` 250 · 접힘 `collapseExit` 200)
+ * - **접힐 때는 높이를 페이드 뒤로 미룬다** — 높이가 먼저 0 이 되면 `overflow: hidden` 이 내용을 잘라
+ *   페이드가 보이지 않는다. 그래서 「글자가 사라진 뒤 한 번에 접힌다」. 펼칠 때는 반대로 높이가 먼저다
  */
 const reducedPanelVariants = {
   closed: {
     height: 0,
     opacity: 0,
-    transition: reduceMotionTransition(motionTransition.collapseExit, true),
+    transition: {
+      opacity: reduceMotionTransition(motionTransition.collapseExit, true),
+      height: {
+        duration: 0,
+        delay: motionTransition.collapseExit.duration,
+      },
+    },
   },
   open: {
     height: "auto",
     opacity: 1,
-    transition: reduceMotionTransition(motionTransition.collapse, true),
+    transition: {
+      opacity: reduceMotionTransition(motionTransition.collapse, true),
+      height: { duration: 0 },
+    },
   },
 };
 

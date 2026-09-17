@@ -6,8 +6,8 @@ import {
   PropsTable,
 } from "@/components/guide";
 import {
-  LayerPopupDeclarativeDemo,
-  LayerPopupImperativeDemo,
+  LayerPopupOpenDemo,
+  LayerPopupFormDemo,
   LayerPopupOptionsDemo,
   LayerPopupFooterDemo,
   LayerPopupCloseDemo,
@@ -32,27 +32,22 @@ export default function LayerPopupPage() {
 
       <p>
         가운데 뜨는 대화상자다. 제목 · 본문 · 푸터를 갖고 dim 과 <kbd>Esc</kbd>{" "}
-        · 닫기 버튼으로 닫힌다. 선언형으로 직접 그리거나{" "}
-        <code>useLayerPopup()</code> 으로 연다. 두 길의 차이는{" "}
-        <Link href="/components/popup">Popup</Link> 에 있다.
+        · 닫기 버튼으로 닫힌다. 팝업을 컴포넌트로 만들고{" "}
+        <code>useLayerPopup()</code> 으로 연다. 앱 루트의 <code>PopupHost</code>{" "}
+        가 그린다. 설치는 <Link href="/components/popup">Popup</Link> 에 있다.
       </p>
 
-      <h2>선언형</h2>
+      <h2>컴포넌트를 만들고 훅으로 연다</h2>
       <p>
-        <code>open</code> 을 쓰는 쪽이 갖는다. 컴포넌트는 닫아 달라고{" "}
-        <code>onRequestClose</code> 로 요청만 하고, 실제로 <code>open</code> 을
-        내리는 것은 쓰는 쪽이다.
+        팝업 하나가 컴포넌트 하나다. <code>PopupHost</code> 가 <code>id</code> ·{" "}
+        <code>open</code> · <code>isTopmost</code> · <code>onRequestClose</code>{" "}
+        · <code>onCloseComplete</code> 다섯을 넣어 렌더하므로 그것을{" "}
+        <code>LayerPopup</code> 에 그대로 펼친다. 닫기는{" "}
+        <code>runtime.onRequestClose</code> 를 부르면 된다. 열림 상태를 쓰는
+        쪽이 들고 있을 자리는 없다.
       </p>
-      <LayerPopupDeclarativeDemo />
-
-      <h2>명령형</h2>
-      <p>
-        <code>useLayerPopup().open({"{ component }"})</code> 에 내용 컴포넌트를
-        넘긴다. <code>PopupHost</code> 가 <code>open</code> ·{" "}
-        <code>onRequestClose</code> · <code>onCloseComplete</code> ·{" "}
-        <code>isTopmost</code> 를 넣어 렌더하므로 그 넷을 셸에 그대로 넘긴다.
-      </p>
-      <LayerPopupImperativeDemo />
+      <LayerPopupOpenDemo />
+      <LayerPopupFormDemo />
 
       <h2>크기</h2>
       <p>
@@ -96,18 +91,19 @@ export default function LayerPopupPage() {
 
       <h2>겹쳐 열기</h2>
       <p>
-        선언형으로 둘을 겹칠 때는 아래쪽에 <code>isTopmost={"{false}"}</code> 를
-        준다. 맨 위 팝업만 <kbd>Esc</kbd> 와 포커스 트랩을 처리한다. 명령형은{" "}
-        <code>PopupHost</code> 가 계산한다.
+        팝업 안에서 훅을 다시 불러 하나를 더 연다. 나중에 연 것이 위에 오고, 맨
+        위 팝업만 <kbd>Esc</kbd> 와 포커스 트랩을 처리한다. 어느 것이 위인지는{" "}
+        <code>PopupHost</code> 가 스택 순서로 계산해 <code>isTopmost</code> 에
+        넣는다.
       </p>
       <LayerPopupStackDemo />
 
-      <DesignNote title="왜 isTopmost 의 기본이 true 인가">
+      <DesignNote title="왜 runtime 다섯을 전부 펼쳐야 하나">
         <p>
-          <code>false</code> 를 기본으로 두면 첫 포커스 이동 · 포커스 트랩 ·{" "}
-          <kbd>Esc</kbd> 셋이 조용히 죽는다. 화면도 마우스도 멀쩡해서 키보드
-          사용자만 겪는다. 선언형에서 팝업을 하나만 띄우는 대부분의 자리에서
-          답은 <code>true</code> 이고, 겹칠 때만 아래쪽이 <code>false</code> 다.
+          <code>isTopmost</code> 가 빠지면 겹친 팝업 둘이 <kbd>Esc</kbd> 를 함께
+          받고, <code>onRequestClose</code> 가 빠지면 dim 과 <kbd>Esc</kbd> 로
+          닫히지 않는다. 화면도 마우스도 멀쩡해서 키보드 사용자만 겪는 종류다.
+          그래서 다섯이 전부 required 다. 하나라도 빠뜨리면 타입이 잡는다.
         </p>
       </DesignNote>
 
@@ -130,7 +126,7 @@ export default function LayerPopupPage() {
 
       <h2>API</h2>
       <p>
-        <code>title</code> 과 <code>dialogLabel</code> 중 하나는 필요하다.
+        <code>title</code> 과 <code>dialogLabel</code> 중 하나는 있어야 한다.
       </p>
       <PropsTable of="LayerPopup" />
     </>

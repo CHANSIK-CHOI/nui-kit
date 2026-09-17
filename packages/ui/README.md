@@ -202,7 +202,7 @@ import "../nui-theme.css";
 | `Select` · `MultiSelect` | `/select` | `select.css` |
 | `Datepicker` · `DateRangePicker` · `DateMultiplePicker` | `/datepicker` | `datepicker.css` |
 | `Accordion`(`.Item` `.Head` `.Button` `.Panel`) | `/accordion` | `accordion.css` |
-| `Alert` · `Confirm` · `LayerPopup` · `BottomSheet` · `FullPopup` · `PopupHost` | `/popup` | `popup.css` |
+| `LayerPopup` · `BottomSheet` · `FullPopup` · `PopupHost` · `useAlert` · `useConfirm` | `/popup` | `popup.css` |
 | `Toast` · `ToastHost` | `/toast` | `toast.css` |
 | `Tooltip` | `/tooltip` | `tooltip.css` |
 | `Icon` | `/icon` | `icon.css` |
@@ -238,8 +238,9 @@ import { Star } from "lucide-react";
 </Icon>
 ```
 
-`Toast` 와 팝업 계열을 **명령형으로**(`useToast()` · `useAlert()` · `useConfirm()` ·
-`useLayerPopup()`) 쓰려면 Host 로 앱을 **감싸야** 합니다. 앱 루트에서 한 번만 합니다.
+팝업 계열(`useAlert()` · `useConfirm()` · `useLayerPopup()` · `useBottomSheet()` ·
+`useFullPopup()`)과 `Toast`(`useToast()`)는 훅으로 엽니다. 그래서 Host 로 앱을 **반드시**
+감쌉니다. 앱 루트에서 한 번만 합니다.
 
 ```tsx
 // app/layout.tsx
@@ -265,19 +266,33 @@ export default function RootLayout({
 두 Host 모두 `children` 을 **필수**로 받는 래퍼입니다. portal 컨테이너는 없으면
 직접 만들므로 따로 심을 필요가 없습니다.
 
-**Host 가 없으면 명령형 팝업·토스트는 조용히 렌더되지 않습니다** — 에러도 경고도
-나지 않습니다. `<LayerPopup open={...} />` 처럼 선언형으로 직접 렌더할 때는 Host 가
-필요 없지만, 그 경우 배경 스크롤 잠금과 배경 `inert` 도 걸리지 않습니다.
+**Host 가 없으면 팝업·토스트가 그려지지 않습니다.** 개발 모드에서는 콘솔에 한 줄이 납니다.
+
+`Alert` · `Confirm` 은 훅에 넘기는 옵션이 곧 내용입니다 — 컴포넌트가 없습니다.
+`LayerPopup` · `BottomSheet` · `FullPopup` 은 팝업을 **컴포넌트로 만들고** 훅에 등록합니다.
+`PopupHost` 가 넣는 runtime 다섯(`id` · `open` · `isTopmost` · `onRequestClose` ·
+`onCloseComplete`)을 셸에 그대로 펼칩니다. 열려 있는 동안 배경 스크롤은 잠기고 배경은
+`inert` 가 됩니다. `PopupHost` 밖에서 셸을 직접 렌더하면 그려지지 않습니다.
+
+```tsx
+function SortSheet(runtime: BottomSheetComponentProps) {
+  return (
+    <BottomSheet {...runtime} shouldCloseOnDrag title="정렬">
+      <Button variant="line" onClick={runtime.onRequestClose}>최신순</Button>
+    </BottomSheet>
+  );
+}
+
+const bottomSheet = useBottomSheet();
+bottomSheet.open({ component: SortSheet });
+
+const alert = useAlert();
+alert.open({ title: "저장했습니다", confirmLabel: "닫기" });
+```
 
 `BottomSheet` 는 `shouldCloseOnDrag` 를 주면 위에 손잡이가 생기고, **위쪽 44px 띠**를 아래로
 끌어 닫을 수 있습니다. 제목과 본문은 끄는 면이 아니라 글을 긁고 스크롤하는 데 지장이 없습니다.
-기본은 꺼져 있고, 끌어서 닫는 것도 `onRequestClose` 를 부르므로 그 prop 이 있어야 닫힙니다.
-
-```tsx
-<BottomSheet open={isOpen} onRequestClose={close} shouldCloseOnDrag title="정렬">
-  …
-</BottomSheet>
-```
+기본은 꺼져 있습니다.
 
 **끌어서 닫기를 켜면 닫기 버튼이 기본으로 사라집니다.** 손잡이가 닫는 자리라 × 가 중복이기
 때문입니다. 둘을 함께 두려면 `hasCloseButton` 을 명시합니다. 손잡이 막대만 감추는

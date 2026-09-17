@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { GuideHeader, PropsTable, DesignNote, HookTable } from "@/components/guide";
+import {
+  GuideHeader,
+  PropsTable,
+  DesignNote,
+  HookTable,
+} from "@/components/guide";
 
 export const metadata = { title: "Popup" };
 
@@ -8,31 +13,31 @@ const KINDS = [
     name: "Alert",
     href: "/components/alert",
     desc: "알린다. 확인 버튼 하나. 확인을 눌러야만 닫힌다",
-    how: "명령형 useAlert()",
+    how: "useAlert().open(options)",
   },
   {
     name: "Confirm",
     href: "/components/confirm",
     desc: "결정을 묻는다. 취소 · 확인. 답을 Promise 로 받을 수 있다",
-    how: "명령형 useConfirm()",
+    how: "useConfirm().open(options)",
   },
   {
     name: "LayerPopup",
     href: "/components/layer-popup",
     desc: "가운데 대화상자. 크기 셋",
-    how: "선언형 · 명령형 useLayerPopup()",
+    how: "컴포넌트 + useLayerPopup().open({ component })",
   },
   {
     name: "BottomSheet",
     href: "/components/bottom-sheet",
     desc: "아래에서 올라오는 시트. 선택지 목록에 맞다",
-    how: "선언형 · 명령형 useBottomSheet()",
+    how: "컴포넌트 + useBottomSheet().open({ component })",
   },
   {
     name: "FullPopup",
     href: "/components/full-popup",
     desc: "화면 전체를 덮는다. 긴 상세 화면에 맞다",
-    how: "선언형 · 명령형 useFullPopup()",
+    how: "컴포넌트 + useFullPopup().open({ component })",
   },
 ];
 
@@ -77,74 +82,64 @@ export default function PopupPage() {
         </table>
       </div>
 
-      <h2>선언형과 명령형</h2>
+      <h2>여는 법은 하나다</h2>
       <p>
-        여는 길이 둘이다. 열림 상태를 화면 컴포넌트가 들고 있으면 선언형, 코드
-        흐름 중간에 띄우고 결과를 받으면 명령형이다. 둘은 보장하는 것이 다르다.
+        팝업은 훅으로 연다. <code>Alert</code> 과 <code>Confirm</code> 은 훅에
+        넘기는 옵션이 곧 내용이라 컴포넌트가 없다. 나머지 셋은 팝업을 컴포넌트로
+        만들고 훅에 등록한다. 열림 상태를 화면 컴포넌트가 들고 있을 자리는 없다.
       </p>
       <div className="doc-table-wrap">
         <table className="doc-table">
           <thead>
             <tr>
               <th></th>
-              <th>선언형</th>
-              <th>명령형</th>
+              <th>Alert · Confirm</th>
+              <th>LayerPopup · BottomSheet · FullPopup</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <th scope="row">쓰는 법</th>
               <td className="doc-wrap">
-                <code>&lt;LayerPopup open={"{isOpen}"} /&gt;</code>
+                <code>useAlert().open({"{ title, description }"})</code>
               </td>
               <td className="doc-wrap">
                 <code>useLayerPopup().open({"{ component }"})</code>
               </td>
             </tr>
             <tr>
-              <th scope="row">되는 것</th>
-              <td className="doc-wrap">Alert · Confirm 은 없다. 나머지 셋</td>
-              <td className="doc-wrap">다섯 전부</td>
+              <th scope="row">내용은 어디에</th>
+              <td className="doc-wrap">훅 옵션</td>
+              <td className="doc-wrap">
+                등록한 컴포넌트. <code>PopupHost</code> 가 넣는 runtime 다섯을
+                셸에 펼친다
+              </td>
             </tr>
             <tr>
               <th scope="row">렌더 위치</th>
-              <td className="doc-wrap">
-                제자리. <code>position: fixed</code> 라 화면에는 제대로 뜬다
-              </td>
-              <td className="doc-wrap">
-                <code>body</code> 직계의 portal
+              <td className="doc-wrap" colSpan={2}>
+                <code>body</code> 직계의 portal. <code>PopupHost</code> 가
+                만든다
               </td>
             </tr>
             <tr>
               <th scope="row">배경 inert · 스크롤 잠금</th>
-              <td className="doc-wrap">없다</td>
-              <td className="doc-wrap">있다</td>
-            </tr>
-            <tr>
-              <th scope="row">
-                <code>isTopmost</code>
-              </th>
-              <td className="doc-wrap">
-                기본 <code>true</code>. 겹쳐 띄울 때만 아래쪽에{" "}
-                <code>false</code>
-              </td>
-              <td className="doc-wrap">
-                <code>PopupHost</code> 가 계산해 넣는다
+              <td className="doc-wrap" colSpan={2}>
+                언제나 걸린다
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div className="doc-note">
-        배경을 만지지 못하게 해야 하는 팝업은 명령형으로 연다. 선언형은 뒤가
-        스크롤되고 Tab 이 팝업 안에 갇힐 뿐이다.
+        <code>PopupHost</code> 밖에서 셸을 직접 렌더하면 그려지지 않는다. 개발
+        모드에서는 콘솔에 한 줄이 난다.
       </div>
 
       <h2>PopupHost</h2>
       <p>
-        명령형 훅은 <code>PopupHost</code> 가 렌더하는 자리에 팝업을 띄운다. 앱
-        루트에 한 번만 둔다. 없으면 훅이 쌓아 둔 팝업이 그려지지 않고 에러도
-        나지 않는다. 선언형만 쓴다면 필요 없다.
+        훅이 쌓은 팝업을 <code>PopupHost</code> 가 그린다. 앱 루트에 한 번만
+        둔다. 없으면 팝업이 그려지지 않고 개발 모드에서 콘솔에 한 줄이 난다.
       </p>
       <pre className="doc-code">
         <code>{`// app/providers.tsx — PopupHost 는 클라이언트 컴포넌트다
@@ -156,7 +151,7 @@ export function Providers({ children }) {
 }`}</code>
       </pre>
 
-      <h2>명령형 훅의 모양</h2>
+      <h2>훅의 모양</h2>
       <p>
         다섯 훅이 같은 모양이다. <code>open()</code> 은 id 를 돌려주고,{" "}
         <code>close(id?)</code> 는 id 가 없으면 그 종류에서 가장 최근에 연 것을
@@ -197,9 +192,8 @@ const closeEverything = usePopupStore((s) => s.closeAll);`}</code>
       <p>
         나중에 연 것이 위에 온다. 열린 BottomSheet 위에 Alert 을 띄우면 Alert 이
         위다. 겹친 상태에서는 맨 위 팝업만 <kbd>Esc</kbd> 와 포커스 트랩을
-        처리한다. 선언형으로 둘을 겹칠 때는 아래쪽에{" "}
-        <code>isTopmost={"{false}"}</code> 를 준다. 안 주면 <kbd>Esc</kbd> 한
-        번에 둘 다 닫힌다.
+        처리한다. 어느 것이 위인지는 <code>PopupHost</code> 가 스택 순서로
+        계산해 <code>isTopmost</code> 에 넣는다.
       </p>
 
       <h2>접근성</h2>
@@ -221,8 +215,8 @@ const closeEverything = usePopupStore((s) => s.closeAll);`}</code>
           위다. 40px 로 보이지만 44px 을 누른다
         </li>
         <li>
-          명령형으로 열면 배경은 <code>inert</code> + <code>aria-hidden</code>{" "}
-          이 되고 스크롤이 잠긴다. 토스트 · 툴팁 · 로딩 알림은 격리에서 빠진다.
+          열려 있는 동안 배경은 <code>inert</code> + <code>aria-hidden</code> 이
+          되고 스크롤이 잠긴다. 토스트 · 툴팁 · 로딩 알림은 격리에서 빠진다.
           팝업 안에서 띄운 것도 눌리고 읽혀야 한다
         </li>
         <li>

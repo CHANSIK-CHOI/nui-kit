@@ -27,7 +27,11 @@ import { createPortal } from "react-dom";
 import { px } from "../../internal/prefix.js";
 import { PORTAL_ROOT_ATTRIBUTE } from "../../internal/portal.js";
 import { DaypickerChevron } from "./DaypickerChevron.js";
-import { motionTransition } from "../../internal/motion.js";
+import {
+  motionTransition,
+  reduceMotion,
+  reduceMotionTransition,
+} from "../../internal/motion.js";
 import Button from "../Button/Button.js";
 import Textfield, { type TextfieldProps } from "../Textfield/Textfield.js";
 import TextfieldBtn from "../Textfield/TextfieldBtn.js";
@@ -766,40 +770,39 @@ export default function DatepickerBase<
           // 위로 뒤집히는 경우가 생기면 그때 `bottom left` 를 준다.
           style={{ transformOrigin: "top left" }}
           // `transform` 문자열로 준다 — 숏핸드는 메인 스레드 rAF 다 (07 M5)
-          initial={
-            shouldReduceMotion
-              ? { opacity: 0 }
-              : { opacity: 0, transform: "translateY(-8px) scale(0.97)" }
-          }
+          initial={reduceMotion(
+            { opacity: 0, transform: "translateY(-8px) scale(0.97)" },
+            shouldReduceMotion,
+          )}
           // `pointerEvents` 를 여기서도 **명시**한다 — 퇴장이 끊기고 다시 열릴 때 `exit` 이
           // 심은 `none` 을 되돌리는 일을 framer 의 폴백에 맡기지 않는다. `Select` 메뉴와
           // 같은 모양이다 (Select.md §6-7).
-          animate={
-            shouldReduceMotion
-              ? { opacity: 1, pointerEvents: "auto" }
-              : {
-                  opacity: 1,
-                  transform: "translateY(0px) scale(1)",
-                  pointerEvents: "auto",
-                }
-          }
+          animate={reduceMotion(
+            {
+              opacity: 1,
+              transform: "translateY(0px) scale(1)",
+              pointerEvents: "auto",
+            },
+            shouldReduceMotion,
+          )}
           // ⚠️ **퇴장에 `pointerEvents: "none"` 을 함께 준다** (2026-09-16).
           //    없으면 닫히는 동안 날짜가 눌린다 — 닫은 뒤 150ms 안에 같은 자리를
           //    클릭하면 값이 바뀐다(`check-menu-motion` 이 잡았다). `Select` 메뉴와
-          //    같은 규칙이다 (Select.md §6-7 · Datepicker.md §6-6).
-          exit={
-            shouldReduceMotion
-              ? { opacity: 0 }
-              : {
-                  opacity: 0,
-                  transform: "translateY(-8px) scale(0.97)",
-                  pointerEvents: "none",
-                  transition: motionTransition.popoverExit,
-                }
-          }
-          transition={
-            shouldReduceMotion ? { duration: 0 } : motionTransition.popover
-          }
+          //    같은 규칙이다 (Select.md §6-7 · Datepicker.md §6-6). 모션 감소에서도 150ms
+          //    페이드 동안 막는다 — `reduceMotion` 이 이 키와 퇴장 시간을 남긴다 (2026-09-17).
+          exit={reduceMotion(
+            {
+              opacity: 0,
+              transform: "translateY(-8px) scale(0.97)",
+              pointerEvents: "none",
+              transition: motionTransition.popoverExit,
+            },
+            shouldReduceMotion,
+          )}
+          transition={reduceMotionTransition(
+            motionTransition.popover,
+            shouldReduceMotion,
+          )}
           role="dialog"
           aria-label={calendarLabel}
         >

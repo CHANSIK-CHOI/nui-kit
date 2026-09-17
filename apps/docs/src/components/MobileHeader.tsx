@@ -21,23 +21,15 @@ const DESKTOP_QUERY = "(min-width: 971px)";
 const MENU_POPUP_ID = "doc-mobile-menu";
 
 /**
- * 목차 패널 내용. `PopupHost` 가 명령형으로 열고 런타임 props 를 넣는다.
- *
- * 선언형(`<FullPopup open>`)으로 늘 마운트해 두면 라이브러리가 배경 inert 와
- * 포커스 복귀를 주지 못한다 — 호스트는 명령형 스택만 보고, 포커스 기억은 마운트
- * 시점에 한 번 한다. 명령형이면 열 때 마운트되어 둘 다 따라온다.
+ * 목차 패널 내용. `PopupHost` 가 열고 runtime 다섯을 넣는다 — 그대로 `FullPopup` 에 펼친다.
+ * 열 때 마운트되므로 배경 inert 와 포커스 복귀가 라이브러리에서 따라온다.
  */
-function MenuPopup({
-  open,
-  onRequestClose,
-  onCloseComplete,
-  isTopmost,
-}: FullPopupComponentProps) {
+function MenuPopup(runtime: FullPopupComponentProps) {
   const pathname = usePathname();
   const openedAtPathname = useRef(pathname);
   // PopupHost 가 주는 onRequestClose 는 렌더마다 새 함수다. 구독을 다시 걸지 않도록 ref 로 본다
-  const requestCloseRef = useRef(onRequestClose);
-  requestCloseRef.current = onRequestClose;
+  const requestCloseRef = useRef(runtime.onRequestClose);
+  requestCloseRef.current = runtime.onRequestClose;
 
   // 링크를 눌러 페이지가 바뀌면 닫는다. 링크마다 onClick 을 달지 않는다 —
   // 같은 페이지 링크를 눌렀을 때는 pathname 이 그대로라 열린 채 남는 것이 맞다.
@@ -58,10 +50,7 @@ function MenuPopup({
 
   return (
     <FullPopup
-      open={open}
-      onRequestClose={onRequestClose}
-      onCloseComplete={onCloseComplete}
-      isTopmost={isTopmost}
+      {...runtime}
       title="문서 목차"
       closeLabel="목차 닫기"
       panelClassName="doc-mobile-menu"

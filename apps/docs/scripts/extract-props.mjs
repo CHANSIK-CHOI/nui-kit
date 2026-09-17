@@ -136,19 +136,26 @@ const TARGETS = [
     type: "RadioGroupProps",
   },
   { name: "Switch", file: "components/Switch/Switch.tsx", type: "SwitchProps" },
+  // `Alert` · `Confirm` 은 컴포넌트가 아니라 훅 옵션이다 (2026-09-17). 표는 옵션 타입에서 뽑는다 —
+  // 내용의 기본값은 Host 가 그리는 구현 파일에, 옵션에만 있는 `shouldCloseOn*` 의 기본값은
+  // `PopupHost.tsx` 의 구조분해에 있다.
   {
     name: "Alert",
     file: "components/Popup/Popup.types.ts",
-    type: "AlertProps",
-    // 타입만 있는 파일이라 기본값이 없다. 구현에서 읽는다 — 앞의 파일이 이긴다.
-    defaultsFrom: ["components/Popup/Alert.tsx"],
+    type: "AlertPopupOptions",
+    defaultsFrom: [
+      "components/Popup/Alert.tsx",
+      "components/Popup/PopupHost.tsx",
+    ],
   },
   {
     name: "Confirm",
     file: "components/Popup/Popup.types.ts",
-    type: "ConfirmProps",
-    // 타입만 있는 파일이라 기본값이 없다. 구현에서 읽는다 — 앞의 파일이 이긴다.
-    defaultsFrom: ["components/Popup/Confirm.tsx"],
+    type: "ConfirmPopupOptions",
+    defaultsFrom: [
+      "components/Popup/Confirm.tsx",
+      "components/Popup/PopupHost.tsx",
+    ],
   },
   {
     name: "LayerPopup",
@@ -398,6 +405,20 @@ function collectDefaultsByType(sourceFile) {
         // 같은 타입을 쓰는 함수가 둘이면 먼저 만난 쪽이 소유자다 (본체가 먼저 온다)
         if (!byType.has(typeName)) byType.set(typeName, {});
         Object.assign(byType.get(typeName), found);
+      }
+    }
+
+    // 변수 선언의 구조분해 기본값 — `const { shouldCloseOnConfirm = true, ...rest } = item.props`.
+    // 타입 이름이 없으므로 `merged` 에만 넣는다(파라미터 타입으로 주인을 찾은 `byType` 이 이긴다).
+    // 훅 옵션의 기본값이 `PopupHost.tsx` 의 이 꼴에만 있어 표에 비어 나왔다 (2026-09-17 리뷰).
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isObjectBindingPattern(node.name)
+    ) {
+      for (const el of node.name.elements) {
+        if (el.initializer && !(el.name.getText() in merged)) {
+          merged[el.name.getText()] = el.initializer.getText();
+        }
       }
     }
     ts.forEachChild(node, visit);

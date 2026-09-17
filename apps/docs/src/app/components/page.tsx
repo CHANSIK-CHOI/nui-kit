@@ -124,7 +124,7 @@ const GROUPS = [
       {
         name: "PopupHost",
         href: "/components/popup",
-        desc: "명령형 팝업이 렌더될 자리. 앱 루트에 한 번 둔다",
+        desc: "팝업이 렌더될 자리. 앱 루트에 한 번 둔다",
       },
       {
         name: "Alert",
@@ -201,8 +201,8 @@ export default function ComponentsPage() {
       <h1>Components</h1>
       <p className="doc-lead">
         각 페이지의 API 표는 컴포넌트 타입에서 자동 생성된다 — 코드가 바뀌면
-        문서가 따라간다. react-hook-form 래퍼는{" "}
-        <code>@nui-kit/react/rhf</code> 에 있다.
+        문서가 따라간다. react-hook-form 래퍼는 <code>@nui-kit/react/rhf</code>{" "}
+        에 있다.
       </p>
 
       {GROUPS.map((group) => (

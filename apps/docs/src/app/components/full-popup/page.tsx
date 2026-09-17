@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { GuideHeader, DesignNote, PropsTable } from "@/components/guide";
 import {
-  FullPopupDeclarativeDemo,
-  FullPopupImperativeDemo,
+  FullPopupOpenDemo,
+  FullPopupDetailDemo,
   FullPopupOptionsDemo,
 } from "./FullPopupDemo";
 
@@ -24,14 +24,12 @@ export default function FullPopupPage() {
         페이지는 전체 화면에서 달라지는 것만 적는다.
       </p>
 
-      <h2>선언형</h2>
-      <FullPopupDeclarativeDemo />
-
-      <h2>명령형</h2>
+      <h2>컴포넌트를 만들고 훅으로 연다</h2>
       <p>
         <code>useFullPopup().open({"{ component }"})</code>.
       </p>
-      <FullPopupImperativeDemo />
+      <FullPopupOpenDemo />
+      <FullPopupDetailDemo />
 
       <h2>LayerPopup 과 다른 점</h2>
       <div className="doc-table-wrap">

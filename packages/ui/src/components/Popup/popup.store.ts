@@ -9,6 +9,7 @@ import type {
   FullPopupOptions,
   LayerPopupOptions,
 } from "./Popup.types.js";
+import { warnIfPopupHostMissing } from "./PopupHost.context.js";
 
 export type PopupType =
   "alert" | "confirm" | "layerPopup" | "bottomSheet" | "fullPopup";
@@ -87,6 +88,9 @@ function appendPopupItem(
       `Popup with id "${nextItem.id}" already exists. ${actionName} only creates new popups.`,
     );
   }
+
+  // Host 가 없으면 쌓이기만 하고 그리는 주체가 없다 — 개발 모드 한 줄 (spec §6-2)
+  warnIfPopupHostMissing(actionName);
 
   return [...items, nextItem];
 }

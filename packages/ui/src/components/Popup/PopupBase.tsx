@@ -12,6 +12,7 @@ import {
 } from "framer-motion";
 import {
   useCallback,
+  useContext,
   useEffect,
   useId,
   useRef,
@@ -28,6 +29,7 @@ import { CloseIcon } from "../Icon/index.js";
 import Button from "../Button/Button.js";
 import ButtonGroup, { ButtonGroupItem } from "../Button/ButtonGroup.js";
 import type { PopupBaseProps, PopupVariant } from "./Popup.types.js";
+import { PopupHostContext, warnPopupHostMissing } from "./PopupHost.context.js";
 import usePopupPanelA11y from "./usePopupPanelA11y.js";
 
 const block = px("popup");
@@ -57,12 +59,17 @@ const VARIANT_CLASS: Record<PopupVariant, string> = {
  *    시트 높이가 바뀔 때 어긋난다 (motion.md §4). `animate` 의 `0` 은 숫자여야 한다 —
  *    드래그가 `y.get()` 에 px 를 더하므로 문자열 `"0%"` 면 산술이 깨진다.
  */
-function getPanelMotion(variant: PopupVariant) {
+function getPanelMotion(variant: PopupVariant, shouldReduce: boolean | null) {
+  // 시트 · 전체는 **미끄러지는 것이 곧 등장**이라 투명도를 1 로 고정한다. 모션 감소에서만 0 에서
+  // 시작한다 — 이동을 빼면 남는 것이 페이드뿐이라, 1 이면 패널이 딤 위에 한 프레임에 나타난다
+  // (2026-09-17 사용자 결정 · Apple §14 *"replace slides … with short opacity cross-fades"*).
+  const slideOpacity = shouldReduce ? 0 : 1;
+
   if (variant === "bottomSheet") {
     return {
-      initial: { opacity: 1, y: "100%" },
+      initial: { opacity: slideOpacity, y: "100%" },
       animate: { opacity: 1, y: 0 },
-      exit: { opacity: 1, y: "100%" },
+      exit: { opacity: slideOpacity, y: "100%" },
       enter: motionTransition.panelSheet,
       exitTransition: motionTransition.panelSheetExit,
     };
@@ -70,9 +77,9 @@ function getPanelMotion(variant: PopupVariant) {
 
   if (variant === "full") {
     return {
-      initial: { opacity: 1, transform: "translateX(100%)" },
+      initial: { opacity: slideOpacity, transform: "translateX(100%)" },
       animate: { opacity: 1, transform: "translateX(0%)" },
-      exit: { opacity: 1, transform: "translateX(100%)" },
+      exit: { opacity: slideOpacity, transform: "translateX(100%)" },
       enter: motionTransition.panelFull,
       exitTransition: motionTransition.panelFullExit,
     };
@@ -123,14 +130,21 @@ const DRAG_CONSTRAINTS: Record<DragAxis, Record<string, number>> = {
   y: { top: 0, bottom: 0 },
   x: { left: 0, right: 0 },
 };
-/** 러버밴드 — 들어온 쪽 0.1 (키우지 않는다) · 나가는 쪽 0.7 (motion.md §8). 모션 감소에서는 들어온 쪽 0 */
+/** 러버밴드 — 들어온 쪽 0.1 (키우지 않는다) · 나가는 쪽 0.7 (motion.md §8) */
 const DRAG_ELASTIC: Record<DragAxis, Record<string, number>> = {
   y: { top: 0.1, bottom: 0.7 },
   x: { left: 0.1, right: 0.7 },
 };
+/**
+ * 모션 감소 — **탄성이 없다.** 들어온 쪽은 0(안 늘어남), 나가는 쪽은 1(손가락과 1:1).
+ *
+ * 끄는 것 자체는 남긴다 — 손가락이 움직인 만큼만 움직이는 직접 조작이고, 끄면 × 가 기본으로 없는
+ * 시트의 닫는 길이 줄어든다. 빼는 것은 손가락보다 덜 따라오는 **탄성**이다 — Apple §14
+ * *"Drop elastic/overshoot"* (2026-09-17 사용자 결정 · spec §6-7).
+ */
 const DRAG_ELASTIC_REDUCED: Record<DragAxis, Record<string, number>> = {
-  y: { top: 0, bottom: 0.7 },
-  x: { left: 0, right: 0.7 },
+  y: { top: 0, bottom: 1 },
+  x: { left: 0, right: 1 },
 };
 // ⚠️ 예전에 여기 `DRAG_START_EXCLUDE`(버튼 · 링크 · 입력)가 있었는데 **도달할 수 없는 코드였다**
 //    (2026-09-15 리뷰). 끄는 면이 헤더였을 때는 헤더 안의 버튼을 걸러내야 했지만, 지금 리스너는
@@ -148,10 +162,32 @@ const DRAG_ELASTIC_REDUCED: Record<DragAxis, Record<string, number>> = {
 type DragExit = { velocity: number; distance: number };
 
 /**
- * 모든 팝업의 공통 골격. 직접 쓰기보다 LayerPopup / BottomSheet / FullPopup 을 쓴다.
+ * 모든 팝업의 공통 골격. 소비자가 쓰는 것은 LayerPopup / BottomSheet / FullPopup 이다.
  * dim + 위치 잡기 + 패널 + 헤더/본문/푸터 슬롯 + 모션 + 접근성을 담당한다.
+ *
+ * **Host 표식이 없으면 그리지 않는다** (2026-09-17 · spec §6-2). 팝업을 여는 길은
+ * `PopupHost` 하나다 — 손으로 `<LayerPopup open>` 을 렌더하면 잠금 · inert · 포커스 복원이
+ * 빠진 채 화면에만 뜨던 자리를 여기서 닫는다. 다섯 셸이 전부 이 문을 지난다.
+ * 훅 규칙 때문에 골격 본체(`PopupBaseInner`) 앞에 얇은 문 하나를 둔다.
  */
-export default function PopupBase({
+export default function PopupBase(props: PopupBaseProps) {
+  const isInsideHost = useContext(PopupHostContext);
+
+  useEffect(() => {
+    if (isInsideHost) return;
+
+    warnPopupHostMissing(
+      "render-outside-host",
+      "팝업을 PopupHost 밖에서 렌더했다 — 그리지 않는다. 컴포넌트를 만들어 useLayerPopup() · useBottomSheet() · useFullPopup() 의 open({ component }) 로 연다.",
+    );
+  }, [isInsideHost]);
+
+  if (!isInsideHost) return null;
+
+  return <PopupBaseInner {...props} />;
+}
+
+function PopupBaseInner({
   children,
   id,
   className,
@@ -195,7 +231,7 @@ export default function PopupBase({
 
   const generatedTitleId = useId();
   const generatedDescriptionId = useId();
-  const panelMotion = getPanelMotion(variant);
+  const panelMotion = getPanelMotion(variant, shouldReduceMotion);
   // 본문에 그리는 제목은 head 를 부르지 않는다 — `Alert`·`Confirm` 은 닫기 버튼도 없으므로
   // head 노드 자체가 사라진다 (spec §2 · §6-1).
   const isTitleInBody = titlePlacement === "body";
@@ -239,10 +275,13 @@ export default function PopupBase({
   useEffect(() => {
     if (!open || dragExit == null) return;
 
+    // 되돌아감은 **위치만 바뀌는** 전환이라 모션 감소에서 페이드로 바꿀 것이 없다 — 즉시다.
+    // 헬퍼(`reduceMotionTransition`)를 쓰지 않는다: 그것은 같은 시간의 전환을 돌려주므로
+    // 여기서는 250ms 이동이 남는다 (motion.ts 주석).
     animate(
       panelOffset,
       0,
-      reduceMotionTransition(motionTransition.panelSheet, shouldReduceMotion),
+      shouldReduceMotion ? { duration: 0 } : motionTransition.panelSheet,
     );
     setDragExit(null);
   }, [open, dragExit, panelOffset, shouldReduceMotion]);
@@ -267,27 +306,28 @@ export default function PopupBase({
       velocity > DRAG_CLOSE_VELOCITY;
 
     if (shouldClose && onRequestClose) {
-      // 모션 감소면 속도를 이어받지 않는다 — exit 이 `{ duration: 0 }` 이라 어차피 즉시다
+      // 모션 감소면 속도를 이어받지 않는다 — 퇴장이 이동 없이 그 자리에서 페이드라 쓸 곳이 없다
       setDragExit({ velocity: shouldReduceMotion ? 0 : velocity, distance });
       onRequestClose();
 
-      // ⚠️ 모션 감소에서는 되돌아감을 걸지 않는다. `{ duration: 0 }` 의 `animate` 는 다음
-      //    프레임에 값을 0 으로 놓는데 exit(페이드만 · 즉시)은 그 프레임 뒤에 언마운트하므로,
-      //    끌어 내린 자리 → 한 프레임 제자리 → 사라짐으로 튄다(리뷰 2회차 실측). 퇴장이
-      //    즉시라 돌아갈 것이 없다. 통로는 `handleExitComplete` 가 비운다.
-      if (shouldReduceMotion) return;
+      // ⚠️ 모션 감소에서는 제자리로 되돌리지 않는다 — **끌어 내린 자리에서 사라져야 한다.**
+      //    그렇다고 아무것도 안 걸면 framer 가 드래그 종료에 스스로 건 복귀(경계 0 으로의 탄성)가
+      //    그대로 돌아, 페이드되는 동안 패널이 원점으로 끌려간다(qa 실측 317 → 114px · 2026-09-17).
+      //    예전에는 퇴장이 즉시라 안 보였다. 그래서 **지금 자리로 0ms 전환**을 걸어 그 복귀를 덮는다 —
+      //    모션을 켠 경로가 우리 스프링으로 덮는 것과 같은 수단이다. 통로는 `handleExitComplete` 가 비운다.
+      if (shouldReduceMotion) {
+        animate(panelOffset, panelOffset.get(), { duration: 0 });
+        return;
+      }
     }
 
     // 되돌아감은 그 밖에 **언제나** 건다. 놓는 순간 framer 가 자기 inertia(bounceStiffness 200 ·
     // Damping 40)를 먼저 걸고 `onDragEnd` 는 그 뒤에 온다 — 같은 값에 우리 스프링을 걸어
     // 덮는다. 등장과 같은 `panelSheet` 라 **한 물리**다. 닫히면 exit 이 같은 값을 `start()`
     // 하며 이것을 멈추고(`stop` 은 `onComplete` 를 부르지 않는다), 요청이 거절돼 열린 채면
-    // 끝까지 돌아와 통로를 비운다. 모션 감소면 즉시 제자리.
+    // 끝까지 돌아와 통로를 비운다. 모션 감소면 즉시 제자리(위 effect 와 같은 이유로 헬퍼를 안 쓴다).
     animate(panelOffset, 0, {
-      ...reduceMotionTransition(
-        motionTransition.panelSheet,
-        shouldReduceMotion,
-      ),
+      ...(shouldReduceMotion ? { duration: 0 } : motionTransition.panelSheet),
       onComplete: () => setDragExit(null),
     });
   };
@@ -299,26 +339,44 @@ export default function PopupBase({
   // 패널이 쓰는 바로 그 값이다. variant 마다 패널이 다르므로 딤도 variant 마다 다르다.
   //
   // 끌어서 닫을 때도 같다 — 패널이 놓은 속도로 나가면 딤도 같은 스프링으로 걷힌다.
+  //
+  // ⚠️ **정지 기준을 속성마다 붙인다** (2026-09-17 · `/review-animations`). framer 는 거리 **그리고**
+  //    속도가 둘 다 기준 안일 때 멈추고, AnimatePresence 는 패널과 딤이 **둘 다** 멈춰야 뺀다.
+  //    기본값(패널 2px/s · 딤 opacity 0.01/s)이면 눈에 안 보이는 꼬리가 ~150ms 더 마운트를 붙들어
+  //    명령형 경로의 배경 스크롤 잠금까지 늦췄다. 지금은 패널이 1px 안에 든 뒤 **두 프레임**(멈춤 판정 ·
+  //    React 커밋)에 DOM 에서 빠진다 — 60fps 실측 348ms → 383ms (spec §6-7).
+  //    `restDelta` 는 거리라 단위가 갈린다 — 패널에 준 `1`(px)을 딤에 주면 opacity 0~1 전체가
+  //    「이미 도착」이라 첫 프레임에 끝난다. 그래서 공용 값(`motion.ts`)에 두지 않는다.
+  //    딤에 opacity 단위의 `restDelta` 도 주지 않는다 — 딤은 WAAPI 로 돌고 framer 가 그 길이를
+  //    0~100 스케일에서 재므로 오히려 300 → 450ms 로 늘어난다. `restSpeed` 만으로 패널보다 먼저 끝난다.
   const dimExit = (custom: DragExit | null) => ({
     opacity: 0,
     transition: reduceMotionTransition(
       custom != null
-        ? motionTransition.panelSheetDragExit
+        ? { ...motionTransition.panelSheetDragExit, restSpeed: 10 }
         : panelMotion.exitTransition,
       shouldReduceMotion,
     ),
   });
 
-  // 끌어서 닫았을 때만 exit 이 놓은 속도와 px 목표를 받는다. 나머지 닫기는 §5 의 `d5 + exit`.
+  // 끌어서 닫았을 때만 exit 이 놓은 속도와 px 목표를 받는다. 나머지 닫기는 §5 의 `d4 + exit`.
   const panelDragExit = (custom: DragExit | null) => {
     const byDrag = custom != null && dragAxis != null;
+    // 모션 감소면 투명도가 0 으로 간다 — 이동은 `reduceMotion` 이 빼므로 끌어 내린 자리에서 페이드된다.
+    // 시간은 `panelSheetDragExit`(물리 스프링 · 시간 없음)라 헬퍼가 `d4` 200 을 쓴다.
+    const dragOpacity = shouldReduceMotion ? 0 : 1;
     const target = byDrag
       ? dragAxis === "y"
-        ? { opacity: 1, y: custom.distance }
-        : { opacity: 1, x: custom.distance }
+        ? { opacity: dragOpacity, y: custom.distance }
+        : { opacity: dragOpacity, x: custom.distance }
       : panelMotion.exit;
     const transition = byDrag
-      ? { ...motionTransition.panelSheetDragExit, velocity: custom.velocity }
+      ? {
+          ...motionTransition.panelSheetDragExit,
+          velocity: custom.velocity,
+          restDelta: 1,
+          restSpeed: 20,
+        }
       : panelMotion.exitTransition;
 
     return {
@@ -515,93 +573,98 @@ export default function PopupBase({
         };
 
   return (
-    <AnimatePresence onExitComplete={handleExitComplete} custom={dragExit}>
-      {open ? (
-        <motion.div
-          id={id}
-          className={cn(
-            block,
-            `${block}--${VARIANT_CLASS[variant]}`,
-            size !== "medium" && `${block}--${size}`,
-            contentAlign === "center" && `${block}--align-center`,
-            hasCloseButton && `${block}--has-close`,
-            // 띠가 있다(끌 수 있다) · 막대가 보인다 — 둘은 다른 것이다
-            isDraggable && `${block}--has-drag`,
-            isDraggable && hasDragHandle && `${block}--has-handle`,
-            !hasHeader && `${block}--no-header`,
-            // `--no-header` 와 다른 것을 잰다 — 앞은 "head 노드가 없다", 이쪽은 "제목이 없다".
-            // `Alert`·`Confirm` 은 앞이 상수라 본문 최소 높이·설명 폭 보정이 이쪽에 걸린다 (spec §9).
-            !title && `${block}--no-title`,
-            !resolvedFooter && `${block}--no-footer`,
-            className,
-          )}
-        >
+    // ⚠️ 표식을 여기서 다시 끈다 (2026-09-17 리뷰). Host 가 켠 표식은 portal 서브트리 전체에
+    //    닿으므로, 이게 없으면 팝업 **안**에서 runtime 다섯을 손으로 지어내 셸을 렌더하는 길이
+    //    남는다(dialog 가 중첩된다). 팝업 안에서 또 여는 것은 훅으로 한다.
+    <PopupHostContext.Provider value={false}>
+      <AnimatePresence onExitComplete={handleExitComplete} custom={dragExit}>
+        {open ? (
           <motion.div
-            className={`${block}__dim`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            variants={{ exit: dimExit }}
-            exit="exit"
-            // 패널과 같은 값 — 한 면으로 읽히게 (위 `dimExit` 주석)
-            transition={reduceMotionTransition(
-              panelMotion.enter,
-              shouldReduceMotion,
+            id={id}
+            className={cn(
+              block,
+              `${block}--${VARIANT_CLASS[variant]}`,
+              size !== "medium" && `${block}--${size}`,
+              contentAlign === "center" && `${block}--align-center`,
+              hasCloseButton && `${block}--has-close`,
+              // 띠가 있다(끌 수 있다) · 막대가 보인다 — 둘은 다른 것이다
+              isDraggable && `${block}--has-drag`,
+              isDraggable && hasDragHandle && `${block}--has-handle`,
+              !hasHeader && `${block}--no-header`,
+              // `--no-header` 와 다른 것을 잰다 — 앞은 "head 노드가 없다", 이쪽은 "제목이 없다".
+              // `Alert`·`Confirm` 은 앞이 상수라 본문 최소 높이·설명 폭 보정이 이쪽에 걸린다 (spec §9).
+              !title && `${block}--no-title`,
+              !resolvedFooter && `${block}--no-footer`,
+              className,
             )}
-            onClick={handleBackdropClick}
-          />
-
-          <div className={`${block}__positioner`}>
-            <motion.section
-              ref={panelRef}
-              role="dialog"
-              aria-modal="true"
-              aria-label={titleId ? undefined : dialogLabel}
-              aria-labelledby={titleId}
-              aria-describedby={descriptionId}
-              className={cn(`${block}__panel`, panelClassName)}
-              tabIndex={-1}
-              initial={reduceMotion(panelMotion.initial, shouldReduceMotion)}
-              animate={reduceMotion(panelMotion.animate, shouldReduceMotion)}
+          >
+            <motion.div
+              className={`${block}__dim`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              variants={{ exit: dimExit }}
+              exit="exit"
+              // 패널과 같은 값 — 한 면으로 읽히게 (위 `dimExit` 주석)
               transition={reduceMotionTransition(
                 panelMotion.enter,
                 shouldReduceMotion,
               )}
-              {...dragProps}
-            >
-              {handle}
-              {headerContent}
+              onClick={handleBackdropClick}
+            />
 
-              <div
-                ref={bodyRef}
-                className={cn(`${block}__body`, bodyClassName)}
-                data-scrolled-top={scrollEdges.top ? "true" : undefined}
-                data-scrolled-bottom={scrollEdges.bottom ? "true" : undefined}
-                onScroll={syncScrollEdges}
+            <div className={`${block}__positioner`}>
+              <motion.section
+                ref={panelRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label={titleId ? undefined : dialogLabel}
+                aria-labelledby={titleId}
+                aria-describedby={descriptionId}
+                className={cn(`${block}__panel`, panelClassName)}
+                tabIndex={-1}
+                initial={reduceMotion(panelMotion.initial, shouldReduceMotion)}
+                animate={reduceMotion(panelMotion.animate, shouldReduceMotion)}
+                transition={reduceMotionTransition(
+                  panelMotion.enter,
+                  shouldReduceMotion,
+                )}
+                {...dragProps}
               >
-                {icon !== null && icon !== undefined ? (
-                  <div className={`${block}__icon`}>{icon}</div>
-                ) : null}
-                {/* 아이콘 → 제목 → 설명. KRDS 390쪽의 「헤더」가 여기 들어온다 (spec §2) */}
-                {isTitleInBody ? titleNode : null}
-                {description ? (
-                  <p id={descriptionId} className={`${block}__description`}>
-                    {description}
-                  </p>
-                ) : null}
-                {children}
-              </div>
+                {handle}
+                {headerContent}
 
-              {resolvedFooter ? (
-                <div className={cn(`${block}__foot`, footerClassName)}>
-                  {resolvedFooter}
+                <div
+                  ref={bodyRef}
+                  className={cn(`${block}__body`, bodyClassName)}
+                  data-scrolled-top={scrollEdges.top ? "true" : undefined}
+                  data-scrolled-bottom={scrollEdges.bottom ? "true" : undefined}
+                  onScroll={syncScrollEdges}
+                >
+                  {icon !== null && icon !== undefined ? (
+                    <div className={`${block}__icon`}>{icon}</div>
+                  ) : null}
+                  {/* 아이콘 → 제목 → 설명. KRDS 390쪽의 「헤더」가 여기 들어온다 (spec §2) */}
+                  {isTitleInBody ? titleNode : null}
+                  {description ? (
+                    <p id={descriptionId} className={`${block}__description`}>
+                      {description}
+                    </p>
+                  ) : null}
+                  {children}
                 </div>
-              ) : null}
 
-              {closeButton}
-            </motion.section>
-          </div>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
+                {resolvedFooter ? (
+                  <div className={cn(`${block}__foot`, footerClassName)}>
+                    {resolvedFooter}
+                  </div>
+                ) : null}
+
+                {closeButton}
+              </motion.section>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </PopupHostContext.Provider>
   );
 }

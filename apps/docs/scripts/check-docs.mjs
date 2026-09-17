@@ -468,6 +468,26 @@ console.log("\n■ 문서가 적은 토큰 · 값 · export 가 생성물과 같
         ok,
       ]);
     }
+    // (f) 페이지 머리말의 import 예시 — `<GuideHeader named={[…]} subpath="…" />` (2026-09-17)
+    //     `GuideHeader` 가 이 이름들로 `import { … } from "@nui-kit/react"` 를 **문자열로** 그린다.
+    //     소비자가 그대로 베끼는 줄인데 문자열이라 tsc 도 빌드도 못 본다 — `Alert` · `Confirm` export 를
+    //     지운 뒤 두 페이지가 없는 이름을 import 하라고 안내하고 있었다(qa 가 잡았다).
+    //     서브패스가 없으면(배럴만) 대조할 폴더가 없어 판정하지 않는다.
+    for (const m of body.matchAll(/<GuideHeader\b[\s\S]*?\/>/g)) {
+      const named = m[0].match(/named=\{\[([^\]]*)\]\}/);
+      const sub = m[0].match(/subpath="([a-z-]+)"/);
+      const dir = sub && SUBPATH_DIR[sub[1]];
+      if (!named || !dir) continue;
+      const have = exportsOf(dir);
+      for (const n of [...named[1].matchAll(/"([A-Za-z][A-Za-z0-9.]*)"/g)].map(
+        (x) => x[1],
+      ))
+        out.push([
+          "머리말 import",
+          `${rel} — 머리말이 \`${n}\` 을 import 하라고 하는데 \`/${sub[1]}\` 에 없다 (index.ts)`,
+          have.has(n.split(".")[0]),
+        ]);
+    }
     return out;
   };
 
@@ -476,7 +496,7 @@ console.log("\n■ 문서가 적은 토큰 · 값 · export 가 생성물과 같
     const cases = [
       ["<code>duration-7</code>", 1], // 위반 — 지운 토큰
       ["<code>font-size-1</code> (12px)", 1], // 위반 — 값이 틀렸다
-      ["| `/popup` | `PopupBase` `Alert` |", 1], // 위반 — 없는 export
+      ["| `/popup` | `PopupBase` `LayerPopup` |", 1], // 위반 — 없는 export (`Alert` 는 2026-09-17 에 export 가 빠져 짝에서 뺐다)
       ["var(--nui-radius-sm)", 1], // 위반 — 옛 이름
       ['import "@nui-kit/react/styles/presets/42.css";', 1], // 위반 — 없는 경로 (2026-09-15 실제 사례)
       ['import "@nui-kit/react/styles/themes/preset-999.css";', 1], // 위반 — 없는 프리셋 번호
@@ -489,6 +509,20 @@ console.log("\n■ 문서가 적은 토큰 · 값 · export 가 생성물과 같
       ['<code>variant="text"</code>', 0], // 함정 — 토큰 모양이 아니다
       ["<code>z-index</code> 를 직접 쓰지 않는다", 0], // 함정 — CSS 속성이지 토큰이 아니다
       ["`@nui-kit/react/styles/*.css` 로 열려 있다", 0], // 함정 — 글로브는 경로가 아니다
+      [
+        '<GuideHeader title="Alert" named={["useAlert", "Alert"]} subpath="popup" />',
+        1,
+      ], // 위반 — 지운 export (2026-09-17 실제 사례)
+      [
+        '<GuideHeader\n  title="X"\n  named={["Nope"]}\n  subpath="select"\n/>',
+        1,
+      ], // 위반 — 여러 줄
+      ['<GuideHeader title="Alert" named={["useAlert"]} subpath="popup" />', 0], // 통과 — 훅
+      [
+        '<GuideHeader title="Search" named={["Search", "Password"]} subpath="textfield" />',
+        0,
+      ], // 통과 — 서브패스가 다른 폴더
+      ['<GuideHeader title="Popup" named={["Nope"]} />', 0], // 함정 — 서브패스가 없으면 판정 안 함
     ];
     let bad = 0;
     for (const [text, expect] of cases) {

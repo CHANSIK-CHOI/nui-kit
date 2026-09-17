@@ -23,7 +23,7 @@
  *   ■ 퇴장       닫은 뒤에도 패널이 DOM 에 남아 `opacity` 가 줄어드는가 (닫는 경로마다)
  *   ■ 포인터     퇴장 중 `pointer-events: none` 이라 옵션이 눌리지 않는가
  *   ■ 재개폐     퇴장 중 다시 열어도 패널이 둘이 되지 않는가
- *   ■ 모션 감소   `prefers-reduced-motion` 에서 위치가 안 움직이고 퇴장이 즉시 끝나는가
+ *   ■ 모션 감소   `prefers-reduced-motion` 에서 위치가 안 움직이고, 퇴장이 0 이 아니라 페이드로 걸리며 그동안 눌리지 않는가
  *   ■ 동일       두 소스가 같은 모션 키를 쓰고, 재 보면 이동 거리도 같은가
  *
  * ⚠️ **일부러 도중을 잡는 검사다**(`scripts.md §10` 의 예외). 「멈출 때까지 읽는다」는
@@ -96,7 +96,8 @@ const EXPECT = {
   sameMotion: true, // Select 와 Datepicker 가 같다
   inPlace: true, // 기본 모드 — 제자리 · 뒤집지 않음 · 페이지 스크롤 0 · 래퍼 0 (2026-09-17 A 안)
   reducedNoMove: true, // 모션 감소 — 등장 내내 `transform: none` 이고 끝에 보인다
-  reducedExitInstant: true, // 모션 감소 — 퇴장이 즉시 끝난다
+  reducedExitFades: true, // 모션 감소 — 퇴장이 0 이 아니라 페이드로 걸린다 (not zero · 2026-09-17)
+  reducedPointerBlocked: true, // 모션 감소 — 퇴장 중에도 눌리지 않는다
 };
 
 // ⚠️ **열 키가 전부 뒤집혀야 한다.** 하나라도 빠뜨리면 그 절은 `--selftest` 에서
@@ -111,7 +112,8 @@ const SELFTEST_EXPECT = {
   sameMotion: false,
   inPlace: false,
   reducedNoMove: false,
-  reducedExitInstant: false,
+  reducedExitFades: false,
+  reducedPointerBlocked: false,
 };
 
 const E = SELFTEST ? SELFTEST_EXPECT : EXPECT;
@@ -536,13 +538,11 @@ async function run() {
       );
     }
 
-    // ── 모션 감소 — 위치 이동 없음 · 퇴장 즉시 (Select.md §10 · motion.md §5-2)
-    //    `reduceMotion` 이 `opacity` 만 남기고 `reduceMotionTransition` 이 `duration: 0` 이다.
-    //    실측(2026-09-17) — 두 컴포넌트 모두 등장 내내 `transform: none` · 퇴장 13~20ms 에 DOM 에서
-    //    사라진다. 모션을 켠 채로는 50ms 에 `opacity` 0.45 로 아직 남아 있어 문턱이 둘을 가른다.
-    //    ⏳ **이 「즉시」는 정본 이탈을 재고 있다** — Emil 은 모션 감소도 *"not zero"* 다(`sources/emil-apple.md`
-    //    「모션 감소」 행 · 예정). 공통 헬퍼를 고치는 판에서 「퇴장 즉시」 기대를 「위치 이동 없는 짧은 페이드」로
-    //    바꾼다 — 그 판에서 이 절이 실패하는 것이 정상이다.
+    // ── 모션 감소 — 위치 이동 없음 · 퇴장은 페이드 · 퇴장 중 포인터 차단 (Select.md §10 · motion.md §5-2)
+    //    Emil *"not zero"* 를 따른다(2026-09-17 · `sources/emil-apple.md` 「모션 감소」 행 따름).
+    //    `reduceMotion` 이 이동을 빼고 `opacity` · `pointerEvents` · 퇴장 시간을 남기고,
+    //    `reduceMotionTransition` 이 같은 시간의 페이드를 준다 — 퇴장 150ms.
+    //    예전 기대는 「퇴장 즉시」(실측 7~21ms)였다 — 그것이 재던 것이 정본 이탈이었다.
     if (t.reduced) {
       const rm = await browser.newPage({
         viewport: { width: 1000, height: 900 },
@@ -560,8 +560,10 @@ async function run() {
       const frames = await rm.evaluate(() => window.__nuiFrames ?? []);
       const moved = frames.filter((f) => f.transform !== "none");
       const last = frames.at(-1);
+      // 「끝에 보인다」는 0.99 이상 — 등장이 페이드라 마지막 기록 프레임이 0.999999 일 수 있다.
+      // 예전 `duration: 0` 은 한 프레임에 1 이 되어 `=== 1` 이 우연히 맞았다 (scripts.md §10)
       const noMove =
-        frames.length > 0 && moved.length === 0 && last?.opacity === 1;
+        frames.length > 0 && moved.length === 0 && (last?.opacity ?? 0) >= 0.99;
       sections.reduced += 1;
       expect(
         noMove === E.reducedNoMove,
@@ -571,37 +573,56 @@ async function run() {
           : `transform 이 none 이 아닌 프레임 ${moved.length}개 (첫 값 ${moved[0]?.transform ?? "-"}) · 마지막 opacity=${last?.opacity}`,
       );
 
-      // 퇴장 시간은 브라우저 안에서 잰다 — 키를 받은 순간부터 패널이 DOM 에서 빠진 순간까지
-      await rm.evaluate((sel) => {
-        window.__nuiExitMs = null;
-        document.addEventListener(
-          "keydown",
-          (e) => {
-            if (e.key !== "Escape") return;
-            const t0 = performance.now();
-            const obs = new MutationObserver(() => {
-              if (document.querySelector(sel)) return;
-              window.__nuiExitMs = performance.now() - t0;
-              obs.disconnect();
-            });
-            obs.observe(document.body, { childList: true, subtree: true });
-          },
-          { capture: true, once: true },
-        );
-      }, t.panel);
+      // 퇴장은 브라우저 안에서 잰다 — 키를 받은 순간부터 패널이 DOM 에서 빠진 순간까지 ·
+      // 그 도중(EXIT_MS / 3 = 50ms)의 `pointer-events`
+      await rm.evaluate(
+        ({ sel, midMs }) => {
+          window.__nuiExitMs = null;
+          window.__nuiMidPointer = null;
+          document.addEventListener(
+            "keydown",
+            (e) => {
+              if (e.key !== "Escape") return;
+              const t0 = performance.now();
+              setTimeout(() => {
+                const el = document.querySelector(sel);
+                window.__nuiMidPointer = el
+                  ? getComputedStyle(el).pointerEvents
+                  : "gone";
+              }, midMs);
+              const obs = new MutationObserver(() => {
+                if (document.querySelector(sel)) return;
+                window.__nuiExitMs = performance.now() - t0;
+                obs.disconnect();
+              });
+              obs.observe(document.body, { childList: true, subtree: true });
+            },
+            { capture: true, once: true },
+          );
+        },
+        { sel: t.panel, midMs: Math.round(EXIT_MS / 3) },
+      );
       await rm.keyboard.press("Escape");
-      await rm.waitForTimeout(EXIT_MS + 200);
+      await rm.waitForTimeout(EXIT_MS + 300);
       const exitMs = await rm.evaluate(() => window.__nuiExitMs);
-      // 문턱은 `EXIT_MS × ⅔`(100ms) — framer 는 `duration: 0` 이어도 한두 프레임 뒤에 DOM 을 뺀다
-      // (실측 7~21ms). 모션을 켠 퇴장은 150ms 라 그보다 빨리 빠질 수 없으므로 구분력은 그대로다 (리뷰 WARN)
-      const REDUCED_EXIT_MAX = Math.round((EXIT_MS * 2) / 3);
-      const instant = exitMs !== null && exitMs <= REDUCED_EXIT_MAX;
+      const midPointer = await rm.evaluate(() => window.__nuiMidPointer);
+      // 문턱은 `EXIT_MS × ⅔`(100ms) — 예전 `duration: 0` 은 7~21ms 에 DOM 을 뺐고, 150ms 페이드는
+      // 그보다 빨리 빠질 수 없다. 둘 사이가 넓어 부하에 흔들리지 않는다.
+      const REDUCED_EXIT_MIN = Math.round((EXIT_MS * 2) / 3);
+      const fades = exitMs !== null && exitMs >= REDUCED_EXIT_MIN;
       expect(
-        instant === E.reducedExitInstant,
-        `${t.label} 모션 감소 — 퇴장이 즉시 끝난다 (${exitMs === null ? "-" : exitMs.toFixed(0)}ms)`,
+        fades === E.reducedExitFades,
+        `${t.label} 모션 감소 — 퇴장이 페이드로 걸린다 (${exitMs === null ? "-" : exitMs.toFixed(0)}ms)`,
         exitMs === null
-          ? `${EXIT_MS + 200}ms 가 지나도 DOM 에 남아 있다`
-          : `${exitMs.toFixed(0)}ms — ${REDUCED_EXIT_MAX}ms 이하여야 한다`,
+          ? `${EXIT_MS + 300}ms 가 지나도 DOM 에 남아 있다`
+          : `${exitMs.toFixed(0)}ms — ${REDUCED_EXIT_MIN}ms 이상이어야 한다 (0 이 아니다)`,
+      );
+      // 퇴장 중 포인터 차단 — 모션 감소에서도 페이드 150ms 동안 옵션 · 날짜가 눌리면 안 된다
+      const blocked = midPointer === "none";
+      expect(
+        blocked === E.reducedPointerBlocked,
+        `${t.label} 모션 감소 — 퇴장 중 포인터 차단 (${midPointer ?? "-"})`,
+        `퇴장 ${Math.round(EXIT_MS / 3)}ms 시점 pointer-events=${midPointer}`,
       );
       await rm.close();
     }

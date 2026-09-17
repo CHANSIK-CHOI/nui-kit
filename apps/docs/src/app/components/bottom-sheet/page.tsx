@@ -7,9 +7,9 @@ import {
   PropsTable,
 } from "@/components/guide";
 import {
-  BottomSheetDeclarativeDemo,
+  BottomSheetOpenDemo,
   BottomSheetDragDemo,
-  BottomSheetImperativeDemo,
+  BottomSheetShareDemo,
   BottomSheetOptionsDemo,
 } from "./BottomSheetDemo";
 
@@ -35,15 +35,13 @@ export default function BottomSheetPage() {
         페이지는 시트에서 달라지는 것만 적는다.
       </p>
 
-      <h2>선언형</h2>
-      <BottomSheetDeclarativeDemo />
-
-      <h2>명령형</h2>
+      <h2>컴포넌트를 만들고 훅으로 연다</h2>
       <p>
         <code>useBottomSheet().open({"{ component }"})</code>. 시트 안의
-        선택지가 <code>onRequestClose</code> 를 부르면 닫힌다.
+        선택지가 <code>runtime.onRequestClose</code> 를 부르면 닫힌다.
       </p>
-      <BottomSheetImperativeDemo />
+      <BottomSheetOpenDemo />
+      <BottomSheetShareDemo />
 
       <h2>LayerPopup 과 다른 점</h2>
       <div className="doc-table-wrap">

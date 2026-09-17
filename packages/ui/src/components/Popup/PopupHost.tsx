@@ -7,6 +7,7 @@ import { PORTAL_ROOT_ATTRIBUTE } from "../../internal/portal.js";
 import Alert from "./Alert.js";
 import Confirm from "./Confirm.js";
 import { usePopupStore } from "./popup.store.js";
+import { PopupHostContext, registerPopupHost } from "./PopupHost.context.js";
 import usePopupHostA11y from "./usePopupHostA11y.js";
 
 const POPUP_ROOT_ID = px("popup-root");
@@ -16,8 +17,12 @@ export type PopupHostProps = {
 };
 
 /**
- * 명령형 팝업(useAlert / useConfirm / useLayerPopup …)의 렌더링 지점.
- * 앱 루트(App Router 라면 `app/layout.tsx`)에서 한 번만 감싼다.
+ * 팝업이 그려지는 **유일한** 자리 (2026-09-17 · spec §6-2). 훅 다섯(useAlert / useConfirm /
+ * useLayerPopup / useBottomSheet / useFullPopup)이 store 에 쌓은 것을 여기서 portal 로 그린다.
+ * 앱 루트(App Router 라면 `app/layout.tsx`)에서 한 번만 감싼다 — 없으면 팝업이 뜨지 않는다.
+ *
+ * 배경 스크롤 잠금 · `inert` · 포커스 복원 · `isTopmost` 계산이 전부 여기 있다. 여는 길이
+ * 하나라 빠지는 팝업이 없다.
  *
  * portal 컨테이너는 **없으면 직접 만든다** — 소비자가 `_document` 나 layout 에
  * 빈 div 를 심어야 하는 부담을 없애기 위해서다.
@@ -26,6 +31,9 @@ export default function PopupHost({ children }: PopupHostProps) {
   const items = usePopupStore((state) => state.items);
   const closePopup = usePopupStore((state) => state.closePopup);
   const removePopup = usePopupStore((state) => state.removePopup);
+
+  // Host 가 있다는 표식 — 훅 `open()` 이 Host 없이 불리면 개발 모드에서 경고한다
+  useEffect(() => registerPopupHost(), []);
 
   // ⚠️ 마운트 이후에 컨테이너를 잡는다.
   //    렌더 중(useState initializer)에 document 를 읽으면 서버 출력과 어긋나
@@ -67,11 +75,15 @@ export default function PopupHost({ children }: PopupHostProps) {
       {children}
       {portalRoot
         ? createPortal(
-            <>
+            // ⚠️ 표식은 portal 안에만 — `children` 을 감싸면 앱 안에서 손으로 렌더한 셸도
+            //    표식을 얻어 둘째 길이 되살아난다 (`PopupHost.context.ts`)
+            <PopupHostContext.Provider value={true}>
               {items.map((item) => {
                 switch (item.type) {
                   case "alert": {
-                    const { shouldCloseOnConfirm, ...alertProps } = item.props;
+                    // 기본값은 구조분해로 둔다 — 문서 props 표(`extract-props`)가 여기서 `true` 를 읽는다
+                    const { shouldCloseOnConfirm = true, ...alertProps } =
+                      item.props;
 
                     return (
                       <Alert
@@ -83,7 +95,7 @@ export default function PopupHost({ children }: PopupHostProps) {
                         onConfirm={() => {
                           alertProps.onConfirm?.();
 
-                          if (shouldCloseOnConfirm ?? true) {
+                          if (shouldCloseOnConfirm) {
                             closePopup(item.id);
                           }
                         }}
@@ -93,8 +105,8 @@ export default function PopupHost({ children }: PopupHostProps) {
                   }
                   case "confirm": {
                     const {
-                      shouldCloseOnCancel,
-                      shouldCloseOnConfirm,
+                      shouldCloseOnCancel = true,
+                      shouldCloseOnConfirm = true,
                       ...confirmProps
                     } = item.props;
 
@@ -108,14 +120,14 @@ export default function PopupHost({ children }: PopupHostProps) {
                         onCancel={() => {
                           confirmProps.onCancel?.();
 
-                          if (shouldCloseOnCancel ?? true) {
+                          if (shouldCloseOnCancel) {
                             closePopup(item.id);
                           }
                         }}
                         onConfirm={() => {
                           confirmProps.onConfirm?.();
 
-                          if (shouldCloseOnConfirm ?? true) {
+                          if (shouldCloseOnConfirm) {
                             closePopup(item.id);
                           }
                         }}
@@ -143,7 +155,7 @@ export default function PopupHost({ children }: PopupHostProps) {
                     return null;
                 }
               })}
-            </>,
+            </PopupHostContext.Provider>,
             portalRoot,
           )
         : null}

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@nui-kit/react";
 import {
   BottomSheet,
@@ -11,64 +10,17 @@ import { Case, CaseGrid, Example } from "@/components/guide";
 
 const SHARE_OPTIONS = ["링크 복사", "카카오톡", "메시지", "메일"];
 
-export function BottomSheetDeclarativeDemo() {
-  const [isOpen, setIsOpen] = useState(false);
-
+/** 시트 하나 = 컴포넌트 하나. 선택지가 runtime.onRequestClose 를 부르면 닫힌다. */
+function SortSheet(runtime: BottomSheetComponentProps) {
   return (
-    <>
-      <Example
-        caption="open 을 쓰는 쪽이 갖는다"
-        code={`<BottomSheet open={isOpen} onRequestClose={() => setIsOpen(false)} title="정렬">…</BottomSheet>`}
-      >
-        <Button size="medium" variant="line" onClick={() => setIsOpen(true)}>
-          정렬 바꾸기
-        </Button>
-      </Example>
-
-      <BottomSheet
-        open={isOpen}
-        onRequestClose={() => setIsOpen(false)}
-        title="정렬"
-      >
-        <div style={{ display: "grid", gap: 8 }}>
-          {["최신순", "인기순", "낮은 가격순"].map((label) => (
-            <Button
-              key={label}
-              variant="line"
-              size="medium"
-              onClick={() => setIsOpen(false)}
-            >
-              {label}
-            </Button>
-          ))}
-        </div>
-      </BottomSheet>
-    </>
-  );
-}
-
-/** 명령형으로 등록할 시트 내용. PopupHost 가 런타임 props 를 넣는다. */
-function ShareSheet({
-  open,
-  onRequestClose,
-  onCloseComplete,
-  isTopmost,
-}: BottomSheetComponentProps) {
-  return (
-    <BottomSheet
-      open={open}
-      onRequestClose={onRequestClose}
-      onCloseComplete={onCloseComplete}
-      isTopmost={isTopmost}
-      title="공유하기"
-    >
+    <BottomSheet {...runtime} title="정렬">
       <div style={{ display: "grid", gap: 8 }}>
-        {SHARE_OPTIONS.map((label) => (
+        {["최신순", "인기순", "낮은 가격순"].map((label) => (
           <Button
             key={label}
             variant="line"
             size="medium"
-            onClick={onRequestClose}
+            onClick={runtime.onRequestClose}
           >
             {label}
           </Button>
@@ -78,12 +30,65 @@ function ShareSheet({
   );
 }
 
-export function BottomSheetImperativeDemo() {
+export function BottomSheetOpenDemo() {
+  const bottomSheet = useBottomSheet();
+
+  return (
+    <>
+      <Example
+        caption="컴포넌트를 만들고 훅으로 연다"
+        code={`bottomSheet.open({ component: SortSheet });`}
+      >
+        <Button
+          size="medium"
+          variant="line"
+          onClick={() => bottomSheet.open({ component: SortSheet })}
+        >
+          정렬 바꾸기
+        </Button>
+      </Example>
+      <pre className="doc-code">
+        <code>{`function SortSheet(runtime: BottomSheetComponentProps) {
+  return (
+    <BottomSheet {...runtime} title="정렬">
+      <Button variant="line" onClick={runtime.onRequestClose}>최신순</Button>
+      …
+    </BottomSheet>
+  );
+}
+
+const bottomSheet = useBottomSheet();
+bottomSheet.open({ component: SortSheet });`}</code>
+      </pre>
+    </>
+  );
+}
+
+function ShareSheet(runtime: BottomSheetComponentProps) {
+  return (
+    <BottomSheet {...runtime} title="공유하기">
+      <div style={{ display: "grid", gap: 8 }}>
+        {SHARE_OPTIONS.map((label) => (
+          <Button
+            key={label}
+            variant="line"
+            size="medium"
+            onClick={runtime.onRequestClose}
+          >
+            {label}
+          </Button>
+        ))}
+      </div>
+    </BottomSheet>
+  );
+}
+
+export function BottomSheetShareDemo() {
   const bottomSheet = useBottomSheet();
 
   return (
     <Example
-      caption="내용 컴포넌트를 등록해서 연다"
+      caption="선택지 목록에 맞는 자리"
       code={`bottomSheet.open({ component: ShareSheet });`}
     >
       <Button
@@ -96,54 +101,62 @@ export function BottomSheetImperativeDemo() {
   );
 }
 
-type OptionKey = "center" | "noClose";
+function CenterSheet(runtime: BottomSheetComponentProps) {
+  return (
+    <BottomSheet
+      {...runtime}
+      contentAlign="center"
+      title="주문을 접수했습니다"
+      description="배송이 시작되면 알려 드릴게요."
+      confirmLabel="주문 내역 보기"
+      onConfirm={runtime.onRequestClose}
+    />
+  );
+}
+
+function NoCloseSheet(runtime: BottomSheetComponentProps) {
+  return (
+    <BottomSheet
+      {...runtime}
+      hasCloseButton={false}
+      title="필터"
+      cancelLabel="닫기"
+      confirmLabel="적용"
+      onConfirm={runtime.onRequestClose}
+    >
+      <p style={{ color: "var(--nui-text-secondary)" }}>
+        × 가 없어도 dim 과 Esc 로 닫힌다.
+      </p>
+    </BottomSheet>
+  );
+}
 
 export function BottomSheetOptionsDemo() {
-  const [open, setOpen] = useState<OptionKey | null>(null);
-  const close = () => setOpen(null);
+  const bottomSheet = useBottomSheet();
 
   return (
-    <>
-      <CaseGrid
-        columns={2}
-        code={`<BottomSheet contentAlign="center" />
+    <CaseGrid
+      columns={2}
+      code={`<BottomSheet contentAlign="center" />
 <BottomSheet hasCloseButton={false} />`}
-      >
-        <Case label='contentAlign="center"' note="짧은 안내">
-          <Button variant="line" onClick={() => setOpen("center")}>
-            가운데 정렬 열기
-          </Button>
-        </Case>
-        <Case label="hasCloseButton={false}" note="dim · Esc 로만">
-          <Button variant="line" onClick={() => setOpen("noClose")}>
-            닫기 버튼 없이 열기
-          </Button>
-        </Case>
-      </CaseGrid>
-
-      <BottomSheet
-        open={open === "center"}
-        onRequestClose={close}
-        contentAlign="center"
-        title="주문을 접수했습니다"
-        description="배송이 시작되면 알려 드릴게요."
-        confirmLabel="주문 내역 보기"
-        onConfirm={close}
-      />
-      <BottomSheet
-        open={open === "noClose"}
-        onRequestClose={close}
-        hasCloseButton={false}
-        title="필터"
-        cancelLabel="닫기"
-        confirmLabel="적용"
-        onConfirm={close}
-      >
-        <p style={{ color: "var(--nui-text-secondary)" }}>
-          × 가 없어도 dim 과 Esc 로 닫힌다.
-        </p>
-      </BottomSheet>
-    </>
+    >
+      <Case label='contentAlign="center"' note="짧은 안내">
+        <Button
+          variant="line"
+          onClick={() => bottomSheet.open({ component: CenterSheet })}
+        >
+          가운데 정렬 열기
+        </Button>
+      </Case>
+      <Case label="hasCloseButton={false}" note="dim · Esc 로만">
+        <Button
+          variant="line"
+          onClick={() => bottomSheet.open({ component: NoCloseSheet })}
+        >
+          닫기 버튼 없이 열기
+        </Button>
+      </Case>
+    </CaseGrid>
   );
 }
 
@@ -168,8 +181,6 @@ const SORT_OPTIONS = [
   "추천순",
 ];
 
-type DragKey = "basic" | "withClose" | "noHandle";
-
 function SortList({ onPick }: { onPick: () => void }) {
   return (
     <div style={{ display: "grid", gap: 8 }}>
@@ -182,17 +193,49 @@ function SortList({ onPick }: { onPick: () => void }) {
   );
 }
 
+function DragSheet(runtime: BottomSheetComponentProps) {
+  return (
+    <BottomSheet {...runtime} shouldCloseOnDrag title="정렬">
+      <SortList onPick={runtime.onRequestClose} />
+    </BottomSheet>
+  );
+}
+
+function DragSheetWithClose(runtime: BottomSheetComponentProps) {
+  return (
+    <BottomSheet {...runtime} shouldCloseOnDrag hasCloseButton title="정렬">
+      <SortList onPick={runtime.onRequestClose} />
+    </BottomSheet>
+  );
+}
+
+function DragSheetNoHandle(runtime: BottomSheetComponentProps) {
+  return (
+    <BottomSheet
+      {...runtime}
+      shouldCloseOnDrag
+      hasDragHandle={false}
+      title="정렬"
+    >
+      <SortList onPick={runtime.onRequestClose} />
+    </BottomSheet>
+  );
+}
+
 export function BottomSheetDragDemo() {
-  const [open, setOpen] = useState<DragKey | null>(null);
-  const close = () => setOpen(null);
+  const bottomSheet = useBottomSheet();
 
   return (
     <>
       <Example
         caption="위쪽 띠를 아래로 끈다. 제목과 본문은 그대로다"
-        code={`<BottomSheet open={isOpen} onRequestClose={close} shouldCloseOnDrag title="정렬">…</BottomSheet>`}
+        code={`<BottomSheet {...runtime} shouldCloseOnDrag title="정렬">…</BottomSheet>`}
       >
-        <Button size="medium" variant="line" onClick={() => setOpen("basic")}>
+        <Button
+          size="medium"
+          variant="line"
+          onClick={() => bottomSheet.open({ component: DragSheet })}
+        >
           끌어서 닫는 시트 열기
         </Button>
       </Example>
@@ -203,43 +246,22 @@ export function BottomSheetDragDemo() {
 <BottomSheet shouldCloseOnDrag hasDragHandle={false} />`}
       >
         <Case label="hasCloseButton" note="× 를 함께 둘 때">
-          <Button variant="line" onClick={() => setOpen("withClose")}>
+          <Button
+            variant="line"
+            onClick={() => bottomSheet.open({ component: DragSheetWithClose })}
+          >
             닫기 버튼도 함께 열기
           </Button>
         </Case>
         <Case label="hasDragHandle={false}" note="막대 없이 끌기">
-          <Button variant="line" onClick={() => setOpen("noHandle")}>
+          <Button
+            variant="line"
+            onClick={() => bottomSheet.open({ component: DragSheetNoHandle })}
+          >
             막대 없는 시트 열기
           </Button>
         </Case>
       </CaseGrid>
-
-      <BottomSheet
-        open={open === "basic"}
-        onRequestClose={close}
-        shouldCloseOnDrag
-        title="정렬"
-      >
-        <SortList onPick={close} />
-      </BottomSheet>
-      <BottomSheet
-        open={open === "withClose"}
-        onRequestClose={close}
-        shouldCloseOnDrag
-        hasCloseButton
-        title="정렬"
-      >
-        <SortList onPick={close} />
-      </BottomSheet>
-      <BottomSheet
-        open={open === "noHandle"}
-        onRequestClose={close}
-        shouldCloseOnDrag
-        hasDragHandle={false}
-        title="정렬"
-      >
-        <SortList onPick={close} />
-      </BottomSheet>
     </>
   );
 }

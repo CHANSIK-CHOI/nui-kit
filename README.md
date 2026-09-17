@@ -30,7 +30,7 @@ import "@nui-kit/react/styles/index.css";
 | 폼 | `Field` · `Textfield` · `Textarea` · `Search` · `Password` |
 | 선택 | `Checkbox` · `Radio` · `Switch` · `Select` · `MultiSelect` |
 | 날짜 | `Datepicker` · `DateRangePicker` · `DateMultiplePicker` |
-| 오버레이 | `Alert` · `Confirm` · `LayerPopup` · `BottomSheet` · `FullPopup` |
+| 오버레이 | `LayerPopup` · `BottomSheet` · `FullPopup` · `useAlert` · `useConfirm`(훅 전용) |
 | 피드백 | `Toast` · `Tooltip` · `Accordion` · `Icon` |
 
 ## 구조

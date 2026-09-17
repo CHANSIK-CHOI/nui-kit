@@ -99,10 +99,21 @@ export const motionTransition = {
   // 아니라 취소라, 등장과 같은 물리여야 손에 붙는다.
   //
   // ⚠️ 딤과 견주지 않는다 — 딤은 전용 값 없이 **이 값을 그대로 따라온다**(위 dim 절).
+  //
+  // ⚠️ **`visualDuration` 이 아니라 `stiffness` · `damping` 으로 적는다** (2026-09-17). framer 12 는
+  //    시간으로 정의한 스프링에서 넘긴 `velocity` 를 버린다(`getSpringOptions` — *"Time-defined
+  //    springs should ignore inherited velocity"*). 그러면 놓은 속도를 이어받지 못해 천천히 끈 것과
+  //    튕긴 것이 똑같이 350ms 에 나갔다(실측). 값은 `visualDuration 0.2 · bounce 0` 을 framer 와 같은
+  //    식으로 옮긴 것이라 **속도 0 일 때 곡선이 같다** — stiffness = (2π / (0.2 × 1.2))² ·
+  //    damping = 2 √stiffness. `visualDuration` 을 고치면 이 두 값을 다시 계산한다.
+  //
+  // 정지 기준(`restDelta` · `restSpeed`)은 여기 두지 않는다 — 패널(px)과 딤(opacity)의 단위가
+  // 달라서 한 값이 한쪽을 첫 프레임에 끝낸다. `PopupBase` 가 속성마다 붙인다.
   panelSheetDragExit: {
     type: "spring",
-    bounce: 0,
-    visualDuration: 0.2,
+    stiffness: 685.4,
+    damping: 52.36,
+    mass: 1,
   } satisfies Transition,
 
   // fullPopup — 전체 화면 슬라이드.
@@ -215,19 +226,49 @@ export const motionTransition = {
 export function reduceMotion<T extends Record<string, unknown>>(
   variant: T,
   shouldReduce: boolean | null,
-): T | Pick<T, "opacity"> {
-  if (!shouldReduce) return variant;
+): T | Partial<T> {
+  if (!shouldReduce || !("opacity" in variant)) return variant;
 
   // 페이드는 남긴다 — 완전히 없애면 요소가 갑자기 나타나 오히려 인지 부담이 크다.
-  return "opacity" in variant
-    ? ({ opacity: variant.opacity } as Pick<T, "opacity">)
-    : variant;
+  //
+  // ⚠️ **움직임이 아닌 키는 남긴다** (2026-09-17). `pointerEvents` 는 퇴장 중 클릭을 막는 계약이고
+  //    (Select.md §6-7 · Datepicker.md §6), variant 안의 `transition` 은 퇴장 시간(`popoverExit`)을
+  //    정한다. 예전에는 `opacity` 하나만 남겨 둘 다 사라졌다 — 페이드가 0 이라 드러나지 않았을 뿐이다.
+  const reduced: Record<string, unknown> = { opacity: variant.opacity };
+  if ("pointerEvents" in variant) reduced.pointerEvents = variant.pointerEvents;
+  if ("transition" in variant)
+    reduced.transition = reduceMotionTransition(variant.transition, true);
+  return reduced as Partial<T>;
 }
 
-/** 모션 감소 시 전환을 즉시 끝낸다. */
+/**
+ * 모션 감소 시 전환을 **같은 시간의 페이드**로 바꾼다 — 0 이 아니다 ★ (2026-09-17).
+ *
+ * Emil `STANDARDS.md:176` — *"Reduced motion means fewer and gentler animations, **not zero**"* ·
+ * Apple §14 — *"replace slides/springs … with short opacity cross-fades"*. 예전에는 `{ duration: 0 }`
+ * 이라 요소가 한 프레임에 나타나고 사라졌다(실측 퇴장 7~21ms · 대장 `sources/emil-apple.md`).
+ *
+ * **시간은 받은 전환의 것을 그대로 쓴다** — 컴포넌트마다 등장 · 퇴장이 이미 다르다(툴팁 150/100 ·
+ * 드롭다운 200/150 · 토스트 250 · 팝업 300/200). 움직임만 빼고 시계는 그대로라 「퇴장이 등장보다
+ * 짧다」도 그대로 지켜진다(사용자 결정 2026-09-17). 스프링은 튐이 곧 움직임이라 쓰지 않고
+ * `visualDuration` 만큼의 페이드가 된다. 시간이 없는 물리 스프링은 `motionDuration.d4` 다.
+ *
+ * ⚠️ **움직임 자체를 0 으로 둘 자리는 이 헬퍼를 쓰지 않는다** — 시트를 놓았을 때의 되돌아감처럼
+ *    위치만 바뀌는 전환은 호출부가 `{ duration: 0 }` 을 직접 준다(Popup.md §6-7).
+ */
 export function reduceMotionTransition<T>(
   transition: T,
   shouldReduce: boolean | null,
-): T | { duration: 0 } {
-  return shouldReduce ? { duration: 0 } : transition;
+): T | Transition {
+  if (!shouldReduce) return transition;
+
+  const t = (transition ?? {}) as {
+    duration?: number;
+    visualDuration?: number;
+    ease?: Transition["ease"];
+  };
+  return {
+    duration: t.duration ?? t.visualDuration ?? motionDuration.d4,
+    ease: t.ease ?? motionEase.exit,
+  };
 }

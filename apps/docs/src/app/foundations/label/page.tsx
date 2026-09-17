@@ -107,10 +107,10 @@ export default function LabelPage() {
       </p>
       <pre className="doc-code">
         <code>{`// ❌ 무엇을 확인하는지 버튼만 봐서는 모른다
-<Confirm title="정말 삭제할까요?" confirmLabel="확인" />
+confirm.open({ title: "정말 삭제할까요?", confirmLabel: "확인" });
 
 // ✅ 버튼만 읽어도 안다
-<Confirm title="이 글을 삭제할까요?" confirmLabel="삭제" tone="danger" />`}</code>
+confirm.open({ title: "이 글을 삭제할까요?", confirmLabel: "삭제", tone: "danger" });`}</code>
       </pre>
       <div className="doc-note">
         <strong>같은 행동에는 같은 단어를 쓴다.</strong> 한 화면에서 「저장」

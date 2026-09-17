@@ -4,11 +4,15 @@ import { useState } from "react";
 import {
   Button,
   IconButton,
-  LayerPopup,
   Tooltip,
   type TooltipPlacement,
 } from "@nui-kit/react";
 import { DelIcon, SearchIcon, CalendarIcon } from "@nui-kit/react/icon";
+import {
+  LayerPopup,
+  useLayerPopup,
+  type LayerPopupComponentProps,
+} from "@nui-kit/react/popup";
 import { Case, CaseGrid, Example } from "@/components/guide";
 
 const PLACEMENTS: TooltipPlacement[] = [
@@ -183,8 +187,51 @@ const CLIP_BOX = {
   borderRadius: "var(--nui-radius-3)",
 } as const;
 
+/** 팝업 안의 툴팁. PopupHost 가 넣는 runtime 다섯을 LayerPopup 에 그대로 펼친다 */
+function TooltipPopup(runtime: LayerPopupComponentProps) {
+  return (
+    <LayerPopup {...runtime} title="툴팁이 있는 팝업">
+      <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <Tooltip content="팝업 패널에 잘린다" placement="bottomCenter">
+            <Button size="small">기본</Button>
+          </Tooltip>
+          <Tooltip
+            content="팝업 위로 떠오른다"
+            placement="bottomCenter"
+            hasPortal
+          >
+            <Button size="small">hasPortal</Button>
+          </Tooltip>
+        </div>
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <Tooltip
+            content="열린 채. 패널 아래가 잘린다"
+            placement="bottomCenter"
+            defaultOpen
+          >
+            <Button size="small" variant="line">
+              기본 · defaultOpen
+            </Button>
+          </Tooltip>
+          <Tooltip
+            content="열린 채. 패널 밖으로 나온다"
+            placement="bottomCenter"
+            defaultOpen
+            hasPortal
+          >
+            <Button size="small" variant="line">
+              hasPortal · defaultOpen
+            </Button>
+          </Tooltip>
+        </div>
+      </div>
+    </LayerPopup>
+  );
+}
+
 export function TooltipPortalDemo() {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const layerPopup = useLayerPopup();
 
   return (
     <>
@@ -222,51 +269,10 @@ export function TooltipPortalDemo() {
         <Button
           size="medium"
           variant="line"
-          onClick={() => setIsPopupOpen(true)}
+          onClick={() => layerPopup.open({ component: TooltipPopup })}
         >
           팝업 열기
         </Button>
-        <LayerPopup
-          open={isPopupOpen}
-          onRequestClose={() => setIsPopupOpen(false)}
-          title="툴팁이 있는 팝업"
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-              <Tooltip content="팝업 패널에 잘린다" placement="bottomCenter">
-                <Button size="small">기본</Button>
-              </Tooltip>
-              <Tooltip
-                content="팝업 위로 떠오른다"
-                placement="bottomCenter"
-                hasPortal
-              >
-                <Button size="small">hasPortal</Button>
-              </Tooltip>
-            </div>
-            <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-              <Tooltip
-                content="열린 채. 패널 아래가 잘린다"
-                placement="bottomCenter"
-                defaultOpen
-              >
-                <Button size="small" variant="line">
-                  기본 · defaultOpen
-                </Button>
-              </Tooltip>
-              <Tooltip
-                content="열린 채. 패널 밖으로 나온다"
-                placement="bottomCenter"
-                defaultOpen
-                hasPortal
-              >
-                <Button size="small" variant="line">
-                  hasPortal · defaultOpen
-                </Button>
-              </Tooltip>
-            </div>
-          </div>
-        </LayerPopup>
       </Example>
     </>
   );

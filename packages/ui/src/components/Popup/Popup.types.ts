@@ -126,16 +126,26 @@ export type PopupBaseProps = PopupBaseOwnProps & {
   dialogLabel?: string;
 };
 
-type PopupInstanceProps = Pick<
-  PopupBaseOwnProps,
-  "id" | "open" | "onCloseComplete" | "isTopmost"
+/**
+ * Host 가 주입하는 인스턴스 값 — **전부 required** (2026-09-17 · spec §3-1).
+ *
+ * 팝업을 여는 길은 `PopupHost` 하나이고 Host 는 언제나 넷을 넘기므로 required 가 사실과
+ * 맞다. 소비자 컴포넌트가 스프레드(`{...runtime}`)를 빠뜨리면 여기서 tsc 가 잡는다 —
+ * 예전에는 전부 optional 이라 빠뜨려도 통과했고, 그러면 ESC · 트랩 · 포커스 복원이
+ * 조용히 죽었다(키보드 사용자만 겪는다).
+ */
+type PopupInstanceProps = Required<
+  Pick<PopupBaseOwnProps, "id" | "open" | "onCloseComplete" | "isTopmost">
 >;
 
 // ⚠️ isTopmost 를 Omit 하지 않는다.
 //    PopupHost 는 등록된 컴포넌트에 isTopmost 를 넘기는데, 셸이 이를 받지 못하면
-//    PopupBase 의 기본값 false 가 그대로 쓰이고 usePopupPanelA11y 가 전부
-//    early-return 한다 — 즉 ESC 로 닫히지도, 포커스가 갇히지도 않는다.
-//    화면도 마우스도 멀쩡해서 키보드 사용자만 겪는다.
+//    PopupBase 의 기본값이 그대로 쓰이고 usePopupPanelA11y 가 스택을 모른 채 돈다.
+//    겹친 팝업 둘이 ESC 를 함께 받는다 — 화면도 마우스도 멀쩡해서 키보드 사용자만 겪는다.
+
+/** runtime 다섯 — 소비자 컴포넌트가 셸에 그대로 스프레드하는 것 */
+type PopupRuntimeKey =
+  "id" | "open" | "isTopmost" | "onRequestClose" | "onCloseComplete";
 /**
  * 푸터는 둘 중 하나다 (2026-09-09). 표준 라벨 넷이거나 `footer` 슬롯이거나.
  * 둘 다 주면 하나가 조용히 무시되므로 타입이 막는다. `footer` 는 확인 · 취소
@@ -157,7 +167,13 @@ type PopupFooterProps =
       onCancel?: () => void;
     };
 
-type PopupSharedShellProps = Omit<
+/**
+ * 셸 셋의 **내용** — 소비자가 적는 것. runtime 다섯은 여기 없다 (spec §3-1 · 2026-09-17).
+ *
+ * ⚠️ `Omit` 은 union 이 섞이기 **전**의 `PopupBaseOwnProps` 에서 한다 — 이름 한 쌍 ·
+ *    푸터 두 갈래의 「둘 중 하나」 제약이 `Omit` 을 지나면 조용히 풀린다(위 주석).
+ */
+type PopupSharedShellContentProps = Omit<
   PopupBaseOwnProps,
   | "variant"
   | "size"
@@ -169,26 +185,34 @@ type PopupSharedShellProps = Omit<
   | "cancelLabel"
   | "onConfirm"
   | "onCancel"
-  // 방향이 있는 variant 만 되돌린다 — 아래 `BottomSheetProps` (spec §3-1)
+  // 방향이 있는 variant 만 되돌린다 — 아래 `BottomSheetContentProps` (spec §3-1)
   | "shouldCloseOnDrag"
   | "hasDragHandle"
+  | PopupRuntimeKey
 > &
   PopupAccessibleName &
   PopupFooterProps;
-type PopupSizedShellProps = PopupSharedShellProps &
+
+export type LayerPopupContentProps = PopupSharedShellContentProps &
   Pick<PopupBaseOwnProps, "size">;
 /**
- * `shouldCloseOnDrag` 는 여기서만 되돌아온다 — `PopupSizedShellProps` 가 `size` 를
+ * `shouldCloseOnDrag` 는 여기서만 되돌아온다 — `LayerPopupContentProps` 가 `size` 를
  * 되돌리는 것과 같은 모양이다. `FullPopup` 은 골격의 축 표(`DRAG_AXIS.full = "x"`)에
  * 배선이 있으나 문을 안 열었다 — 열려면 타입 한 줄 · `getPanelMotion` 의 `x` 키 전환 ·
  * 끄는 면(헤더) 셋이 함께 간다. `LayerPopup` · `Alert` · `Confirm` 은 방향이 없다
  * (spec §3-1 받지 않는 prop · §6-7).
  */
-type PopupDraggableShellProps = PopupSharedShellProps &
+export type BottomSheetContentProps = PopupSharedShellContentProps &
   Pick<PopupBaseOwnProps, "shouldCloseOnDrag" | "hasDragHandle">;
+export type FullPopupContentProps = PopupSharedShellContentProps;
 
+/**
+ * Host 가 소비자 컴포넌트에 넘기는 runtime 다섯 — **전부 required.** 소비자 컴포넌트는
+ * 이것을 받아 셸에 그대로 스프레드한다. `onRequestClose` 가 빠지면 ESC · 딤 · 드래그가
+ * 안 닫히므로 타입이 잡는다.
+ */
 export type PopupRuntimeProps = PopupInstanceProps &
-  Pick<PopupBaseOwnProps, "onRequestClose">;
+  Required<Pick<PopupBaseOwnProps, "onRequestClose">>;
 
 /**
  * 아이콘은 슬롯이 아니라 열거형이다 (2026-09-11). 자유 슬롯이면 소비자가 56px 자리에
@@ -213,6 +237,11 @@ export type AlertContentProps = Pick<
     onConfirm?: () => void;
   };
 
+/**
+ * `Alert` 컴포넌트의 props — **배럴로 나가지 않는다** (2026-09-17). `Alert` 은 훅 옵션이지
+ * 컴포넌트가 아니다. `PopupHost` 가 안에서 그릴 때만 쓴다. 소비자에게 보이는 것은
+ * `AlertPopupOptions` 다.
+ */
 export type AlertProps = AlertContentProps & PopupInstanceProps;
 
 export type AlertPopupOptions = AlertContentProps & {
@@ -232,6 +261,7 @@ export type ConfirmContentProps = Pick<
     onConfirm?: () => void;
   };
 
+/** `Alert` 과 같다 — 배럴로 나가지 않는다. 소비자에게 보이는 것은 `ConfirmPopupOptions` 다 */
 export type ConfirmProps = ConfirmContentProps & PopupInstanceProps;
 
 export type ConfirmPopupOptions = ConfirmContentProps & {
@@ -246,9 +276,19 @@ type PopupRegistrationOptions = {
   component: ComponentType<PopupRuntimeProps>;
 };
 
-export type LayerPopupProps = PopupSizedShellProps;
-export type BottomSheetProps = PopupDraggableShellProps;
-export type FullPopupProps = PopupSharedShellProps;
+/**
+ * 셸의 props = 내용 + runtime 다섯. 소비자 컴포넌트가 이 꼴로 셸을 그린다 (spec §3-1) —
+ *
+ * ```tsx
+ * function FilterSheet(runtime: BottomSheetComponentProps) {
+ *   return <BottomSheet {...runtime} title="필터" />;
+ * }
+ * useBottomSheet().open({ component: FilterSheet });
+ * ```
+ */
+export type LayerPopupProps = LayerPopupContentProps & PopupRuntimeProps;
+export type BottomSheetProps = BottomSheetContentProps & PopupRuntimeProps;
+export type FullPopupProps = FullPopupContentProps & PopupRuntimeProps;
 
 export type LayerPopupComponentProps = PopupRuntimeProps;
 export type BottomSheetComponentProps = PopupRuntimeProps;

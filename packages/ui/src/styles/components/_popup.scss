@@ -296,6 +296,10 @@
       height: var(#{v("space-panel-card")});
       z-index: 1;
       cursor: grab;
+      // 잡은 동안은 쥔 손 — 누르는 순간 「잡혔다」를 커서가 말한다 (2026-09-17 · `/review-animations`)
+      &:active {
+        cursor: grabbing;
+      }
       // 끄는 부분에만 건다 — 본문은 스크롤한다 (motion.md §8)
       touch-action: none;
       user-select: none;

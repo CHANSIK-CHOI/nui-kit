@@ -183,17 +183,23 @@ export default function ApiPage() {
 
       <h2>여는 방법이 둘인 것</h2>
       <p>
-        팝업과 토스트는 <strong>선언형</strong>과 <strong>명령형</strong>을 다
-        지원한다. 화면에 매인 것은 선언형, 흐름 중간에 물어보는 것은 명령형이
-        읽기 좋다.
+        토스트는 <strong>선언형</strong>과 <strong>명령형</strong>을 다
+        지원한다. 팝업은 훅으로만 연다. 앱 루트의 <code>PopupHost</code> 가
+        그리고, 열려 있는 동안 배경 스크롤이 잠긴다.
       </p>
       <pre className="doc-code">
-        <code>{`// 선언형 — 상태로 연다
-<LayerPopup open={isOpen} title="설정" onRequestClose={close}>…</LayerPopup>
+        <code>{`// 토스트 — 상태로도 연다
+<Toast open={isOpen} message="저장했어요" onRequestClose={close} />
 
-// 명령형 — 기다렸다가 답을 받는다
+// 팝업 — 훅으로 연다. 기다렸다가 답을 받는다
 const confirm = useConfirm();
-if (await confirm.openAsync({ title: "삭제할까요?" })) remove();`}</code>
+if (await confirm.openAsync({ title: "삭제할까요?" })) remove();
+
+// 셸 셋은 컴포넌트를 만들어 등록한다
+function SettingsPopup(runtime: LayerPopupComponentProps) {
+  return <LayerPopup {...runtime} title="설정">…</LayerPopup>;
+}
+useLayerPopup().open({ component: SettingsPopup });`}</code>
       </pre>
 
       <DesignNote title="왜 이름을 맞추는 데 공을 들였나">

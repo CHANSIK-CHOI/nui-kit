@@ -228,8 +228,8 @@ export function NuiMenu<IsMulti extends boolean>({
       // ⚠️ **퇴장에 `pointerEvents: "none"` 을 함께 준다.** 없으면 닫히는 동안 옵션이
       //    눌린다(실측 — 히트테스트가 메뉴를 집었다). 옵션은 `tabIndex: -1` 이라
       //    키보드로는 닿지 않으므로 막을 것이 포인터뿐이다.
-      //    모션 감소에서는 `reduceMotion` 이 `opacity` 만 남기고 전환이 `duration: 0`
-      //    이라 DOM 이 즉시 사라진다 — 눌릴 시간이 없다.
+      //    모션 감소에서도 같다 — `reduceMotion` 이 이동을 빼되 `pointerEvents` 와 퇴장 시간은
+      //    남기므로 150ms 페이드 동안 옵션이 눌리지 않는다 (2026-09-17 · not zero).
       exit={reduceMotion(
         {
           opacity: 0,

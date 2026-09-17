@@ -12,11 +12,7 @@ export const metadata = { title: "Alert" };
 export default function AlertPage() {
   return (
     <>
-      <GuideHeader
-        title="Alert"
-        named={["useAlert", "Alert"]}
-        subpath="popup"
-      />
+      <GuideHeader title="Alert" named={["useAlert"]} subpath="popup" />
 
       <ExceptionBadges items={[{ kind: "cappedWidth", target: "Alert" }]} />
 
@@ -113,10 +109,8 @@ export default function AlertPage() {
 
       <h2>API</h2>
       <p>
-        <code>PopupHost</code> 가 렌더하는 컴포넌트다. 직접 그리는 일은 드물고
-        훅의 옵션이 곧 이 props 다. <code>open</code> · <code>id</code> ·{" "}
-        <code>isTopmost</code> · <code>onCloseComplete</code> 는{" "}
-        <code>PopupHost</code> 가 넣는다.
+        <code>useAlert().open()</code> 에 넘기는 옵션이다. 컴포넌트로는 쓰지
+        않는다. <code>id</code> 를 주지 않으면 만들어 준다.
       </p>
       <PropsTable of="Alert" />
     </>

@@ -236,8 +236,7 @@ export default function Tooltip({
   const openByHover = useCallback(() => {
     clearHoverTimer();
 
-    const isFromNeighbor =
-      Date.now() - lastTooltipClosedAt < INSTANT_WINDOW_MS;
+    const isFromNeighbor = Date.now() - lastTooltipClosedAt < INSTANT_WINDOW_MS;
 
     if (isFromNeighbor || openDelay <= 0) {
       setIsInstant(isFromNeighbor);
@@ -495,17 +494,20 @@ export default function Tooltip({
           className={`${block}__panel`}
           // 트리거에서 자란다 — 원점이 없으면 중앙에서 커진다 (07 M2)
           style={{ transformOrigin }}
-          initial={reduceMotion(
-            {
-              opacity: 0,
-              transform: `translateY(${animationOffset}px) scale(0.97)`,
-            },
-            shouldReduceMotion,
-          )}
-          animate={reduceMotion(
-            { opacity: 1, transform: "translateY(0px) scale(1)" },
-            shouldReduceMotion,
-          )}
+          // ⚠️ **모션 감소에서도 `initial` · `animate` 둘 다 항등 `transform` 을 갖는다** (2026-09-17 · qa 두 판).
+          //    ① `defaultOpen` 이면 `initial={false}` 라 서버가 `animate` 의 `transform` 을 inline style 로 그린다 —
+          //       모션 감소 클라이언트가 그 키를 빼면 style 이 달라 hydration 불일치가 났다.
+          //    ② 그래서 `animate` 에만 남기면, `initial` 에 없는 키의 시작값을 framer 가 **0** 으로 채워
+          //       모션 감소인데 `scale(0)` 에서 커져 나왔다. 둘의 키 집합이 같아야 한다 — 항등이라 움직임은 없다.
+          initial={
+            shouldReduceMotion
+              ? { opacity: 0, transform: "translateY(0px) scale(1)" }
+              : {
+                  opacity: 0,
+                  transform: `translateY(${animationOffset}px) scale(0.97)`,
+                }
+          }
+          animate={{ opacity: 1, transform: "translateY(0px) scale(1)" }}
           exit={{
             ...reduceMotion(
               {
