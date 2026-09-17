@@ -58,10 +58,9 @@ export default function DatepickerPage() {
 
       <DesignNote title="왜 확정 버튼이 없나">
         <p>
-          하루를 고르는 데 두 번 누르게 하지 않는다. 날짜 하나는 고른 순간
-          결과가 확정되고 되돌릴 것이 없다. 잘못 골랐으면 다시 고르면 된다. 확정
-          버튼이 필요한 것은 여러 번의 클릭이 하나의 값을 만드는 기간과 여러
-          날짜다.
+          하루를 고르는 데는 두 번 누를 일이 없다. 날짜 하나는 고른 순간 결과가
+          확정되고 되돌릴 것이 없다. 잘못 골랐으면 다시 고르면 된다. 확정 버튼이
+          필요한 것은 여러 번의 클릭이 하나의 값을 만드는 기간과 여러 날짜다.
         </p>
       </DesignNote>
 
@@ -184,6 +183,11 @@ export default function DatepickerPage() {
         <code>hasPortal</code> 을 켜면 달력이 <code>body</code> 로 나가 잘리지
         않는다. <code>Select</code> · <code>Tooltip</code> 의 같은 이름 prop 과
         한 규칙이다.
+      </p>
+      <p>
+        아래 공간이 모자라면 달력이 위로 뒤집힌다. 화면 가장자리와는 8px 를
+        띄운다. 위아래 모두 모자라면 넓은 쪽으로 열린다. <code>hasPortal</code>{" "}
+        을 켜도 같고, <code>Select</code> 메뉴와 같은 규칙이다.
       </p>
       <DatepickerPortalDemo />
 

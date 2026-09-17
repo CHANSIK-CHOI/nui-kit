@@ -173,13 +173,13 @@
     }
 
     // ── menu
-    //   `max-height` 는 react-select 이 `maxMenuHeight` prop 으로 소유한다 —
-    //   여기서 덮으면 메뉴 위치 계산과 어긋난다.
+    //   목록의 `max-height` 는 `maxMenuHeight` prop 이 소유한다(`styles.menuList` 기본) —
+    //   여기서 덮으면 방향 판정에 쓴 높이와 보이는 높이가 어긋난다.
     //
     //   배치는 우리 것이다(머리 주석). portal 래퍼 안에서도 제자리에서도 같은 규칙이
-    //   맞는 이유 — 래퍼는 높이 0 에 컨트롤의 rect 를 입고 그 윗변(위로 뒤집힐 때) 또는
-    //   아랫변(아래로 펼칠 때)에 앉으므로, `top: 100%` 와 `bottom: 100%` 가 제자리일
-    //   때와 똑같은 자리를 가리킨다. 좌표 계산을 CSS 와 JS 두 벌로 만들지 않는다.
+    //   맞는 이유 — 래퍼는 **컨트롤의 rect 를 그대로 입은 유령 상자**라(`styles.menuPortal`
+    //   기본 · 2026-09-17) `top: 100%` 와 `bottom: 100%` 가 제자리일 때와 똑같은 자리를
+    //   가리킨다. `Datepicker.__portal` 과 같은 꼴이다. 좌표 계산을 CSS 와 JS 두 벌로 만들지 않는다.
     &__menu {
       position: absolute;
       top: 100%;
@@ -208,6 +208,13 @@
       bottom: 100%;
       margin-top: 0;
       margin-bottom: var(#{v("space-2")});
+    }
+
+    // portal 래퍼는 컨트롤 위를 덮는 유령 상자라 `pointer-events: none` 이다(`styles.menuPortal`).
+    // 메뉴만 되살린다 — `Datepicker.__portal` 과 같은 규칙. 퇴장 중에는 framer 의 인라인
+    // `pointer-events: none` 이 이긴다.
+    &__menu-portal &__menu {
+      pointer-events: auto;
     }
 
     // 흐름 배치(`menuPosition="static"`) — 메뉴가 아래 콘텐츠를 밀어낸다.

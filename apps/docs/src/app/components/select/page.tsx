@@ -12,6 +12,7 @@ import {
   SelectSizeDemo,
   SelectSearchDemo,
   SelectOptionsDemo,
+  SelectPlacementDemo,
   SelectPortalDemo,
 } from "./SelectDemo";
 import { RHFSelectDemo } from "./RHFSelectDemo";
@@ -109,12 +110,17 @@ export default function SelectPage() {
         <code>Tooltip</code> 의 같은 이름 prop 과 한 규칙이다.
       </p>
       <p>
-        아래 공간이 모자라도 페이지를 스크롤하지 않는다. <code>hasPortal</code>{" "}
-        을 켜면 화면에 맞춰 위로 뒤집힌다. 메뉴를 문서 흐름 안에 두려면{" "}
+        아래 공간이 모자라면 메뉴가 위로 뒤집힌다. 화면 가장자리와는 8px 를
+        띄운다. 위아래 모두 모자라면 넓은 쪽으로 열리고 높이는 줄지 않는다.
+        페이지는 스크롤하지 않는다. <code>hasPortal</code> 을 켜도 같고,{" "}
+        <code>Datepicker</code> 의 달력과 같은 규칙이다. 방향을 고정하려면{" "}
+        <code>menuPlacement=&quot;bottom&quot;</code> 이나{" "}
+        <code>&quot;top&quot;</code> 을 준다. 메뉴를 문서 흐름 안에 두려면{" "}
         <code>menuPosition=&quot;static&quot;</code> 을 준다. 메뉴가 열리는 만큼
-        아래 내용이 밀린다.
+        아래 내용이 밀리고, 뒤집히지 않는다.
       </p>
       <SelectPortalDemo />
+      <SelectPlacementDemo />
 
       <RHFSelectDemo />
 
@@ -181,6 +187,13 @@ const SELECT_COMPONENTS = { Option: CustomOption };
         prop(<code>menuPlacement</code> · <code>maxMenuHeight</code> ·{" "}
         <code>isLoading</code> 등)도 그대로 전달된다. <code>defaultValue</code>{" "}
         · <code>getOptionValue</code> · <code>theme</code> 셋은 받지 않는다.
+      </p>
+      <p>
+        <code>menuPlacement</code> 는 이름과 값이 react-select 그대로지만 뜻이
+        다르다. 기본 <code>&quot;auto&quot;</code> 는 위치 모드와 상관없이 화면
+        기준으로 뒤집고, <code>&quot;bottom&quot;</code> ·{" "}
+        <code>&quot;top&quot;</code> 은 그 방향에 고정한다. 목록 높이는 언제나{" "}
+        <code>maxMenuHeight</code> 까지다.
       </p>
       <PropsTable of="Select" />
 

@@ -24,6 +24,7 @@ import {
   type OnSelectHandler,
 } from "react-day-picker";
 import { createPortal } from "react-dom";
+import { DropdownPlacementScope } from "../../internal/dropdownPlacement.js";
 import { px } from "../../internal/prefix.js";
 import { PORTAL_ROOT_ATTRIBUTE } from "../../internal/portal.js";
 import { DaypickerChevron } from "./DaypickerChevron.js";
@@ -703,10 +704,15 @@ export default function DatepickerBase<
   // 래퍼에 입력창의 rect 를 그대로 입히면 `top: calc(100% + …)` 같은 배치 규칙이
   // 제자리일 때와 똑같이 맞는다. 좌표 계산을 CSS 와 JS 두 벌로 만들지 않는다.
   useEffect(() => {
-    if (!hasPortal || !isCalendarOpen) {
+    if (!hasPortal) {
       setAnchorRect(null);
       return;
     }
+    // ⚠️ **닫혀도 좌표를 지우지 않는다** (2026-09-17). 지우면 portal 래퍼가 그 커밋에 사라져
+    //    **퇴장 모션이 잘렸다.** 좌표는 퇴장이 끝난 뒤 `AnimatePresence` 의 `onExitComplete` 가
+    //    지운다 — 그래야 다음에 열 때 래퍼와 `AnimatePresence` 가 새로 생겨 등장이 재생되고,
+    //    방향 판정도 새 좌표로 한다(Datepicker.md §6-6 · §6-9). 닫힌 동안은 추적만 멈춘다.
+    if (!isCalendarOpen) return;
 
     let frameId = 0;
 
@@ -761,88 +767,113 @@ export default function DatepickerBase<
   const isPortalActive = hasPortal && Boolean(portalRoot);
 
   const calendarPanel = (
-    <AnimatePresence initial={false}>
+    // ⚠️ **portal 에서는 `initial` 이 true 다** (2026-09-17). portal 래퍼는 좌표를 잰 뒤에야 그려져
+    //    이 `AnimatePresence` 가 **열 때마다 새로 마운트된다** — `false` 면 등장을 매번 건너뛰었다
+    //    (`hasPortal` 달력만 첫 프레임이 이미 `scale(1)` 이었다). 제자리는 한 번 마운트되어 남으므로
+    //    `false` 가 「페이지 로드 때 열린 채면 모션 없음」만 뜻한다.
+    <AnimatePresence
+      initial={isPortalActive}
+      onExitComplete={() => {
+        if (isPortalActive) setAnchorRect(null);
+      }}
+    >
       {isCalendarOpen && !disabled && (
-        <motion.div
-          id={calendarDropdownId}
-          className={cn(`${block}__dropdown`, dropdownClassName)}
-          // 입력창 아래로 열리므로 **위 왼쪽 모서리**에서 자란다 (07 M2).
-          // 위로 뒤집히는 경우가 생기면 그때 `bottom left` 를 준다.
-          style={{ transformOrigin: "top left" }}
-          // `transform` 문자열로 준다 — 숏핸드는 메인 스레드 rAF 다 (07 M5)
-          initial={reduceMotion(
-            { opacity: 0, transform: "translateY(-8px) scale(0.97)" },
-            shouldReduceMotion,
-          )}
-          // `pointerEvents` 를 여기서도 **명시**한다 — 퇴장이 끊기고 다시 열릴 때 `exit` 이
-          // 심은 `none` 을 되돌리는 일을 framer 의 폴백에 맡기지 않는다. `Select` 메뉴와
-          // 같은 모양이다 (Select.md §6-7).
-          animate={reduceMotion(
-            {
-              opacity: 1,
-              transform: "translateY(0px) scale(1)",
-              pointerEvents: "auto",
-            },
-            shouldReduceMotion,
-          )}
-          // ⚠️ **퇴장에 `pointerEvents: "none"` 을 함께 준다** (2026-09-16).
-          //    없으면 닫히는 동안 날짜가 눌린다 — 닫은 뒤 150ms 안에 같은 자리를
-          //    클릭하면 값이 바뀐다(`check-menu-motion` 이 잡았다). `Select` 메뉴와
-          //    같은 규칙이다 (Select.md §6-7 · Datepicker.md §6-6). 모션 감소에서도 150ms
-          //    페이드 동안 막는다 — `reduceMotion` 이 이 키와 퇴장 시간을 남긴다 (2026-09-17).
-          exit={reduceMotion(
-            {
-              opacity: 0,
-              transform: "translateY(-8px) scale(0.97)",
-              pointerEvents: "none",
-              transition: motionTransition.popoverExit,
-            },
-            shouldReduceMotion,
-          )}
-          transition={reduceMotionTransition(
-            motionTransition.popover,
-            shouldReduceMotion,
-          )}
-          role="dialog"
-          aria-label={calendarLabel}
-        >
-          <DayPicker
-            {...dayPickerProps}
-            mode={mode}
-            required={dayPickerProps?.required}
-            selected={calendarSelected as never}
-            onSelect={handleDayPickerSelect as never}
-            modifiers={resolvedModifiers}
-            modifiersClassNames={resolvedModifiersClassNames}
-            classNames={resolvedClassNames}
-            components={{
-              Chevron: DaypickerChevron,
-              ...dayPickerProps?.components,
-            }}
-            labels={resolvedLabels}
-            month={resolvedMonth}
-            onMonthChange={(nextMonth) => {
-              setMonth(nextMonth);
-              dayPickerProps?.onMonthChange?.(nextMonth);
-            }}
-            startMonth={resolvedStartMonth}
-            endMonth={resolvedEndMonth}
-            disabled={isDayPickerDisabled}
-            // 앞뒤 달 날짜는 **비워 둔다** (2026-09-08 · 08 DP1).
-            // SEED — "달의 앞뒤 빈 자리(이전·다음 달 날짜)는 흐리게 표시하지
-            // 않고 비워 둡니다". 흐린 날짜는 「고를 수 있나」를 헷갈리게 한다.
-            //
-            // ⚠️ 실제로 **색과 동작이 어긋나 있었다.** 비활성 색(gray-9)인데
-            //    버튼이 살아 있어 눌렸고(cursor: pointer), 누를 수 있는 글자의
-            //    대비 기준 4.5 에 미달했다(실측 3.30). `verify:a11y` 가 달력
-            //    앞뒤 달을 재지 않아 검사 밖에 숨어 있었다.
-            showOutsideDays={dayPickerProps?.showOutsideDays ?? false}
-            captionLayout={resolvedCaptionLayout}
-            navLayout={dayPickerProps?.navLayout ?? "after"}
-            locale={resolvedLocale}
-            className={cn(daypickerBlock, dayPickerProps?.className)}
-          />
-          {/*
+        // ⚠️ **두 층이다** (2026-09-17 · Datepicker.md §6-9). 방향 상태는 key 가 고정인 이
+        //    층이 갖고, `key={placement}` remount 는 안쪽 motion 요소만 한다. 직계 자식의 key 를
+        //    placement 로 바꾸면 아래 달력의 퇴장과 위 달력의 등장이 겹쳐 **달력이 둘** 보인다.
+        //    판정은 `Select` 메뉴와 같은 함수다(`internal/dropdownPlacement`).
+        <DropdownPlacementScope key="calendar" preference="auto">
+          {(placement, panelRef) => {
+            const isTop = placement === "top";
+            // 트리거 쪽에서 자란다 — 아래로 펼치면 위에서, 뒤집히면 아래에서 (motion.md §6)
+            const away = `translateY(${isTop ? 8 : -8}px) scale(0.97)`;
+            return (
+              <motion.div
+                // placement 가 확정되면 remount 되어 `initial` 이 다시 읽힌다 — 페인트 전이다
+                key={placement}
+                ref={panelRef}
+                id={calendarDropdownId}
+                className={cn(
+                  `${block}__dropdown`,
+                  isTop && `${block}__dropdown--top`,
+                  dropdownClassName,
+                )}
+                // 입력창 아래로 열리면 **위 왼쪽 모서리**, 위로 뒤집히면 **아래 왼쪽**에서 자란다 (07 M2)
+                style={{ transformOrigin: isTop ? "bottom left" : "top left" }}
+                // `transform` 문자열로 준다 — 숏핸드는 메인 스레드 rAF 다 (07 M5)
+                initial={reduceMotion(
+                  { opacity: 0, transform: away },
+                  shouldReduceMotion,
+                )}
+                // `pointerEvents` 를 여기서도 **명시**한다 — 퇴장이 끊기고 다시 열릴 때 `exit` 이
+                // 심은 `none` 을 되돌리는 일을 framer 의 폴백에 맡기지 않는다. `Select` 메뉴와
+                // 같은 모양이다 (Select.md §6-7).
+                animate={reduceMotion(
+                  {
+                    opacity: 1,
+                    transform: "translateY(0px) scale(1)",
+                    pointerEvents: "auto",
+                  },
+                  shouldReduceMotion,
+                )}
+                // ⚠️ **퇴장에 `pointerEvents: "none"` 을 함께 준다** (2026-09-16).
+                //    없으면 닫히는 동안 날짜가 눌린다 — 닫은 뒤 150ms 안에 같은 자리를
+                //    클릭하면 값이 바뀐다(`check-menu-motion` 이 잡았다). `Select` 메뉴와
+                //    같은 규칙이다 (Select.md §6-7 · Datepicker.md §6-6). 모션 감소에서도 150ms
+                //    페이드 동안 막는다 — `reduceMotion` 이 이 키와 퇴장 시간을 남긴다 (2026-09-17).
+                exit={reduceMotion(
+                  {
+                    opacity: 0,
+                    transform: away,
+                    pointerEvents: "none",
+                    transition: motionTransition.popoverExit,
+                  },
+                  shouldReduceMotion,
+                )}
+                transition={reduceMotionTransition(
+                  motionTransition.popover,
+                  shouldReduceMotion,
+                )}
+                role="dialog"
+                aria-label={calendarLabel}
+              >
+                <DayPicker
+                  {...dayPickerProps}
+                  mode={mode}
+                  required={dayPickerProps?.required}
+                  selected={calendarSelected as never}
+                  onSelect={handleDayPickerSelect as never}
+                  modifiers={resolvedModifiers}
+                  modifiersClassNames={resolvedModifiersClassNames}
+                  classNames={resolvedClassNames}
+                  components={{
+                    Chevron: DaypickerChevron,
+                    ...dayPickerProps?.components,
+                  }}
+                  labels={resolvedLabels}
+                  month={resolvedMonth}
+                  onMonthChange={(nextMonth) => {
+                    setMonth(nextMonth);
+                    dayPickerProps?.onMonthChange?.(nextMonth);
+                  }}
+                  startMonth={resolvedStartMonth}
+                  endMonth={resolvedEndMonth}
+                  disabled={isDayPickerDisabled}
+                  // 앞뒤 달 날짜는 **비워 둔다** (2026-09-08 · 08 DP1).
+                  // SEED — "달의 앞뒤 빈 자리(이전·다음 달 날짜)는 흐리게 표시하지
+                  // 않고 비워 둡니다". 흐린 날짜는 「고를 수 있나」를 헷갈리게 한다.
+                  //
+                  // ⚠️ 실제로 **색과 동작이 어긋나 있었다.** 비활성 색(gray-9)인데
+                  //    버튼이 살아 있어 눌렸고(cursor: pointer), 누를 수 있는 글자의
+                  //    대비 기준 4.5 에 미달했다(실측 3.30). `verify:a11y` 가 달력
+                  //    앞뒤 달을 재지 않아 검사 밖에 숨어 있었다.
+                  showOutsideDays={dayPickerProps?.showOutsideDays ?? false}
+                  captionLayout={resolvedCaptionLayout}
+                  navLayout={dayPickerProps?.navLayout ?? "after"}
+                  locale={resolvedLocale}
+                  className={cn(daypickerBlock, dayPickerProps?.className)}
+                />
+                {/*
             확정 버튼 (§6-8). 여러 번의 클릭이 하나의 값을 만드는 모드에만 있다 —
             single 은 고른 순간 결과가 확정되므로 두지 않는다.
 
@@ -850,20 +881,23 @@ export default function DatepickerBase<
             Tab 이 그 순서로 지나간다 — 팝업 닫기 버튼을 DOM 마지막으로 옮긴 것과
             같은 이유다 (08 E1).
           */}
-          {hasConfirmButton ? (
-            <div className={`${block}__dropdown-foot`}>
-              <Button
-                type="button"
-                size="medium"
-                color="primary"
-                disabled={!isConfirmable}
-                onClick={handleConfirm}
-              >
-                {confirmLabel}
-              </Button>
-            </div>
-          ) : null}
-        </motion.div>
+                {hasConfirmButton ? (
+                  <div className={`${block}__dropdown-foot`}>
+                    <Button
+                      type="button"
+                      size="medium"
+                      color="primary"
+                      disabled={!isConfirmable}
+                      onClick={handleConfirm}
+                    >
+                      {confirmLabel}
+                    </Button>
+                  </div>
+                ) : null}
+              </motion.div>
+            );
+          }}
+        </DropdownPlacementScope>
       )}
     </AnimatePresence>
   );

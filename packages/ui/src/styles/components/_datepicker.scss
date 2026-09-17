@@ -61,6 +61,15 @@
       box-shadow: var(#{v("shadow-2")});
     }
 
+    // 위로 뒤집혔다 — 아래가 모자라면(`internal/dropdownPlacement` · Datepicker.md §6-9).
+    // 간격도 반대쪽으로 간다. 원점과 `translateY` 부호는 `DatepickerBase` 가 인라인으로 뒤집는다.
+    // `Select` 의 `__menu--top` 과 짝이다.
+    // ⚠️ **`__dropdown` 뒤에 둔다** — 상세도가 같아 앞에 두면 `top: calc(…)` 가 이긴다.
+    &__dropdown--top {
+      top: auto;
+      bottom: calc(100% + var(#{v("space-2")}));
+    }
+
     // 확정 버튼 자리 (2026-09-08 · 08 DP2). range · multiple 에만 있다.
     // 달력과 경계를 두는 선은 「한 화면에 한두 번」이라 의미경계선이다 —
     // design-system.md §2-6

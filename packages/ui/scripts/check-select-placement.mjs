@@ -33,6 +33,8 @@
  *    목록의 길이에서 센다.
  *
  * 헛짚기 — 첫 실행(2026-09-17) 행 24 · 키 유무 8 · placement 4 · 일치 24 · 헛짚기 0.
+ *   넘침(같은 날 둘째 판) — placement 5(기본 `"auto"`) · **판정 함수 7행**(`internal/dropdownPlacement` —
+ *   Select · Datepicker 공용 순수 함수) · 헛짚기 0 · 변이 11/11(배치 7 · 판정 4).
  *
  * 사용:
  *   node scripts/check-select-placement.mjs              전수
@@ -50,14 +52,14 @@ const require = createRequire(join(UI, "package.json"));
 
 let checks = 0;
 let failures = 0;
-const counts = { rows: 0, keys: 0, placement: 0, agree: 0 };
+const counts = { rows: 0, keys: 0, placement: 0, agree: 0, judge: 0 };
 let mutantsDetected = 0;
 
 process.on("exit", (code) => {
   console.log(
-    `RECEIPT check-select-placement rows=${counts.rows} keys=${counts.keys} placement=${counts.placement} agree=${counts.agree} checks=${checks} failures=${failures}` +
+    `RECEIPT check-select-placement rows=${counts.rows} keys=${counts.keys} placement=${counts.placement} agree=${counts.agree} judge=${counts.judge} checks=${checks} failures=${failures}` +
       (SELFTEST
-        ? ` mutants=${MUTANTS.length} detected=${mutantsDetected}`
+        ? ` mutants=${MUTANTS.length + JUDGE_MUTANTS.length} detected=${mutantsDetected}`
         : "") +
       ` exit=${code}`,
   );
@@ -67,10 +69,15 @@ async function loadUtils() {
   const esbuild = require("esbuild");
   const out = await esbuild.build({
     stdin: {
-      contents: `export { resolveMenuPlacementProps, needsSelectPortalRoot } from "./src/components/Select/Select.utils.ts";`,
+      contents: [
+        `export { resolveMenuPlacementProps, needsSelectPortalRoot } from "./src/components/Select/Select.utils.ts";`,
+        `export { resolveDropdownPlacement } from "./src/internal/dropdownPlacement.tsx";`,
+      ].join("\n"),
       resolveDir: UI,
       loader: "ts",
     },
+    // `dropdownPlacement.tsx` 에 JSX 가 있다 — 전역 `React` 없이 번들되게
+    jsx: "automatic",
     bundle: true,
     format: "cjs",
     platform: "node",
@@ -170,10 +177,15 @@ const TABLE = [
   [true, "static", EL, "absolute", null, false, "1 static"],
 ];
 
-/** `menuPlacement` — 4단계. static 만 강제로 아래 */
+/** `menuPlacement` — 4단계. 기본 `"auto"`(2026-09-17 · Select.md §6-7 「넘침」) · static 만 강제로 아래 */
 const PLACEMENT = [
-  [{ hasPortal: false }, "bottom", "안 주면 bottom"],
-  [{ hasPortal: true, menuPlacement: "auto" }, "auto", "명시값 통과"],
+  [{ hasPortal: false }, "auto", "안 주면 auto — 제자리"],
+  [{ hasPortal: true }, "auto", "안 주면 auto — hasPortal"],
+  [
+    { hasPortal: true, menuPlacement: "bottom" },
+    "bottom",
+    "명시값 통과 — 고정",
+  ],
   [{ hasPortal: false, menuPlacement: "top" }, "top", "명시값 통과"],
   [
     { hasPortal: true, menuPosition: "static", menuPlacement: "top" },
@@ -346,7 +358,8 @@ const MUTANTS = [
     }),
   },
   {
-    name: "menuPlacement 기본이 auto 다",
+    // 2026-09-17 이전의 기본값 — 되돌아가면 기본 모드가 다시 넘친다
+    name: "menuPlacement 기본이 bottom 이다 (옛 기본)",
     make: ({ resolve, needsRoot }) => ({
       needsRoot,
       resolve: (input, root) => ({
@@ -354,9 +367,161 @@ const MUTANTS = [
         menuPlacement:
           input.menuPosition === "static"
             ? "bottom"
-            : (input.menuPlacement ?? "auto"),
+            : (input.menuPlacement ?? "bottom"),
       }),
     }),
+  },
+  {
+    name: "static 이 명시한 top 을 통과시킨다 (흐름 안에서 뒤집힘)",
+    make: ({ resolve, needsRoot }) => ({
+      needsRoot,
+      resolve: (input, root) => ({
+        ...resolve(input, root),
+        menuPlacement:
+          input.menuPlacement ?? resolve(input, root).menuPlacement,
+      }),
+    }),
+  },
+];
+
+/**
+ * 드롭다운 방향 판정 — `internal/dropdownPlacement` 의 `resolveDropdownPlacement` (2026-09-17).
+ * Select 메뉴와 Datepicker 달력이 **같이 쓰는** 순수 함수라 여기서 표로 잰다(브라우저 없이).
+ * 브라우저 쪽(실제 방향 · 간격 · 모션 부호)은 `apps/docs/scripts/check-menu-motion.mjs` 「넘침」 절이다.
+ *
+ * 열: [anchorTop, anchorBottom, panelHeight, 기대, 이유] — 뷰포트 800 · 여백 8 · 간격 8 고정.
+ * 아래 공간 = 800 − 8 − (bottom + 8) · 위 공간 = top − 8 − 8 (Select.md §6-7 「넘침」 표).
+ * 행마다 **어느 변이를 잡으려고 넣었는지** 이유 끝에 적었다.
+ */
+const JUDGE_VH = 800;
+const JUDGE_SPACE = 8;
+const JUDGE = [
+  [100, 148, 350, "bottom", "아래 636 ≥ 350 — 들어간다"],
+  [600, 648, 350, "top", "아래 136 · 위 584 — 위에만 들어간다"],
+  [300, 348, 600, "bottom", "아래 436 · 위 284 — 둘 다 모자라고 아래가 넓다"],
+  [
+    450,
+    498,
+    600,
+    "top",
+    "아래 286 · 위 434 — 둘 다 모자라고 위가 넓다 (「무조건 아래」를 잡는다)",
+  ],
+  [
+    376,
+    424,
+    600,
+    "bottom",
+    "아래 360 = 위 360 — 동률은 아래 (「동률 → 위」를 잡는다)",
+  ],
+  [600, 648, 136, "bottom", "아래 136 = H — 경계는 들어간다 (`<` 를 잡는다)"],
+  [
+    500,
+    548,
+    240,
+    "top",
+    "아래 236 < 240 ≤ 위 484 — 여백 8 이 뒤집는다 (「여백 0」이면 아래 244 로 들어간다)",
+  ],
+];
+
+function runJudge(resolveDropdown, report) {
+  let bad = 0;
+  if (report)
+    console.log(
+      "\n■ 판정 함수 — 뒤집기 · 여백 · 넓은 쪽 (Select · Datepicker 공용)",
+    );
+  for (const [anchorTop, anchorBottom, panelHeight, want, why] of JUDGE) {
+    const got = resolveDropdown({
+      anchorTop,
+      anchorBottom,
+      panelHeight,
+      viewportHeight: JUDGE_VH,
+      pad: JUDGE_SPACE,
+      gutter: JUDGE_SPACE,
+    });
+    const pass = got === want;
+    if (!report) {
+      if (!pass) bad += 1;
+      continue;
+    }
+    counts.judge += 1;
+    checks += 1;
+    if (pass)
+      console.log(
+        `   ✅ A ${anchorTop}~${anchorBottom} · H ${panelHeight} → ${want} (${why})`,
+      );
+    else {
+      failures += 1;
+      bad += 1;
+      console.log(
+        `   ❌ A ${anchorTop}~${anchorBottom} · H ${panelHeight} → ${want} (${why}) — 받은 값 ${got}`,
+      );
+    }
+  }
+  return bad;
+}
+
+/** 판정 함수의 변이 — spec 「넘침」 규칙에서 한 자리씩 틀린 구현 */
+const JUDGE_MUTANTS = [
+  {
+    name: "뷰포트 여백을 빼지 않는다 (SEED overflowPadding 누락)",
+    make: (real) => (input) => real({ ...input, pad: 0 }),
+  },
+  {
+    name: "경계를 `<` 로 잰다 (딱 맞는 공간을 모자라다고 본다)",
+    make:
+      () =>
+      ({
+        anchorTop,
+        anchorBottom,
+        panelHeight,
+        viewportHeight,
+        pad,
+        gutter,
+      }) => {
+        const below = viewportHeight - pad - (anchorBottom + gutter);
+        const above = anchorTop - gutter - pad;
+        if (panelHeight < below) return "bottom";
+        if (panelHeight < above) return "top";
+        return above > below ? "top" : "bottom";
+      },
+  },
+  {
+    name: "둘 다 모자라면 무조건 아래 (넓은 쪽을 안 본다)",
+    make:
+      () =>
+      ({
+        anchorTop,
+        anchorBottom,
+        panelHeight,
+        viewportHeight,
+        pad,
+        gutter,
+      }) => {
+        const below = viewportHeight - pad - (anchorBottom + gutter);
+        const above = anchorTop - gutter - pad;
+        if (panelHeight <= below) return "bottom";
+        if (panelHeight <= above) return "top";
+        return "bottom";
+      },
+  },
+  {
+    name: "동률이면 위",
+    make:
+      () =>
+      ({
+        anchorTop,
+        anchorBottom,
+        panelHeight,
+        viewportHeight,
+        pad,
+        gutter,
+      }) => {
+        const below = viewportHeight - pad - (anchorBottom + gutter);
+        const above = anchorTop - gutter - pad;
+        if (panelHeight <= below) return "bottom";
+        if (panelHeight <= above) return "top";
+        return above >= below ? "top" : "bottom";
+      },
   },
 ];
 
@@ -368,15 +533,17 @@ async function run() {
   };
   if (
     typeof real.resolve !== "function" ||
-    typeof real.needsRoot !== "function"
+    typeof real.needsRoot !== "function" ||
+    typeof utils.resolveDropdownPlacement !== "function"
   ) {
     console.error(
-      "❌ Select.utils.ts 에서 두 함수를 못 찾았다 — 이름이 바뀌었으면 이 스크립트도 고친다",
+      "❌ Select.utils.ts · internal/dropdownPlacement.tsx 에서 함수를 못 찾았다 — 이름이 바뀌었으면 이 스크립트도 고친다",
     );
     process.exit(1);
   }
 
   runTable(real, true);
+  runJudge(utils.resolveDropdownPlacement, true);
 
   for (const [key, n] of Object.entries(counts)) {
     if (n === 0) {
@@ -405,13 +572,26 @@ async function run() {
         console.log(`   ❌ 못 잡았다 — ${m.name}`);
       }
     }
-    console.log(`\n🎯 검출력 ${mutantsDetected}/${MUTANTS.length}`);
+    for (const m of JUDGE_MUTANTS) {
+      const bad = runJudge(m.make(utils.resolveDropdownPlacement), false);
+      checks += 1;
+      if (bad > 0) {
+        mutantsDetected += 1;
+        console.log(`   🎯 검출 — 판정: ${m.name} (실패한 행 ${bad})`);
+      } else {
+        failures += 1;
+        console.log(`   ❌ 못 잡았다 — 판정: ${m.name}`);
+      }
+    }
+    console.log(
+      `\n🎯 검출력 ${mutantsDetected}/${MUTANTS.length + JUDGE_MUTANTS.length}`,
+    );
     process.exit(failures === 0 ? 0 : 1);
   }
 
   console.log(
     failures === 0
-      ? `\n✅ Select 배치 해석 통과 — 조합 ${counts.rows} · 키 유무 ${counts.keys} · placement ${counts.placement} · 일치 ${counts.agree}`
+      ? `\n✅ Select 배치 해석 통과 — 조합 ${counts.rows} · 키 유무 ${counts.keys} · placement ${counts.placement} · 일치 ${counts.agree} · 판정 ${counts.judge}`
       : `\n❌ ${failures}건 실패`,
   );
   process.exit(failures === 0 ? 0 : 1);

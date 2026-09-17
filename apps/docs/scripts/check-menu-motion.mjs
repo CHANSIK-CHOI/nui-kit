@@ -25,6 +25,21 @@
  *   ■ 재개폐     퇴장 중 다시 열어도 패널이 둘이 되지 않는가
  *   ■ 모션 감소   `prefers-reduced-motion` 에서 위치가 안 움직이고, 퇴장이 0 이 아니라 페이드로 걸리며 그동안 눌리지 않는가
  *   ■ 동일       두 소스가 같은 모션 키를 쓰고, 재 보면 이동 거리도 같은가
+ *   ■ 넘침       (2026-09-17) 두 모드(기본 · hasPortal) × 네 자리(아래쪽 · 가운데 · 작은 화면 위 · 아래)에서
+ *                방향 · 간격 space-2 · 여백 · 첫 프레임 부호와 원점 · 목록 높이 불변 · 래퍼 위 클릭 통과,
+ *                모션 감소에서 뒤집힌 자리, 그리고 **같은 자리에서 Select 와 Datepicker 의 방향이 같은가**.
+ *                자리마다 전제(위 · 아래 공간과 H)를 재 뜻을 잃으면 실패로 잡는다.
+ *                헛짚기 — 첫 실행 121 검사 · 헛짚기 0. 코드 변이 둘로 검출 확인 — 래퍼 `pointerEvents: auto` 는
+ *                클릭 통과 세 자리가, react-select 의 줄인 `maxHeight` 를 되살리면 「목록 높이」(252px)가 잡았다.
+ *                `build:ui` 직후 한 판에서 MultiSelect 「기본 모드」 스크롤 17px 가 한 번 나왔다 — dev 가 새 dist 를
+ *                읽는 중이었고 연속 4회 재실행은 0 이었다(알려진 스크롤 앵커링 한계와 같은 자리)
+ *   ■ portal 추적 (2026-09-17 · reviewer BLOCKER) — `hasPortal`(fixed) · `hasPortal menuPosition="absolute"` ·
+ *                Datepicker `hasPortal` 을 연 채 문서를 스크롤하고 패널 안에 마우스를 올려 **다시 렌더시킨 뒤**
+ *                트리거와의 간격이 그대로인가. 검출 확인 — react-select `MenuPortal` + `rect.top + pageYOffset`
+ *                (고치기 전 코드)을 되살리면 absolute 에서 간격 8 → 168 로 잡았다. fixed 는 그 코드에서도 통과한다
+ *                (좌표가 스크롤로 바뀌어 갱신이 멈추지 않는다) — 결함 자리는 absolute 하나다
+ *   ■ 방향 고정 (2026-09-17 · qa 미실시 항목) — `menuPlacement="bottom"` · `"top"` 데모를 **판정과 반대가 나오는
+ *                자리**에서 연다. 검출 확인 — 훅이 고정을 무시하게 하면 두 자리 다 반대 방향으로 잡았다
  *
  * ⚠️ **일부러 도중을 잡는 검사다**(`scripts.md §10` 의 예외). 「멈출 때까지 읽는다」는
  *    최종값을 기대값과 견주는 자리의 규칙인데, 여기서 보는 것은 **전환이 일어나는 중이라는
@@ -94,7 +109,8 @@ const EXPECT = {
   pointerBlocked: true, // 퇴장 중에는 눌리지 않는다
   singlePanel: true, // 퇴장 중 다시 열어도 패널은 하나다
   sameMotion: true, // Select 와 Datepicker 가 같다
-  inPlace: true, // 기본 모드 — 제자리 · 뒤집지 않음 · 페이지 스크롤 0 · 래퍼 0 (2026-09-17 A 안)
+  inPlace: true, // 기본 모드 — 제자리 · 아래가 모자라면 뒤집힘 · 페이지 스크롤 0 · 래퍼 0 (A 안 · 2026-09-17 넘침)
+  overflow: true, // 넘침 — 방향 · 간격 · 여백 · 부호 · 높이 불변 · 클릭 통과 · 둘이 같은 방향 (Select.md §6-7 「넘침」)
   reducedNoMove: true, // 모션 감소 — 등장 내내 `transform: none` 이고 끝에 보인다
   reducedExitFades: true, // 모션 감소 — 퇴장이 0 이 아니라 페이드로 걸린다 (not zero · 2026-09-17)
   reducedPointerBlocked: true, // 모션 감소 — 퇴장 중에도 눌리지 않는다
@@ -111,6 +127,7 @@ const SELFTEST_EXPECT = {
   singlePanel: false,
   sameMotion: false,
   inPlace: false,
+  overflow: false,
   reducedNoMove: false,
   reducedExitFades: false,
   reducedPointerBlocked: false,
@@ -157,11 +174,47 @@ const TARGETS = [
     panel: ".nui-select__menu",
     option: ".nui-select__option",
     closers: ["escape", "outside", "option"],
-    // 기본 모드는 뒤집지 않는다(`menuPlacement="bottom"`). 뒤집히는 것은 `hasPortal`(`fixed`)
-    // 하나라 그 데모를 집는다 — Select.md §6-7
+    // 뒤집힘 방향 절은 `hasPortal` 데모를 집는다 — 기본 모드의 뒤집힘은 「기본 모드」 절과 「넘침」 절이
+    // 잰다(기본 `menuPlacement="auto"` · Select.md §6-7 「넘침」). 이 절은 portal 래퍼 안에서의 부호를 본다
     flipTrigger: '[data-demo="has-portal"] .nui-select__control',
     inPlace: true,
     reduced: true,
+    // 방향 고정 절 — `menuPlacement="bottom"` · `"top"` 은 판정하지 않는다(Select.md §6-7 「넘침」 1).
+    // 자리를 판정과 반대로 둔다 — bottom 은 화면 아래쪽(판정이면 위), top 은 가운데(판정이면 아래)
+    fixedPlacement: [
+      {
+        want: "bottom",
+        trigger: '[data-demo="placement-bottom"] .nui-select__control',
+        vh: 520,
+        block: "end",
+      },
+      {
+        want: "top",
+        trigger: '[data-demo="placement-top"] .nui-select__control',
+        vh: 1400,
+        block: "center",
+      },
+    ],
+    // portal 추적 절 — 연 채 문서를 스크롤하고 옵션에 마우스를 올려(다시 렌더) 래퍼가 컨트롤을 따라가나.
+    // `absolute` 가 reviewer BLOCKER 의 자리다(2026-09-17 · 옛 좌표 + 새 스크롤)
+    portalTrack: [
+      {
+        mode: 'hasPortal menuPosition="absolute"',
+        trigger: '[data-demo="has-portal-absolute"] .nui-select__control',
+      },
+      {
+        mode: "hasPortal",
+        trigger: '[data-demo="has-portal"] .nui-select__control',
+      },
+    ],
+    // 넘침 절 — 기본(첫 컨트롤) · hasPortal 두 모드. Datepicker 와 같은 자리에서 방향이 같아야 한다
+    overflow: [
+      { mode: "기본", trigger: ".nui-select__control" },
+      {
+        mode: "hasPortal",
+        trigger: '[data-demo="has-portal"] .nui-select__control',
+      },
+    ],
   },
   {
     slug: "multi-select",
@@ -175,6 +228,8 @@ const TARGETS = [
     flipTrigger: null,
     inPlace: true,
     reduced: false, // `NuiMenu` 한 벌이라 Select 가 잰다
+    overflow: null, // `NuiMenu` 한 벌이라 Select 가 잰다
+    portalTrack: null, // `NuiMenuPortal` 한 벌이라 Select 가 잰다
   },
   {
     slug: "datepicker",
@@ -184,9 +239,74 @@ const TARGETS = [
     panel: ".nui-datepicker__dropdown",
     option: ".nui-daypicker__day-button",
     closers: ["escape", "outside"],
-    flipTrigger: null, // 자동 뒤집기가 없다 — Datepicker.md §6-6
+    // 뒤집힘은 아래 「넘침」 절이 잰다(첫 프레임 부호 포함) — Datepicker.md §6-9
+    flipTrigger: null,
+    portalTrack: [
+      {
+        mode: "hasPortal",
+        trigger: '.nui-datepicker input[placeholder="잘리지 않는다"]',
+      },
+    ],
     inPlace: false, // 달력은 원래 제자리다 — 이 절은 Select 의 배치 전환을 잰다
     reduced: true,
+    overflow: [
+      {
+        mode: "기본",
+        trigger: '.nui-datepicker input[placeholder="날짜를 고르세요"]',
+      },
+      {
+        mode: "hasPortal",
+        trigger: '.nui-datepicker input[placeholder="잘리지 않는다"]',
+      },
+    ],
+  },
+];
+
+/**
+ * 넘침 절의 자리 넷 (2026-09-17 · Select.md §6-7 「넘침」 · Datepicker.md §6-9).
+ *
+ * 각 자리는 **전제**를 갖는다 — 데모 배치가 바뀌어 그 자리가 뜻을 잃으면(예: 「아래쪽」인데
+ * 아래에 들어간다) 판정 대신 **실패**로 잡는다. `space` 는 `--nui-space-2` 계산값, `H` 는 패널의
+ * `offsetHeight` 다. 공간은 판정식 그대로 여백 + 간격(= 2 × space)을 뺀다.
+ */
+const OVERFLOW_POSITIONS = [
+  {
+    name: "아래쪽 — 위에 들어간다",
+    vh: 520,
+    block: "end",
+    want: "top",
+    fits: true,
+    premise: (m) => m.below - 2 * m.space < m.H && m.above - 2 * m.space >= m.H,
+  },
+  {
+    name: "가운데 — 아래에 들어간다",
+    vh: 1400,
+    block: "center",
+    want: "bottom",
+    fits: true,
+    premise: (m) => m.below - 2 * m.space >= m.H,
+  },
+  {
+    name: "작은 화면 아래쪽 — 둘 다 모자라고 위가 넓다",
+    vh: 300,
+    block: "end",
+    want: "top",
+    fits: false,
+    premise: (m) =>
+      m.below - 2 * m.space < m.H &&
+      m.above - 2 * m.space < m.H &&
+      m.above > m.below,
+  },
+  {
+    name: "작은 화면 위쪽 — 둘 다 모자라고 아래가 넓다",
+    vh: 300,
+    block: "start",
+    want: "bottom",
+    fits: false,
+    premise: (m) =>
+      m.below - 2 * m.space < m.H &&
+      m.above - 2 * m.space < m.H &&
+      m.below > m.above,
   },
 ];
 
@@ -195,11 +315,17 @@ let checks = 0;
 let detected = 0;
 const targetsSeen = new Set();
 // 플래그로 켜는 절의 수 — 범위 안 대상이 플래그를 갖는데 0 이면 실패다 (scripts.md §2 · 리뷰 INFO)
-const sections = { inPlace: 0, reduced: 0 };
+const sections = {
+  inPlace: 0,
+  reduced: 0,
+  overflow: 0,
+  portalTrack: 0,
+  fixedPlacement: 0,
+};
 
 process.on("exit", (code) => {
   console.log(
-    `RECEIPT check-menu-motion targets=${targetsSeen.size} checks=${checks} inPlace=${sections.inPlace} reduced=${sections.reduced} failures=${failures}` +
+    `RECEIPT check-menu-motion targets=${targetsSeen.size} checks=${checks} inPlace=${sections.inPlace} reduced=${sections.reduced} overflow=${sections.overflow} portalTrack=${sections.portalTrack} fixedPlacement=${sections.fixedPlacement} failures=${failures}` +
       (SELFTEST ? ` detected=${detected}` : "") +
       ` scope=${SCOPE ? [...SCOPE].join(",") : "all"}` +
       ` exit=${code}`,
@@ -239,7 +365,8 @@ async function readPanel(page, panel) {
       opacity: Number(cs.opacity),
       transform: cs.transform,
       pointerEvents: cs.pointerEvents,
-      placement: el.className.includes("menu--top") ? "top" : "bottom",
+      // Select `__menu--top` · Datepicker `__dropdown--top` (2026-09-17)
+      placement: el.className.includes("--top") ? "top" : "bottom",
       count: document.querySelectorAll(sel).length,
     };
   }, panel);
@@ -262,7 +389,8 @@ async function armEnterRecorder(page, panel) {
       window.__nuiFrames.push({
         transform: cs.transform,
         opacity: Number(cs.opacity),
-        placement: el.className.includes("menu--top") ? "top" : "bottom",
+        origin: cs.transformOrigin,
+        placement: el.className.includes("--top") ? "top" : "bottom",
       });
       if (window.__nuiFrames.length < 14) requestAnimationFrame(tick);
     };
@@ -282,6 +410,68 @@ async function readRecordedEnter(page) {
   return frames.reduce((a, f) =>
     Math.abs(ty(f.transform)) > Math.abs(ty(a.transform)) ? f : a,
   );
+}
+
+/** 넘침 절 — 방향 판정이 쓴 값과 결과를 한 번에 잰다 (자리마다 새 페이지) */
+const directions = new Map();
+
+async function openAt(
+  browser,
+  t,
+  trigger,
+  vh,
+  block,
+  { reduced = false } = {},
+) {
+  const page = await browser.newPage({
+    viewport: { width: 1000, height: vh },
+    reducedMotion: reduced ? "reduce" : "no-preference",
+  });
+  await page.goto(`${BASE}${t.path}`, { waitUntil: "networkidle" });
+  const loc = page.locator(`${trigger} >> visible=true`).first();
+  await loc.evaluate((el, b) => el.scrollIntoView({ block: b }), block);
+  await page.waitForTimeout(150);
+  await armEnterRecorder(page, t.panel);
+  await loc.click();
+  await page.waitForSelector(t.panel, { timeout: 3000 });
+  const first = await readRecordedEnter(page);
+  // 등장이 끝난 뒤 레이아웃 rect 를 읽는다(transform 이 없는 상태)
+  await page.waitForTimeout(150);
+  const m = await page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    const anchor = el?.offsetParent;
+    if (!el || !anchor) return null;
+    const a = anchor.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const top = el.className.includes("--top");
+    const raw = getComputedStyle(el).getPropertyValue("--nui-space-2").trim();
+    const space = raw.endsWith("rem")
+      ? Number.parseFloat(raw) *
+        Number.parseFloat(getComputedStyle(document.documentElement).fontSize)
+      : Number.parseFloat(raw);
+    const vh = document.documentElement.clientHeight;
+    const list = el.querySelector(".nui-select__menu-list");
+    return {
+      top,
+      H: el.offsetHeight,
+      above: a.top,
+      below: vh - a.bottom,
+      gap: top ? a.top - r.bottom : r.top - a.bottom,
+      panelTop: r.top,
+      panelBottom: r.bottom,
+      vh,
+      space,
+      listMax: list ? getComputedStyle(list).maxHeight : null,
+      count: document.querySelectorAll(sel).length,
+    };
+  }, t.panel);
+  const hitsControl = await loc.evaluate((el) => {
+    const root = el.closest(".nui-select, .nui-datepicker");
+    const b = el.getBoundingClientRect();
+    const at = document.elementFromPoint(b.left + 12, b.top + b.height / 2);
+    return Boolean(root && at && root.contains(at));
+  });
+  return { page, first, m, hitsControl };
 }
 
 async function openPanel(page, t) {
@@ -486,15 +676,17 @@ async function run() {
         await page.close();
         continue;
       }
+      // 2026-09-17 — 기본(`menuPlacement="auto"`)도 아래가 모자라면 **뒤집는다**(Select.md §6-7 「넘침」).
+      // 예전 기대는 「뒤집지 않음」이었다. 제자리 · 스크롤 0 · 래퍼 0 은 그대로다
       const inPlace =
-        placed.top === false &&
+        placed.top === true &&
         placed.inContainer &&
         placed.wrappers === 0 &&
         moved === 0;
       sections.inPlace += 1;
       expect(
         inPlace === E.inPlace,
-        `${t.label} 기본 모드 — 제자리 · 뒤집지 않음 · 페이지 스크롤 0 · 래퍼 0 (아래 공간 ${Math.round(below)}px)`,
+        `${t.label} 기본 모드 — 제자리 · 위로 뒤집힘 · 페이지 스크롤 0 · 래퍼 0 (아래 공간 ${Math.round(below)}px)`,
         `menu--top=${placed.top} 컨테이너 안=${placed.inContainer} 래퍼=${placed.wrappers} 스크롤 변화=${moved}px`,
       );
     }
@@ -627,7 +819,236 @@ async function run() {
       await rm.close();
     }
 
+    // ── 방향 고정 — `menuPlacement="bottom"` · `"top"` 은 판정하지 않는다 (Select.md §6-7 「넘침」 1)
+    //    판정과 **반대가 나오는 자리**에 둔다 — 판정기가 새어 들면 방향이 뒤집혀 잡힌다.
+    //    전제: bottom 자리는 아래가 모자라야, top 자리는 아래가 넉넉해야 이 절이 무언가를 잰다.
+    if (t.fixedPlacement) {
+      for (const f of t.fixedPlacement) {
+        const where = `${t.label} menuPlacement="${f.want}" · 방향 고정`;
+        const o = await openAt(browser, t, f.trigger, f.vh, f.block);
+        if (!o.m) {
+          failures += 1;
+          checks += 1;
+          console.log(`   ❌ ${where} — 패널을 못 읽었다`);
+          await o.page.close();
+          continue;
+        }
+        const judged = o.m.below - 2 * o.m.space >= o.m.H ? "bottom" : "top";
+        if (judged === f.want) {
+          failures += 1;
+          checks += 1;
+          console.log(
+            `   ❌ ${where} — 전제 실패: 판정으로도 ${judged} 가 나오는 자리다(위 ${Math.round(o.m.above)} · 아래 ${Math.round(o.m.below)} · H ${o.m.H}). 이 자리로는 고정을 못 가른다`,
+          );
+          await o.page.close();
+          continue;
+        }
+        sections.fixedPlacement += 1;
+        const got = o.m.top ? "top" : "bottom";
+        expect(
+          (got === f.want && Math.abs(o.m.gap - o.m.space) <= 1) === E.overflow,
+          `${where} — 판정(${judged})과 상관없이 ${f.want} · 간격 ${o.m.gap.toFixed(1)}`,
+          `방향 ${got} · 간격 ${o.m.gap.toFixed(1)} (위 ${Math.round(o.m.above)} · 아래 ${Math.round(o.m.below)} · H ${o.m.H})`,
+        );
+        await o.page.close();
+      }
+    }
+
+    // ── portal 추적 — 연 채 문서를 스크롤하고 패널 안에 마우스를 올려 다시 렌더시킨 뒤에도 트리거와의
+    //    간격이 space-2 인가 (2026-09-17 · Select.md §6-7 「배치의 소유권」 · reviewer BLOCKER).
+    //    react-select 의 `MenuPortal` 은 자기 판정 좌표가 같으면 갱신을 멈춰, 옛 좌표에 새 스크롤을 더한
+    //    래퍼가 스크롤한 만큼 어긋났다. 스크롤만으로는 안 드러나고 **다시 렌더돼야** 드러난다.
+    if (t.portalTrack) {
+      for (const { mode, trigger } of t.portalTrack) {
+        const where = `${t.label} ${mode} · portal 추적`;
+        const p = await browser.newPage({
+          viewport: { width: 1000, height: 900 },
+        });
+        await p.goto(`${BASE}${t.path}`, { waitUntil: "networkidle" });
+        const loc = p.locator(`${trigger} >> visible=true`).first();
+        await loc.evaluate((el) => el.scrollIntoView({ block: "center" }));
+        await p.waitForTimeout(150);
+        await loc.click();
+        await p.waitForSelector(t.panel, { timeout: 3000 });
+        await p.waitForTimeout(ENTER_MS + 120);
+        const gapOf = () =>
+          p.evaluate(
+            ({ panel, trig }) => {
+              const el = document.querySelector(panel);
+              const anchor = [...document.querySelectorAll(trig)].find(
+                (n) => n.getBoundingClientRect().height > 0,
+              );
+              const box = anchor?.closest(
+                ".nui-select__container, .nui-datepicker",
+              );
+              if (!el || !box) return null;
+              const a = box.getBoundingClientRect();
+              const r = el.getBoundingClientRect();
+              return el.className.includes("--top")
+                ? a.top - r.bottom
+                : r.top - a.bottom;
+            },
+            { panel: t.panel, trig: trigger },
+          );
+        // 기대 간격은 `--nui-space-2` 계산값이다 — 넘침 절과 같은 방식으로 읽는다(8 을 박지 않는다)
+        const space = await p.evaluate(() => {
+          const raw = getComputedStyle(document.documentElement)
+            .getPropertyValue("--nui-space-2")
+            .trim();
+          return raw.endsWith("rem")
+            ? Number.parseFloat(raw) *
+                Number.parseFloat(
+                  getComputedStyle(document.documentElement).fontSize,
+                )
+            : Number.parseFloat(raw);
+        });
+        const before = await gapOf();
+        await p.mouse.wheel(0, 160);
+        await p.waitForTimeout(200);
+        // 다시 렌더 — 패널 안 첫 옵션 · 날짜에 마우스를 올린다(Select 는 포커스 옵션이 바뀌어 렌더된다)
+        const target = p
+          .locator(`${t.panel} ${t.option} >> visible=true`)
+          .nth(1);
+        const box = await target.boundingBox();
+        if (box)
+          await p.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await p.waitForTimeout(200);
+        const after = await gapOf();
+        const scrolled = await p.evaluate(() => window.scrollY);
+        sections.portalTrack += 1;
+        expect(
+          (before !== null &&
+            after !== null &&
+            box !== null &&
+            Math.abs(after - before) <= 1 &&
+            Math.abs(after - space) <= 1) === E.overflow,
+          `${where} — 스크롤 · 다시 렌더 뒤 간격 유지 (${before?.toFixed(1)} → ${after?.toFixed(1)})`,
+          `간격 ${before} → ${after} · 문서 스크롤 ${scrolled} · 옵션 ${box ? "hover" : "못 찾음"}`,
+        );
+        await p.close();
+      }
+    }
+
+    // ── 넘침 — 뒤집기 · 여백 · 넓은 쪽 (2026-09-17 · Select.md §6-7 「넘침」 · Datepicker.md §6-9)
+    //    두 모드 × 네 자리. 자리마다 새 페이지다 — 스크롤 · 뷰포트가 섞이지 않게.
+    if (t.overflow) {
+      for (const { mode, trigger } of t.overflow) {
+        for (const pos of OVERFLOW_POSITIONS) {
+          const where = `${t.label} ${mode} · ${pos.name}`;
+          const o = await openAt(browser, t, trigger, pos.vh, pos.block);
+          if (!o.m) {
+            failures += 1;
+            checks += 1;
+            console.log(`   ❌ ${where} — 패널을 못 읽었다`);
+            await o.page.close();
+            continue;
+          }
+          const { m, first } = o;
+          if (!pos.premise(m)) {
+            failures += 1;
+            checks += 1;
+            console.log(
+              `   ❌ ${where} — 전제 실패: 위 ${Math.round(m.above)} · 아래 ${Math.round(m.below)} · H ${m.H} · 여백 ${m.space}. 데모 배치가 바뀌어 이 자리가 뜻을 잃었다`,
+            );
+            await o.page.close();
+            continue;
+          }
+          sections.overflow += 1;
+          const got = m.top ? "top" : "bottom";
+          directions.set(`${t.slug}|${mode}|${pos.name}`, got);
+
+          expect(
+            (got === pos.want && m.count === 1) === E.overflow,
+            `${where} — ${pos.want === "top" ? "위로 뒤집힌다" : "아래로 열린다"}`,
+            `방향 ${got} · 패널 ${m.count}개 (위 ${Math.round(m.above)} · 아래 ${Math.round(m.below)} · H ${m.H})`,
+          );
+          expect(
+            Math.abs(m.gap - m.space) <= 1 === E.overflow,
+            `${where} — 트리거와 간격 space-2 (${m.gap.toFixed(1)})`,
+            `간격 ${m.gap.toFixed(1)} · 기대 ${m.space} ±1`,
+          );
+          if (pos.fits) {
+            const inside =
+              got === "top"
+                ? m.panelTop >= m.space - 1
+                : m.panelBottom <= m.vh - m.space + 1;
+            expect(
+              inside === E.overflow,
+              `${where} — 뷰포트 여백 ${m.space} 안에 선다`,
+              `패널 ${m.panelTop.toFixed(0)}~${m.panelBottom.toFixed(0)} · 뷰포트 ${m.vh}`,
+            );
+          } else if (m.listMax !== null) {
+            // 둘 다 모자라도 **줄이지 않는다** — react-select 의 ③ 줄임이 새면 여기서 걸린다
+            expect(
+              (m.listMax === "480px") === E.overflow,
+              `${where} — 목록 높이가 줄지 않는다 (${m.listMax})`,
+              `max-height ${m.listMax} · 기대 480px(maxMenuHeight)`,
+            );
+          }
+          // 첫 프레임 — 트리거 쪽에서 자란다. 부호 전용(뒤집힘 절과 같은 이유로 하한은 절반)
+          const firstTy = ty(first?.transform);
+          const originY = Number.parseFloat(
+            (first?.origin ?? "").split(" ")[1] ?? "0",
+          );
+          const wantSign = pos.want === "top" ? 1 : -1;
+          expect(
+            (Math.sign(firstTy) === wantSign &&
+              Math.abs(firstTy) >= AWAY_PX / 2 &&
+              (pos.want === "top" ? originY > 0 : originY === 0)) ===
+              E.overflow,
+            `${where} — 첫 프레임 부호 · 원점 (ty=${firstTy.toFixed(1)} · origin-y=${originY})`,
+            `ty=${firstTy.toFixed(1)} · origin=${first?.origin} — 기대 부호 ${wantSign} · ${pos.want === "top" ? "bottom" : "top"} left`,
+          );
+          if (mode === "hasPortal") {
+            // 유령 래퍼가 컨트롤 위를 덮는다 — 클릭이 통과해야 한다 (Select.md §6-7 ⚠️)
+            expect(
+              o.hitsControl === E.overflow,
+              `${where} — 래퍼 위 컨트롤 클릭 통과`,
+              "컨트롤 가운데의 elementFromPoint 가 컨트롤이 아니다 — 래퍼가 클릭을 먹는다",
+            );
+          }
+          await o.page.close();
+        }
+      }
+
+      // 모션 감소 — 뒤집힌 자리에서도 이동 없이 페이드
+      if (t.reduced) {
+        const pos = OVERFLOW_POSITIONS[0];
+        const o = await openAt(
+          browser,
+          t,
+          t.overflow[0].trigger,
+          pos.vh,
+          pos.block,
+          { reduced: true },
+        );
+        const frames = await o.page.evaluate(() => window.__nuiFrames ?? []);
+        const moved = frames.filter((f) => f.transform !== "none");
+        expect(
+          (o.m?.top === true && frames.length > 0 && moved.length === 0) ===
+            E.overflow,
+          `${t.label} 넘침 · 모션 감소 — 위로 뒤집힌 자리에 이동 없이 나타난다`,
+          `뒤집힘 ${o.m?.top} · 프레임 ${frames.length} · 이동한 프레임 ${moved.length}`,
+        );
+        await o.page.close();
+      }
+    }
+
     await page.close();
+  }
+
+  // ── 넘침 동일 — 같은 모드 · 같은 자리에서 Select 와 Datepicker 의 방향이 같다
+  if (!SCOPE || (SCOPE.has("select") && SCOPE.has("datepicker"))) {
+    const keys = [...directions.keys()].filter((k) => k.startsWith("select|"));
+    for (const k of keys) {
+      const other = `datepicker|${k.slice("select|".length)}`;
+      if (!directions.has(other)) continue;
+      expect(
+        (directions.get(k) === directions.get(other)) === E.overflow,
+        `넘침 동일 — ${k.slice("select|".length)} (Select ${directions.get(k)} · Datepicker ${directions.get(other)})`,
+        "같은 자리에서 방향이 갈렸다",
+      );
+    }
   }
 
   // ── 동일 ①: 두 소스가 같은 모션 키를 쓴다 (브라우저가 아니라 파일로 잰다)

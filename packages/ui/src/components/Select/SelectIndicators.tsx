@@ -4,9 +4,13 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronDown, X } from "lucide-react";
 import {
   Children,
+  useCallback,
   useContext,
+  useLayoutEffect,
   useRef,
+  useState,
   type ButtonHTMLAttributes,
+  type CSSProperties,
   type KeyboardEvent,
   type MouseEvent,
 } from "react";
@@ -19,6 +23,8 @@ import {
   type MenuProps,
   type MultiValueRemoveProps,
 } from "react-select";
+import { createPortal } from "react-dom";
+import { useDropdownPlacement } from "../../internal/dropdownPlacement.js";
 import {
   motionTransition,
   reduceMotion,
@@ -164,13 +170,15 @@ export function NuiMultiValueRemove<IsMulti extends boolean>({
  *    감싸 준다(아래). `menuIsOpen` 을 제어하지 않으므로 `verify:select-rhf` 가
  *    지키는 remount 경로를 건드리지 않는다.
  *
- * ⚠️ **`key={placement}` 가 방향을 고친다.** framer 의 `initial` 은 마운트 때 한 번만
- *    읽히는데 `MenuPlacer` 의 `placement` state 초기값이 `null` 이라 **첫 렌더는
- *    언제나 `"bottom"`** 이고 `"top"` 은 `useLayoutEffect` 의 두 번째 렌더에 온다.
- *    그대로 두면 뒤집힌 메뉴가 **트리거 반대편에서 온다**(실측 — top 자리에서도
- *    `ty=-6.6`). key 가 바뀌면 remount 되어 `initial` 이 다시 읽힌다(`ty=+6.8`).
- *    layout effect 안이라 **페인트 전이고 깜빡임이 없다.** 열린 뒤에는 그 effect 의
- *    deps 에 스크롤이 없어 placement 가 다시 바뀌지 않는다.
+ * ⚠️ **방향은 우리 판정기가 정한다 — react-select 가 넘기는 `placement` prop 은 읽지 않는다**
+ *    (2026-09-17 · Select.md §6-7 「넘침」). `internal/dropdownPlacement` 를 `Datepicker` 와 같이 쓴다.
+ *    react-select 의 판정은 여백 축이 없고 `absolute` 에서 문서 기준이며 뒤집기 전에 높이를 줄인다.
+ *
+ * ⚠️ **두 층이다 — 상태는 이 컴포넌트, `key={placement}` 는 안쪽 `motion.div`.** framer 의
+ *    `initial` 은 마운트 때 한 번만 읽히는데 판정은 layout effect 에서 나오므로 **첫 렌더는 언제나
+ *    `"bottom"`** 이다. key 가 바뀌면 안쪽만 remount 되어 `initial` 이 다시 읽힌다(`ty=+6.8`).
+ *    layout effect 안이라 **페인트 전이고 깜빡임이 없다.** 상태를 안쪽에 두면 remount 와 함께
+ *    `"bottom"` 으로 돌아가 영원히 못 뒤집는다.
  */
 export function NuiMenu<IsMulti extends boolean>({
   children,
@@ -178,9 +186,23 @@ export function NuiMenu<IsMulti extends boolean>({
   innerProps,
   className,
   cx,
-  placement,
+  selectProps,
 }: MenuProps<SelectOption, IsMulti, GroupBase<SelectOption>>) {
   const shouldReduceMotion = useReducedMotion();
+  // `resolveMenuPlacementProps` 가 기본 `"auto"` · `static` 이면 `"bottom"` 으로 정해 넘긴다
+  const { placement, panelRef } = useDropdownPlacement(
+    selectProps.menuPlacement,
+  );
+  // react-select 의 `MenuPlacer` 도 이 요소를 잡는다 — 결과는 안 쓰지만 ref 는 살려 둔다
+  const setMenuElement = useCallback(
+    (element: HTMLDivElement | null) => {
+      panelRef.current = element;
+      if (typeof innerRef === "function") innerRef(element);
+      else if (innerRef)
+        (innerRef as { current: HTMLDivElement | null }).current = element;
+    },
+    [innerRef, panelRef],
+  );
   // ⚠️ framer 가 애니메이션·드래그 핸들러의 타입을 자기 것으로 덮어쓴다.
   //    react-select 의 `innerProps` 는 `div` 전체 속성 타입이라 그대로 펼치면
   //    타입이 부딪힌다. 실제로 오는 것은 `id` · `onMouseDown` 정도다.
@@ -207,7 +229,7 @@ export function NuiMenu<IsMulti extends boolean>({
       {...restInnerProps}
       // placement 가 확정되면 remount 되어 `initial` 이 다시 읽힌다 (머리 주석)
       key={placement}
-      ref={innerRef}
+      ref={setMenuElement}
       // `cx` 가 키마다 프리픽스를 붙인다 — `menu--top` → `…__menu--top`
       className={cx({ menu: true, "menu--top": isTop }, className)}
       style={{
@@ -288,3 +310,139 @@ export function NuiSelectContainer<IsMulti extends boolean>({
 }
 
 NuiSelectContainer.displayName = "NuiSelectContainer";
+
+/**
+ * react-select 는 `MenuPortalProps` 를 루트에서 내보내지 않는다 — 깊은 경로 import 는 소비자의
+ * `.d.ts` 해석을 깨므로(exports map) 공개 컴포넌트의 시그니처에서 꺼낸다.
+ */
+type NuiMenuPortalProps<IsMulti extends boolean> = Parameters<
+  typeof reactSelectComponents.MenuPortal<
+    SelectOption,
+    IsMulti,
+    GroupBase<SelectOption>
+  >
+>[0];
+
+type PortalRect = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  bottom: number;
+  right: number;
+};
+
+/**
+ * portal 래퍼 — **컨트롤 rect 를 입은 유령 상자**를 우리가 추적한다 (2026-09-17 · Select.md §6-7).
+ *
+ * `Datepicker.__portal` 과 같은 방식이다 — `scroll`(캡처) · `resize` · 컨트롤 `ResizeObserver` 를
+ * 한 프레임에 한 번으로 병합해 잰다. 메뉴는 래퍼 안에서 `top: 100%` / `bottom: 100%` 로 앉는다.
+ *
+ * ⚠️ **react-select 의 `MenuPortal` 을 쓰지 않는 이유.** 그것은 **자기 판정의** `rect[placement]`
+ *    (+ 문서 스크롤)이 바뀔 때만 좌표를 갱신한다. 방향은 우리 판정기가 정하므로 그 조건이 맞지 않는다 —
+ *    ① `absolute` portal 에서 문서를 스크롤하면 `rect.bottom` 이 준 만큼 스크롤이 늘어 갱신이 멈추고,
+ *    거기에 지금 스크롤값을 더하면 래퍼가 스크롤한 만큼 어긋난다 ② 컨트롤 높이만 바뀌면(칩 줄바꿈)
+ *    래퍼 높이가 옛 값으로 남아 메뉴가 컨트롤과 겹친다 (reviewer BLOCKER · WARN · 2026-09-17).
+ *    좌표와 스크롤을 **같은 순간에** 재 한 쌍으로 둔다.
+ *
+ * - 스타일은 `getStyles("menuPortal", …)` 로 받아 **인라인**으로 준다 — `styles.menuPortal` 의 우리
+ *   기본(높이 · `pointerEvents` · z)과 소비자 함수가 그대로 걸린다. `offset` 은 위치 기준의 윗변이다
+ * - 클래스는 react-select 와 같은 꼴(`cx` + `getClassNames`)이라 `__menu-portal` 이 그대로 붙는다
+ * - react-select 의 `PortalPlacementContext` 는 두지 않는다 — `MenuPlacer` 가 없어도 동작하고(선택적 호출),
+ *   그 placement 는 우리가 안 쓴다
+ */
+export function NuiMenuPortal<IsMulti extends boolean>(
+  props: NuiMenuPortalProps<IsMulti>,
+) {
+  const {
+    appendTo,
+    children,
+    controlElement,
+    innerProps,
+    menuPosition,
+    cx,
+    getStyles,
+    getClassNames,
+    className,
+  } = props;
+  const [rect, setRect] = useState<PortalRect | null>(null);
+
+  useLayoutEffect(() => {
+    if (!controlElement) return;
+    let frameId = 0;
+
+    const measure = () => {
+      const r = controlElement.getBoundingClientRect();
+      // `fixed` 는 뷰포트 좌표, `absolute`(body) 는 문서 좌표 — 스크롤을 **같은 순간에** 읽는다
+      const scrollY = menuPosition === "fixed" ? 0 : window.pageYOffset;
+      const scrollX = menuPosition === "fixed" ? 0 : window.pageXOffset;
+      const next: PortalRect = {
+        top: r.top + scrollY,
+        left: r.left + scrollX,
+        width: r.width,
+        height: r.height,
+        bottom: r.bottom + scrollY,
+        right: r.right + scrollX,
+      };
+      setRect((prev) =>
+        prev &&
+        prev.top === next.top &&
+        prev.left === next.left &&
+        prev.width === next.width &&
+        prev.height === next.height
+          ? prev
+          : next,
+      );
+    };
+
+    const scheduleMeasure = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        measure();
+      });
+    };
+
+    measure();
+    // `scroll` 은 버블하지 않는다. 캡처로 받아야 조상 어디의 스크롤이든 잡힌다
+    window.addEventListener("scroll", scheduleMeasure, true);
+    window.addEventListener("resize", scheduleMeasure);
+    const observer = new ResizeObserver(scheduleMeasure);
+    observer.observe(controlElement);
+
+    return () => {
+      if (frameId) window.cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", scheduleMeasure, true);
+      window.removeEventListener("resize", scheduleMeasure);
+      observer.disconnect();
+    };
+  }, [controlElement, menuPosition]);
+
+  // react-select 와 같은 조건 — 내보낼 곳도 없고 `fixed` 도 아니면 그리지 않는다
+  if ((!appendTo && menuPosition !== "fixed") || !rect) return null;
+
+  const styleArgs = {
+    ...props,
+    offset: rect.top,
+    position: menuPosition,
+    rect,
+  };
+
+  const wrapper = (
+    <div
+      {...innerProps}
+      className={cx(
+        { "menu-portal": true },
+        getClassNames("menuPortal", styleArgs),
+        className,
+      )}
+      style={getStyles("menuPortal", styleArgs) as CSSProperties}
+    >
+      {children}
+    </div>
+  );
+
+  return appendTo ? createPortal(wrapper, appendTo) : wrapper;
+}
+
+NuiMenuPortal.displayName = "NuiMenuPortal";

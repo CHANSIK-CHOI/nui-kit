@@ -190,6 +190,53 @@ const CLIP_BOX = {
   borderRadius: 8,
 } as const;
 
+export function SelectPlacementDemo() {
+  const [auto, setAuto] = useState<SingleSelectValue>(null);
+  const [bottom, setBottom] = useState<SingleSelectValue>(null);
+  const [top, setTop] = useState<SingleSelectValue>(null);
+
+  return (
+    <CaseGrid
+      columns={3}
+      code={`<Select options={OPTIONS} />                        // 아래가 모자라면 위로 뒤집힌다
+<Select options={OPTIONS} menuPlacement="bottom" /> // 언제나 아래
+<Select options={OPTIONS} menuPlacement="top" />    // 언제나 위`}
+    >
+      <Case label="기본" note="화면에 맞춰 뒤집힌다">
+        <Select
+          options={CITIES}
+          value={auto}
+          onChange={(next) => setAuto(next)}
+          placeholder="지역"
+        />
+      </Case>
+      {/* `data-demo` — `check-menu-motion` 의 「방향 고정」 절이 이 두 케이스를 집는다 */}
+      <Case label={`menuPlacement="bottom"`} note="언제나 아래">
+        <div data-demo="placement-bottom">
+          <Select
+            menuPlacement="bottom"
+            options={CITIES}
+            value={bottom}
+            onChange={(next) => setBottom(next)}
+            placeholder="지역"
+          />
+        </div>
+      </Case>
+      <Case label={`menuPlacement="top"`} note="언제나 위">
+        <div data-demo="placement-top">
+          <Select
+            menuPlacement="top"
+            options={CITIES}
+            value={top}
+            onChange={(next) => setTop(next)}
+            placeholder="지역"
+          />
+        </div>
+      </Case>
+    </CaseGrid>
+  );
+}
+
 export function SelectPortalDemo() {
   const [inPlace, setInPlace] = useState<SingleSelectValue>(null);
   const [portaled, setPortaled] = useState<SingleSelectValue>(null);
@@ -202,7 +249,7 @@ export function SelectPortalDemo() {
       code={`<Select options={OPTIONS} />                                  // 제자리 — 상자에 잘린다
 <Select options={OPTIONS} hasPortal />                        // body 로 나가 잘리지 않는다. 화면에 맞춰 뒤집힌다
 <Select options={OPTIONS} menuPosition="static" />           // 흐름 안 — 아래를 민다
-<Select options={OPTIONS} hasPortal menuPosition="absolute" /> // body 로 나가되 문서 기준 — 뒤집지 않는다`}
+<Select options={OPTIONS} hasPortal menuPosition="absolute" /> // body 로 나가되 문서 좌표로 따라간다`}
     >
       <Case label="기본" note="상자에 잘린다">
         <div style={CLIP_BOX}>
@@ -239,9 +286,10 @@ export function SelectPortalDemo() {
       </Case>
       <Case
         label={`hasPortal · menuPosition="absolute"`}
-        note="상자를 벗어나고 뒤집지 않는다"
+        note="상자를 벗어나고 문서 좌표로 따라간다"
       >
-        <div style={CLIP_BOX}>
+        {/* `data-demo` — `check-menu-motion` 의 「portal 추적」 절이 이 케이스를 집는다 */}
+        <div style={CLIP_BOX} data-demo="has-portal-absolute">
           <Select
             hasPortal
             menuPosition="absolute"

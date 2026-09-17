@@ -533,16 +533,22 @@ emotion 쪽에서 걷어내** CSS 가 책임지게 합니다.
   `--border-width`). 옵션 낱말은 `size` 값 그대로입니다. 색은 `className` 으로 씁니다
 - `styles` prop 을 직접 넘기면 그 정리된 값 위에 얹히므로 의도대로 덧칠됩니다
 - 다만 **메뉴 최대 높이는 CSS 가 아니라 `maxMenuHeight` prop** 으로 조정합니다.
-  `react-select` 이 메뉴를 어디에 펼칠지 계산할 때 이 값을 참조하므로, CSS 로 덮으면
+  메뉴를 위로 뒤집을지 계산할 때 이 값으로 자른 높이를 쓰므로, CSS 로 덮으면
   실제 높이와 계산이 어긋납니다 (기본값 `480`)
 
 **메뉴는 컨트롤 바로 아래 제자리에 뜹니다.** 스크롤하면 컨트롤과 함께 움직이고, 아래 공간이
-모자라도 페이지를 스크롤하지 않습니다. `overflow: hidden` 인 조상(카드 · 팝업) 안에서는 잘리므로
-그때 `hasPortal` 을 켭니다 — `Datepicker` · `Tooltip` 과 같은 이름입니다.
+모자라면 **위로 뒤집힙니다** — 화면 가장자리와 8px 를 띄우고, 위아래 모두 모자라면 넓은 쪽으로
+열리며 높이는 줄지 않습니다. 페이지는 스크롤하지 않습니다. `Datepicker` 의 달력과 같은 규칙입니다.
+`overflow: hidden` 인 조상(카드 · 팝업) 안에서는 잘리므로 그때 `hasPortal` 을 켭니다 —
+`Datepicker` · `Tooltip` 과 같은 이름입니다.
+
+`menuPlacement` 는 `react-select` 의 이름과 값 그대로지만 **뜻이 다릅니다** — 기본 `"auto"` 는
+위치 모드와 상관없이 화면 기준으로 뒤집고, `"bottom"` · `"top"` 은 그 방향에 고정합니다.
 
 ```tsx
-<Select options={OPTIONS} />                          // 제자리 — 기본
-<Select options={OPTIONS} hasPortal />                // body 로 나가 잘리지 않는다. 화면에 맞춰 위로 뒤집힌다
+<Select options={OPTIONS} />                          // 제자리 — 기본. 아래가 모자라면 위로 뒤집힌다
+<Select options={OPTIONS} menuPlacement="bottom" />   // 언제나 아래
+<Select options={OPTIONS} hasPortal />                // body 로 나가 잘리지 않는다. 뒤집기는 같다
 <Select options={OPTIONS} menuPosition="static" />    // 문서 흐름 안. 아래 내용을 밀어낸다
 <Select options={OPTIONS} menuPortalTarget={modalEl} /> // 특정 요소로 내보낸다 — hasPortal 보다 우선
 ```

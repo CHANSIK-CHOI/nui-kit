@@ -25,6 +25,7 @@ import {
   NuiDropdownIndicator,
   NuiMenu,
   NuiMultiValueRemove,
+  NuiMenuPortal,
   NuiSelectContainer,
 } from "./SelectIndicators.js";
 import { getMergedAriaIds } from "../Field/Field.context.js";
@@ -107,9 +108,10 @@ export function needsSelectPortalRoot({
  *
  * ⚠️ **`"static"` 은 react-select 에 넘기지 않는다.** 공식 값이 `absolute | fixed` 둘뿐이다.
  *
- * ⚠️ **`menuPlacement` 기본은 `"bottom"`** — 뒤집지 않는다. `Datepicker` 에 자동 뒤집기가
- *    없어서 둘을 맞췄다. 그래도 `fixed`(`hasPortal`)에서는 react-select 가 `menuPlacement` 와
- *    상관없이 뷰포트 기준으로 줄이거나 뒤집는다 — 넘침 처리는 Datepicker 와 함께 다음 작업이다.
+ * ⚠️ **`menuPlacement` 기본은 `"auto"`** (2026-09-17) — 아래가 모자라면 위로 뒤집는다. 판정은
+ *    react-select 가 아니라 `internal/dropdownPlacement` 가 하고 `Datepicker` 와 같다
+ *    (Select.md §6-7 「넘침」). `NuiMenu` 가 이 값을 `selectProps.menuPlacement` 로 읽는다 —
+ *    `"bottom"` · `"top"` 이면 방향 고정. `static` 은 흐름 안이라 언제나 `"bottom"` 이다.
  */
 export function resolveMenuPlacementProps(
   input: MenuPlacementInput,
@@ -134,7 +136,7 @@ export function resolveMenuPlacementProps(
 
   return {
     menuPosition: menuPosition ?? (usesOurPortal ? "fixed" : "absolute"),
-    menuPlacement: menuPlacement ?? "bottom",
+    menuPlacement: menuPlacement ?? "auto",
     menuPortalTarget: hasConsumerTarget
       ? menuPortalTarget!
       : usesOurPortal
@@ -169,9 +171,9 @@ export function resolveMenuPlacementProps(
  *
  * ⚠️ 목록에 없는 것은 **일부러** 남긴 것이다. 크게 두 부류다.
  *   1) react-select 의 기능 스타일 — 지우면 동작이 깨진다
- *      · menuPortal 의 `position` `left` `top` `width` — portal 래퍼의 배치 계산.
- *        이쪽은 대체하지 않아 emotion 이 그대로 돌고 `zIndex` 만 우리가 얹는다
- *      · menuList 의 `maxHeight` — `maxMenuHeight` prop 이 소유한다
+ *      · menuPortal 의 `position` `left` `top` `width` — portal 래퍼의 배치. 좌표는 `NuiMenuPortal` 이
+ *        추적해 넘기고, `height` · `pointerEvents` · `zIndex` 는 우리가 더한다(`getResolvedSelectStyles`)
+ *      · menuList 의 `overflowY` · `position` — 목록 스크롤. `maxHeight` 는 우리가 덮는다(같은 곳)
  *      · valueContainer 의 `display` — 단일=grid / 다중=flex 전환에 의존
  *      · indicatorsContainer 의 `alignSelf` — 컨트롤 높이 추종
  *      · control 의 `flexWrap` `justifyContent` — 칩 줄바꿈 레이아웃
@@ -373,6 +375,9 @@ export function getResolvedSelectComponents<IsMulti extends boolean>(
     // 갈아끼우면 퇴장 모션을 잃지만 그것은 **화면에 보인다**(tokens.md §1-2).
     // `ValueContainer` 를 감싸는 것과 갈리는 자리다: aria 는 조용히 깨진다.
     SelectContainer: NuiSelectContainer,
+    // portal 래퍼 — 컨트롤 rect 를 우리가 추적한다(Select.md §6-7 「배치의 소유권」). react-select 의
+    // 것은 자기 판정의 좌표가 바뀔 때만 갱신해 우리 방향 판정과 어긋난다. 기본값이다
+    MenuPortal: NuiMenuPortal,
     ...components,
     ...overrides,
   };
@@ -432,13 +437,41 @@ export function getResolvedSelectStyles<IsMulti extends boolean>(
 
   const consumerMenuPortal = consumerStyles.menuPortal;
 
+  // portal 래퍼를 **컨트롤 rect 를 입은 유령 상자**로 만든다 (2026-09-17 · Select.md §6-7 「배치의
+  // 소유권」). 좌표(`offset` · `rect`)는 `NuiMenuPortal` 이 컨트롤을 추적해 **위치 기준으로 이미 맞춰**
+  // 넘긴다 — `offset` 이 윗변이고 `rect.left` 도 같은 기준이라 base 의 `top` · `left` 가 그대로 맞는다.
+  // 여기서는 높이만 더한다. 상자가 컨트롤과 같으면 메뉴의 `top: 100%` · `bottom: 100%` 가 제자리일
+  // 때와 같은 자리를 가리킨다 — `Datepicker.__portal` 과 같은 꼴이다.
+  //
+  // ⚠️ **`pointerEvents: "none"` 이 없으면 래퍼가 컨트롤 위를 덮어 클릭을 먹는다.** 메뉴는
+  //    `_select.scss` 가 `auto` 로 되살린다.
   resolved.menuPortal = (base, props) => {
+    const { rect } = props as unknown as { rect: { height?: number } };
     const nextBase: CSSObjectWithLabel = {
       ...base,
+      height: rect.height,
+      pointerEvents: "none",
       zIndex: MENU_PORTAL_Z_INDEX,
     };
 
     return consumerMenuPortal ? consumerMenuPortal(nextBase, props) : nextBase;
+  };
+
+  const consumerMenuList = consumerStyles.menuList;
+
+  // 목록 높이는 **언제나 `maxMenuHeight`** 다 — react-select 의 `MenuPlacer` 가 줄인 `maxHeight`
+  // (③ 줄임)를 덮는다. 우리 판정은 이 높이로 방향을 정했으므로, 줄어든 값이 새면 판정과 보이는
+  // 높이가 갈린다 (Select.md §6-7 「넘침」 · 사용자 결정 — 줄이지 않고 넓은 쪽으로 넘친다).
+  resolved.menuList = (base, props) => {
+    const { selectProps } = props as unknown as {
+      selectProps: { maxMenuHeight: number };
+    };
+    const nextBase: CSSObjectWithLabel = {
+      ...base,
+      maxHeight: selectProps.maxMenuHeight,
+    };
+
+    return consumerMenuList ? consumerMenuList(nextBase, props) : nextBase;
   };
 
   return resolved as StylesConfig<
