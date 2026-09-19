@@ -132,6 +132,10 @@ export default function SelectPage() {
           <code>aria-invalid</code> 가 붙는다
         </li>
         <li>
+          <code>Field</code> 에 <code>required</code> 를 주면 입력에{" "}
+          <code>aria-required</code> 가 붙는다. <code>MultiSelect</code> 도 같다
+        </li>
+        <li>
           <kbd>↑</kbd> <kbd>↓</kbd> 로 옮기고 <kbd>Enter</kbd> 로 고르고{" "}
           <kbd>Esc</kbd> 로 닫는다
         </li>
