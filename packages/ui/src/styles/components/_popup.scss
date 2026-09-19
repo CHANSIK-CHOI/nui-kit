@@ -5,7 +5,7 @@
 //
 // 구조: .nui-popup > (.nui-popup__dim + .nui-popup__positioner > .nui-popup__panel)
 // variant: --dialog(기본) / --bottom-sheet / --full
-// size:    --small / (regular=기본) / --large
+// size:    --small / (medium=기본) / --large
 //
 // 공개 훅
 //   크기 : --nui-popup--lg-width / -md-width / -sm-width
@@ -17,7 +17,7 @@
 //
 // ⚠️ 너비 훅에 옵션 이름이 붙는 이유:
 //    이름을 하나(--nui-popup-width)만 두면 소비자가 그걸 :root 에 설정한 순간
-//    small/regular/large 세 자리가 전부 같은 폭이 되어 크기 variant 가 죽는다.
+//    small/medium/large 세 자리가 전부 같은 폭이 되어 크기 variant 가 죽는다.
 //
 // ⏸️ 원본은 데스크톱에서 내부 여백을 card → section 으로 키웠으나
 //    브레이크포인트 대응이 보류 상태라 card 값으로 통일했다.
@@ -27,6 +27,11 @@
     position: fixed;
     inset: 0;
     z-index: var(#{v("z-overlay-layer")});
+    // ⚠️ 루트가 클릭을 안 받아야 dim 이 받는다. `__positioner` 가 화면 전체를 덮는
+    //    flex 상자라, 여기가 `none` 이 아니면 positioner 가 dim 위에서 클릭을 먹어
+    //    「dim 을 누르면 닫힌다」가 조용히 죽는다 (2026-09-09 · 문서를 쓰다 발견).
+    //    dim 과 panel 이 `auto` 로 다시 켠다.
+    pointer-events: none;
 
     &__dim {
       position: absolute;
@@ -55,9 +60,11 @@
       max-height: min(calc(100dvh - 2.5rem), 45rem);
       overflow: hidden;
       background: var(#{v("layer-floating")});
+      // 떠 있는 것의 가장자리는 반투명 링이다 — 실선과 그림자를 같이 쓰면
+      // 실선이 이겨서 그림자가 안 보인다 (design-system.md §2-5-2).
       border: #{hook("popup--border-width", var(#{v("border-width-1")}))} solid
-        var(#{v("border-form")});
-      border-radius: #{hook("popup--radius", var(#{v("radius-3")}))};
+        var(#{v("border-floating")});
+      border-radius: #{hook("popup--radius", var(#{v("radius-5")}))};
       box-shadow: var(#{v("shadow-3")});
       pointer-events: auto;
       transform-origin: center;
@@ -95,7 +102,7 @@
     &__title {
       color: var(#{v("text-primary")});
 
-      @include typo(6, "bold");
+      @include typo(5, "bold");
     }
 
     &__close {
@@ -103,6 +110,7 @@
       appearance: none;
       margin: 0;
       padding: 0;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
 
@@ -158,31 +166,69 @@
       flex-direction: column;
       gap: var(#{v("space-component-gap")});
       overflow-y: auto;
+      // 본문 끝에 닿아도 스크롤이 **뒤 페이지로 넘어가지 않는다** (2026-09-15 · 실기기).
+      // 배경 잠금은 `PopupHost` 를 지나는 명령형 경로에만 걸리므로(spec §6-2), 선언형으로
+      // 직접 렌더한 팝업은 이 한 줄이 없으면 본문을 끝까지 민 뒤부터 뒤가 따라 움직인다.
+      overscroll-behavior: contain;
       padding: var(#{v("space-panel-compact")}) var(#{v("space-panel-card")})
         var(#{v("space-panel-card")});
     }
 
-    &__icon {
-      display: inline-flex;
-      flex-shrink: 0;
-      align-self: center;
-      align-items: center;
-      justify-content: center;
-      width: var(#{v("size-field")});
-      height: var(#{v("size-field")});
-      color: var(#{v("text-info")});
-      // 콘텐츠 위에 얹는 은은한 면 — 그라디언트는 쓰지 않는다 (design-system.md §2-5)
-      background: var(#{v("surface-neutral-soft")});
-      border: #{hook("popup--border-width", var(#{v("border-width-1")}))} solid
+    // 스크롤 경계선 ★ (2026-09-08 · 08 DL2)
+    //
+    // SEED 는 헤더 아래 경계선(Divider Visibility)과 본문 하단 Scroll Fog 를
+    // 둔다. **Fog 는 그라디언트라 쓰지 않고**(design-system.md §2-5) 위아래
+    // 같은 수단인 선으로 옮겼다. 위는 "위로 더 있다", 아래는 "아래로 더 있다".
+    //
+    // ⚠️ `border` 가 아니라 `inset box-shadow` 다. 선이 생길 때 테두리가
+    //    레이아웃을 1px 밀어 **글이 움찔한다** — 스크롤 중에 특히 눈에 띈다.
+    //    소비자 눈에는 같은 선이므로 두께 훅도 같이 쓴다 (tokens.md §3-8).
+    &__body[data-scrolled-top="true"] {
+      box-shadow: inset 0
+        #{hook("popup--border-width", var(#{v("border-width-1")}))} 0
         var(#{v("border-section")});
-      border-radius: var(#{v("radius-full")});
-      box-shadow: var(#{v("shadow-inset-soft")});
     }
+
+    &__body[data-scrolled-bottom="true"] {
+      box-shadow: inset 0
+        calc(-1 * #{hook("popup--border-width", var(#{v("border-width-1")}))}) 0
+        var(#{v("border-section")});
+    }
+
+    &__body[data-scrolled-top="true"][data-scrolled-bottom="true"] {
+      box-shadow:
+        inset 0 #{hook("popup--border-width", var(#{v("border-width-1")}))} 0
+          var(#{v("border-section")}),
+        inset 0
+          calc(-1 * #{hook("popup--border-width", var(#{v("border-width-1")}))})
+          0 var(#{v("border-section")});
+    }
+
+    // ⚠️ `&__icon` 에 **골격은 규칙을 두지 않는다** ★ (2026-09-11)
+    //
+    // 이 자리를 쓰는 것은 `Alert`·`Confirm` 뿐이고(셸 셋은 타입에서 `icon` 을 닫았다),
+    // 크기·색은 그 둘의 tone 계약이라 아래 프리셋 절이 갖는다. 골격이 쥐고 있었더니
+    // 면을 없애는 변경이 **쓰지도 않는 셸 셋까지 따라가** 28px 글리프가 56px 빈 상자
+    // 안에 뜨는 자리가 생겼다(리뷰 실측 · LayerPopup 데모).
+    //
+    // 골격이 소유하는 것은 **구조 하나** — 「아이콘이 오면 본문 맨 앞 div 로 감싼다」.
+    // 그 div 를 어떻게 그릴지는 감싼 쪽이 정한다.
 
     &__description {
       color: var(#{v("text-secondary")});
 
-      @include typo(3, "regular");
+      @include typo(2, "regular");
+    }
+
+    // 표준 푸터(confirmLabel · cancelLabel)의 버튼 묶음. Alert · Confirm 의 것과 같다.
+    &__actions {
+      #{cls("button-group")}__wrap {
+        width: 100%;
+      }
+
+      #{cls("button-group")}__item {
+        display: flex;
+      }
     }
 
     &__foot {
@@ -214,7 +260,89 @@
     &--bottom-sheet &__panel {
       width: 100%;
       max-height: min(88dvh, 45rem);
-      border-radius: var(#{v("radius-3")}) var(#{v("radius-3")}) 0 0;
+      border-radius: var(#{v("radius-5")}) var(#{v("radius-5")}) 0 0;
+    }
+
+    // ── 끄는 띠와 손잡이 ★ (2026-09-15 · G1 · spec §6-7 · §9)
+    //
+    // **끄는 면은 이 띠 하나다** — 패널 위쪽 44(`size-control-option`). 보이는 막대는 36×4 로
+    // 그대로 두고 **누르는 범위만** 넓힌다. SEED `bottom-sheet-handle.yaml` 이 `root`(36×4)와
+    // `touchArea`(44×44)를 다른 슬롯으로 두는 그대로다. 이 저장소가 닫기 버튼(40→44)과
+    // 달력 이전·다음(32→44)에 쓰는 것과 같은 꼴이다 (a11y.md §8 「보이는 크기와 누르는 크기」).
+    //
+    // ⚠️ **헤더는 끄는 면이 아니다.** 예전에는 헤더 전체가 끌렸는데 셋이 걸렸다 — 제목이 두
+    //    줄이면 끄는 면이 두 배가 되어 계약이 아니게 되고, `touch-action: none` 이 제목 선택을
+    //    막고, 헤더에 컨트롤을 넣는 순간 그 컨트롤을 일일이 걸러 내야 한다.
+    //
+    // `position: absolute` 라 **레이아웃을 차지하지 않는다.** 자리는 아래 여백 규칙이 만든다.
+    //
+    // ⚠️ **띠 높이와 비워 둔 자리는 언제나 같다** ★ (2026-09-15 리뷰). 띠만 44 로 키우고 자리를
+    //    32 로 두었더니 띠가 **제목을 12px 덮었고**, 막대를 끄면 20px 을 덮어 제목 중앙이 띠
+    //    안으로 들어갔다 — 그 시트에서는 제목을 끌면 닫혔다. 헤더를 끄는 면에서 뺀 이유가
+    //    그대로 되살아난 것이다. 둘을 한 값으로 묶으면 겹칠 구간 자체가 없다.
+    //
+    //      막대가 보이면  띠 44 · 자리 44 (SEED touchArea)
+    //      막대를 끄면    띠 24 · 자리 24 (기본 여백 그대로)
+    //
+    // ⚠️ 띠가 닫기 버튼과 겹치지만 X 가 DOM 뒤이고 `z-index: 1` 이라 X 가 클릭을 받는다.
+    &--has-drag &__handle {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      // ⚠️ 자리와 **같은 토큰**이다. 막대가 없을 때 비우는 것은 헤더·본문의 기본 여백
+      //    `space-panel-card` 이므로 띠도 그것을 쓴다 — 값이 같은 다른 토큰(`space-5`)을 쓰면
+      //    한쪽이 움직일 때 띠가 제목을 덮는 결함이 조용히 되살아난다.
+      height: var(#{v("space-panel-card")});
+      z-index: 1;
+      cursor: grab;
+      // 잡은 동안은 쥔 손 — 누르는 순간 「잡혔다」를 커서가 말한다 (2026-09-17 · `/review-animations`)
+      &:active {
+        cursor: grabbing;
+      }
+      // 끄는 부분에만 건다 — 본문은 스크롤한다 (motion.md §8)
+      touch-action: none;
+      user-select: none;
+    }
+
+    &--has-handle &__handle {
+      height: var(#{v("size-control-option")});
+    }
+
+    // 막대는 `hasDragHandle` 일 때만 — 띠는 그것과 무관하게 남는다.
+    // 위에서 8(`space-2`) — SEED `fromTop: 6` 은 우리 스케일에 6 이 없다.
+    //
+    // 훅 접두어가 `popup--` 가 아니라 `bottom-sheet--` 인 이유 — 소비자가 import 하는
+    // 이름은 `BottomSheet` 다 (tokens.md §1-3). 둥글기는 `radius-full` 고정.
+    // 막대 색 `surface-handle` 은 gray-8 — a4 는 1.23 으로 거의 안 보였다 (spec §9).
+    &--has-handle &__handle::before {
+      content: "";
+      position: absolute;
+      top: var(#{v("space-2")});
+      left: 50%;
+      width: #{hook("bottom-sheet--handle-width", 2.25rem)};
+      height: #{hook("bottom-sheet--handle-height", 0.25rem)};
+      border-radius: var(#{v("radius-full")});
+      background: var(#{v("surface-handle")});
+      transform: translateX(-50%);
+    }
+
+    // 막대가 보이면 띠와 **같은 44** 를 비운다 — 위 경고의 「한 값」이 여기다.
+    // 막대를 끈 시트는 기본 여백(`space-panel-card` 24)이 띠 24 와 이미 같아 규칙이 없다.
+    &--has-handle &__head {
+      padding-top: var(#{v("size-control-option")});
+    }
+
+    // 닫기 버튼이 제목을 밀지 않게 헤더 높이도 같은 만큼 (0,3,0) — `--has-close &__head` 를 이긴다
+    &--has-handle#{cls("popup")}--has-close &__head {
+      min-height: calc(
+        var(#{v("size-control-option")}) + var(#{v("size-control-lg")})
+      );
+    }
+
+    // 헤더가 없으면 본문이 그 자리를 대신 비운다
+    &--has-handle#{cls("popup")}--no-header &__body {
+      padding-top: var(#{v("size-control-option")});
     }
 
     // ── variant: full
@@ -293,12 +421,46 @@
   // ── Alert / Confirm 공통 (가운데 정렬 메시지형)
   #{cls("popup-alert")},
   #{cls("popup-confirm")} {
-    #{cls("popup")}__header-content {
-      text-align: center;
-    }
+    // 제목이 본문에 온다 — head 를 렌더하지 않으므로 `__header-content` 도 없다.
+    // 가운데 정렬은 `--align-center &__body` 가 이미 하고, `__title` 의 typo 는
+    // 골격의 것과 같아 여기서 다시 적지 않는다 (spec §9 「지워진 것」).
 
-    #{cls("popup")}__title {
-      @include typo(6, "bold");
+    // ── 아이콘 — **글리프만 선다. 면도 테두리도 없다** ★ (2026-09-11)
+    //
+    // 예전에는 56px 회색 원(`surface-neutral-soft` + `border-section` + `shadow-inset-soft`)
+    // 안에 24px 글리프가 있었다. 배지가 하나 더 있는 셈이라 제목보다 먼저 눈에 들어왔다.
+    // 지금은 **글리프가 그 56 을 그대로 차지한다** — 그릴 것이 하나면 그것이 tone 을 말한다.
+    //
+    // 덤으로 대비가 쉬워졌다. 알파 면 위가 아니라 패널 배경(`layer-floating`) 위라
+    // 합성 없이 재진다 (spec §9 · §11).
+    //
+    // **이 규칙이 골격이 아니라 여기 있는 이유** — `icon` 자리를 쓰는 것은 이 둘뿐이다.
+    // 골격에 두면 쓰지 않는 셸 셋까지 크기·색을 물려받는다 (spec §3-1).
+    //
+    // ⚠️ **`:where()` 로 상세도를 0 으로 낮춘다** (styles.md §7-1 · 2026-09-11 리뷰).
+    //    그냥 `.nui-popup-alert .nui-popup__icon` 이면 (0,2,0)이라 아래 tone 절과 **같고**,
+    //    그러면 tone 이 상세도가 아니라 **소스 순서로만** 이긴다. 골격에 있던 시절에는
+    //    기본이 (0,1,0)이라 그 문제가 없었다 — 자리를 옮기며 생긴 빚이다.
+    //    순서를 바꾸면 색이 조용히 뒤바뀌는 모양이고, Switch 의 readonly/error 사고가 그것이다.
+    //    `:where(&)` 는 **부모 셀렉터 목록 전체**를 감싼다 — 이 블록이 둘을 함께 열고
+    //    있으므로 `:where(.nui-popup-alert, .nui-popup-confirm)` 이 된다.
+    :where(&) #{cls("popup")}__icon {
+      display: inline-flex;
+      flex-shrink: 0;
+      align-self: center;
+      align-items: center;
+      justify-content: center;
+      width: var(#{v("size-field")});
+      height: var(#{v("size-field")});
+      // 기본 tone(`info`)의 선 색. 나머지 셋은 아래 tone 절이 덮는다.
+      color: var(#{v("text-info")});
+
+      // 자리가 곧 크기다 — `:where(.nui-icon)` 의 100% 가 이 56 을 채운다 (styles.md §7-1).
+      // 그래도 명시해 둔다: 슬롯 규칙이 바뀌어도 이 자리는 56 이어야 한다.
+      #{cls("icon")} {
+        width: 100%;
+        height: 100%;
+      }
     }
 
     #{cls("popup")}__description {
@@ -306,7 +468,19 @@
       color: var(#{v("text-secondary")});
     }
 
-    &#{cls("popup")}--no-header {
+    // 본문 위를 더 연다 — 아이콘이 56px 로 커지면서 패널 천장에 붙어 보였다.
+    // ⚠️ 상세도를 소스 순서에 맡기지 않는다 (styles.md §7). 골격의
+    //    `--no-header &__body`(0,2,0)와 같은 값이 되므로 `--no-header` 를 함께 적어
+    //    (0,3,0)으로 올린다. Alert·Confirm 은 그 클래스가 **항상** 붙는다.
+    &#{cls("popup")}--no-header #{cls("popup")}__body {
+      padding-top: calc(var(#{v("space-5")}) + var(#{v("space-4")}));
+    }
+
+    // ⚠️ **`--no-title` 이다. `--no-header` 가 아니다** (2026-09-11).
+    // 제목을 본문으로 내린 뒤 이 둘은 다른 것을 잰다 — `--no-header` 는 "head 노드가
+    // 없다" 인데 Alert·Confirm 에서는 **항상 참**이라, 그대로 두면 제목이 있는 알림에도
+    // 180px 하한과 20rem 설명 폭이 걸린다 (spec §2 · §9).
+    &#{cls("popup")}--no-title {
       #{cls("popup")}__body {
         justify-content: center;
         min-height: 11.25rem;
@@ -317,6 +491,33 @@
         max-width: 20rem;
         margin: 0 auto;
       }
+    }
+
+    // 제목과 설명은 한 문장의 두 부분이라 더 붙인다 — 본문 기본 gap(12)이 아이콘↔제목이고
+    // 여기만 8 이다. SEED `alert-dialog.yaml` 의 `header.gap: x1_5`(6)를 우리 스케일로
+    // 옮긴 값이다 (spec §9 고유 치수).
+    #{cls("popup")}__title + #{cls("popup")}__description {
+      margin-top: calc(var(#{v("space-2")}) - var(#{v("space-component-gap")}));
+    }
+
+    // ── tone — **바뀌는 것은 선 색 하나다**
+    //
+    // 면이 없으므로 갈아끼울 면도 없다. 글리프 모양은 `tone.tsx` 가 고른다.
+    //
+    // 기본 `info` 는 클래스가 없다 — `__icon` 의 기본 색이 이미 `text-info` 다.
+    // 대비는 패널 표면(`layer-floating`) 위에서 두 테마로 쟀고 라이트 최저가 warning
+    // 4.41 · 다크 최저가 danger 7.18 이다. 아이콘은 글자가 아니므로 기준이 4.5 가 아니라
+    // 3.0 이다 (a11y.md §4-1). `check-a11y.mjs` 가 tone 마다 따로 잰다.
+    &--success #{cls("popup")}__icon {
+      color: var(#{v("text-success")});
+    }
+
+    &--warning #{cls("popup")}__icon {
+      color: var(#{v("text-warning")});
+    }
+
+    &--danger #{cls("popup")}__icon {
+      color: var(#{v("text-danger")});
     }
 
     &__actions {

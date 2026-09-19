@@ -58,6 +58,16 @@ const TARGETS = [
   },
   { name: "Field", file: "components/Field/Field.tsx", type: "FieldProps" },
   {
+    name: "ToastHost",
+    file: "components/Toast/ToastHost.tsx",
+    type: "ToastHostProps",
+  },
+  {
+    name: "PopupHost",
+    file: "components/Popup/PopupHost.tsx",
+    type: "PopupHostProps",
+  },
+  {
     name: "Field.Item",
     file: "components/Field/Field.tsx",
     type: "FieldItemProps",
@@ -68,14 +78,21 @@ const TARGETS = [
     type: "FieldGridProps",
   },
   {
-    name: "Field.Description",
+    name: "Field.Header",
     file: "components/Field/Field.tsx",
-    type: "FieldDescriptionProps",
+    type: "FieldHeaderProps",
   },
   {
     name: "Field.Message",
     file: "components/Field/Field.tsx",
     type: "FieldMessageProps",
+  },
+  // 2026-09-09 — spec 대조가 `as` · `htmlFor` 를 「코드에 없는 prop」으로 잡았다. 없는 게 아니라
+  //    Field.Label 이 추출 목록에 빠져 있었다. 문서 표도 같이 비어 있었다.
+  {
+    name: "Field.Label",
+    file: "components/Field/Field.tsx",
+    type: "FieldLabelProps",
   },
   {
     name: "Textfield",
@@ -86,11 +103,6 @@ const TARGETS = [
     name: "Message",
     file: "components/Textfield/Message.tsx",
     type: "MessageProps",
-  },
-  {
-    name: "TextfieldBtn",
-    file: "components/Textfield/TextfieldBtn.tsx",
-    type: "TextfieldBtnProps",
   },
   {
     name: "Search",
@@ -124,35 +136,56 @@ const TARGETS = [
     type: "RadioGroupProps",
   },
   { name: "Switch", file: "components/Switch/Switch.tsx", type: "SwitchProps" },
-  {
-    name: "PopupBase",
-    file: "components/Popup/Popup.types.ts",
-    type: "PopupBaseProps",
-  },
+  // `Alert` · `Confirm` 은 컴포넌트가 아니라 훅 옵션이다 (2026-09-17). 표는 옵션 타입에서 뽑는다 —
+  // 내용의 기본값은 Host 가 그리는 구현 파일에, 옵션에만 있는 `shouldCloseOn*` 의 기본값은
+  // `PopupHost.tsx` 의 구조분해에 있다.
   {
     name: "Alert",
     file: "components/Popup/Popup.types.ts",
-    type: "AlertProps",
+    type: "AlertPopupOptions",
+    defaultsFrom: [
+      "components/Popup/Alert.tsx",
+      "components/Popup/PopupHost.tsx",
+    ],
   },
   {
     name: "Confirm",
     file: "components/Popup/Popup.types.ts",
-    type: "ConfirmProps",
+    type: "ConfirmPopupOptions",
+    defaultsFrom: [
+      "components/Popup/Confirm.tsx",
+      "components/Popup/PopupHost.tsx",
+    ],
   },
   {
     name: "LayerPopup",
     file: "components/Popup/Popup.types.ts",
     type: "LayerPopupProps",
+    // 타입만 있는 파일이라 기본값이 없다. 구현에서 읽는다 — 앞의 파일이 이긴다.
+    defaultsFrom: [
+      "components/Popup/LayerPopup.tsx",
+      "components/Popup/PopupBase.tsx",
+    ],
   },
   {
     name: "BottomSheet",
     file: "components/Popup/Popup.types.ts",
     type: "BottomSheetProps",
+    // 타입만 있는 파일이라 기본값이 없다. 구현에서 읽는다 — 앞의 파일이 이긴다.
+    defaultsFrom: [
+      "components/Popup/BottomSheet.tsx",
+      "components/Popup/PopupBase.tsx",
+    ],
   },
   {
     name: "FullPopup",
     file: "components/Popup/Popup.types.ts",
     type: "FullPopupProps",
+    // 타입만 있는 파일이라 기본값이 없다. 구현에서 읽는다 — 앞의 파일이 이긴다.
+    defaultsFrom: [
+      "components/Popup/FullPopup.tsx",
+      "components/Popup/PopupBase.tsx",
+    ],
   },
   {
     name: "Toast",
@@ -214,7 +247,11 @@ const TARGETS = [
 ];
 
 const entryFiles = [
-  ...new Set(TARGETS.map((t) => join(UI_ROOT, "src", t.file))),
+  ...new Set(
+    TARGETS.flatMap((t) =>
+      [t.file, ...(t.defaultsFrom ?? [])].map((f) => join(UI_ROOT, "src", f)),
+    ),
+  ),
 ];
 
 const configPath = join(UI_ROOT, "tsconfig.json");
@@ -249,11 +286,66 @@ function docOf(symbol) {
 }
 
 /**
+ * 리터럴 유니온이면 값을 **전부 펼친 문자열**을, 아니면 null 을 돌려준다.
+ *
+ * ⚠️ 왜 필요한가 (2026-09-09) — 표에 `ButtonShape` 라고만 찍히면 소비자는 무엇을
+ *    넣을 수 있는지 모른다. 별칭 이름은 우리 사정이고 소비자가 쓰는 것은 값이다.
+ *    실제로 27자리가 그랬다 — `ButtonSize` · `SelectionTone` · `TooltipPlacement` …
+ *
+ * ⚠️ **숫자 리터럴도 편다** (2026-09-14). `AccordionHeadingLevel` 이 표에 이름으로만
+ *    찍혀 `2`~`6` 을 받는다는 사실이 문서에서 사라졌다. 문자열일 때와 같은 이유다 —
+ *    가르는 것은 리터럴이냐이지 무슨 리터럴이냐가 아니다.
+ *
+ *    넓히기 전후로 `props.json` 을 전량 대조했다 — **438자리 중 둘**이 바뀐다
+ *    (scripts.md §3). 하나는 위 `Accordion.headingLevel`, 다른 하나는
+ *    **`Field.Grid.columns` 가 `1 | 2 | 3 | 4` → `1 | 2 | 3 | 4 | undefined`** 다.
+ *    그 자리는 인라인으로 적혀 있어 아래 `decl.type.getText()` 경로를 타느라 혼자
+ *    `| undefined` 가 없었다 — 다른 optional 유니온(`"multiple" | "single" | undefined`)과
+ *    표기가 같아지는 방향이라 그대로 받는다.
+ *
+ * ⚠️ 별칭을 무조건 풀지는 않는다. `ToastAction` 같은 객체 타입은 펼치면 표가
+ *    터지고, `boolean` 은 `false | true` 가 되어 오히려 나빠진다. 그래서 **모든
+ *    갈래가 문자열 · 숫자 리터럴일 때만** 편다. `boolean` 의 갈래는 `BooleanLiteral`
+ *    이라 둘 다 아니어서 지금처럼 걸러진다.
+ *
+ * ⚠️ `undefined` 는 맨 뒤로 보낸다. checker 가 앞에 두는데, 손으로 쓴 표기
+ *    (`"a" | "b" | undefined`)와 순서가 어긋나면 같은 뜻이 두 꼴로 보인다.
+ */
+function expandLiteralUnion(type) {
+  if (!type.isUnion()) return null;
+
+  const literals = [];
+  let hasUndefined = false;
+  for (const member of type.types) {
+    if (member.flags & ts.TypeFlags.Undefined) {
+      hasUndefined = true;
+      continue;
+    }
+    if (member.isStringLiteral()) {
+      literals.push(`"${member.value}"`);
+      continue;
+    }
+    if (member.isNumberLiteral()) {
+      literals.push(String(member.value));
+      continue;
+    }
+    return null;
+  }
+  if (literals.length === 0) return null;
+  return [...literals, ...(hasUndefined ? ["undefined"] : [])].join(" | ");
+}
+
+/**
  * 선언에 적힌 타입 텍스트 (checker 문자열보다 사람이 읽기 좋다).
  * 단 선언이 여럿이면(판별 유니온의 각 갈래 등) 한 갈래만 보여주게 되므로
  * checker 가 합성한 타입 문자열을 쓴다.
+ *
+ * 리터럴 유니온은 **별칭 이름 대신 값**을 보여준다 (`expandLiteralUnion`).
  */
 function typeTextOf(symbol, fallbackType) {
+  const expanded = expandLiteralUnion(fallbackType);
+  if (expanded) return expanded;
+
   const decls = symbol.getDeclarations() ?? [];
   if (decls.length === 1) {
     const decl = decls[0];
@@ -264,29 +356,76 @@ function typeTextOf(symbol, fallbackType) {
   return checker.typeToString(fallbackType).replace(/\s+/g, " ");
 }
 
-/** 컴포넌트 함수의 구조분해 기본값을 뽑는다 */
-function collectDefaults(sourceFile) {
-  const defaults = {};
+/**
+ * 컴포넌트 함수의 구조분해 기본값을 **파라미터 타입 이름별로** 뽑는다.
+ *
+ * ⚠️ 왜 타입별인가 (2026-09-09) — 한 파일에 컴포넌트가 여럿이면 예전 구현은 전부 한
+ *    맵에 섞었고 **뒤에 선언된 것이 앞을 덮었다.** `Field.tsx` 가 그랬다 — `Field` 의
+ *    기본값이 `column`·`start` 인데 표에는 `FieldItem` 의 `row`·`center` 가 찍혔다.
+ *    소비자가 문서만 보고 쓰면 반대로 배치된다.
+ *
+ * 제네릭은 이름만 본다 — `DatepickerProps<TSelected>` → `DatepickerProps`.
+ *
+ * ⚠️ `forwardRef<HTMLDivElement, FieldProps>((props) => …)` 는 파라미터에 타입 주석이
+ *    없다 — 타입이 **호출의 제네릭 인자**에 있다. 그 자리는 두 번째 인자다.
+ */
+function collectDefaultsByType(sourceFile) {
+  const byType = new Map();
+  const merged = {};
+  /** forwardRef 호출을 지나는 동안 그 제네릭 두 번째 인자를 물고 간다 */
+  let inheritedType = null;
   const visit = (node) => {
-    let params = null;
+    let restore = inheritedType;
     if (
+      ts.isCallExpression(node) &&
+      /(^|\.)forwardRef$/.test(node.expression.getText()) &&
+      node.typeArguments?.length >= 2
+    ) {
+      const t = node.typeArguments[1];
+      inheritedType = ts.isTypeReferenceNode(t) ? t.typeName.getText() : null;
+    }
+    const params =
       ts.isFunctionDeclaration(node) ||
       ts.isArrowFunction(node) ||
       ts.isFunctionExpression(node)
-    ) {
-      params = node.parameters;
-    }
+        ? node.parameters
+        : null;
+
     if (params?.[0] && ts.isObjectBindingPattern(params[0].name)) {
+      const found = {};
       for (const el of params[0].name.elements) {
-        if (el.initializer) {
-          defaults[el.name.getText()] = el.initializer.getText();
+        if (el.initializer) found[el.name.getText()] = el.initializer.getText();
+      }
+      Object.assign(merged, found);
+
+      const t = params[0].type;
+      const typeName =
+        t && ts.isTypeReferenceNode(t) ? t.typeName.getText() : inheritedType;
+      if (typeName) {
+        // 같은 타입을 쓰는 함수가 둘이면 먼저 만난 쪽이 소유자다 (본체가 먼저 온다)
+        if (!byType.has(typeName)) byType.set(typeName, {});
+        Object.assign(byType.get(typeName), found);
+      }
+    }
+
+    // 변수 선언의 구조분해 기본값 — `const { shouldCloseOnConfirm = true, ...rest } = item.props`.
+    // 타입 이름이 없으므로 `merged` 에만 넣는다(파라미터 타입으로 주인을 찾은 `byType` 이 이긴다).
+    // 훅 옵션의 기본값이 `PopupHost.tsx` 의 이 꼴에만 있어 표에 비어 나왔다 (2026-09-17 리뷰).
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isObjectBindingPattern(node.name)
+    ) {
+      for (const el of node.name.elements) {
+        if (el.initializer && !(el.name.getText() in merged)) {
+          merged[el.name.getText()] = el.initializer.getText();
         }
       }
     }
     ts.forEachChild(node, visit);
+    inheritedType = restore;
   };
   visit(sourceFile);
-  return defaults;
+  return { byType, merged };
 }
 
 const result = {};
@@ -312,14 +451,40 @@ for (const target of TARGETS) {
   }
 
   const type = checker.getDeclaredTypeOfSymbol(typeSymbol);
-  const defaults = collectDefaults(sourceFile);
+  // 기본값은 `defaultsFrom` 이 있으면 그 파일들에서, 없으면 타입 파일 자신에서 읽는다.
+  // **앞의 파일이 이긴다** — 셸이 자기 기본값을 갖고 나머지는 Base 로 흐르는 꼴이다.
+  //
+  // ⚠️ 셸이 값을 **고정**하는 것(`<PopupBase hasCloseButton={false}>`)은 구조분해 기본값이
+  //    아니라 JSX 속성이라 여기 안 잡힌다. 그래서 Alert·Confirm 은 Base 를 잇지 않는다 —
+  //    이으면 그들이 끈 `hasCloseButton` 이 `true` 로 찍힌다.
+  const defaultFiles = target.defaultsFrom ?? [target.file];
+  const defaults = {};
+  for (const rel of [...defaultFiles].reverse()) {
+    const sf = program.getSourceFile(join(UI_ROOT, "src", rel));
+    if (!sf) {
+      warnings.push(`${target.name}: 기본값 파일 없음 (${rel})`);
+      continue;
+    }
+    const { byType, merged } = collectDefaultsByType(sf);
+    const own = byType.get(target.type);
+    if (!own && rel === target.file && byType.size > 1) {
+      warnings.push(
+        `${target.name}: 파라미터 타입 \`${target.type}\` 을 못 찾아 파일 전체의 기본값을 합쳐 쓴다 — 값이 섞일 수 있다`,
+      );
+    }
+    Object.assign(defaults, own ?? merged);
+  }
 
   const own = [];
   let inheritedCount = 0;
+  // 이름만 남긴다 — spec 대조(scripts/check-specs.mjs)가 「이 prop 이 상속인가」를 물을 때 쓴다.
+  // 타입·설명까지 담으면 React DOM props 수백 개로 파일이 터진다.
+  const inheritedNames = [];
 
   for (const prop of checker.getPropertiesOfType(type)) {
     if (!isOwnDeclaration(prop)) {
       inheritedCount += 1;
+      inheritedNames.push(prop.getName());
       // 상속 props 는 목록에 넣지 않는다. React DOM props 만 수백 개라 표가 터진다.
       //
       // ⚠️ 예외 — **우리가 기본값을 지정한 것은 우리 API 의 일부다.**
@@ -352,6 +517,7 @@ for (const target of TARGETS) {
     sourceFile: target.file,
     props: own,
     inheritedCount,
+    inheritedNames: inheritedNames.sort(),
   };
 }
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Sidebar } from "@/components/Sidebar";
+import { MobileHeader } from "@/components/MobileHeader";
 import { PopupProvider } from "@/components/PopupProvider";
 import { ThemeToggle, THEME_STORAGE_KEY } from "@/components/ThemeToggle";
 
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s · nui-kit",
   },
   description:
-    "Next.js App Router 전용 React UI 컴포넌트 시스템 — 디자인 파운데이션과 컴포넌트 API 문서",
+    "Next.js 와 React 를 위한 UI 컴포넌트 시스템 — 디자인 파운데이션과 컴포넌트 API 문서",
 };
 
 // 첫 페인트 전에 테마를 확정한다. React 가 마운트된 뒤에 칠하면
@@ -38,6 +39,8 @@ export default function RootLayout({
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <PopupProvider>
+          {/* 970px 이하에서만 보인다. 사이드바와 떠 있는 토글은 그 위에서만 */}
+          <MobileHeader />
           <div className="doc-shell">
             <Sidebar />
             <main className="doc-main">{children}</main>

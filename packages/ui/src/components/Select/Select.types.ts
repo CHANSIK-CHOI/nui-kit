@@ -19,6 +19,26 @@ export type SingleSelectValue = SelectOptionValue | null;
 export type MultiSelectValue = SelectOptionValue[];
 
 /**
+ * 컨트롤 높이 단계. `small` 은 없다 — SEED `text-input` 도 두 단계이고, 입력 컨트롤은
+ * 컨트롤 전체가 누르는 타겟이라 KRDS 권장 44 아래로 내리지 않는다 (Select.md §4).
+ */
+export type SelectSize = "large" | "medium";
+
+/**
+ * 메뉴의 **배치 기준.** 안 주면 `hasPortal` 이 정한다 — 켜면 `fixed`, 끄면 `absolute`.
+ *
+ * `absolute` · `fixed` 는 react-select 의 값 그대로이고 **`static` 만 우리 확장**이다
+ * (components.md §9-1 — 이름은 라이브러리 것을 쓰고 값만 넓힌다).
+ *
+ * - `absolute` (기본) — 컨트롤 아래 **제자리.** 스크롤을 CSS 가 따라간다. 잘리는 조상
+ *   안에서는 잘린다 — 그때는 `hasPortal`
+ * - `fixed` (`hasPortal` 의 기본) — **뷰포트를 기준으로** 자리를 잡아 아래가 모자라면
+ *   높이를 줄이거나 위로 뒤집는다. 조상 스크롤은 react-select 의 `autoUpdate` 가 따라간다
+ * - `static` — 문서 흐름 안이라 아래 콘텐츠를 밀어낸다. portal 은 언제나 해제된다
+ */
+export type SelectMenuPosition = "absolute" | "fixed" | "static";
+
+/**
  * Select / MultiSelect 가 공유하는 prop.
  *
  * react-select 의 prop 중 우리가 소유하는 것들은 `Omit` 으로 걷어낸다.
@@ -48,6 +68,7 @@ export type SelectSharedProps<IsMulti extends boolean> = Omit<
   | "id"
   | "inputId"
   | "isDisabled"
+  | "menuPosition"
   | "name"
   | "onChange"
   | "options"
@@ -65,19 +86,32 @@ export type SelectSharedProps<IsMulti extends boolean> = Omit<
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
+  /**
+   * 컨트롤의 한 줄 높이. 기본 `medium`(48) · `large`(56). Button · Textfield 의 같은
+   * 이름과 같은 값이라 `size` 를 안 적어도 나란히 놓인 것과 높이가 맞는다. 메뉴 · 옵션은
+   * 이 값과 무관하고, 다중은 칩이 줄을 넘으면 이 값보다 커진다 (Select.md §4 · §9).
+   * react-select 에 넘기지 않는다.
+   */
+  size?: SelectSize;
   isError?: boolean;
   infoMessage?: string;
   errorMessage?: string;
   /**
-   * 메뉴를 `body` 로 내보내 **잘리는 조상을 탈출한다.**
+   * 메뉴를 `body` 로 내보내 **잘리는 조상을 탈출한다.** 기본 `false` — 컨트롤 아래 제자리에 뜬다.
+   * 카드 · 팝업처럼 `overflow` 로 잘리는 곳 안에 넣을 때 켠다. `Tooltip` · `Datepicker` 와
+   * 같은 이름 · 같은 기본값이다 (components.md §9).
    *
-   * 기본 배치는 제자리(`absolute`)라 조상에 `overflow: hidden` 이 있으면 메뉴가
-   * 잘려 값을 고를 수 없다. 카드·팝업 안에 넣을 때 켠다.
-   * `Tooltip` 의 같은 이름 prop 과 한 규칙이다.
-   *
-   * ⚠️ 소비자가 `menuPortalTarget` 을 직접 주면 그쪽이 이긴다.
+   * 켜면 `menuPosition` 기본이 `"fixed"` 가 된다. `menuPortalTarget` 을 `undefined` 가 아닌
+   * 값으로 주면(`null` 포함) 그 값이 이기고 이 prop 은 무시된다 (Select.md §6-7).
    */
   hasPortal?: boolean;
+  /**
+   * 메뉴의 배치 기준. 안 주면 `hasPortal` 이 정한다 — 켜면 `"fixed"`, 끄면 `"absolute"`.
+   *
+   * `"static"` 이면 문서 흐름에 들어가 아래 콘텐츠를 밀어내고, portal 도 해제된다.
+   * 그 값은 react-select 에 넘기지 않는다 — 공식 값이 아니다 (Select.md §6-7).
+   */
+  menuPosition?: SelectMenuPosition;
   components?: SelectComponentsConfig<
     SelectOption,
     IsMulti,
@@ -98,11 +132,7 @@ export type SelectSharedProps<IsMulti extends boolean> = Omit<
  *    `dayPickerProps` 와 함께 타입을 재수출한다).
  */
 export type SelectChangeAction =
-  | "select-option"
-  | "deselect-option"
-  | "remove-value"
-  | "pop-value"
-  | "clear";
+  "select-option" | "deselect-option" | "remove-value" | "pop-value" | "clear";
 
 export type SelectChangeMeta = {
   /** 무엇을 해서 값이 바뀌었나 */

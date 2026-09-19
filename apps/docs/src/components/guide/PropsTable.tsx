@@ -1,4 +1,22 @@
+import { Fragment, type ReactNode } from "react";
 import propsData from "@/generated/props.json";
+
+/**
+ * JSDoc 설명의 백틱을 `<code>` 로 바꾼다.
+ *
+ * props 설명은 소스의 주석에서 그대로 뽑아 오는데 우리 주석은 마크다운으로
+ * 쓴다 — 그대로 두면 91개 중 32개가 백틱을 글자로 보여준다.
+ * 표 안이라 인라인 코드 하나면 충분하다. 마크다운 전체를 파싱하지 않는다.
+ */
+function withInlineCode(text: string): ReactNode {
+  return text.split(/`([^`]+)`/g).map((part, i) =>
+    i % 2 === 1 ? (
+      <code key={i}>{part}</code>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    ),
+  );
+}
 
 type PropRow = {
   name: string;
@@ -60,7 +78,9 @@ export function PropsTable({ of }: { of: string }) {
                   <span className="doc-type">{prop.type}</span>
                 </td>
                 <td>{prop.default ? <code>{prop.default}</code> : "—"}</td>
-                <td className="doc-wrap">{prop.description || "—"}</td>
+                <td className="doc-wrap">
+                  {prop.description ? withInlineCode(prop.description) : "—"}
+                </td>
               </tr>
             ))}
           </tbody>

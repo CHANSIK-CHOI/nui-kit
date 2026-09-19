@@ -35,8 +35,8 @@ body {
     "Segoe UI",
     Roboto,
     sans-serif;
-  font-size: var(--nui-font-size-4);
-  line-height: var(--nui-line-height-4);
+  font-size: var(--nui-font-size-3);
+  line-height: var(--nui-line-height-3);
   color: var(--nui-text-primary);
   background: var(--nui-layer-default);
   -webkit-font-smoothing: antialiased;
@@ -62,7 +62,7 @@ body {
 .doc-brand {
   display: block;
   font-weight: var(--nui-font-weight-bold);
-  font-size: var(--nui-font-size-4);
+  font-size: var(--nui-font-size-3);
   color: var(--nui-text-primary);
   text-decoration: none;
   margin-bottom: 24px;
@@ -102,18 +102,45 @@ body {
   color: var(--nui-text-disabled);
 }
 
+// 사이트의 누르는 것 — 라이브러리의 `pressable` 믹스인과 같은 네 줄 (styles.md §9-1).
+// 패키지 내부 믹스인이라 여기서는 못 쓰고 인라인으로 둔다. `verify:touch` 가 사이트 전부를 잰다
+.doc-nav-link,
+.doc-badge__label,
+.doc-brand,
+.doc-why__summary,
+.doc-theme-toggle__label,
+.doc-demo-label,
+.preset-group,
+.preset-jump a {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+// 본문 글 안의 링크 — **하이라이트만** 끄고 선택은 막지 않는다 (styles.md §9-1 「걸지 않는 자리」).
+// `user-select: none` 을 걸면 문단을 드래그로 복사할 때 링크 글자만 빠진다.
+.doc-shell a:not([class]) {
+  -webkit-tap-highlight-color: transparent;
+  border-radius: var(--nui-radius-1);
+}
+
 .doc-nav-link {
   display: block;
   padding: 5px 8px;
-  border-radius: var(--nui-radius-2);
+  border-radius: var(--nui-radius-3);
   color: var(--nui-text-secondary);
   text-decoration: none;
-  font-size: var(--nui-font-size-3);
+  font-size: var(--nui-font-size-2);
 }
 
-.doc-nav-link:hover {
-  background: var(--nui-control-bg-hover);
-  color: var(--nui-text-primary);
+// hover 는 hover 가 있는 기기에서만 — 터치는 탭한 뒤 :hover 가 남아 회색이 다음 탭까지 붙는다
+// (styles.md §9 · 2026-09-17 모바일 에뮬레이션 실측)
+@media (hover: hover) and (pointer: fine) {
+  .doc-nav-link:hover {
+    background: var(--nui-control-bg-hover);
+    color: var(--nui-text-primary);
+  }
 }
 
 .doc-nav-link[aria-current="page"] {
@@ -128,21 +155,24 @@ body {
 }
 
 // ─── 타이포
-.doc-main h1 {
-  font-size: var(--nui-font-size-6);
-  letter-spacing: var(--nui-letter-spacing-6);
+// ⚠️ heading 도 `.nui-` 를 뺀다 (2026-09-14). `Accordion` 의 `headingLevel` 이 생기면서
+//    라이브러리가 `h2`~`h6` 를 만들기 시작했다 — 아래 `p` 와 같은 길이다. 빼기 전 실측:
+//    아코디언 항목이 `24px + 8px` 를 받아 닫힌 항목 69 → 101px 였다.
+.doc-main h1:not([class^="nui-"]) {
+  font-size: var(--nui-font-size-5);
+  letter-spacing: var(--nui-letter-spacing-5);
   margin: 0 0 8px;
 }
 
-.doc-main h2 {
-  font-size: var(--nui-font-size-5);
+.doc-main h2:not([class^="nui-"]) {
+  font-size: var(--nui-font-size-4);
   margin: 40px 0 12px;
   padding-top: 12px;
   border-top: 1px solid var(--doc-border);
 }
 
-.doc-main h3 {
-  font-size: var(--nui-font-size-4);
+.doc-main h3:not([class^="nui-"]) {
+  font-size: var(--nui-font-size-3);
   margin: 24px 0 8px;
 }
 
@@ -151,16 +181,20 @@ body {
   margin: 0 0 32px;
 }
 
-.doc-main p {
+// ⚠️ 태그 셀렉터는 라이브러리 요소에도 닿는다 — 레이어 밖이라 `@layer nui.*` 를 이긴다.
+//    당시의 `Field.Description`(<p>) 이 이 규칙의 12px 를 받아 spec 의 -2px 보정이 죽었다
+//    (2026-09-11 실측). `.nui-` 클래스를 가진 요소는 뺀다. 소비자 앱의 리셋도 같은 길로
+//    들어온다 — Foundations 「오염시키지 않는다」에 적었다.
+.doc-main p:not([class^="nui-"]) {
   margin: 0 0 12px;
 }
 
-.doc-main :is(ul, ol) {
+.doc-main :is(ul, ol):not([class^="nui-"]) {
   margin: 0 0 12px;
   padding-left: 20px;
 }
 
-.doc-main li {
+.doc-main li:not([class^="nui-"]) {
   margin-bottom: 4px;
 }
 
@@ -175,15 +209,19 @@ body {
 // ─── 표
 .doc-table-wrap {
   overflow-x: auto;
+  // 스크롤 컨테이너가 자기 안의 absolute 요소(Message 의 예약 live 영역 · sr-only)의
+  // 기준이 되게 한다. 없으면 그것들의 기준이 문서 전체라 표는 잘려도 문서에
+  // 가로 스크롤이 남는다 — Field 페이지 400px 에서 95px 이 실제로 남았다
+  position: relative;
   border: 1px solid var(--doc-border);
-  border-radius: var(--nui-radius-2);
+  border-radius: var(--nui-radius-3);
   margin-bottom: 16px;
 }
 
 .doc-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--nui-font-size-3);
+  font-size: var(--nui-font-size-2);
 }
 
 .doc-table th,
@@ -228,7 +266,7 @@ body {
 //    예제는 데모가 자기 상자에 직접 건다 (Tooltip 의 hasPortal 예제).
 .doc-example {
   border: 1px solid var(--doc-border);
-  border-radius: var(--nui-radius-2);
+  border-radius: var(--nui-radius-3);
   margin-bottom: 20px;
 }
 
@@ -259,9 +297,14 @@ body {
 // 케이스 격자 — 라벨과 실물을 묶어 어느 것이 어느 옵션인지 드러낸다.
 .doc-case-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
   gap: 16px;
   align-items: start;
+}
+
+// `columns` 를 준 격자 — 열 수 고정. 좁은 화면에서는 아래 미디어쿼리가 풀어 흐르게 한다
+.doc-case-grid[data-cols] {
+  grid-template-columns: repeat(var(--doc-case-cols), minmax(0, 1fr));
 }
 
 .doc-case {
@@ -323,7 +366,7 @@ body {
   background: var(--doc-code-bg);
   color: var(--doc-code-fg);
   padding: 14px 16px;
-  border-radius: var(--nui-radius-2);
+  border-radius: var(--nui-radius-3);
   overflow-x: auto;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.8rem;
@@ -356,9 +399,9 @@ body {
   border-left: 3px solid var(--nui-color-info-9);
   background: var(--nui-status-info-soft);
   padding: 10px 14px;
-  border-radius: 0 var(--nui-radius-2) var(--nui-radius-2) 0;
+  border-radius: 0 var(--nui-radius-3) var(--nui-radius-3) 0;
   margin: 0 0 16px;
-  font-size: var(--nui-font-size-3);
+  font-size: var(--nui-font-size-2);
 }
 
 .doc-note--warn {
@@ -366,29 +409,147 @@ body {
   background: var(--nui-status-warning-soft);
 }
 
-@media (max-width: 860px) {
-  .doc-shell {
-    grid-template-columns: 1fr;
-  }
-  .doc-sidebar {
-    position: static;
-    height: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--doc-border);
-  }
-  .doc-main {
-    padding: 32px 20px 64px;
+// ─── 예외 배지 · 설계 노트
+// 문장 층을 만드는 둘이다 (docs-voice 규칙 §1 · §4).
+// 배지는 규칙이 있는 곳을 가리키기만 하고, 설계 노트는 근거를 접는다.
+
+.doc-badges {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.doc-badge {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: var(--nui-font-size-1);
+  line-height: var(--nui-line-height-1);
+}
+
+.doc-badge__label {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  // 누르는 것의 선이라 action-border 다 — border-section(gray-a5)은 배경과
+  // 1.3:1 이라 "누를 수 있다"가 안 보인다 (design-system.md §2-4-0 · a11y.md §4-1)
+  border: 1px solid var(--nui-action-border);
+  border-radius: var(--nui-radius-full);
+  color: var(--nui-text-secondary);
+  background: var(--nui-surface-neutral-soft);
+  text-decoration: none;
+  font-weight: var(--nui-font-weight-bold);
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .doc-badge__label:hover {
+    border-color: var(--nui-action-border-hover);
+    color: var(--nui-text-primary);
   }
 }
 
-// ─── 테마 전환
-// 우측 상단 고정. 스크롤과 무관하게 항상 같은 자리에 있어야
-// "지금 무슨 테마인지"를 확인하러 위로 올라갈 필요가 없다.
-.doc-theme-toggle {
-  position: fixed;
-  top: 16px;
-  right: 20px;
+.doc-badge__label:focus-visible {
+  outline: var(--nui-focus-width) solid var(--nui-focus-color);
+  outline-offset: var(--nui-focus-offset);
+}
+
+.doc-badge__hint {
+  color: var(--nui-text-secondary);
+}
+
+.doc-why {
+  margin: 0 0 24px;
+  border: 1px solid var(--doc-border);
+  border-radius: var(--nui-radius-3);
+  background: var(--doc-bg-subtle);
+}
+
+.doc-why__summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  font-size: var(--nui-font-size-2);
+  color: var(--nui-text-secondary);
+  list-style: none;
+}
+
+.doc-why__summary::-webkit-details-marker {
+  display: none;
+}
+
+// 여는 표시를 직접 그린다 — 브라우저 기본 삼각형은 크기와 색이 제각각이다
+.doc-why__summary::before {
+  content: "▸";
+  display: inline-block;
+  width: 1em;
+  color: var(--nui-text-disabled);
+}
+
+.doc-why[open] > .doc-why__summary::before {
+  transform: rotate(90deg);
+}
+
+.doc-why__summary:focus-visible {
+  outline: var(--nui-focus-width) solid var(--nui-focus-color);
+  outline-offset: calc(-1 * var(--nui-focus-width));
+  border-radius: var(--nui-radius-3);
+}
+
+.doc-why__body {
+  padding: 0 14px 12px;
+  font-size: var(--nui-font-size-2);
+  line-height: var(--nui-line-height-2);
+  color: var(--nui-text-secondary);
+}
+
+.doc-why__body > :first-child {
+  margin-top: 0;
+}
+
+.doc-why__body > :last-child {
+  margin-bottom: 0;
+}
+
+// ─── 모바일 헤더 · 메뉴 패널
+// 970px 이하에서 사이드바 대신 선다. 브랜드 왼쪽, 테마 토글과 목차 버튼 오른쪽.
+// sticky 라 스크롤 중에도 목차에 닿는다 — seed-design 의 상단 바와 같은 자리다.
+.doc-mobile-header {
+  display: none;
+  position: sticky;
+  top: 0;
   z-index: 20;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--doc-border);
+  background: var(--nui-layer-default);
+
+  .doc-brand {
+    margin-bottom: 0;
+  }
+}
+
+.doc-mobile-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+// 목차 패널 본문. 사이드바와 같은 nav 를 전체 화면에 그린다.
+.doc-mobile-menu .doc-nav-link {
+  // 손가락으로 누르는 자리라 사이드바(5px)보다 세로를 넓힌다 — 44px 터치 영역
+  padding: 11px 8px;
+  font-size: var(--nui-font-size-3);
+}
+
+// ─── 테마 전환
+.doc-theme-toggle {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -396,8 +557,57 @@ body {
   border: 1px solid var(--doc-border);
   border-radius: var(--nui-radius-full);
   background: var(--nui-layer-floating);
+}
+
+// 데스크톱 — 우측 상단 고정. 스크롤과 무관하게 항상 같은 자리에 있어야
+// "지금 무슨 테마인지"를 확인하러 위로 올라갈 필요가 없다.
+.doc-theme-toggle--floating {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 20;
   box-shadow: var(--nui-shadow-1);
   backdrop-filter: blur(8px);
+}
+
+// 모바일 헤더 안 — 헤더가 이미 면이라 pill 을 그리지 않는다
+.doc-theme-toggle--inline {
+  padding: 0;
+  border: 0;
+  background: none;
+  gap: 8px;
+}
+
+// ─── 좁은 화면 (970px 이하)
+// ⚠️ 이 블록은 위의 `.doc-theme-toggle` 뒤에 있어야 한다. 상세도가 같아서(클래스 하나)
+//    앞에 두면 `display: flex` 가 `none` 을 덮어 떠 있는 토글이 모바일 헤더 위에 남는다 —
+//    실제로 그랬고 메뉴 버튼 클릭을 가로챘다. 변경점 값은 `MobileHeader.tsx` 의
+//    `DESKTOP_QUERY` 와 같아야 한다.
+@media (max-width: 970px) {
+  .doc-mobile-header {
+    display: flex;
+  }
+  .doc-shell {
+    // `1fr` 은 `minmax(auto, 1fr)` 라 코드 블록·표의 min-content 가 열을 밀어낸다.
+    // 400px 에서 본문이 940px 까지 늘어나 가로 스크롤이 생기던 원인이다.
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+  }
+  .doc-sidebar,
+  .doc-theme-toggle--floating {
+    display: none;
+  }
+  .doc-main {
+    padding: 32px 16px 64px;
+  }
+  // 열 수를 고정한 케이스 격자 — 좁으면 흐른다. 4열 × 120px 버튼은 400px 에 못 들어간다
+  .doc-case-grid[data-cols] {
+    grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  }
+  // 자는 막대 길이가 곧 값이라 줄이지 않는다. 안 들어가면 다음 줄로 내린다
+  .doc-ruler {
+    flex-wrap: wrap;
+  }
 }
 
 .doc-theme-toggle__label {
@@ -423,7 +633,7 @@ body {
 
 .doc-scale__head strong {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: var(--nui-font-size-3);
+  font-size: var(--nui-font-size-2);
   color: var(--nui-text-primary);
 }
 
@@ -436,7 +646,7 @@ body {
 .doc-scale__row {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  border-radius: var(--nui-radius-2);
+  border-radius: var(--nui-radius-3);
   overflow: hidden;
   border: 1px solid var(--doc-border);
 }
@@ -827,4 +1037,37 @@ body {
 /* 테두리가 이웃 칸에 가리지 않도록 여백을 조금 준다 */
 .preset-scale {
   padding: 3px 0;
+}
+
+// 라벨 쓰기 — 「이렇게 말고」 칸. 취소선 대신 색으로 구분한다.
+// 취소선은 「지워진 것」으로 읽히는데 여기 있는 것은 지운 문구가 아니라
+// 쓰지 않는 문구다.
+.doc-label-no {
+  color: var(--nui-text-disabled);
+}
+
+// 본문 링크 — 브라우저 기본 파랑(#0000EE)은 다크 배경에서 1.87:1 이었다 (2026-09-19 실측).
+// `text-brand` 는 두 테마 모두 본문 배경 위 4.5 를 넘는다(라이트 5.34 · 다크 9.40). 밑줄은 둔다 —
+// 색만으로 링크를 말하지 않는다. 클래스 없는 `a` 만 — nav · 칩 · 버튼 링크는 자기 색이 있다.
+.doc-shell a:not([class]) {
+  color: var(--nui-text-brand);
+}
+
+// ─── 누르는 것의 눌림 — 파일 끝에 둔다
+// 하이라이트를 끈 자리의 눌림은 우리 것이 말한다 — 표면 눌림 면 (design-system.md §2-3 · styles.md §9-1).
+// 안 두면 탭해도 아무 반응이 없다. 로고 · 테마 토글은 자기 면이 따로 있어 뺀다.
+// ⚠️ **hover 규칙보다 뒤에 있어야 한다.** 상세도가 같아(클래스 + 의사클래스) 소스 순서가 이긴다 —
+//    위쪽에 두었을 때 `.doc-nav-link:hover` 가 누르는 동안의 면을 덮었다 (2026-09-17 실측)
+.doc-nav-link,
+.doc-badge__label,
+.doc-why__summary,
+.preset-group,
+.preset-jump a,
+.doc-shell a:not([class]) {
+  transition: background-color var(--nui-duration-pressed)
+    var(--nui-easing-pressed);
+
+  &:active {
+    background-color: var(--nui-control-bg-active);
+  }
 }

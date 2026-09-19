@@ -12,7 +12,6 @@ const SCALES: [string, string][] = [
   ],
   ["gray", "무채색 — 브랜드에 맞춰 살짝 초록빛이다"],
   ["danger", "되돌릴 수 없는 액션 · 오류"],
-  ["warning", "주의가 필요한 액션"],
   ["success", "완료 · 확인"],
   ["info", "정보 전달 · 도움말"],
 ];
@@ -26,65 +25,19 @@ export default function ColorPage() {
         쓰는지는 <Link href="/foundations/state">상태</Link> 문서에 있다.
       </p>
 
-      <h2 id="change">색을 바꾸는 방법 두 가지</h2>
-
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>범위</th>
-              <th>방법</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row" className="doc-wrap">
-                화면 전체
-              </th>
-              <td className="doc-wrap">
-                <Link href="/brand-colors">브랜드 프리셋 185색</Link> 에서
-                고른다. 명령 한 줄이 <code>nui-theme.css</code> 를 만든다.
-                라이브러리 CSS 뒤에 불러오면 끝난다
-              </td>
-            </tr>
-            <tr>
-              <th scope="row" className="doc-wrap">
-                한 컴포넌트
-              </th>
-              <td className="doc-wrap">
-                <code>className</code> 으로 직접 지정한다. 배경과 글자를 같은
-                자리에 쓰게 되므로 짝을 놓치기 어렵다
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <pre className="doc-code">
-        <code>{`/* 1) 화면 전체 */
-import "@nui-kit/react/styles/index.css";
-import "./nui-theme.css";
-
-/* 2) 한 컴포넌트 — !important 는 필요 없다 */
-.my-tooltip {
-  background: #222;
-  color: #fff;
-}`}</code>
-      </pre>
-
-      <div className="doc-note doc-note--warn">
-        <strong>컴포넌트별 색 변수는 제공하지 않는다.</strong> 배경만 바꾸면
-        글자색은 라이브러리 값이 남아 대비가 조용히 깨진다. 그 사실은 화면에
-        드러나지 않는다. semantic 변수를 <code>:root</code> 에서 덮어쓰는 방법도
-        같은 이유로 지원하지 않는다.
-      </div>
+      <p>
+        색을 바꾸는 길은 둘이다. 화면 전체는 브랜드 색 하나(프리셋 또는{" "}
+        <code>npx nui-theme</code>), 한 컴포넌트는 <code>className</code>. 왜 그
+        둘뿐인지는 <Link href="/design-system/color">색은 고르는 것이다</Link>{" "}
+        에 있다.
+      </p>
 
       <h2>역할별 색</h2>
       <p>
         <code>className</code> 으로 색을 맞출 때 아래 이름을 참조한다.
       </p>
 
-      <h3>글자</h3>
+      <h3 id="text">글자</h3>
       <p>
         글자로 쓸 수 있는 단계는 11번과 12번뿐이다. 9번과 10번은 채워진 배경
         자리라 글자로 쓰면 대비가 3점대로 떨어진다. <code>text-disabled</code>{" "}
@@ -92,7 +45,7 @@ import "./nui-theme.css";
       </p>
       <TokenTable group="text" />
 
-      <h3>면</h3>
+      <h3 id="layer">면</h3>
       <p>
         면은 콘텐츠를 담는 것의 배경이다. 글자나 아이콘이 아니라 화면의 층을
         만든다. 층의 순서는 <Link href="/foundations/elevation">깊이</Link>{" "}
@@ -107,7 +60,7 @@ import "./nui-theme.css";
       </p>
       <TokenTable group="border" omit="border-width" />
 
-      <h3>액션</h3>
+      <h3 id="action">액션</h3>
       <p>
         액션은 버튼 계열이다. 색이 아니라 역할이 이름이라 이 버튼이 삭제인지만
         물으면 정해진다. 각 역할의 <code>-fg</code> 는 그 배경 위에서 대비 4.5
@@ -116,22 +69,19 @@ import "./nui-theme.css";
         투명도로 표현하지 않는다. 정부 가이드라인(KRDS)의 상태 색 규칙이다.
       </p>
       <TokenTable group="action" />
-      <div className="doc-note">
-        <strong>
-          <code>action-warning</code> 만 글자가 어둡다.
-        </strong>{" "}
-        노랑 배경에 흰 글자는 대비가 크게 미달한다. 노랑을 어둡게 하면 갈색이
-        되어 주의의 의미를 잃으므로 배경을 밝게 두고 글자를 어둡게 했다.
-      </div>
-
-      <h3>입력 컨트롤</h3>
+      <h3 id="control">입력 컨트롤</h3>
       <p>
         입력 컨트롤 색은 <code>Textfield</code> 와 <code>Select</code>,{" "}
-        <code>Checkbox</code> 처럼 값을 받는 것들이 공유한다.
+        <code>Checkbox</code> 처럼 값을 받는 것들이 공유한다. hover·누름 면 (
+        <code>control-bg-hover</code> · <code>control-bg-active</code>)은
+        아코디언 헤더나 메뉴 항목처럼 면이 통째로 반응하는 자리도 함께 쓴다.
+        이름이 <code>-on-inverse</code> 로 끝나는 짝은 토스트 닫기처럼 반전 표면
+        위에 올라가는 자리라 얹는 방향이 반대다 — 라이트에서 흰색, 다크에서
+        검정이다.
       </p>
       <TokenTable group="control" />
 
-      <h3>상태 표시</h3>
+      <h3 id="status">상태 표시</h3>
       <p>상태 표시는 알림이나 배지처럼 은은한 면으로 알릴 때 쓴다.</p>
       <TokenTable group="status" />
 
@@ -154,8 +104,8 @@ import "./nui-theme.css";
 
       <div className="doc-note">
         라이트에서 1번부터 7번까지는 어두운 글자를, 8번부터 12번까지는 밝은
-        글자를 얹도록 만들었다. 다크에서는 스케일 전체가 뒤집혀 같은 번호가 반대
-        밝기가 된다. 그래서{" "}
+        글자를 얹는다. 다크에서는 스케일 전체가 뒤집혀 같은 번호가 반대 밝기가
+        된다. 그래서{" "}
         <strong>
           같은 번호를 쓰면 어느 테마에서든 대비가 자동으로 확보된다.
         </strong>
@@ -170,10 +120,13 @@ import "./nui-theme.css";
       </p>
       <p>
         바뀌는 것은 12단계 값뿐이다. <code>action-primary</code> 같은 역할
-        이름은 그대로라 컴포넌트 CSS 는 고칠 것이 없다. 예외는 셋 — 층(
+        이름은 그대로라 컴포넌트 CSS 는 고칠 것이 없다. 예외는 넷이다. 층(
         <code>layer-*</code>)은 &quot;위가 밝다&quot;를 지키려고 순서를 바꾸고,
-        토스트·툴팁 위 글자(<code>text-on-inverse</code>)는 표면이 밝아지므로
-        어두워지고, 에러 토스트 배경이 진해진다.
+        토스트·툴팁의 반전 표면(<code>layer-inverse</code>)은 라이트에서 검정,
+        다크에서 밝은 회색이라 그 위 글자(<code>text-on-inverse</code>)와 얹는
+        면(
+        <code>control-bg-hover-on-inverse</code>)이 함께 뒤집힌다. 그림자는
+        다크에서 검정을 진하게 쓰고 위쪽에 밝은 1px 을 얹는다.
       </p>
       <div className="doc-note doc-note--warn">
         <strong>다크는 옵션이 아니라 두 번째 정본이다.</strong> 라이트에서
@@ -181,7 +134,7 @@ import "./nui-theme.css";
         테마를 다 잰다.
       </div>
 
-      <h2>팔레트 전량</h2>
+      <h2 id="color">팔레트 전량</h2>
       <p>
         컴포넌트는 팔레트를 직접 참조하지 않는다. 참조하면 브랜드 색을 바꿔도 그
         컴포넌트만 옛 색으로 남는다.

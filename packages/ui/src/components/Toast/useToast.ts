@@ -12,9 +12,15 @@ export default function useToast() {
 
   const open = (options: ToastOpenOptions) => openToast(options);
 
-  /** id 를 주지 않으면 가장 최근 토스트를 닫는다 */
+  /**
+   * id 를 주지 않으면 **지금 보이는 것**을 닫는다.
+   *
+   * 토스트는 한 번에 하나만 보이므로 큐의 맨 앞이 그 대상이다 (TO2).
+   * 배열의 마지막을 고르면 아직 차례가 오지 않은 것을 닫게 된다.
+   * 이미 나가는 중이면 아무것도 하지 않는다 — 연속 호출이 큐를 갉아먹지 않게.
+   */
   const close = (id?: string) => {
-    const targetId = id ?? toasts[toasts.length - 1]?.id;
+    const targetId = id ?? toasts.find((item) => item.status === "open")?.id;
     if (!targetId) return;
 
     closeToast(targetId);

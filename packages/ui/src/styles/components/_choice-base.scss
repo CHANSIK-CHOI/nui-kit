@@ -18,10 +18,54 @@
   #{cls("checkbox")},
   #{cls("radio")},
   #{cls("switch")} {
+    // ── 채움색 배선 ★ (2026-09-08 · prototype S1)
+    // 세 컨트롤이 같은 두 변수를 읽고, tone 과 상태가 그것을 갈아끼운다.
+    // 색을 컴포넌트별 훅으로 열지 않는 이유는 tokens.md §1-2 와 같다 —
+    // 배경만 바뀌면 그 위 표시가 안 보이게 되는데 그 사실이 화면에 안 드러난다.
+    #{iv("selector-accent")}: var(#{v("control-accent")});
+    // 선택된 채로 누를 때의 채움 — 같은 색조의 다음 단계다 (design-system.md §2-4).
+    // SEED 도 `radiomark` 의 `selected,pressed` 를 `bg.brand-solid-pressed` 로 둔다.
+    #{iv("selector-accent-active")}: var(#{v("action-neutral-active")});
+    #{iv("selector-accent-fg")}: var(#{v("control-accent-fg")});
+    // 선택된 채로 누를 때 칠하는 면. 보통은 위의 다음 단계 그대로지만, **채움이 없는
+    // 모양**(Checkbox `shape="ghost"`)은 투명으로 되돌린다 — 안 그러면 면 없던
+    // 자리에 진한 상자가 튀어나온다. ghost 의 눌림은 배율만이다.
+    //
+    // ⚠️ 이름을 `selector-accent-active` 와 나눈 이유는 상세도다. 에러는 루트에
+    //    `.nui-is-error`(클래스 둘)로 앉는데 모양 modifier 는 하나라, 같은 변수를
+    //    쓰면 ghost 가 에러를 못 이겨 **빨간 상자**가 남는다. 자리를 나누면 겨룰 일이
+    //    없다 (styles.md §7).
+    #{iv("selector-press-fill")}: var(#{iv("selector-accent-active")});
+
     position: relative;
     display: inline-flex;
     flex-shrink: 0;
     cursor: pointer;
+    // 하이라이트가 라벨 span 박스(44 히트 포함) 전체에 회색으로 덮이던 것을 끈다 (spec §9).
+    // `__input` 은 투명이라 건드리지 않는다
+    @include pressable;
+
+    // 브랜드로 강조하는 자리. 기본은 조용하고 여기만 색이 온다
+    &--brand {
+      #{iv("selector-accent")}: var(#{v("control-accent-brand")});
+      #{iv("selector-accent-active")}: var(#{v("action-primary-active")});
+    }
+
+    // ⚠️ 브랜드·에러·비활성 채움은 두 테마에서 값이 **고정**이라 그 위 표시도
+    //    흰색으로 고정이다. 중립 채움만 테마를 따라 뒤집히므로 짝도 뒤집힌다
+    //    (tokens.md §4-1-2). 이 세 줄을 빼면 다크에서 표시가 사라진다.
+    &--brand,
+    &#{state("error")},
+    &#{state("disabled")} {
+      #{iv("selector-accent-fg")}: var(#{v("control-accent-fg-static")});
+    }
+
+    // ⚠️ 에러도 눌림 단계를 갖는다. 안 두면 **빨간 채움이 눌리는 순간 중립색으로
+    //    바뀐다** — 눌림 규칙의 상세도가 컴포넌트별 에러 규칙보다 높아서다
+    //    (`_checkbox.scss` 의 `is-error` 블록). 합성 규칙은 §3-2 가 정본이다.
+    &#{state("error")} {
+      #{iv("selector-accent-active")}: var(#{v("action-danger-active")});
+    }
 
     &#{state("disabled")} {
       cursor: not-allowed;
@@ -62,14 +106,22 @@
       justify-content: center;
       width: 100%;
       height: 100%;
-      color: var(#{v("text-on-accent")});
+      color: var(#{iv("selector-accent-fg")});
       background-color: var(#{v("control-bg")});
-      // 세 컨트롤이 이 __control 골격을 함께 쓴다. selector-size 와 같은 이유로
-      // 두께도 하나로 묶는다 — 컴포넌트별로 쪼개면 같은 골격이 서로 다른 두께가 된다.
-      border: #{hook("selector--border-width", var(#{v("border-width-1")}))}
-        solid var(#{v("control-border")});
+      // 세 컨트롤이 이 __control 골격을 함께 쓴다. 우리에게는 한 벌이지만
+      // **소비자에게는 셋**이다 — 이 파일은 셀렉터 목록 하나로 셋을 그리므로
+      // `hook()` 을 부를 수 없고(이름이 하나가 된다), 내부 배선을 읽는다.
+      // 값은 `_checkbox.scss` · `_radio.scss` · `_switch.scss` 가 각자의 공개 훅으로
+      // 채운다 (styles.md §3 · tokens.md §1-3).
+      border: var(#{iv("selector-border-width")}) solid
+        var(#{v("control-border")});
 
-      @include motion((border-color, background-color, box-shadow, color));
+      // 눌림은 배율·시간·곡선 세 축을 함께 써야 한 인터랙션이 된다 —
+      // `transition` 은 한 번만 선언할 수 있으므로 `motion-press` 로 묶는다
+      // (design-system.md §6-3).
+      @include motion-press(
+        (border-color, background-color, box-shadow, color)
+      );
     }
 
     &__indicator {
@@ -84,8 +136,37 @@
           #{state("error")}
         ):hover
         &__control {
-        border-color: var(#{v("control-accent")});
+        border-color: var(#{iv("selector-accent")});
       }
+    }
+
+    // ── 눌림 ★ (2026-09-08 · 08 C1)
+    //
+    // SEED 는 `checkmark` · `radiomark` · `switchmark` 셋 다 `pressed` 에
+    // `scaleScope: self` 를 준다. Emil 도 "모든 pressable 에 scale" 이다.
+    // 우리는 Button 계열에만 있었다.
+    //
+    // ⚠️ **§2-3-1 의 「목록·격자의 칸에는 scale 을 걸지 않는다」와 어긋나지 않는다.**
+    //    그 규칙은 폭을 꽉 채우며 반복되는 **칸**(Accordion 헤더 · Select 옵션 ·
+    //    달력 날짜)의 것이다. 선택 컨트롤은 24px 짜리 **자기 경계가 있는 컨트롤**이라
+    //    앞쪽 무리(개별 버튼)에 속한다.
+    //
+    // 미선택은 알파 면(SEED `bg.transparent-pressed`), 선택은 채움색의 다음 단계다.
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__input:active
+      + &__control {
+      background-color: var(#{v("control-bg-active")});
+      transform: scale(var(#{v("scale-94")}));
+    }
+
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__input:checked:active
+      + &__control,
+    &:not(#{state("disabled")}):not(#{state("readonly")})
+      &__input:indeterminate:active
+      + &__control {
+      background-color: var(#{iv("selector-press-fill")});
+      border-color: var(#{iv("selector-press-fill")});
     }
 
     &#{state("error")} &__control {
@@ -100,12 +181,5 @@
     &#{state("readonly")} &__control {
       background-color: var(#{v("control-bg-readonly")});
     }
-  }
-
-  // 사각/원형 선택자는 같은 치수를 쓴다 (Switch 는 자체 치수).
-  #{cls("checkbox")},
-  #{cls("radio")} {
-    width: #{hook("selector--size", var(#{v("size-selector")}))};
-    height: #{hook("selector--size", var(#{v("size-selector")}))};
   }
 }

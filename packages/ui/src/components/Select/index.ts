@@ -13,4 +13,6 @@ export type {
   SingleSelectValue,
   MultiSelectValue,
   SelectSharedProps,
+  SelectSize,
+  SelectMenuPosition,
 } from "./Select.types.js";

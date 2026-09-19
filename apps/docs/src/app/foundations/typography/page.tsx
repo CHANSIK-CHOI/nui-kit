@@ -5,43 +5,55 @@ export const metadata = { title: "타이포그래피" };
 /** 크기·행간·자간이 같은 번호로 묶인다. 값은 tokens.md §3-3 과 같은 출처다. */
 const SCALE: { n: number; px: number; lh: string; ls: string }[] = [
   { n: 1, px: 13, lh: "1.5", ls: "0" },
-  { n: 3, px: 14, lh: "1.5", ls: "0" },
-  { n: 4, px: 16, lh: "1.5", ls: "0" },
-  { n: 5, px: 18, lh: "1.5", ls: "0" },
-  { n: 6, px: 20, lh: "1.5", ls: "0" },
+  { n: 2, px: 14, lh: "1.5", ls: "0" },
+  { n: 3, px: 16, lh: "1.5", ls: "0" },
+  { n: 4, px: 18, lh: "1.5", ls: "0" },
+  { n: 5, px: 20, lh: "1.5", ls: "0" },
 ];
 
-/** 아홉 조합이 전부다 — design-system.md §5 와 같은 출처다. */
+/** 열 조합이 전부다 — design-system.md §5 와 같은 출처다. */
 const ROLES: [string, string, string, string][] = [
   [
     "입력값 · 본문",
-    "4",
+    "3",
     "regular",
     "Textfield · Textarea · Select 값 · 옵션 · placeholder",
   ],
+  ["액션 라벨", "3", "bold", "Button(text 버튼 포함) · Datepicker 년월"],
   [
-    "액션 라벨",
+    "항목 제목",
+    "3",
+    "regular · 펼침은 bold",
+    "Accordion 제목 — 굵기가 열림을 말한다",
+  ],
+  [
+    "액션 라벨 (large)",
     "4",
     "bold",
-    "Button(text 버튼 포함) · Accordion 헤더 · Datepicker 년월",
+    'Button · IconButton · ButtonLink 의 size="large"',
   ],
   [
     "보조 텍스트",
-    "3",
+    "2",
     "regular",
     "Popup 본문 · Accordion 본문 · Tooltip · Select 안내",
   ],
   [
     "라벨 · 값 강조",
-    "3",
+    "2",
     "regular",
     "Field 라벨 · Datepicker 날짜 · Select 태그 · Toast 메시지",
   ],
-  ["액션 라벨 (small)", "3", "bold", "Button small · Datepicker 월 드롭다운"],
+  [
+    "액션 라벨 (small)",
+    "2",
+    "bold",
+    "Button small · Datepicker 월 드롭다운 · Toast 액션",
+  ],
   ["캡션 · 설명 · 메시지", "1", "regular", "Field 설명 · Message · 에러 문구"],
   ["그룹 라벨", "1", "regular", "Select 그룹 헤딩"],
   ["요일 · 소제목", "1", "bold", "Datepicker 요일"],
-  ["제목", "6", "bold", "Popup 제목"],
+  ["제목", "5", "bold", "Popup 제목"],
 ];
 
 export default function TypographyPage() {
@@ -50,8 +62,8 @@ export default function TypographyPage() {
       <h1>타이포그래피</h1>
       <p className="doc-lead">
         크기와 행간, 자간에 <strong>같은 번호</strong>를 붙였다.{" "}
-        <code>font-size-4</code> 를 쓰면 <code>line-height-4</code> 와{" "}
-        <code>letter-spacing-4</code> 가 짝이다. 셋을 따로 고르지 않는다.
+        <code>font-size-3</code> 를 쓰면 <code>line-height-3</code> 와{" "}
+        <code>letter-spacing-3</code> 가 짝이다. 셋을 따로 고르지 않아도 된다.
       </p>
 
       <h2>글꼴</h2>
@@ -92,16 +104,16 @@ body { font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; }`
           ))}
         </div>
         <p className="doc-example__caption">
-          2 · 7 · 8번은 없다. 쓰이지 않아서 만들지 않았다. 5번은 이 문서
-          사이트가 쓴다.
+          번호는 1부터 5까지 순서대로다. 컴포넌트는 다섯을 다 쓴다. 4번(18px)은
+          large 버튼의 라벨이다. 새 크기가 필요하면 끝 번호로 더한다.
         </p>
       </div>
 
       <h2>행간과 자간</h2>
       <p>
-        큰 글자일수록 줄 높이 배수를 줄인다(1.5 → 1.4). 단일 배수를 전 스케일에
-        적용하면 큰 제목이 헐거워 보인다. 자간은 반대로 큰 글자일수록 좁힌다. 둘
-        다 광학 보정이다.
+        행간은 전 스케일 1.5 배수이고 자간은 0 이다. 같은 번호의 크기 · 행간 ·
+        자간이 한 벌이라 <code>typo(2)</code> 처럼 번호 하나로 셋이 함께 붙는다.
+        글자 크기를 덮어도 비율이 유지되도록 행간은 배수(unitless)다.
       </p>
 
       <div className="doc-table-wrap">
@@ -183,7 +195,7 @@ body { font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; }`
             <div key={name as string} style={{ textAlign: "center" }}>
               <div
                 style={{
-                  fontSize: "var(--nui-font-size-6)",
+                  fontSize: "var(--nui-font-size-5)",
                   fontWeight: `var(--nui-font-weight-${name})`,
                 }}
               >
@@ -196,11 +208,11 @@ body { font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; }`
           ))}
         </div>
         <p className="doc-example__caption">
-          500 · 600 · 800 은 두지 않는다. 강조가 필요하면 bold 다.
+          500 · 600 · 800 은 없다. 강조가 필요하면 bold 다.
         </p>
       </div>
 
-      <h2>전체 토큰</h2>
+      <h2 id="typography">전체 토큰</h2>
       <TokenTable group="typography" />
     </>
   );

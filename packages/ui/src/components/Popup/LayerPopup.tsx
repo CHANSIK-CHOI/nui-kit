@@ -10,7 +10,6 @@ const block = px("layer-popup");
 export default function LayerPopup({
   className,
   contentAlign = "left",
-  dialogLabel = "레이어 팝업",
   ...props
 }: LayerPopupProps) {
   return (
@@ -18,7 +17,6 @@ export default function LayerPopup({
       {...props}
       variant="dialog"
       contentAlign={contentAlign}
-      dialogLabel={dialogLabel}
       className={cn(block, className)}
     />
   );

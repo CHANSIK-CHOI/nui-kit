@@ -30,9 +30,15 @@ const INPUT: [string, string, string, string][] = [
 
 const CHOICE: [string, string, string][] = [
   ["default", "control-bg", "control-border"],
-  ["hover", "변화 없음", "control-accent"],
+  ["hover", "변화 없음", "채움색"],
   ["focus", "—", "focus-color + focus-ring-strong"],
-  ["checked", "control-accent", "control-accent"],
+  [
+    "pressed",
+    "미선택 control-bg-active · 선택 채움색의 다음 단계 + scale-94",
+    "배경과 같이",
+  ],
+  ["checked", "채움색", "채움색"],
+  ["indeterminate (Checkbox)", "채움색 · 표시만 대시", "채움색"],
   ["checked + error", "control-accent-error", "control-accent-error"],
   [
     "checked + disabled",
@@ -117,11 +123,7 @@ export default function StatePage() {
                 <th scope="row">{state}</th>
                 {[bg, border, text].map((v, i) => (
                   <td key={i} className="doc-wrap">
-                    {v.includes("-") && v !== "변화 없음" ? (
-                      <code>{v}</code>
-                    ) : (
-                      v
-                    )}
+                    {/^[a-z0-9-]+$/.test(v) ? <code>{v}</code> : v}
                   </td>
                 ))}
               </tr>
@@ -150,13 +152,7 @@ export default function StatePage() {
                 <th scope="row">{state}</th>
                 {[bg, border].map((v, i) => (
                   <td key={i} className="doc-wrap">
-                    {v.includes("-") &&
-                    !v.startsWith("변화") &&
-                    !v.startsWith("default") ? (
-                      <code>{v}</code>
-                    ) : (
-                      v
-                    )}
+                    {/^[a-z0-9-]+$/.test(v) ? <code>{v}</code> : v}
                   </td>
                 ))}
               </tr>
@@ -165,12 +161,104 @@ export default function StatePage() {
         </table>
       </div>
 
+      <p>
+        채움색은 기본이 중립(<code>control-accent</code>)이고{" "}
+        <code>tone=&quot;brand&quot;</code> 면 브랜드 색(
+        <code>control-accent-brand</code>)이다. 약관 동의처럼 하나만 도드라져야
+        하는 자리에만 브랜드를 쓴다. 채움 위의 표시(체크 · 점 · 썸)는{" "}
+        <code>control-accent-fg</code> 라 다크에서 채움과 함께 뒤집힌다.
+      </p>
       <div className="doc-note">
         <strong>hover 테두리가 두 부류에서 다른 것은 의도다.</strong> 입력
-        컨트롤은 회색으로, 선택 컨트롤은 초록으로 바뀐다. 선택 컨트롤은 hover
-        직후 클릭 한 번으로 값이 확정되므로 미리 강조한다. 입력 컨트롤은 hover
-        해도 아직 아무 일도 일어나지 않는다.
+        컨트롤은 회색으로, 선택 컨트롤은 자기 채움색으로 바뀐다. 선택 컨트롤은
+        hover 직후 클릭 한 번으로 값이 확정되므로 미리 강조한다. 입력 컨트롤은
+        hover 해도 아직 아무 일도 일어나지 않는다.
       </div>
+
+      <h3>액션</h3>
+      <p>
+        <code>Button</code> 계열이다. 색은 역할(<code>color</code>)이 정하고
+        위계는 채움(<code>variant</code>)이 정한다.
+      </p>
+      <div className="doc-table-wrap">
+        <table className="doc-table">
+          <thead>
+            <tr>
+              <th>상태</th>
+              <th>solid</th>
+              <th>soft</th>
+              <th>line · text</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">default</th>
+              <td className="doc-wrap">
+                면 <code>action-{"{역할}"}</code> · 글자{" "}
+                <code>action-{"{역할}"}-fg</code>
+              </td>
+              <td className="doc-wrap">
+                면 <code>-soft</code> · 글자 <code>-fg-line</code>
+              </td>
+              <td className="doc-wrap">
+                글자 <code>-fg-line</code>. line 의 선은 중립{" "}
+                <code>action-border</code>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">hover</th>
+              <td className="doc-wrap">
+                면 <code>-hover</code> — 같은 색조의 다음 단계
+              </td>
+              <td className="doc-wrap">
+                면 <code>-soft-hover</code> · 글자 <code>-fg-line-strong</code>
+              </td>
+              <td className="doc-wrap">
+                면 <code>action-bg-hover</code> · 글자{" "}
+                <code>-fg-line-strong</code> · 선{" "}
+                <code>action-border-hover</code>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">active</th>
+              <td className="doc-wrap">
+                면 <code>-active</code> + 눌림 <code>scale-98</code>
+              </td>
+              <td className="doc-wrap">
+                면 <code>-soft-active</code> · 글자 <code>-fg-line-strong</code>
+              </td>
+              <td className="doc-wrap">
+                면 <code>action-bg-active</code> · 선{" "}
+                <code>action-border-active</code>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">disabled</th>
+              <td className="doc-wrap">
+                면 <code>action-bg-disabled</code> · 글자{" "}
+                <code>action-fg-disabled</code>
+              </td>
+              <td className="doc-wrap">solid 와 같다</td>
+              <td className="doc-wrap">
+                글자 <code>action-fg-line-disabled</code> · 선{" "}
+                <code>action-border-disabled</code>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">loading</th>
+              <td className="doc-wrap" colSpan={3}>
+                색은 default 그대로. 아이콘 자리에 스피너, hover · active 없음,{" "}
+                <code>cursor: progress</code>. disabled 와 겹치면 색은 disabled,
+                스피너와 <code>aria-busy</code> 는 남는다
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <code>disabled</code> 는 조건이 맞으면 되는 것이고 <code>loading</code>{" "}
+        은 지금 처리 중인 것이다. 같은 색을 쓰면 「왜 안 되지」로 읽힌다.
+      </p>
 
       <h2>상태가 겹칠 때</h2>
       <p>겹침에는 두 가지가 있다. 하나만 이기는 것과 함께 그리는 것이다.</p>
@@ -180,9 +268,10 @@ export default function StatePage() {
         <code>{`disabled   >   error   >   readonly`}</code>
       </pre>
       <p>
-        셋은 CSS 상세도가 같아서 소스에 나중에 쓴 규칙이 이긴다. 파일 안에서
-        순서만 바꿔도 색이 조용히 뒤바뀐다. 우선순위를 <code>:not()</code> 으로
-        명시해 순서에 의존하지 않게 했다.
+        셋은 CSS 상세도가 같아서 소스에 나중에 쓴 규칙이 이긴다. 그래서{" "}
+        <code>disabled</code> 가 최우선인 것은 <code>:not()</code> 으로
+        명시했다. error 와 readonly 는 겹치면 속성별로 합성된다 — 테두리는
+        error, 글자는 readonly 다.
       </p>
       <h3>함께 그린다</h3>
       <div className="doc-table-wrap">
@@ -273,7 +362,7 @@ export default function StatePage() {
                 <code>disabled</code>
               </th>
               <td className="doc-wrap">지금은 안 되지만 조건이 맞으면 된다</td>
-              <td className="doc-wrap">필수 항목 미입력 시의 제출 버튼</td>
+              <td className="doc-wrap">필수 항목이 비어 있을 때의 제출 버튼</td>
             </tr>
             <tr>
               <th scope="row">
@@ -308,7 +397,8 @@ export default function StatePage() {
       <p>
         <strong>hover 는 hover 가 있는 기기에서만 그린다.</strong> 터치 기기는
         탭한 뒤에 hover 가 남아 버튼이 눌린 채로 보인다. 모든 hover 가{" "}
-        <code>@media (hover: hover)</code> 안에 있다.
+        <code>@media (hover: hover) and (pointer: fine)</code> 안에 있다.
+        스타일러스와 TV 커서처럼 거친 포인터도 hover 를 받지 않는다.
       </p>
 
       <h2>색이 아닌 상태 표현</h2>

@@ -3,6 +3,7 @@
 import cn from "classnames";
 import {
   forwardRef,
+  useEffect,
   useId,
   useState,
   type ChangeEvent,
@@ -82,10 +83,13 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       inputId: fieldContextId,
       describedByIds: fieldDescribedByIds,
       isError: isFieldError,
+      isRequired: isFieldRequired,
+      registerFooter,
     } = useFieldContext();
+    // Field 안이면 `__foot` 을 통째로 접고 Field 의 Footer 로 올린다 (Field.md §6 「Footer 승계」)
+    const isInField = typeof registerFooter === "function";
     const generatedId = useId();
     const generatedMessageId = useId();
-    const generatedCounterId = useId();
     const resolvedId = id ?? fieldContextId ?? generatedId;
     const hasOwnMessage = Boolean(infoMessage || errorMessage);
     const resolvedIsError = isFieldError || Boolean(errorMessage);
@@ -99,14 +103,43 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     // 세는 단위는 브라우저의 `maxlength` 와 같은 UTF-16 코드 단위다 —
     // 다르게 세면 카운터가 100 인데 더 쳐지거나 99 인데 안 쳐진다.
     const valueLength = value != null ? value.length : uncontrolledLength;
-    const isOverLimit = hasCounter && valueLength > maxLength;
+    // 메시지와 카운터가 **한 줄**에 오므로 둘 중 하나만 있어도 자리를 쓴다.
+    const hasFooter = hasOwnMessage || hasCounter;
 
     const resolvedAriaDescribedBy = getMergedAriaIds(
       ariaDescribedBy,
       ...fieldDescribedByIds,
-      hasOwnMessage ? generatedMessageId : null,
-      hasCounter ? generatedCounterId : null,
+      // 카운터가 메시지와 같은 컨테이너로 들어갔으므로 id 하나로 둘을 가리킨다.
+      // Field 안에서는 만들지 않는다 — Footer 의 id 가 describedByIds 로 들어온다.
+      !isInField && hasFooter ? generatedMessageId : null,
     );
+
+    // 카운터가 없으면 타이핑마다 Footer 를 다시 등록하지 않는다 — deps 에는 이 값만
+    const footerCount = hasCounter ? valueLength : undefined;
+
+    useEffect(() => {
+      if (!isInField) return;
+
+      return registerFooter({
+        id: resolvedId,
+        infoMessage,
+        errorMessage,
+        isError: Boolean(errorMessage),
+        count: footerCount,
+        maxCount: maxLength,
+        counterLabel,
+      });
+    }, [
+      counterLabel,
+      errorMessage,
+      footerCount,
+      hasCounter,
+      infoMessage,
+      isInField,
+      maxLength,
+      registerFooter,
+      resolvedId,
+    ]);
 
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
       setUncontrolledLength(event.target.value.length);
@@ -135,32 +168,22 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             maxLength={maxLength}
             aria-describedby={resolvedAriaDescribedBy}
             aria-invalid={resolvedIsError ? true : undefined}
+            aria-required={isFieldRequired ? true : undefined}
             onChange={handleChange}
           />
         </div>
-        <div className={`${block}__foot`}>
-          <Message
-            id={hasOwnMessage ? generatedMessageId : undefined}
-            infoMessage={infoMessage}
-            errorMessage={errorMessage}
-          />
-          {/*
-            `aria-live` 를 붙이지 않는다 — 글자마다 갱신되므로 live 로 두면
-            스크린리더가 타이핑 한 글자마다 숫자를 읽는다. 사용자가 직접 만드는
-            변화라 `aria-describedby` 로 포커스 시점에 알리는 것으로 충분하다.
-          */}
-          {hasCounter ? (
-            <span
-              id={generatedCounterId}
-              className={cn(`${block}__counter`, {
-                [`${block}__counter--over`]: isOverLimit,
-              })}
-            >
-              <span className={px("sr-only")}>{counterLabel}</span>
-              {valueLength} / {maxLength}
-            </span>
-          ) : null}
-        </div>
+        {isInField ? null : (
+          <div className={`${block}__foot`}>
+            <Message
+              id={hasFooter ? generatedMessageId : undefined}
+              infoMessage={infoMessage}
+              errorMessage={errorMessage}
+              count={hasCounter ? valueLength : undefined}
+              maxCount={maxLength}
+              counterLabel={counterLabel}
+            />
+          </div>
+        )}
       </div>
     );
   },

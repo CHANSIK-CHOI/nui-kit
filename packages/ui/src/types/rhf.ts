@@ -3,13 +3,20 @@ import type {
   FieldValues,
   UseControllerProps,
 } from "react-hook-form";
+import type { DistributiveOmit } from "./util.js";
 
+/**
+ * ⚠️ **`Omit` 이 아니라 `DistributiveOmit` 이다.** `CheckboxProps` 는 `shape` 으로 갈리는
+ *    유니온이라 평범한 `Omit` 으로 감싸면 갈래가 접혀 `RHFCheckbox` 안에서 `{...rest}` 를
+ *    넘기는 자리가 깨진다 (2026-09-12 실측 · `RHFCheckbox.tsx:52`).
+ *    **소비자가 우리 props 를 감쌀 때도 같은 벽에 부딪히므로 그 타입을 배럴로 공개한다.**
+ */
 export type RHFComponentProps<
   TFormValues extends FieldValues,
   TFieldName extends FieldPath<TFormValues>,
   TComponentProps,
   TManagedProps extends PropertyKey = never,
-> = Omit<TComponentProps, TManagedProps> &
+> = DistributiveOmit<TComponentProps, TManagedProps> &
   UseControllerProps<TFormValues, TFieldName>;
 
 /** 체크형 입력에서 RHF 가 소유하는 prop 들 */

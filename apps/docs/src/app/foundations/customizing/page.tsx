@@ -9,7 +9,7 @@ export default function CustomizingPage() {
       <h1>커스터마이징</h1>
       <p className="doc-lead">
         만질 수 있는 자리는 <strong>{HOOK_COUNT}개</strong>다. CSS 변수를
-        덮어쓰면 된다.
+        덮어쓰면 값이 바뀐다.
       </p>
 
       <h2>
@@ -56,22 +56,14 @@ export default function CustomizingPage() {
           <tbody>
             <tr>
               <th scope="row" className="doc-wrap">
-                화면 전체 색
+                색
               </th>
               <td className="doc-wrap">
-                <Link href="/brand-colors">브랜드 프리셋 185색</Link> 에서
-                고른다
+                <Link href="/design-system/color">
+                  프리셋 · <code>npx nui-theme</code> 또는 className
+                </Link>
               </td>
-              <td className="doc-wrap">화면 전체</td>
-            </tr>
-            <tr>
-              <th scope="row" className="doc-wrap">
-                한 컴포넌트의 색
-              </th>
-              <td className="doc-wrap">
-                <code>className</code> 으로 지정한다
-              </td>
-              <td className="doc-wrap">그 요소만</td>
+              <td className="doc-wrap">화면 전체 또는 그 요소만</td>
             </tr>
             <tr>
               <th scope="row" className="doc-wrap">
@@ -84,15 +76,16 @@ export default function CustomizingPage() {
         </table>
       </div>
 
-      <h2>이름을 읽는 법</h2>
+      <h2>변수 이름을 읽는 법</h2>
       <p>
         이름은 컴포넌트, 옵션, 요소, 속성 순서로 붙는다. 읽으면 문장이 된다.
       </p>
       <pre className="doc-code">
-        <code>{`--nui-button--lg-height        버튼 · large 옵션 · 높이
---nui-button--radius           버튼 · 둥글기 (옵션 없음)
---nui-button--border-width     버튼 · 테두리 두께 (옵션 없음)
---nui-datepicker--day-size     달력 · 날짜 · 크기 (요소 있음)`}</code>
+        <code>{`--nui-button--large-height      버튼 · large 옵션 · 높이
+--nui-button--large-radius      버튼 · large 옵션 · 둥글기 (크기마다 따로)
+--nui-button--border-width      버튼 · 테두리 두께 (옵션 없음)
+--nui-icon-button--medium-size  아이콘 버튼 · medium 옵션 · 크기
+--nui-datepicker--day-size      달력 · 날짜 · 크기 (요소 있음)`}</code>
       </pre>
       <ul>
         <li>
@@ -100,13 +93,19 @@ export default function CustomizingPage() {
           한자리에 모이기 때문이다
         </li>
         <li>
-          옵션 이름은 큰 것부터 <code>lg</code> · <code>md</code> ·{" "}
-          <code>sm</code> 이고 기본은 <code>md</code> 다
+          옵션 이름은 prop 값 그대로다. <code>size=&quot;large&quot;</code> 면{" "}
+          <code>--large-</code>, <code>shape=&quot;round&quot;</code> 면{" "}
+          <code>--round-</code> 다
         </li>
         <li>
           크기 옵션마다 이름을 나눈다. 하나로 덮으면 세 크기가 전부 같아진다
         </li>
         <li>없는 옵션은 이름에 넣지 않는다. 테두리 두께는 컴포넌트당 하나다</li>
+        <li>
+          컴포넌트가 다르면 이름도 다르다. <code>Button</code> 은{" "}
+          <code>--nui-button--</code>, <code>IconButton</code> 은{" "}
+          <code>--nui-icon-button--</code> 다
+        </li>
       </ul>
 
       <h2>전체 목록</h2>
@@ -116,65 +115,24 @@ export default function CustomizingPage() {
       <pre className="doc-code">
         <code>{`/* 전역으로 — 모든 버튼 */
 :root {
-  --nui-button--radius: 0;
-  --nui-button--lg-height: 3.75rem;
+  --nui-button--medium-radius: 0;
+  --nui-button--large-height: 3.75rem;
   --nui-button--border-width: 2px;
 }
 
-/* 부분적으로 — 상속되므로 하위에만 적용된다 */
+/* 부분적으로 — 상속되므로 하위에만 적용된다. 옵션 낱말은 prop 값 그대로다 */
 .compact-form {
-  --nui-textfield--height: 2.5rem;
-  --nui-select--height: 2.5rem;
+  --nui-textfield--medium-height: 2.5rem;
+  --nui-select--medium-height: 2.5rem;
 }`}</code>
       </pre>
 
       <h2>막아둔 것</h2>
-      <div className="doc-table-wrap">
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>무엇</th>
-              <th>왜</th>
-              <th>대신</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row" className="doc-wrap">
-                컴포넌트별 색
-              </th>
-              <td className="doc-wrap">
-                배경과 글자는 짝이라 한쪽만 바꾸면 대비가 깨지는데 화면에
-                드러나지 않는다
-              </td>
-              <td className="doc-wrap">
-                <code>className</code> 또는 브랜드 프리셋
-              </td>
-            </tr>
-            <tr>
-              <th scope="row" className="doc-wrap">
-                포커스 링 두께
-              </th>
-              <td className="doc-wrap">
-                얇아지면 키보드로 조작하는 사용자만 영향을 받는다
-              </td>
-              <td className="doc-wrap">—</td>
-            </tr>
-            <tr>
-              <th scope="row" className="doc-wrap">
-                바깥 여백 · 배치
-              </th>
-              <td className="doc-wrap">
-                <code>margin</code> · <code>position</code> ·{" "}
-                <code>z-index</code> 는 부모가 소유한다
-              </td>
-              <td className="doc-wrap">
-                감싸는 요소에서 <code>className</code> 으로
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <p>
+        색 · 포커스 링 두께 · 바깥 여백은 변수로 열려 있지 않다. 각각의 이유는{" "}
+        <Link href="/design-system">디자인 시스템</Link> 의 「바꿀 수 있는 것과
+        없는 것」 에 있다.
+      </p>
 
       <div className="doc-note doc-note--warn">
         <strong>

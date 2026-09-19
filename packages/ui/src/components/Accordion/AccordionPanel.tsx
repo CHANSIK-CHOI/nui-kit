@@ -4,8 +4,12 @@ import cn from "classnames";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 import { px } from "../../internal/prefix.js";
-import { motionTransition } from "../../internal/motion.js";
-import { useAccordionContext } from "./Accordion.context.js";
+import {
+  motionEase,
+  motionTransition,
+  reduceMotionTransition,
+} from "../../internal/motion.js";
+import { useAccordionContext, useResolvedIndex } from "./Accordion.context.js";
 
 const block = px("accordion");
 
@@ -37,9 +41,55 @@ const panelVariants = {
   },
 };
 
+/**
+ * 모션 감소용 한 벌. **`transition` prop 으로는 못 끈다** (2026-09-14 실측).
+ *
+ * 위 주석대로 variant 안의 `transition` 이 prop 을 이기므로, `transition={{ duration: 0 }}` 을
+ * 밖에서 줘도 `collapse` · `collapseExit` 가 그것을 덮는다. 실제로 `reducedMotion: "reduce"`
+ * 컨텍스트에서 패널 높이가 120ms 사이 74 → 7px 로 움직이고 있었다 — **모션 감소가 무력화된
+ * 채였다.** 끄려면 variant 를 통째로 갈아야 한다.
+ *
+ * 높이를 빼지 않는 것은 Accordion 만의 사정이다 — 다른 컴포넌트는 `reduceMotion()` 으로 이동·
+ * 확대를 빼고 페이드만 남기지만, 여기서는 **높이 변화가 곧 기능**이라 빼면 닫혀도 자리를
+ * 차지한다. 그래서 값은 그대로 두고 **속성마다 시간을 가른다** (2026-09-17 사용자 결정 · not zero).
+ *
+ * - **높이는 0ms** — 늘고 주는 동안 아래 항목이 밀리는 것이 곧 움직임이다
+ * - **투명도는 페이드** — 시간은 모션을 켰을 때와 같다(펼침 `collapse` 250 · 접힘 `collapseExit` 200)
+ * - **접힐 때는 높이를 페이드 뒤로 미룬다** — 높이가 먼저 0 이 되면 `overflow: hidden` 이 내용을 잘라
+ *   페이드가 보이지 않는다. 그래서 「글자가 사라진 뒤 한 번에 접힌다」. 펼칠 때는 반대로 높이가 먼저다
+ */
+const reducedPanelVariants = {
+  closed: {
+    height: 0,
+    opacity: 0,
+    transition: {
+      opacity: reduceMotionTransition(motionTransition.collapseExit, true),
+      height: {
+        duration: 0,
+        delay: motionTransition.collapseExit.duration,
+      },
+    },
+  },
+  open: {
+    height: "auto",
+    opacity: 1,
+    transition: {
+      // 시간은 `collapse`(250) 그대로 · **곡선은 `enter`** (2026-09-19 · review-animations).
+      // `collapse` 의 `expand` 는 높이가 아래 항목을 밀 때의 곡선이라 첫 프레임이 13% 다 —
+      // 크기가 변하지 않는 페이드에는 뜸으로 읽힌다. 접힘은 `collapseExit` 의 `exit` 가 이미 같은 값이다
+      opacity: {
+        duration: motionTransition.collapse.duration,
+        ease: motionEase.enter,
+      },
+      height: { duration: 0 },
+    },
+  },
+};
+
 export type AccordionPanelProps = {
   children: ReactNode;
-  index: number;
+  /** 어느 항목의 본문인가. 생략하면 감싼 `Accordion.Item` 에서 온다 */
+  index?: number;
   className?: string;
 };
 
@@ -51,18 +101,23 @@ export default function AccordionPanel({
   const shouldReduceMotion = useReducedMotion();
   const { accordionId, activeIndices, shouldKeepMounted } =
     useAccordionContext();
-  const isItemOpen = activeIndices.includes(index);
-  const panelId = `${accordionId}-panel-${index}`;
-  const buttonId = `${accordionId}-button-${index}`;
+  const resolvedIndex = useResolvedIndex(index, "Accordion.Panel");
+  const isItemOpen = activeIndices.includes(resolvedIndex);
+  const panelId = `${accordionId}-panel-${resolvedIndex}`;
+  const buttonId = `${accordionId}-button-${resolvedIndex}`;
 
-  // 모션 감소 환경에서만 트랜지션을 덮는다. 그 외에는 variant 가 갖는다
-  // (나타남과 사라짐은 대칭이 아니다 — design-system.md §6-2).
-  const reducedTransition = shouldReduceMotion ? { duration: 0 } : undefined;
+  // 모션 감소면 variant 를 통째로 바꾼다. `transition` prop 으로는 못 끈다 —
+  // variant 안의 `transition` 이 이기기 때문이다 (위 `reducedPanelVariants` 주석).
+  const variants = shouldReduceMotion ? reducedPanelVariants : panelVariants;
 
   // 높이를 애니메이션하는 동안 내용이 밖으로 새지 않게 잘라낸다.
+  //
+  // ⚠️ **`will-change` 는 여기 두지 않는다** — `_accordion.scss` 의 `__panel` 이 정본이고
+  //    모션 감소 분기도 거기 media query 가 갖는다. 인라인으로 두면 `useReducedMotion()` 값이
+  //    들어가는데 framer-motion 이 그것을 `useState` 초기값으로만 읽고 SSR 은 OS 설정을 모른다 —
+  //    서버가 이미 열어 보낸 패널이 hydration 직후 `height, opacity` 인 채로 남았다(실측).
   const panelStyle = {
     overflow: "hidden" as const,
-    willChange: shouldReduceMotion ? "auto" : ("height, opacity" as const),
   };
 
   // shouldKeepMounted: 내용을 DOM 에 남긴다.
@@ -76,23 +131,37 @@ export default function AccordionPanel({
         id={panelId}
         role="region"
         aria-labelledby={buttonId}
-        aria-hidden={!isItemOpen}
-        // ⚠️ `aria-hidden` 만으로는 부족하다. 닫힌 패널 안의 버튼·입력이 **Tab 에 그대로
-        //    잡히고**, "aria-hidden 인데 포커스 가능한 자손"은 전형적인 접근성 위반이다.
-        //    `pointer-events: none` 은 마우스만 막는다. `inert` 가 키보드까지 막는다.
-        inert={!isItemOpen}
+        // ⚠️ **감추는 수단은 `inert` 하나다. `aria-hidden` 도 `pointer-events` 도 겹쳐 걸지
+        //    않는다** (2026-09-14). `inert` 가 셋을 한 번에 한다 — 접근성 트리에서 빼고(패널과
+        //    그 안의 입력 둘 다 `ignored: true` · `ignoredReasons: [inertElement]` · CDP 실측),
+        //    포커스를 막고(`focus()` 를 불러도 안 잡힌다), 포인터를 막는다.
+        //
+        //    포인터는 재서 확인했다 — 닫힌 패널에 `pointer-events: auto` 를 되돌리고 높이를
+        //    열어도 `elementFromPoint` 가 패널을 건너뛰어 `__item` 을 돌려주고, `Range` 로 고른
+        //    패널 안 텍스트가 빈 문자열이다. 인라인 한 줄이 하는 일이 없었다.
+        //
+        //    `aria-hidden` 은 첫째만 하고 **Tab 은 못 막는다** — 둘을 함께 걸면 `inert` 가 그
+        //    위반("aria-hidden 인데 포커스 가능한 자손")을 가려줄 뿐이다. 게다가 패널 안 입력이
+        //    포커스를 쥔 채 접히면 브라우저가 그 속성을 거부한다(`Blocked aria-hidden on an
+        //    element because its descendant retained focus`). 되돌리면 그 경고가 돌아온다.
+        //
+        // ⚠️ **열렸을 때는 속성을 아예 뺀다** — `inert={false}` 로 넘기지 않는다. peer 가
+        //    `react@^18 || ^19` 인데 **18 은 `inert="false"` 를 내보내고 브라우저는 값과 무관하게
+        //    존재만 보고 참으로 읽는다.** 열린 패널이 통째로 죽는다.
+        {...(isItemOpen ? {} : { inert: true })}
         className={cn(`${block}__panel`, className)}
-        variants={panelVariants}
-        transition={reducedTransition}
+        variants={variants}
         initial={false}
         animate={isItemOpen ? "open" : "closed"}
-        style={{ ...panelStyle, pointerEvents: isItemOpen ? "auto" : "none" }}
+        style={panelStyle}
       >
         <div className={`${block}__panel-box`}>{children}</div>
       </motion.div>
     );
   }
 
+  // 퇴장 200ms 동안 패널은 트리에 남는다. 그대로 둔다 — 닫히는 중에 포커스를 빼앗지 않는 것이
+  // 맞고, 언마운트되면 브라우저가 포커스를 `body` 로 옮긴다 (spec §6-4).
   return (
     <AnimatePresence initial={false}>
       {isItemOpen ? (
@@ -101,11 +170,10 @@ export default function AccordionPanel({
           role="region"
           aria-labelledby={buttonId}
           className={cn(`${block}__panel`, className)}
-          variants={panelVariants}
+          variants={variants}
           initial="closed"
           animate="open"
           exit="closed"
-          transition={reducedTransition}
           style={panelStyle}
         >
           <div className={`${block}__panel-box`}>{children}</div>

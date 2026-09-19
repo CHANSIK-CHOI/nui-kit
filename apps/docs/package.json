@@ -12,7 +12,13 @@
     "verify:console": "node scripts/check-console.mjs",
     "verify:select-rhf": "node scripts/check-select-rhf.mjs",
     "verify:datepicker": "node scripts/check-datepicker.mjs",
-    "verify:a11y": "node scripts/check-a11y.mjs"
+    "verify:popup": "node scripts/check-popup.mjs",
+    "verify:feedback": "node scripts/check-feedback.mjs",
+    "verify:a11y": "node scripts/check-a11y.mjs",
+    "verify:press": "node scripts/check-press.mjs",
+    "verify:touch": "node scripts/check-touch.mjs",
+    "verify:menu-motion": "node scripts/check-menu-motion.mjs",
+    "verify:docs": "node scripts/check-docs.mjs"
   },
   "dependencies": {
     "@nui-kit/react": "*",
@@ -20,6 +26,7 @@
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^16.3.2",
     "@types/mdx": "^2.0.14",
+    "lucide-react": "^1.39.0",
     "next": "16.3.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

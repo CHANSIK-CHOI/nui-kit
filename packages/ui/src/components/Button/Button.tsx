@@ -13,14 +13,27 @@ import useLoadingStatus from "./useLoadingStatus.js";
 
 const block = px("button");
 
-// 기본은 medium(48px). 위아래로 large(56px)·small(36px)이 있는 형태가 표준이고,
+// 기본은 medium(48px). 위아래로 large(56px)·small(40px)이 있는 형태가 표준이고,
 // 소비자는 small 을 보고 "가장 작은 것"이라고 읽는다.
 export type ButtonSize = "large" | "medium" | "small";
 // 색이 아니라 역할이 이름이다 — "이 버튼은 삭제인가"만 물으면 된다.
 // secondary 는 KRDS 의 보조 색(2026-09-04, A1) — 덜 중요한 액션.
+//
+// quiet 은 neutral 보다 한 단계 낮은 강조(2026-09-11) — 취소 · 닫기 · 목록 행의 부차 액션.
+//    SEED `neutralWeak` · `text-button` 의 `fg.neutral-muted`, KRDS 514쪽 「텍스트 버튼이 가장
+//    낮은 수준의 강조」가 근거다. 색(gray)이 아니라 역할로 이름 짓는다.
+//
+// ⚠️ `warning` 은 없다(2026-09-07 제거). 노랑은 면이 있어야 하는 색이라 line·text 에서
+//    대비를 맞추면 갈색이 되어 "주의"를 잃는다 — variant 축을 못 채운다. 되돌릴 수 없는
+//    행동은 `danger`, 확인이 필요하면 `Confirm` 이 그 자리다.
 export type ButtonColor =
-  "neutral" | "primary" | "secondary" | "danger" | "warning";
-export type ButtonVariant = "solid" | "line" | "text";
+  "neutral" | "quiet" | "primary" | "secondary" | "danger";
+// 위계 넷 — 채움의 진하기로 나눈다 (design-system.md §2-4-1)
+//   solid  High     한 화면에 하나. 눌러야 하는 것
+//   soft   Medium   두 번째 행동. 채워져 있지만 조용하다 (2026-09-07 추가)
+//   line   Low      반복되는 자리. 테두리는 중립, 색은 글자에만
+//   text   Lowest   목록 안·문장 안
+export type ButtonVariant = "solid" | "soft" | "line" | "text";
 export type ButtonShape = "round" | "square";
 
 export type ButtonDesignProps =
@@ -31,8 +44,14 @@ export type ButtonDesignProps =
     }
   | {
       variant: "text";
+      /** 면이 없어 둥글기가 닿을 곳이 없다 */
       shape?: never;
-      size?: never;
+      /**
+       * text 도 받는다. 바뀌는 것은 글자 · 아이콘 · 스피너뿐이고 높이는 잡지 않는다 —
+       * 내용 폭 · `min-height: auto` 예외(design-system.md §7-2)는 그대로다.
+       * 글자는 large 18 · medium 16 · small 14, 아이콘은 24 · 20 · 16 이다.
+       */
+      size?: ButtonSize;
     };
 
 export type ButtonBaseProps = {

@@ -13,6 +13,7 @@ import type {
   ActionMeta,
   CSSObjectWithLabel,
   GroupBase,
+  MenuPlacement,
   OptionsOrGroups,
   SelectComponentsConfig,
   StylesConfig,
@@ -22,14 +23,18 @@ import { components as reactSelectComponents } from "react-select";
 import {
   NuiClearIndicator,
   NuiDropdownIndicator,
+  NuiMenu,
   NuiMultiValueRemove,
+  NuiMenuPortal,
+  NuiSelectContainer,
 } from "./SelectIndicators.js";
 import { getMergedAriaIds } from "../Field/Field.context.js";
-import { pv } from "../../internal/prefix.js";
+import { px, pv } from "../../internal/prefix.js";
 import SelectAriaContext from "./Select.context.js";
 import type {
   MultiSelectValue,
   SelectChangeMeta,
+  SelectMenuPosition,
   SelectOption,
   SingleSelectValue,
 } from "./Select.types.js";
@@ -49,6 +54,98 @@ declare const process: { env: { NODE_ENV?: string } };
 const MENU_PORTAL_Z_INDEX = `var(${pv("z-portal-menu")})`;
 
 /**
+ * 메뉴가 나가는 `body` 컨테이너의 id. Tooltip · Datepicker 와 같은 규칙으로
+ * `data-nui-portal-root` 를 달아 팝업의 inert 루프에서 빠진다
+ * (design-system.md §10-1).
+ */
+export const SELECT_PORTAL_ROOT_ID = px("select-root");
+
+/** 메뉴 배치를 정하는 소비자 prop — `Select` · `MultiSelect` 가 같은 모양으로 넘긴다. */
+export type MenuPlacementInput = {
+  hasPortal: boolean;
+  menuPosition?: SelectMenuPosition;
+  menuPlacement?: MenuPlacement;
+  menuPortalTarget?: HTMLElement | null;
+};
+
+/**
+ * 우리 portal 컨테이너(`#nui-select-root`)를 잡아야 하는가.
+ *
+ * **`hasPortal` 이 켜져 있고, 소비자가 `menuPortalTarget` 을 안 줬고, 흐름 배치가 아닐 때만.**
+ * 두 컴포넌트가 이 판정을 복제하지 않는다 — 아래 해석과 어긋나면 메뉴는 portal 로 가는데
+ * 컨테이너가 없어 제자리로 떨어진다.
+ */
+export function needsSelectPortalRoot({
+  hasPortal,
+  menuPosition,
+  menuPortalTarget,
+}: MenuPlacementInput): boolean {
+  return (
+    hasPortal && menuPosition !== "static" && menuPortalTarget === undefined
+  );
+}
+
+/**
+ * 메뉴 배치 prop 을 한자리에서 해석한다 — `Select` 와 `MultiSelect` 가 같이 쓴다 (Select.md §6-7 「해석 순서」).
+ *
+ * **두 컴포넌트에 복제하지 않는다.** 한쪽만 고쳐지는 자리가 된다 (`getReadOnlyGuardedProps`
+ * 와 같은 이유).
+ *
+ * 1. `menuPosition === "static"` — 흐름 · portal 없음 · 언제나 아래. `hasPortal` 과
+ *    `menuPortalTarget` 은 무시한다
+ * 2. `menuPortalTarget` 을 **`undefined` 가 아닌 값으로** 줬으면 그 값이 portal 을 정하고
+ *    **`hasPortal` 은 통째로 무시된다** — 위치 기본도 `absolute` 로 남는다
+ * 3. 아니면 `hasPortal` — 켜면 우리 컨테이너 + 위치 기본 `fixed`, 끄면 제자리 + `absolute`
+ *
+ * ⚠️ **`fixed` 로 따라가는 기준은 `hasPortal` 하나다** (2026-09-17 사용자 결정). 「실제로
+ *    portal 이 생겼는가」로 넓히면 `menuPortalTarget={요소}` 만 준 소비자가 조용히 `fixed` 로
+ *    바뀐다 — 0.1.2 에서 그 조합은 `absolute` 였다.
+ *
+ * ⚠️ **`menuPortalTarget={null}` 은 「안 준 것」과 다르다.** `??` 로 기본값을 주면 `null` 이
+ *    삼켜져 **타입은 통과하는데 끌 수 없는** prop 이 된다. 그렇다고 `"menuPortalTarget" in rest`
+ *    로 가르지도 않는다 — `undefined` 를 **명시한** 것도 키를 만든다. **가르는 경계는 키의
+ *    유무가 아니라 `undefined` 냐다.** `undefined` 면 `hasPortal` 에 맡긴다.
+ *
+ * ⚠️ **`"static"` 은 react-select 에 넘기지 않는다.** 공식 값이 `absolute | fixed` 둘뿐이다.
+ *
+ * ⚠️ **`menuPlacement` 기본은 `"auto"`** (2026-09-17) — 아래가 모자라면 위로 뒤집는다. 판정은
+ *    react-select 가 아니라 `internal/dropdownPlacement` 가 하고 `Datepicker` 와 같다
+ *    (Select.md §6-7 「넘침」). `NuiMenu` 가 이 값을 `selectProps.menuPlacement` 로 읽는다 —
+ *    `"bottom"` · `"top"` 이면 방향 고정. `static` 은 흐름 안이라 언제나 `"bottom"` 이다.
+ */
+export function resolveMenuPlacementProps(
+  input: MenuPlacementInput,
+  portalRoot: HTMLElement | null,
+): {
+  menuPosition: "absolute" | "fixed";
+  menuPlacement: MenuPlacement;
+  menuPortalTarget: HTMLElement | null;
+} {
+  const { hasPortal, menuPosition, menuPlacement, menuPortalTarget } = input;
+
+  if (menuPosition === "static") {
+    return {
+      menuPosition: "absolute",
+      menuPlacement: "bottom",
+      menuPortalTarget: null,
+    };
+  }
+
+  const hasConsumerTarget = menuPortalTarget !== undefined;
+  const usesOurPortal = !hasConsumerTarget && hasPortal;
+
+  return {
+    menuPosition: menuPosition ?? (usesOurPortal ? "fixed" : "absolute"),
+    menuPlacement: menuPlacement ?? "auto",
+    menuPortalTarget: hasConsumerTarget
+      ? menuPortalTarget!
+      : usesOurPortal
+        ? portalRoot
+        : null,
+  };
+}
+
+/**
  * `unstyled` 여도 react-select 이 emotion 클래스로 남기는 속성 중
  * **우리 CSS 가 책임지는 것들.**
  *
@@ -64,12 +161,19 @@ const MENU_PORTAL_Z_INDEX = `var(${pv("z-portal-menu")})`;
  *   - option   `display: 'block'` / `cursor: 'default'` → 옵션 정렬·커서 깨짐
  *   - option   `fontSize: 'inherit'` → 타이포 토큰 대신 **소비자 body 글꼴**을
  *              따라가, 메뉴와 컨트롤의 글자 크기가 어긋난다
- *   - menu     `zIndex: 1` → `--nui-z-tooltip` 무시
+ *
+ * ⚠️ **`menu` 는 여기 없다** (2026-09-14). `Menu` 를 `NuiMenu` 로 **통째로 대체**했고
+ *    그 컴포넌트가 `getStyleProps` 를 부르지 않아 **emotion 이 아예 닿지 않는다** —
+ *    `unstyled` 에서도 살아남는 `position` `top` `width` `zIndex` 넷이 DOM 에 오지
+ *    않는다. 그래서 제자리 메뉴의 배치는 **우리 CSS 가 소유한다**(`_select.scss` ·
+ *    Select.md §6-5 · §6-7). 여기 두면 다음 사람이 「emotion 이 menu 를 그린다」고
+ *    다시 읽는다 — 실제로 그 오해가 메뉴를 `position: static` 으로 두었다.
  *
  * ⚠️ 목록에 없는 것은 **일부러** 남긴 것이다. 크게 두 부류다.
  *   1) react-select 의 기능 스타일 — 지우면 동작이 깨진다
- *      · menu/menuPortal 의 `position` `top` `width` — 메뉴 배치 계산
- *      · menuList 의 `maxHeight` — `maxMenuHeight` prop 이 소유한다
+ *      · menuPortal 의 `position` `left` `top` `width` — portal 래퍼의 배치. 좌표는 `NuiMenuPortal` 이
+ *        추적해 넘기고, `height` · `pointerEvents` · `zIndex` 는 우리가 더한다(`getResolvedSelectStyles`)
+ *      · menuList 의 `overflowY` · `position` — 목록 스크롤. `maxHeight` 는 우리가 덮는다(같은 곳)
  *      · valueContainer 의 `display` — 단일=grid / 다중=flex 전환에 의존
  *      · indicatorsContainer 의 `alignSelf` — 컨트롤 높이 추종
  *      · control 의 `flexWrap` `justifyContent` — 칩 줄바꿈 레이아웃
@@ -87,7 +191,6 @@ const CSS_OWNED_PROPERTIES: Record<string, readonly string[]> = {
   multiValueRemove: ["display"],
   clearIndicator: ["display", "transition"],
   dropdownIndicator: ["display", "transition"],
-  menu: ["zIndex"],
 };
 
 /** react-select 이 검색 input 에 붙이는 role. 이 자식만 골라 aria 를 보강한다. */
@@ -97,6 +200,7 @@ type ComboboxChildProps = {
   role?: string;
   "aria-describedby"?: string;
   "aria-readonly"?: boolean;
+  "aria-required"?: boolean;
 };
 
 type StyleFn = (base: CSSObjectWithLabel, props: never) => CSSObjectWithLabel;
@@ -190,7 +294,7 @@ export function createAriaValueContainer<IsMulti extends boolean>(
   function NuiValueContainer(
     props: ValueContainerProps<SelectOption, IsMulti, GroupBase<SelectOption>>,
   ) {
-    const { describedBy, readOnly } = useContext(SelectAriaContext);
+    const { describedBy, readOnly, isRequired } = useContext(SelectAriaContext);
     let hasCombobox = false;
 
     const children = Children.map(props.children, (child) => {
@@ -215,6 +319,10 @@ export function createAriaValueContainer<IsMulti extends boolean>(
         // 붙인다 — "텍스트 입력 불가" 를 뜻하지만, combobox 의 `aria-readonly` 는
         // "값 변경 불가" 다. 우리 readOnly 상태와 일치시킨다.
         "aria-readonly": readOnly ? true : undefined,
+        // `Field required` 를 전한다. react-select 은 자기 `required` prop 에서만
+        // 이 값을 만들고 우리가 넘긴 것을 덮어쓴다 — 그 prop 은 네이티브 검증
+        // input 을 함께 만들어 쓸 수 없다 (Select.context.ts 의 `isRequired`).
+        "aria-required": isRequired ? true : undefined,
       });
     });
 
@@ -260,6 +368,16 @@ export function getResolvedSelectComponents<IsMulti extends boolean>(
     DropdownIndicator: NuiDropdownIndicator,
     ClearIndicator: NuiClearIndicator,
     MultiValueRemove: NuiMultiValueRemove,
+    // 메뉴의 등장·퇴장 모션 (07 M4). 소비자가 갈아끼울 수 있다 — 기본값이다.
+    Menu: NuiMenu,
+    // 퇴장의 경계. react-select 이 메뉴를 즉시 언마운트하므로 `AnimatePresence` 가
+    // 메뉴보다 **위**에 있어야 한다 (Select.md §6-6). 역시 기본값이다 — 소비자가
+    // 갈아끼우면 퇴장 모션을 잃지만 그것은 **화면에 보인다**(tokens.md §1-2).
+    // `ValueContainer` 를 감싸는 것과 갈리는 자리다: aria 는 조용히 깨진다.
+    SelectContainer: NuiSelectContainer,
+    // portal 래퍼 — 컨트롤 rect 를 우리가 추적한다(Select.md §6-7 「배치의 소유권」). react-select 의
+    // 것은 자기 판정의 좌표가 바뀔 때만 갱신해 우리 방향 판정과 어긋난다. 기본값이다
+    MenuPortal: NuiMenuPortal,
     ...components,
     ...overrides,
   };
@@ -319,13 +437,41 @@ export function getResolvedSelectStyles<IsMulti extends boolean>(
 
   const consumerMenuPortal = consumerStyles.menuPortal;
 
+  // portal 래퍼를 **컨트롤 rect 를 입은 유령 상자**로 만든다 (2026-09-17 · Select.md §6-7 「배치의
+  // 소유권」). 좌표(`offset` · `rect`)는 `NuiMenuPortal` 이 컨트롤을 추적해 **위치 기준으로 이미 맞춰**
+  // 넘긴다 — `offset` 이 윗변이고 `rect.left` 도 같은 기준이라 base 의 `top` · `left` 가 그대로 맞는다.
+  // 여기서는 높이만 더한다. 상자가 컨트롤과 같으면 메뉴의 `top: 100%` · `bottom: 100%` 가 제자리일
+  // 때와 같은 자리를 가리킨다 — `Datepicker.__portal` 과 같은 꼴이다.
+  //
+  // ⚠️ **`pointerEvents: "none"` 이 없으면 래퍼가 컨트롤 위를 덮어 클릭을 먹는다.** 메뉴는
+  //    `_select.scss` 가 `auto` 로 되살린다.
   resolved.menuPortal = (base, props) => {
+    const { rect } = props as unknown as { rect: { height?: number } };
     const nextBase: CSSObjectWithLabel = {
       ...base,
+      height: rect.height,
+      pointerEvents: "none",
       zIndex: MENU_PORTAL_Z_INDEX,
     };
 
     return consumerMenuPortal ? consumerMenuPortal(nextBase, props) : nextBase;
+  };
+
+  const consumerMenuList = consumerStyles.menuList;
+
+  // 목록 높이는 **언제나 `maxMenuHeight`** 다 — react-select 의 `MenuPlacer` 가 줄인 `maxHeight`
+  // (③ 줄임)를 덮는다. 우리 판정은 이 높이로 방향을 정했으므로, 줄어든 값이 새면 판정과 보이는
+  // 높이가 갈린다 (Select.md §6-7 「넘침」 · 사용자 결정 — 줄이지 않고 넓은 쪽으로 넘친다).
+  resolved.menuList = (base, props) => {
+    const { selectProps } = props as unknown as {
+      selectProps: { maxMenuHeight: number };
+    };
+    const nextBase: CSSObjectWithLabel = {
+      ...base,
+      maxHeight: selectProps.maxMenuHeight,
+    };
+
+    return consumerMenuList ? consumerMenuList(nextBase, props) : nextBase;
   };
 
   return resolved as StylesConfig<

@@ -15,9 +15,17 @@
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { hexToOklch, oklchToHex, compositeOver, inGamut } from "./oklch.mjs";
-import { contrast, AA, SOLID_TEXT, MUTED_TEXT } from "./contrast.mjs";
+import { compositeOver } from "./oklch.mjs";
 import { generate, STEPS, ALPHA_STEPS } from "./generate.mjs";
+import { checkTheme, deltaE, GATES } from "./gates.mjs";
+
+// 영수증 — 어느 길로 끝나든 마지막 줄. 없으면 끝까지 안 돈 것이다 (rules/scripts.md §1)
+const receipt = { compared: 0, presets: 0, checks: 0, fail: 0, info: 0 };
+process.on("exit", (code) =>
+  console.log(
+    `RECEIPT color-verify compared=${receipt.compared} presets=${receipt.presets} checks=${receipt.checks} fail=${receipt.fail} info=${receipt.info} exit=${code}`,
+  ),
+);
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SEED = join(HERE, "..", "..", "src", "styles", "tokens", "_seed.scss");
@@ -38,19 +46,7 @@ export const MAX_DELTA_E = 1.0;
  */
 export const MAX_DELTA_E_GRAY = 1.5;
 
-/** OKLab 공간의 거리 = 지각 색차. */
-export function deltaE(hexA, hexB) {
-  const a = hexToOklch(hexA);
-  const b = hexToOklch(hexB);
-  const rad = (d) => (d * Math.PI) / 180;
-  return (
-    Math.hypot(
-      (a.L - b.L) / 100,
-      a.C * Math.cos(rad(a.H)) - b.C * Math.cos(rad(b.H)),
-      a.C * Math.sin(rad(a.H)) - b.C * Math.sin(rad(b.H)),
-    ) * 100
-  );
-}
+// deltaE 는 `gates.mjs` 에 있다 — 관문 3 의 9번 재조정 판정도 같은 자를 쓴다.
 
 /**
  * `_seed.scss` 를 테마별로 가른다.
@@ -156,71 +152,57 @@ if (isMain) {
     `\n── 관문 2 · 재현 — ${ACCENT} 로 만든 색(보조 포함)이 원본과 같아 보이나`,
   );
   const made = generate(ACCENT);
-  failed += report("생성 결과", compare(themes, made));
+  const rows = compare(themes, made);
+  receipt.compared = rows.length;
+  if (rows.length === 0) {
+    console.log("   ✗ 대조할 색이 0개 — _seed.scss 정규식이 늙었다");
+    failed++;
+  }
+  failed += report("생성 결과", rows);
   for (const theme of ["light", "dark"]) {
     const t = made[theme];
-    const bad = t.belowStandard;
     console.log(
-      `     ${theme.padEnd(5)} 9번 글자색 ${t.contrast} (${t.contrastRatio}:1) · 보조 ${t.secondaryContrast} (${t.secondaryContrastRatio}:1)` +
-        `${bad ? ` ✗ 기준 ${SOLID_TEXT}:1 미달` : ""}`,
+      `     ${theme.padEnd(5)} 9번 글자색 ${t.contrast} (${t.contrastRatio}:1) · 보조 ${t.secondaryContrast} (${t.secondaryContrastRatio}:1)`,
     );
-    if (bad) failed++;
   }
+  // 기본 브랜드도 같은 기준을 지나야 한다 — 관문 3 과 같은 함수
+  const own = checkTheme(made);
+  receipt.checks += own.checks;
+  for (const f of own.fails) console.log(`     ✗ ${f.message}`);
+  failed += own.fails.length;
 
   // ── 관문 3: 프리셋 전부를 돌린다
   console.log(
     `\n── 관문 3 · 전수 — 프리셋 ${presets.length}색이 전부 안전한가`,
   );
+  // 기준은 `gates.mjs` 한 벌이다 — CLI 의 `--accent` 와 문서 미리보기도 같은 것을 읽는다.
   const problems = [];
+  const shifted = { light: 0, dark: 0 };
+  let checks = 0;
   for (const p of presets) {
-    const r = generate(p.hex);
-    for (const theme of ["light", "dark"]) {
-      const t = r[theme];
-      if (t.contrastRatio < SOLID_TEXT) {
-        problems.push(
-          `${p.n}. ${p.name} (${theme}) 9번 글자 대비 ${t.contrastRatio}:1`,
-        );
-      }
-      if (t.secondaryContrastRatio < SOLID_TEXT) {
-        problems.push(
-          `${p.n}. ${p.name} (${theme}) 보조 9번 글자 대비 ${t.secondaryContrastRatio}:1`,
-        );
-      }
-      // 본문 글자(11·12번)는 여전히 AA 다. 9번만 완화했다.
-      //
-      // ⚠️ 배경은 **2번**이다. Radix 가 11번에 대해 보장하는 조건이 "1·2번 배경 위"이고,
-      //    우리 `layer-default` 도 gray-2 다. 순수 흰색으로 재면 실제보다 낮게 나온다.
-      // 11번은 저대비 글자라 기준이 4.0, 12번은 고대비라 AA 다.
-      for (const [step, min] of [
-        [11, MUTED_TEXT],
-        [12, AA],
-      ]) {
-        const onBg = contrast(t.brand[step], t.gray[2]);
-        if (onBg < min) {
-          problems.push(
-            `${p.n}. ${p.name} (${theme}) ${step}번 본문 대비 ${onBg.toFixed(2)}:1 (기준 ${min})`,
-          );
-        }
-      }
-      for (const [group, colors] of [
-        ["brand", t.brand],
-        ["secondary", t.secondary],
-        ["gray", t.gray],
-      ]) {
-        for (const [step, hex] of Object.entries(colors)) {
-          const c = hexToOklch(hex);
-          if (!inGamut(c))
-            problems.push(
-              `${p.n}. ${p.name} ${theme}/${group}-${step} 화면 밖`,
-            );
-        }
-      }
-    }
+    const g = checkTheme(generate(p.hex));
+    checks += g.checks;
+    for (const f of g.fails) problems.push(`${p.n}. ${p.name} ${f.message}`);
+    for (const i of g.infos) shifted[i.theme]++;
   }
-  console.log(`   대비 미달 · 화면 밖 색: ${problems.length}건`);
+  receipt.presets = presets.length;
+  receipt.checks += checks;
+  receipt.fail = problems.length;
+  receipt.info = shifted.light + shifted.dark;
+  console.log(
+    `   검사 ${checks}건 (${presets.length}색 × 기준 ${GATES.length} + 9번 재조정 × 2테마)`,
+  );
+  console.log(
+    `   9번 재조정(정보) — 라이트 ${shifted.light} · 다크 ${shifted.dark}. 입력이 페이지 배경과 구분되지 않아 참조 스케일의 9번이 앉은 것. 문서 카드가 같은 수를 보여준다`,
+  );
+  console.log(`   기준 미달 · 화면 밖 색: ${problems.length}건`);
   for (const x of problems.slice(0, 15)) console.log(`     ✗ ${x}`);
   if (problems.length > 15)
     console.log(`     … 그리고 ${problems.length - 15}건 더`);
+  if (checks === 0) {
+    console.log("   ✗ 검사한 수가 0 — presets.json 이 비었거나 경로가 늙었다");
+    failed++;
+  }
   failed += problems.length;
 
   console.log(

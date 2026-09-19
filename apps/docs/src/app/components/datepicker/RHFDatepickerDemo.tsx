@@ -1,49 +1,39 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Button, Field } from "@nui-kit/react";
-import {
-  RHFDateMultiplePicker,
-  RHFDateRangePicker,
-  RHFDatepicker,
-} from "@nui-kit/react/rhf";
-import type { DateRange } from "react-day-picker";
+import { Button, ButtonGroup, Field } from "@nui-kit/react";
+import { RHFDatepicker } from "@nui-kit/react/rhf";
 import { Example } from "@/components/guide";
 
-type FormValues = {
-  visitDate: Date | undefined;
-  stay: DateRange | undefined;
-  extraDates: Date[] | undefined;
-};
+type FormValues = { visitDate: Date | undefined };
 
 export function RHFDatepickerDemo() {
   const { control, handleSubmit, formState, reset, watch } =
     useForm<FormValues>({
       mode: "onChange",
-      defaultValues: {
-        visitDate: undefined,
-        stay: undefined,
-        extraDates: undefined,
-      },
+      defaultValues: { visitDate: undefined },
     });
 
-  const values = watch();
+  const visitDate = watch("visitDate");
 
   return (
     <>
-      <h2>react-hook-form 연동</h2>
+      <h2>react-hook-form</h2>
       <p>
-        <code>@nui-kit/react/rhf</code> 의 <code>RHFDatepicker</code> ·{" "}
-        <code>RHFDateRangePicker</code> · <code>RHFDateMultiplePicker</code> 는{" "}
-        <code>control</code> 만 넘기면 값과 에러를 스스로 소유한다.{" "}
-        <code>selected</code> · <code>name</code> · <code>onBlur</code> 는
-        타입에서 제외되어 중복 소유가 생기지 않는다.
+        <code>RHFDatepicker</code> 가 <code>@nui-kit/react/rhf</code> 에 있다.{" "}
+        <code>control</code> 과 <code>name</code> 만 주면 값 · 검증 · 에러
+        표시가 이어진다. 검증에 걸려 포커스가 이 입력으로 와도 달력은 열리지
+        않는다. 에러 메시지를 가리지 않기 위해서다.
       </p>
-
-      <Example row={false} caption='mode: "onChange"' overflow>
+      <Example
+        row={false}
+        caption="required 검증. 값은 Date 로 들어온다"
+        code={`<RHFDatepicker control={control} name="visitDate" rules={{ required: "방문일을 골라 주세요" }} isClearable />`}
+        overflow
+      >
         <form
           onSubmit={handleSubmit(() => {
-            window.alert("제출되었습니다.");
+            window.alert("저장했습니다.");
           })}
         >
           <Field>
@@ -51,85 +41,36 @@ export function RHFDatepickerDemo() {
             <RHFDatepicker
               control={control}
               name="visitDate"
-              rules={{ required: "방문일을 선택해주세요." }}
-              placeholder="방문일"
+              rules={{ required: "방문일을 골라 주세요" }}
+              placeholder="날짜를 고르세요"
               isClearable
             />
           </Field>
 
-          <div style={{ marginTop: 16 }}>
-            <Field>
-              <Field.Label>숙박 기간</Field.Label>
-              <Field.Description>
-                시작일과 종료일을 모두 선택해야 합니다.
-              </Field.Description>
-              <RHFDateRangePicker
-                control={control}
-                name="stay"
-                rules={{
-                  validate: (value: DateRange | undefined) =>
-                    Boolean(value?.from && value?.to) ||
-                    "기간을 모두 선택해주세요.",
-                }}
-                placeholder="숙박 기간"
-                isClearable
-              />
-            </Field>
-          </div>
-
-          <div style={{ marginTop: 16 }}>
-            <Field>
-              <Field.Label>추가 방문일</Field.Label>
-              <Field.Description>
-                여러 날짜를 고를 수 있습니다.
-              </Field.Description>
-              <RHFDateMultiplePicker
-                control={control}
-                name="extraDates"
-                rules={{
-                  validate: (value: Date[] | undefined) =>
-                    (value?.length ?? 0) > 0 || "하루 이상 선택해주세요.",
-                }}
-                placeholder="추가 방문일"
-                isClearable
-              />
-            </Field>
-          </div>
-
-          <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
-            <Button type="submit">제출</Button>
-            <Button
-              type="button"
-              variant="line"
-              onClick={() =>
-                reset({
-                  visitDate: undefined,
-                  stay: undefined,
-                  extraDates: undefined,
-                })
-              }
-            >
-              초기화
-            </Button>
+          <div style={{ marginTop: 20 }}>
+            <ButtonGroup ratio="3:7">
+              <ButtonGroup.Item>
+                <Button
+                  type="button"
+                  variant="line"
+                  onClick={() => reset({ visitDate: undefined })}
+                >
+                  초기화
+                </Button>
+              </ButtonGroup.Item>
+              <ButtonGroup.Item>
+                <Button type="submit">저장</Button>
+              </ButtonGroup.Item>
+            </ButtonGroup>
           </div>
 
           <pre className="doc-code" style={{ marginTop: 16 }}>
             <code>
               {JSON.stringify(
                 {
-                  visitDate: values.visitDate
-                    ? values.visitDate.toLocaleDateString("ko-KR")
+                  visitDate: visitDate
+                    ? visitDate.toLocaleDateString("ko-KR")
                     : null,
-                  stay: values.stay?.from
-                    ? {
-                        from: values.stay.from.toLocaleDateString("ko-KR"),
-                        to: values.stay.to?.toLocaleDateString("ko-KR") ?? null,
-                      }
-                    : null,
-                  extraDates:
-                    values.extraDates?.map((d) =>
-                      d.toLocaleDateString("ko-KR"),
-                    ) ?? null,
                   isValid: formState.isValid,
                   errors: Object.fromEntries(
                     Object.entries(formState.errors).map(([key, error]) => [

@@ -1,23 +1,35 @@
 # @nui-kit/react
 
-Next.js **App Router 전용** React UI 컴포넌트 라이브러리.
-모든 컴포넌트는 클라이언트 컴포넌트(`"use client"`)로 배포된다.
+Next.js 와 React 를 위한 UI 컴포넌트 라이브러리.
+모든 컴포넌트는 클라이언트 컴포넌트(`"use client"`)로 배포된다 — App Router 가 이 지시어로
+서버/클라이언트 경계를 만들고, Pages Router 와 순수 React 번들러는 무시한다.
+
+| 환경 | 상태 |
+| --- | --- |
+| Next.js App Router | 문서 사이트와 검사 스크립트가 여기서 돈다 |
+| Next.js Pages Router | 같은 `next/link` · 같은 클라이언트 API 라 막지 않는다. 전역 CSS 는 `_app` 에서 불러온다 |
+| 순수 React (Vite 등) | 배럴과 컴포넌트 서브패스는 `next` 없이 설치·타입체크된다. `ButtonLink` 만 Next 전용이라 `/next` 서브패스에 있다 |
 
 ## 설치
 
 ```bash
-npm install @nui-kit/react
+npm install @nui-kit/react lucide-react
 ```
 
-`react` / `react-dom` 외에 **추가로 설치할 것은 없습니다.**
-`react-hook-form` 은 RHF 래퍼(`/rhf`)를 사용할 때만 필요합니다.
+아이콘은 `lucide-react` 를 씁니다. 소비자 프로젝트와 **같은 한 벌을 나눠 쓰므로**
+직접 설치합니다 — 그래야 `<Icon icon={Star} />` 로 넘긴 아이콘과 라이브러리 안의
+아이콘이 한 세트가 됩니다.
+
+`react-hook-form` 은 RHF 래퍼(`/rhf`)를 사용할 때만, `next` 는 `ButtonLink`(`/next`)를
+사용할 때만 필요합니다. 둘 다 optional peer 입니다.
 
 ```jsonc
 "peerDependencies": {
   "react": "^18 || ^19",
   "react-dom": "^18 || ^19",
-  "react-hook-form": ">=7.50.0",  // optional — /rhf 사용 시에만
-  "next": ">=14"                  // optional — ButtonLink 사용 시에만
+  "lucide-react": "^1.39.0",
+  "next": ">=14",                // optional — /next 사용 시에만
+  "react-hook-form": ">=7.50.0"  // optional — /rhf 사용 시에만
 }
 ```
 
@@ -94,9 +106,36 @@ import "@nui-kit/react/styles/preflight.css";
 ```
 
 **전체 브랜드 색은 프리셋으로 바꿉니다.** 185색 중 하나를 고르면 버튼·입력창·선택
-컨트롤·회색까지 **대비를 유지한 채** 함께 바뀝니다. 고르는 법과 미리보기는 문서
-사이트의 「브랜드 색 고르기」에 있습니다. 다크는 OS 설정을 자동으로 따르고,
-`<html data-theme="dark">` 또는 `"light"` 로 강제할 수 있습니다.
+컨트롤·회색까지 **대비를 유지한 채** 함께 바뀝니다. 185색이 전부 패키지에 들어 있어
+번호의 CSS 를 한 줄 더 불러오면 됩니다.
+
+```tsx
+// app/layout.tsx
+import "@nui-kit/react/styles/index.css";
+import "@nui-kit/react/styles/themes/preset-42.css";
+```
+
+미리보기와 번호는 문서 사이트의 「브랜드 색 고르기」에 있습니다. 다크는 OS 설정을
+자동으로 따르고, `<html data-theme="dark">` 또는 `"light"` 로 강제할 수 있습니다.
+
+**목록에 없는 색은 명령으로 만듭니다.** 설치돼 있으면 바로 됩니다. `./nui-theme.css` 가
+생기고 루트 `layout` 에 import 한 줄이 들어갑니다. 다시 실행하면 덮어씁니다.
+
+```bash
+npx nui-theme --accent "#b1002a"     # 목록에 없는 색
+npx nui-theme --preset 42            # 프리셋도 같은 명령. 패키지에 든 파일을 복사합니다
+```
+
+```tsx
+// app/layout.tsx — 명령이 넣는 줄. --no-apply 를 주면 직접 넣습니다
+import "@nui-kit/react/styles/index.css";
+import "../nui-theme.css";
+```
+
+고른 색은 색조의 원천이고 9단계는 그 색조로 만든 채움입니다. 페이지 배경과 구분되는 한
+고른 색이 9단계에 그대로 앉고, 배경에 녹는 색이면 같은 색조의 가장 가까운 채움이 대신 앉습니다.
+명령이 그 사실을 전후 값과 함께 찍습니다. 프리셋을 고를 때 쓴 기준(회색 제외 · 채움 위 글자 ·
+본문 글자 대비)에 못 미치는 색은 받지 않고, 이유를 찍은 뒤 아무것도 바꾸지 않습니다.
 
 ### 치수·모양·선 두께는 컴포넌트별로 엽니다
 
@@ -105,28 +144,45 @@ import "@nui-kit/react/styles/preflight.css";
 
 ```css
 :root {
-  --nui-button--lg-height: 3.75rem; /* 버튼 · large 옵션 · 높이 */
-  --nui-button--radius: 0;
+  --nui-button--large-height: 3.75rem; /* 버튼 · large 옵션 · 높이 */
+  --nui-button--medium-radius: 0; /* 버튼 · medium 옵션 · 둥글기 (large · small 은 따로) */
   --nui-button--border-width: 2px;
 }
 ```
 
 | 컴포넌트 | 공개 변수 |
 | --- | --- |
-| Button | `-lg-height` `-md-height` `-sm-height` · `-lg-padding-x` `-md-padding-x` `-sm-padding-x` · `-min-width` · `-radius` `-round-radius` · `-border-width` |
+| Button · ButtonLink | `-large-height` `-medium-height` `-small-height` · `-large-padding-x` `-medium-padding-x` `-small-padding-x` · `-large-radius` `-medium-radius` `-small-radius` · `-text-padding-x` `-text-padding-y` · `-min-width` · `-gap` · `-round-radius` · `-border-width` |
+| IconButton | `--nui-icon-button--large-size` `-medium-size` `-small-size` · `-large-radius` `-medium-radius` `-small-radius` · `-round-radius` · `-border-width` |
+| Textfield · Search · Password | `--nui-textfield--medium-height` `-large-height` · `-medium-radius` `-large-radius` · `-border-width` |
+| Select · MultiSelect | `--nui-select--medium-height` `-large-height` · `-medium-radius` `-large-radius` · `-border-width` |
+| ButtonGroup | `--nui-button-group--gap` |
 | Popup | `-lg-width` `-md-width` `-sm-width` · `-radius` · `-border-width` |
-| Textfield | `-height` · `-radius` · `-border-width` |
+| BottomSheet | `--nui-bottom-sheet--handle-width` `-handle-height` (손잡이 막대) |
 | Textarea | `-min-height` · `-radius` · `-border-width` |
-| Select | `-height` · `-radius` · `-border-width` |
 | Datepicker | `-dropdown-radius` · `-day-size` `-day-button-size` `-day-radius` · `-border-width` |
-| Accordion | `-gap` · `-radius` · `-border-width` |
+| Accordion | `-box-radius` · `-separated-radius` `-separated-gap` · `-border-width` |
+| Field | `-gap` · `-grid-gap` · `-row-label-width` |
 | Toast | `-width` · `-radius` |
 | Tooltip | `-max-width` · `-radius` |
-| Checkbox · Radio · Switch | `--nui-selector--size` · `--nui-selector--border-width` · `--nui-switch--width` `--nui-switch--height` |
+| Checkbox | `--nui-checkbox--size` · `--nui-checkbox--square-radius` · `--nui-checkbox--border-width` |
+| Radio | `--nui-radio--size` · `--nui-radio--border-width` |
+| Switch | `--nui-switch--width` `--nui-switch--height` · `--nui-switch--border-width` (**2px 까지**) |
 
-크기 옵션이 있는 것은 옵션별로 이름이 나뉩니다. `--nui-button--md-height` 하나만 두면
+`--nui-switch--border-width` 에는 상한이 있습니다. 썸과 트랙 사이 여백이 2px 뿐이라
+3px 이상을 주면 썸이 한쪽으로 밀립니다. 더 두꺼운 테두리가 필요하면
+`--nui-switch--height` 를 함께 키우세요.
+
+크기 옵션이 있는 것은 옵션별로 이름이 나뉩니다. `--nui-button--medium-height` 하나만 두면
 `:root` 에 값을 넣는 순간 large·medium·small 이 전부 같은 높이가 되어 크기 variant 가
 죽기 때문입니다.
+
+**옵션 이름은 prop 값 그대로입니다.** `size="large"` 면 `--large-`, `shape="round"` 면
+`--round-` 입니다. 코드에서 읽은 낱말을 그대로 찾을 수 있습니다.
+
+**컴포넌트가 다르면 변수 이름도 다릅니다.** `Button` 은 `--nui-button--`,
+`IconButton` 은 `--nui-icon-button--`, `ButtonGroup` 은 `--nui-button-group--` 입니다.
+`IconButton` 만 손볼 때 옆의 `Button` 이 따라 움직이지 않습니다.
 
 > ⚠️ **`--nui-_` 로 시작하는 변수는 내부 배선입니다.** variant 가 갈아끼우는 수단이므로
 > 덮어쓰면 variant 가 무력화됩니다. 공개 API 가 아니며 예고 없이 바뀔 수 있습니다.
@@ -135,9 +191,10 @@ import "@nui-kit/react/styles/preflight.css";
 
 | 컴포넌트 | 서브패스 | 온디맨드 CSS |
 | --- | --- | --- |
-| `Button` · `IconButton` · `ButtonGroup`(`.Item`) · `ButtonLink` | `/button` | `button.css` |
-| `Field`(`.Item` `.Grid` `.Label` `.Description` `.Message`) | `/field` | `field.css` |
-| `Textfield` · `Search` · `Password` · `TextfieldBtn` · `Message` | `/textfield` | `textfield.css` |
+| `Button` · `IconButton` · `ButtonGroup`(`.Item`) | `/button` | `button.css` |
+| `ButtonLink` — **Next.js 전용** (`next/link`) | `/next` | `button.css` |
+| `Field`(`.Item` `.Grid` `.Header` `.Label` `.Message`) | `/field` | `field.css` |
+| `Textfield` · `Search` · `Password` · `Message` | `/textfield` | `textfield.css` |
 | `Textarea` | `/textarea` | `textarea.css` |
 | `Checkbox` · `CheckboxGroup` | `/checkbox` | `checkbox.css` |
 | `Radio` · `RadioGroup` | `/radio` | `radio.css` |
@@ -145,7 +202,7 @@ import "@nui-kit/react/styles/preflight.css";
 | `Select` · `MultiSelect` | `/select` | `select.css` |
 | `Datepicker` · `DateRangePicker` · `DateMultiplePicker` | `/datepicker` | `datepicker.css` |
 | `Accordion`(`.Item` `.Head` `.Button` `.Panel`) | `/accordion` | `accordion.css` |
-| `PopupBase` · `Alert` · `Confirm` · `LayerPopup` · `BottomSheet` · `FullPopup` · `PopupHost` | `/popup` | `popup.css` |
+| `LayerPopup` · `BottomSheet` · `FullPopup` · `PopupHost` · `useAlert` · `useConfirm` | `/popup` | `popup.css` |
 | `Toast` · `ToastHost` | `/toast` | `toast.css` |
 | `Tooltip` | `/tooltip` | `tooltip.css` |
 | `Icon` | `/icon` | `icon.css` |
@@ -154,21 +211,36 @@ import "@nui-kit/react/styles/preflight.css";
 
 ### 아이콘
 
-아이콘은 [`lucide-react`](https://lucide.dev) 입니다. 컴포넌트가 쓰는 일곱 개(`DelIcon` ·
-`SearchIcon` · `ShowPwIcon` · `HidePwIcon` · `CloseIcon` · `CalendarIcon` · `AttentionIcon`)는
-`/icon` 에서 가져오고, `title` 을 주면 스크린리더가 읽고 없으면 장식으로 건너뜁니다.
-
-직접 넣을 아이콘은 `lucide-react` 에서 바로 가져오면 라이브러리와 선 굵기가 맞습니다.
-`size` 는 14 · 16 · 20 · 24 를 씁니다.
+아이콘은 [`lucide-react`](https://lucide.dev) 를 씁니다. **아이콘이 지나는 문은 `Icon` 하나**라
+크기 · 색 상속 · 스크린리더 규칙이 어디서든 같습니다.
 
 ```tsx
-import { Trash2 } from "lucide-react";
+import { Icon } from "@nui-kit/react";
+import { Star } from "lucide-react";
 
-<Button icon={<Trash2 size={20} />}>삭제</Button>;
+<Icon icon={<Star />} size={20} />;
+<Button icon={<Icon icon={<Star />} />}>즐겨찾기</Button>;
 ```
 
-`Toast` 와 팝업 계열을 **명령형으로**(`useToast()` · `useAlert()` · `useConfirm()` ·
-`useLayerPopup()`) 쓰려면 Host 로 앱을 **감싸야** 합니다. 앱 루트에서 한 번만 합니다.
+`title` 을 주면 스크린리더가 읽고, 없으면 장식으로 건너뜁니다. `size` 는 14 · 16 · 20 · 24 를
+씁니다. 버튼이나 컨트롤 안에 넣을 때는 자리가 크기를 정하므로 `size` 를 주지 않아도 됩니다.
+
+컴포넌트가 쓰는 열한 개(`DelIcon` · `CloseIcon` · `SearchIcon` · `ShowPwIcon` · `HidePwIcon` ·
+`CalendarIcon` · `AttentionIcon` · `SuccessIcon` · `InfoIcon` · `WarningIcon` · `SpinnerIcon`)는
+`/icon` 에서 가져옵니다.
+이름이 자리를 말합니다.
+
+직접 그린 SVG 는 `viewBox` 와 도형을 주면 같은 규칙을 따릅니다.
+
+```tsx
+<Icon viewBox="0 0 24 24" size={20} title="별점">
+  <path d="…" fill="currentColor" />
+</Icon>
+```
+
+팝업 계열(`useAlert()` · `useConfirm()` · `useLayerPopup()` · `useBottomSheet()` ·
+`useFullPopup()`)과 `Toast`(`useToast()`)는 훅으로 엽니다. 그래서 Host 로 앱을 **반드시**
+감쌉니다. 앱 루트에서 한 번만 합니다.
 
 ```tsx
 // app/layout.tsx
@@ -194,9 +266,59 @@ export default function RootLayout({
 두 Host 모두 `children` 을 **필수**로 받는 래퍼입니다. portal 컨테이너는 없으면
 직접 만들므로 따로 심을 필요가 없습니다.
 
-**Host 가 없으면 명령형 팝업·토스트는 조용히 렌더되지 않습니다** — 에러도 경고도
-나지 않습니다. `<LayerPopup open={...} />` 처럼 선언형으로 직접 렌더할 때는 Host 가
-필요 없지만, 그 경우 배경 스크롤 잠금과 배경 `inert` 도 걸리지 않습니다.
+**Host 가 없으면 팝업·토스트가 그려지지 않습니다.** 개발 모드에서는 콘솔에 한 줄이 납니다.
+
+`Alert` · `Confirm` 은 훅에 넘기는 옵션이 곧 내용입니다 — 컴포넌트가 없습니다.
+`LayerPopup` · `BottomSheet` · `FullPopup` 은 팝업을 **컴포넌트로 만들고** 훅에 등록합니다.
+`PopupHost` 가 넣는 runtime 다섯(`id` · `open` · `isTopmost` · `onRequestClose` ·
+`onCloseComplete`)을 셸에 그대로 펼칩니다. 열려 있는 동안 배경 스크롤은 잠기고 배경은
+`inert` 가 됩니다. `PopupHost` 밖에서 셸을 직접 렌더하면 그려지지 않습니다.
+
+```tsx
+function SortSheet(runtime: BottomSheetComponentProps) {
+  return (
+    <BottomSheet {...runtime} shouldCloseOnDrag title="정렬">
+      <Button variant="line" onClick={runtime.onRequestClose}>최신순</Button>
+    </BottomSheet>
+  );
+}
+
+const bottomSheet = useBottomSheet();
+bottomSheet.open({ component: SortSheet });
+
+const alert = useAlert();
+alert.open({ title: "저장했습니다", confirmLabel: "닫기" });
+```
+
+`BottomSheet` 는 `shouldCloseOnDrag` 를 주면 위에 손잡이가 생기고, **위쪽 44px 띠**를 아래로
+끌어 닫을 수 있습니다. 제목과 본문은 끄는 면이 아니라 글을 긁고 스크롤하는 데 지장이 없습니다.
+기본은 꺼져 있습니다.
+
+**끌어서 닫기를 켜면 닫기 버튼이 기본으로 사라집니다.** 손잡이가 닫는 자리라 × 가 중복이기
+때문입니다. 둘을 함께 두려면 `hasCloseButton` 을 명시합니다. 손잡이 막대만 감추는
+`hasDragHandle={false}` 도 있지만, 띠가 24px 로 줄고 끌 수 있다는 것을 알릴 길도 없어져
+권하지 않습니다.
+
+토스트는 **읽는 동안 사라지지 않습니다.** 마우스가 올라가 있거나, 포커스가 안에
+있거나, 다른 탭에 가 있으면 시간이 멈추고 돌아오면 남은 시간부터 다시 갑니다.
+
+```tsx
+const toast = useToast();
+
+toast.open({ message: "저장을 완료했어요", tone: "success" });
+
+// 되돌릴 수 있는 행동에는 액션 하나를 붙입니다. 누르면 실행하고 닫힙니다.
+toast.open({
+  message: "항목을 삭제했어요",
+  action: { label: "되돌리기", onClick: restore },
+});
+
+// 직접 닫게 하려면 닫기 버튼을 켭니다. 기본값은 꺼짐입니다.
+toast.open({ message: "동기화 중입니다", duration: 0, closable: true });
+```
+
+`tone` 은 `"default"` · `"success"` · `"error"` 셋입니다. `success` 와 `error` 에는
+아이콘이 함께 붙어 색만으로 구분하지 않습니다.
 
 ### react-hook-form 래퍼
 
@@ -281,6 +403,33 @@ import { RHFTextfield } from "@nui-kit/react/rhf";
 />
 ```
 
+### 체크박스의 두 가지 모양
+
+`shape` 이 상자를 그릴지 체크만 둘지 정합니다. 기본은 `square` 입니다.
+
+```tsx
+<Checkbox checked={agreed} onChange={toggle} />                  // square — 상자 안에 체크
+<Checkbox shape="ghost" checked={agreed} onChange={toggle} />    // 체크만
+```
+
+`ghost` 는 필수 선택이 아니고 항목이 셋 이하인 자리에 씁니다. 상자가 없어 외곽선
+대비 요건(3:1)을 만족하지 못하므로, 공공 서비스처럼 KRDS 준수가 요구되는 화면에서는
+`square` 를 씁니다. 상자가 없으니 「일부」를 그릴 자리도 없어 `ghost` 에는
+`indeterminate` 를 줄 수 없습니다 — 타입이 막습니다.
+
+⚠️ **`CheckboxProps` 를 감쌀 때는 `Omit` 이 아니라 `DistributiveOmit` 을 씁니다.**
+`shape` 으로 갈리는 유니온이라 평범한 `Omit` 은 갈래를 접습니다. 접히면 감싼 타입을 다시
+`<Checkbox>` 에 넘길 수 없고, 막아 둔 `ghost` + `indeterminate` 조합이 통과합니다.
+
+```tsx
+import type { CheckboxProps, DistributiveOmit } from "@nui-kit/react";
+
+type MyCheckboxProps = DistributiveOmit<CheckboxProps, "className">;   // ✅
+// type MyCheckboxProps = Omit<CheckboxProps, "className">;            // ❌ 갈래가 접힌다
+```
+
+갈래가 없는 다른 컴포넌트의 props 에는 `Omit` 과 결과가 같으므로 아무 데나 써도 됩니다.
+
 ### 여러 줄 입력의 글자 수
 
 `Textarea` 에 `maxLength` 를 주면 영역 아래 오른쪽에 카운터가 붙습니다. 제한이 곧
@@ -295,7 +444,7 @@ UTF-16 코드 단위여서 이모지는 2로 세집니다.
 
 ```tsx
 <Tooltip content="설명" hasPortal>
-  <IconButton aria-label="도움말"><InfoIcon /></IconButton>
+  <IconButton aria-label="검색"><SearchIcon /></IconButton>
 </Tooltip>
 ```
 
@@ -324,8 +473,8 @@ import { Field, FieldLabel } from "@nui-kit/react";
 | --- | --- |
 | `Field.Item` | `FieldItem` |
 | `Field.Grid` | `FieldGrid` |
+| `Field.Header` | `FieldHeader` |
 | `Field.Label` | `FieldLabel` |
-| `Field.Description` | `FieldDescription` |
 | `Field.Message` | `FieldMessage` |
 | `ButtonGroup.Item` | `ButtonGroupItem` |
 | `Accordion.Item` | `AccordionItem` |
@@ -333,10 +482,26 @@ import { Field, FieldLabel } from "@nui-kit/react";
 | `Accordion.Button` | `AccordionButton` |
 | `Accordion.Panel` | `AccordionPanel` |
 
-### ButtonLink 와 `next`
+### ButtonLink 는 Next.js 전용 — `@nui-kit/react/next`
 
-`ButtonLink` 만 `next/link` 를 사용합니다. `next` 는 optional peer 이므로
-`ButtonLink` 를 쓰지 않으면 설치할 필요가 없습니다.
+`ButtonLink` 만 `next/link` 를 사용합니다. 그래서 배럴이 아니라 `/next` 서브패스로만
+나가고, `next` 는 optional peer 입니다 — `/next` 를 가져오지 않으면 `next` 가 없어도
+설치 · 타입체크 · 번들이 됩니다.
+
+```tsx
+import { ButtonLink } from "@nui-kit/react/next";
+
+<ButtonLink href="/orders" color="primary">주문 내역</ButtonLink>
+```
+
+Next 가 아닌 환경에서 버튼 모양의 링크가 필요하면 `getButtonClassName` 으로 자기 라우터의
+Link 에 같은 클래스를 붙입니다.
+
+```tsx
+import { getButtonClassName } from "@nui-kit/react";
+
+<Link to="/orders" className={getButtonClassName({ color: "primary" })}>주문 내역</Link>
+```
 
 ### Select / MultiSelect 와 `react-select`
 
@@ -364,11 +529,36 @@ const OPTIONS = [
 emotion 쪽에서 걷어내** CSS 가 책임지게 합니다.
 
 - 치수·모양은 위 커스터마이징 절의 CSS 변수로 조정합니다
-  (`--nui-select--height` / `-radius` / `-border-width`). 색은 `className` 으로 씁니다
+  (`--nui-select--medium-height` / `--large-height` / `--medium-radius` / `--large-radius` /
+  `--border-width`). 옵션 낱말은 `size` 값 그대로입니다. 색은 `className` 으로 씁니다
 - `styles` prop 을 직접 넘기면 그 정리된 값 위에 얹히므로 의도대로 덧칠됩니다
 - 다만 **메뉴 최대 높이는 CSS 가 아니라 `maxMenuHeight` prop** 으로 조정합니다.
-  `react-select` 이 메뉴 배치를 계산할 때 이 값을 참조하므로, CSS 로 덮으면
-  실제 높이와 계산이 어긋납니다 (기본값 `240`)
+  메뉴를 위로 뒤집을지 계산할 때 이 값으로 자른 높이를 쓰므로, CSS 로 덮으면
+  실제 높이와 계산이 어긋납니다 (기본값 `480`)
+
+**메뉴는 컨트롤 바로 아래 제자리에 뜹니다.** 스크롤하면 컨트롤과 함께 움직이고, 아래 공간이
+모자라면 **위로 뒤집힙니다** — 화면 가장자리와 8px 를 띄우고, 위아래 모두 모자라면 넓은 쪽으로
+열리며 높이는 줄지 않습니다. 페이지는 스크롤하지 않습니다. `Datepicker` 의 달력과 같은 규칙입니다.
+`overflow: hidden` 인 조상(카드 · 팝업) 안에서는 잘리므로 그때 `hasPortal` 을 켭니다 —
+`Datepicker` · `Tooltip` 과 같은 이름입니다.
+
+`menuPlacement` 는 `react-select` 의 이름과 값 그대로지만 **뜻이 다릅니다** — 기본 `"auto"` 는
+위치 모드와 상관없이 화면 기준으로 뒤집고, `"bottom"` · `"top"` 은 그 방향에 고정합니다.
+
+```tsx
+<Select options={OPTIONS} />                          // 제자리 — 기본. 아래가 모자라면 위로 뒤집힌다
+<Select options={OPTIONS} menuPlacement="bottom" />   // 언제나 아래
+<Select options={OPTIONS} hasPortal />                // body 로 나가 잘리지 않는다. 뒤집기는 같다
+<Select options={OPTIONS} menuPosition="static" />    // 문서 흐름 안. 아래 내용을 밀어낸다
+<Select options={OPTIONS} menuPortalTarget={modalEl} /> // 특정 요소로 내보낸다 — hasPortal 보다 우선
+```
+
+`hasPortal` 은 여러 컴포넌트에 걸친 이 라이브러리의 이름이고, **어느 요소로** 내보낼지는
+`react-select` 의 `menuPortalTarget` 그대로입니다. `menuPosition` 도 `react-select` 의 prop
+이름 그대로이고, 값 `"static"` 만 이 라이브러리가 더한 것입니다. **감싼 라이브러리에만 있는
+prop 은 이름을 바꾸지 않습니다** —
+`menuPlacement` · `maxMenuHeight` · `menuPortalTarget` · `filterOption` 모두 `react-select`
+문서의 이름 그대로 넘깁니다.
 
 **칩의 × 는 Tab 으로 닿는 버튼입니다.** 칩이 여럿이면 앞에서부터 하나씩 잡히고 그다음이
 입력창입니다. <kbd>Enter</kbd>·<kbd>Space</kbd> 로 지우고, 지운 뒤 포커스는 이전 칩(없으면
@@ -436,8 +626,8 @@ import { DateRangePicker, type DateRange } from "@nui-kit/react";
 
 **알려진 제약**
 - 기간(`DateRangePicker`)은 최소 2일입니다 — 하루짜리 기간은 만들 수 없습니다
-- 캘린더 팝업은 portal 을 쓰지 않으므로 `overflow: hidden` 인 조상 안에서 잘릴 수
-  있습니다 (`Select` 의 메뉴도 같습니다)
+- 캘린더 팝업은 기본으로 portal 을 쓰지 않으므로 `overflow: hidden` 인 조상 안에서
+  잘릴 수 있습니다 — `hasPortal` 로 내보냅니다
 - 월 전환 애니메이션(`animate`)은 지원하지 않습니다
 - 달력 컨트롤의 접근 이름은 한국어가 기본입니다. 다른 언어를 쓰려면
   `dayPickerProps.labels` 와 `calendarLabel` 을 함께 넘깁니다

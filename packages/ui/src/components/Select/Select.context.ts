@@ -17,6 +17,18 @@ export type SelectAriaContextValue = {
   /** 값 변경이 불가능한 상태인지 */
   readOnly: boolean;
   /**
+   * 필수 입력인지 — `Field required` 에서 온다.
+   *
+   * ⚠️ react-select 에 `aria-required` 를 넘겨도 무시된다. 5.10.2 의
+   *    `renderInput()` 이 `'aria-required': props.required` 로 만들고 그 객체를
+   *    **마지막에 스프레드**하기 때문이다 (`aria-invalid` 는 props 에서 오는데
+   *    이것만 다르다). 그렇다고 `required` 를 넘길 수도 없다 — 값이 비면
+   *    네이티브 `required` input 이 생겨 브라우저 검증이 우리 `Message` 와
+   *    겹친다. 그래서 여기서 직접 붙인다.
+   *    (react-select 5.10.2 `renderInput()` · `renderFormField()` 실측)
+   */
+  isRequired: boolean;
+  /**
    * MultiSelect 칩의 삭제 버튼 접근 이름을 만든다 (KRDS 가이드 566쪽 02).
    *
    * 문자열이 아니라 함수인 이유는 라벨을 끼워 넣는 자리가 언어마다 다르기 때문이다.
@@ -32,6 +44,7 @@ export const DEFAULT_REMOVE_BUTTON_LABEL = (optionLabel: string) =>
 export const SelectAriaContext = createContext<SelectAriaContextValue>({
   describedBy: undefined,
   readOnly: false,
+  isRequired: false,
   getRemoveButtonLabel: DEFAULT_REMOVE_BUTTON_LABEL,
 });
 

@@ -15,11 +15,20 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const DOCS_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const BASE = process.argv[2] ?? "http://localhost:3000";
+const BASE =
+  process.argv.slice(2).find((a) => !a.startsWith("--")) ??
+  `http://localhost:${process.env.PORT ?? 3000}`; // PORT 는 next dev 도 읽는다 — 세션마다 다른 포트 (2026-09-11)
+// --page=button,textfield — `scripts/changed-scope.mjs` 가 뽑은 슬러그만. 없으면 nav 전체 (2026-09-11)
+const pageArg = process.argv.find((a) => a.startsWith("--page="));
+const SCOPE = pageArg
+  ? new Set(pageArg.slice("--page=".length).split(",").filter(Boolean))
+  : null;
 
 /** nav.ts 에서 라우트를 뽑는다 — 페이지를 추가하면 자동으로 검사 대상이 된다 */
 const navSource = readFileSync(join(DOCS_ROOT, "src/site/nav.ts"), "utf8");
-const routes = [...navSource.matchAll(/href:\s*"([^"]+)"/g)].map((m) => m[1]);
+const routes = [...navSource.matchAll(/href:\s*"([^"]+)"/g)]
+  .map((m) => m[1])
+  .filter((r) => !SCOPE || SCOPE.has(r.replace(/^\/components\//, "")));
 
 /** 개발 환경에서만 나오고 실사용과 무관한 잡음 */
 const IGNORE = ["Download the React DevTools", "[Fast Refresh]", "webpack-hmr"];
@@ -35,6 +44,12 @@ try {
 
 const browser = await chromium.launch();
 const failures = [];
+// 영수증 — 어느 길로 끝나든 마지막 줄. dev server 가 없어 위에서 죽으면 이 줄이 없다 = 미실시 (2026-09-11)
+process.on("exit", (code) =>
+  console.log(
+    `RECEIPT check-console pages=${routes.length} scope=${SCOPE ? [...SCOPE].join(",") : "all"} failures=${failures.length} exit=${code}`,
+  ),
+);
 
 for (const route of routes) {
   const page = await browser.newPage();

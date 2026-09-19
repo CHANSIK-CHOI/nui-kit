@@ -16,7 +16,7 @@ export default function SpacingPage() {
   );
   const sizes = DATA.size ?? [];
   const controls = sizes.filter((t) =>
-    /--nui-size-(control|field)/.test(t.name),
+    /--nui-size-(control-(sm|md|lg|xl)|field)$/.test(t.name),
   );
 
   return (
@@ -46,16 +46,15 @@ export default function SpacingPage() {
       </div>
 
       <p>
-        4px 기준 숫자 스케일이다. <code>space-4</code> 는 4 × 4px = 16px 이다.
-        중간값을 넣어도 기존 이름이 바뀌지 않는다. <code>space-1</code> 과{" "}
-        <code>space-2</code> 사이가 필요하면 <code>space-1_5</code> 다.
+        4px 기준 숫자 스케일이다. <code>space-4</code> 는 4 × 4px = 16px 이고{" "}
+        <code>space-5</code> 는 24px 이다. 번호는 1부터 5까지 순서대로다.
       </p>
       <p>
-        <code>space-5</code> · <code>space-7</code> · <code>space-8</code> ·{" "}
-        <code>space-9</code> 는 없다. 쓰이지 않아서 만들지 않았다.
+        다섯뿐이다. 쓰이지 않아서 만들지 않았다. 새 간격이 필요하면 끝 번호로
+        더한다. 중간에 끼워 넣지 않는다.
       </p>
 
-      <h2>정해진 게 없으면 이것</h2>
+      <h2 id="space">정해진 게 없으면 이것</h2>
       <p>
         규칙이 따로 없을 때 쓸 기본값도 이름을 갖는다. 임의의 숫자가 코드에
         들어가는 경로를 막기 위해서다.
@@ -88,7 +87,7 @@ export default function SpacingPage() {
                   height: `var(${token.name})`,
                   background: "var(--nui-color-brand-3)",
                   border: "1px solid var(--nui-color-brand-9)",
-                  borderRadius: "var(--nui-radius-2)",
+                  borderRadius: "var(--nui-radius-3)",
                   marginBottom: 8,
                 }}
               />
@@ -108,9 +107,12 @@ export default function SpacingPage() {
 
       <h2>크기 옵션</h2>
       <p>
-        크기를 고를 수 있는 컴포넌트는 <code>lg</code> · <code>md</code> ·{" "}
-        <code>sm</code> 세 단계이고 기본은 <code>md</code> 다. 위아래로 하나씩
-        있는 형태가 표준이고 <code>sm</code> 은 가장 작은 것으로 읽힌다.
+        크기를 고를 수 있는 컴포넌트는 <code>large</code> · <code>medium</code>{" "}
+        · <code>small</code> 이고 기본은 <code>medium</code> 이다. 위아래로
+        하나씩 있는 형태가 표준이고 <code>small</code> 은 가장 작은 것으로
+        읽힌다. 입력 컨트롤은 <code>large</code> 와 <code>medium</code> 둘이다 —{" "}
+        <code>small</code>(40px)은 컨트롤 전체가 누르는 자리라 터치 기준 44px
+        아래로 내려간다.
       </p>
       <div className="doc-table-wrap">
         <table className="doc-table">
@@ -134,6 +136,16 @@ export default function SpacingPage() {
               <td>40px</td>
             </tr>
             <tr>
+              <th scope="row" className="doc-wrap">
+                입력 컨트롤 · Select · Datepicker 계열
+              </th>
+              <td>56px</td>
+              <td>
+                <strong>48px</strong>
+              </td>
+              <td>—</td>
+            </tr>
+            <tr>
               <th scope="row">Popup</th>
               <td>40rem</td>
               <td>
@@ -146,9 +158,11 @@ export default function SpacingPage() {
       </div>
       <p>
         크기별 값은 단계마다 이름이 따로 있는 변수로 연다.{" "}
-        <code>--nui-button--lg-height</code> · <code>-md-height</code> ·{" "}
-        <code>-sm-height</code> 가 그렇다. 하나로 두면 값을 넣는 순간 세 단계가
-        전부 같아진다. 자세한 것은{" "}
+        <code>--nui-button--large-height</code> · <code>-medium-height</code> ·{" "}
+        <code>-small-height</code> 가 그렇다. 하나로 두면 값을 넣는 순간 모든
+        단계가 같아진다. 둥글기도 크기를 따라 나뉜다 —{" "}
+        <code>--nui-button--large-radius</code>(8px) ·{" "}
+        <code>-medium-radius</code>(6px). 자세한 것은{" "}
         <Link href="/foundations/customizing">커스터마이징</Link> 문서에 있다.
       </p>
 
@@ -164,11 +178,13 @@ export default function SpacingPage() {
         <br />
         <br />
         자기 치수를 갖는 선택 컨트롤(Checkbox · Radio 24px, Switch 40×24)은
-        컨트롤 자체가 44px 보다 작다. 라벨을 포함한 클릭 영역이 44px 을 채우고,
-        라벨이 <code>&lt;label&gt;</code> 로 연결돼 있으면 자동으로 확보된다.
+        보이지 않는 input 이 44×44 를 누른다. 라벨을 <code>
+          &lt;label&gt;
+        </code>{" "}
+        로 연결하면 가로가 그만큼 더 넓어진다.
       </div>
 
-      <h2>전체 토큰</h2>
+      <h2 id="size">전체 토큰</h2>
       <TokenTable group="size" swatch={false} />
     </>
   );

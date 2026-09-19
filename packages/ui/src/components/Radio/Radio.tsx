@@ -9,6 +9,7 @@ import {
   type MouseEvent,
 } from "react";
 import { px } from "../../internal/prefix.js";
+import type { SelectionTone } from "../../types/selection.js";
 import { getMergedAriaIds, useFieldContext } from "../Field/Field.context.js";
 import { useRadioGroupContext } from "./RadioGroup.context.js";
 
@@ -17,14 +18,27 @@ const block = px("radio");
 const INTERACTION_KEYS = new Set([" ", "Enter"]);
 
 type RadioBaseProps = {
+  /**
+   * 선택됐을 때의 채움색. 기본은 **중립(먹색)** 이고, 강조가 필요한 자리에만
+   * `"brand"` 를 준다 (2026-09-08 · prototype S1).
+   *
+   * 선택 컨트롤은 한 화면에 여럿 반복되는 자리라 전부 브랜드색이면 목록이
+   * 얼룩덜룩해지고 강조가 흔해져 강조가 아니게 된다. 약관 동의나 추천 항목처럼
+   * **하나만 도드라져야 하는 자리**가 `"brand"` 의 자리다.
+   */
+  tone?: SelectionTone;
   id?: string;
   className?: string;
   isError?: boolean;
   readOnly?: boolean;
 };
 
+// ⚠️ `children` 을 닫는다. `InputHTMLAttributes` 가 `children` 을 품고 있어
+//    `<Radio>라벨</Radio>` 이 **타입은 통과하고 런타임에 죽었다** —
+//    `{...rest}` 가 그것을 `<input>` 에 넣어 "input is a void element tag" 가 난다.
+//    라벨은 `Field.Label` 이 붙인다 (a11y.md §1).
 export type RadioProps = RadioBaseProps &
-  Omit<InputHTMLAttributes<HTMLInputElement>, "readOnly" | "type">;
+  Omit<InputHTMLAttributes<HTMLInputElement>, "readOnly" | "type" | "children">;
 
 const Radio = forwardRef<HTMLInputElement, RadioProps>(
   (
@@ -34,6 +48,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
       className,
       isError,
       readOnly,
+      tone = "neutral",
       disabled,
       onClick,
       onKeyDown,
@@ -47,6 +62,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
       inputId: fieldContextId,
       describedByIds: fieldDescribedByIds,
       isError: isFieldError,
+      isRequired: isFieldRequired,
     } = useFieldContext();
     const groupContext = useRadioGroupContext();
     const generatedId = useId();
@@ -81,7 +97,11 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
 
     return (
       <span
-        className={cn(block, className, {
+        className={cn(
+          block,
+          tone !== "neutral" && `${block}--${tone}`,
+          className,
+          {
           [px("is-disabled")]: resolvedDisabled,
           [px("is-error")]: resolvedIsError,
           [px("is-readonly")]: resolvedReadOnly,
@@ -99,6 +119,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
           //    `checked` 를 controlled 로 보고 onChange 누락 경고를 낸다.
           readOnly={resolvedReadOnly}
           aria-describedby={resolvedAriaDescribedBy}
+          aria-required={isFieldRequired ? true : undefined}
           className={`${block}__input`}
           onClick={handleClick}
           onKeyDown={handleKeyDown}

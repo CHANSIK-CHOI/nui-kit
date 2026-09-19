@@ -12,17 +12,20 @@
   #{cls("textarea")} {
     width: 100%;
 
+    // ── 상태 색은 여기서 한 번만 해석한다 ★ (`_textfield.scss` 와 같은 판정)
+    // wrap 의 면 · input 의 글자 · **자동 완성이 칠하는 면**이 같은 변수를 읽는다.
+    // 상태별 값은 아래 disabled · readonly · error 블록이 덮는다(소스 순서가 우선순위다).
+    #{iv("textarea-surface")}: var(#{v("control-bg")});
+    #{iv("textarea-fg")}: var(#{v("control-text")});
+
     &__wrap {
       position: relative;
-      background-color: var(#{v("control-bg")});
+      background-color: var(#{iv("textarea-surface")});
       border: #{hook("textarea--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border")});
-      border-radius: #{hook("textarea--radius", var(#{v("radius-1_5")}))};
+      border-radius: #{hook("textarea--radius", var(#{v("radius-2")}))};
 
-      @include motion(
-        (border-color, background-color, box-shadow, border-width),
-        "3"
-      );
+      @include motion((border-color, background-color, box-shadow), "3");
     }
 
     &__input {
@@ -40,10 +43,22 @@
           calc(var(#{v("size-field")}) * 2)
         )};
       padding: var(#{v("space-4")});
-      color: var(#{v("control-text")});
+      color: var(#{iv("textarea-fg")});
+      // caret 은 글자와 갈린다 — error 에서만 `control-text-error` 로 바뀐다(아래).
       caret-color: var(#{v("control-text")});
 
-      @include typo(4, "regular");
+      // 자동 완성 면이 wrap 과 같은 속도로 상태를 따라간다. 안 걸면 wrap 만 150ms 로
+      // 가고 면은 즉시 튄다. ⚠️ `transition` 은 한 번만 선언할 수 있다 — 이 요소에
+      // 다른 전환을 더하려면 여기 목록에 넣는다.
+      @include motion(box-shadow, "3");
+      @include typo(3, "regular");
+
+      // 자동 완성 면 — UA 의 `!important` 배경·글자를 우리 색으로 되돌린다.
+      // `__input` 이 `__wrap` 의 직계 자식이라 `inherit` 하나로 네 모서리가 따라온다.
+      @include autofill-surface(
+        var(#{iv("textarea-surface")}),
+        var(#{iv("textarea-fg")})
+      );
     }
 
     &__input:focus,
@@ -54,7 +69,7 @@
     &__input::placeholder {
       color: var(#{v("control-text-placeholder")});
 
-      @include typo(4, "regular");
+      @include typo(3, "regular");
     }
 
     // ── interaction
@@ -67,40 +82,57 @@
     // readonly 도 포커스를 받는다 — 링을 그린다 (design-system.md §3-2).
     // 배경은 뒤의 readonly 규칙이 그대로 남긴다. `disabled` 만 제외한다.
     &:not(#{state("disabled")}):focus-within &__wrap {
+      // ⚠️ **두께는 바꾸지 않는다.** 포커스는 색과 링이 말한다 (design-system.md §4-1).
+      // 예전에는 여기서 1px → 2px 로 굵혔는데 `border-box` 라 안쪽이 1px 줄어
+      // **글자가 밀렸다**(실측 left 1 → 2). 그리고 라이브러리 안에서 두께를 상태로
+      // 바꾸는 곳이 입력 컨트롤 셋뿐이라 선택 컨트롤·버튼과도 어긋나 있었다.
       border-color: var(#{v("focus-color")});
-      border-width: var(#{v("focus-width")});
       box-shadow: var(#{v("focus-ring")});
     }
 
     // ── disabled
+    &#{state("disabled")} {
+      #{iv("textarea-surface")}: var(#{v("control-bg-disabled")});
+      #{iv("textarea-fg")}: var(#{v("control-text-disabled")});
+    }
+
     &#{state("disabled")} &__wrap {
-      background-color: var(#{v("control-bg-disabled")});
       border-color: var(#{v("control-border-disabled")});
     }
 
     &__input[disabled] {
-      color: var(#{v("control-text-disabled")});
       cursor: not-allowed;
     }
 
     // ── readonly
-    &#{state("readonly")} &__wrap {
-      background-color: var(#{v("control-bg-readonly")});
+    // ⚠️ **우선순위는 `:not()` 이 만든다 — 소스 순서가 아니다** (styles.md §7 · 2026-09-12).
+    //    상태 셋이 전부 같은 상세도라 예전에는 소스 순서대로 `error > readonly > disabled`
+    //    였다. `Textfield` 와 한 건이고 그쪽 주석이 자세하다.
+    &#{state("readonly")}:not(#{state("disabled")}) {
+      #{iv("textarea-surface")}: var(#{v("control-bg-readonly")});
+      #{iv("textarea-fg")}: var(#{v("control-text-muted")});
+    }
+
+    &#{state("readonly")}:not(#{state("disabled")}) &__wrap {
       border-color: var(#{v("control-border-disabled")});
     }
 
-    &#{state("readonly")} &__input {
-      color: var(#{v("control-text-muted")});
+    &#{state("readonly")}:not(#{state("disabled")}) &__input {
       cursor: default;
     }
 
     // ── error
-    &#{state("error")} &__wrap {
-      background-color: var(#{v("control-bg")});
+    // 면만 기본으로 되돌린다 — 입력값은 에러여도 빨개지지 않는다 (design-system.md §2-1).
+    // ⚠️ `fg` 를 여기서 선언하면 `readonly + error` 의 글자가 muted 에서 바뀐다.
+    &#{state("error")}:not(#{state("disabled")}) {
+      #{iv("textarea-surface")}: var(#{v("control-bg")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")}) &__wrap {
       border-color: var(#{v("control-border-error")});
     }
 
-    &#{state("error")} &__input {
+    &#{state("error")}:not(#{state("disabled")}) &__input {
       caret-color: var(#{v("control-text-error")});
     }
 
@@ -128,27 +160,11 @@
       gap: var(#{v("space-2")});
     }
 
-    &__counter {
-      flex-shrink: 0;
-      // 메시지와 같은 위 여백을 줘야 두 글의 첫 줄이 맞는다 (_message.scss)
-      margin-top: var(#{v("space-2")});
-      margin-left: auto;
-      padding-right: var(#{v("space-2")});
-      color: var(#{v("text-secondary")});
-      // 숫자가 늘고 줄 때 폭이 흔들리지 않게
-      font-variant-numeric: tabular-nums;
-
-      @include typo(1, "regular");
-    }
-
-    // 브라우저는 maxlength 로 타이핑을 막지만 프로그램으로 넣은 값은 넘을 수 있다.
-    // 컨트롤 **밖**의 상태 글자라 `text-danger` 다 — `control-text-error` 는
-    // 입력 안쪽(caret · 단위)의 이름이다 (design-system.md §2-1).
-    &__counter--over {
-      color: var(#{v("text-danger")});
-    }
-
-    &#{state("disabled")} &__counter {
+    // 비활성에서는 카운터도 죽은 글자다. 카운터 자체는 `_message.scss` 가 갖는다
+    // (2026-09-08 · 08 F3) — Textfield 에도 같은 자리를 주기 위해 옮겼다.
+    &#{state("disabled")} #{cls("message")}__counter,
+    &#{state("disabled")} #{cls("message")}__counter-current,
+    &#{state("disabled")} #{cls("message")}__counter-max {
       color: var(#{v("control-text-disabled")});
     }
 

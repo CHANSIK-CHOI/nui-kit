@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { Field, FieldLabel } from "@nui-kit/react";
 import { Password } from "@nui-kit/react/textfield";
 import {
   GuideHeader,
+  DesignNote,
   Case,
   CaseGrid,
   InputStateCases,
@@ -20,65 +22,117 @@ export default function PasswordPage() {
         named={["Password"]}
         subpath="textfield"
         css="textfield"
-      >
-        표시 토글이 붙은 <code>Textfield</code> 다.
-      </GuideHeader>
+      />
+
+      <p>
+        표시 · 숨김 토글이 붙은{" "}
+        <Link href="/components/textfield">Textfield</Link> 다. 입력 · 메시지 ·
+        상태는 Textfield 와 같다.
+      </p>
 
       <h2>표시 상태</h2>
-      <p>
-        <code>defaultIsPasswordVisible</code> 을 주면 처음부터 값이 보인다.
-      </p>
       <CaseGrid
         columns={2}
-        code={`<Password placeholder="8자 이상" defaultIsPasswordVisible />`}
+        caption="defaultIsPasswordVisible — 처음부터 보이게"
+        code={`<Password placeholder="8자 이상" autoComplete="new-password" />`}
       >
         <Case label="기본" note="숨김">
           <Field>
             <FieldLabel>비밀번호</FieldLabel>
-            <Password placeholder="8자 이상 입력" />
+            <Password placeholder="8자 이상" autoComplete="new-password" />
           </Field>
         </Case>
-        <Case label="defaultIsPasswordVisible">
+        <Case label="defaultIsPasswordVisible" note="처음부터 보인다">
           <Field>
             <FieldLabel>비밀번호</FieldLabel>
-            <Password placeholder="입력값이 보인다" defaultIsPasswordVisible />
+            <Password placeholder="8자 이상" defaultIsPasswordVisible />
           </Field>
         </Case>
       </CaseGrid>
+      <div className="doc-note">
+        토글의 접근 이름은 <code>showPasswordTitle</code> ·{" "}
+        <code>hidePasswordTitle</code> 로 바꿀 수 있다. 기본은 「비밀번호 보기」
+        · 「비밀번호 숨기기」다.
+      </div>
 
       <h2>지우기</h2>
       <p>
-        <code>isClearable</code> 과 <code>onClear</code> 를 함께 준다. 지우기
-        버튼은 표시 토글 왼쪽에 놓이고, Textfield · Textarea · Datepicker ·
-        Select 의 지우기와 같은 버튼이다.
+        <code>isClearable</code> 과 <code>onClear</code> 를 함께 주면 지우기
+        버튼이 토글 왼쪽에 놓이고,{" "}
+        <strong>지우면 표시 상태가 숨김으로 돌아간다.</strong>
       </p>
       <PasswordDemo />
-      <div className="doc-note">
-        값을 지우면 표시 상태가 숨김으로 되돌아간다. 지운 뒤 새로 입력할 때
-        비밀번호가 노출된 채로 남지 않게 한 동작이다.
-      </div>
+
+      <h2>크기</h2>
       <p>
-        <code>showPasswordTitle</code> 과 <code>hidePasswordTitle</code> 로
-        토글의 접근 이름을 바꾼다.
+        <code>size</code> 는 <code>Textfield</code> 와 같다 —{" "}
+        <code>medium</code>
+        (48px · 기본)과 <code>large</code>(56px). 안쪽 표시 토글은 두 단계가
+        같다.
       </p>
+      <CaseGrid
+        columns={2}
+        caption="size — medium(기본) · large"
+        code={`<Password size="large" autoComplete="current-password" />`}
+      >
+        <Case label="medium" note="48px · 기본">
+          <Password aria-label="비밀번호" autoComplete="current-password" />
+        </Case>
+        <Case label="large" note="56px">
+          <Password
+            size="large"
+            aria-label="비밀번호"
+            autoComplete="current-password"
+          />
+        </Case>
+      </CaseGrid>
+
+      <DesignNote title="왜 지우면 숨김으로 돌아가나">
+        <p>
+          보이는 상태로 지운 뒤 새로 치면 다음 비밀번호가 그대로 노출된다.
+          지우는 순간은 「다시 입력하겠다」는 뜻이라 처음 상태로 되돌아간다.
+        </p>
+      </DesignNote>
 
       <h2>상태</h2>
       <InputStateCases
         columns={2}
-        caption="isError · disabled · readOnly"
+        caption="isError · disabled · readOnly — 토글은 비활성에서 함께 꺼진다"
         render={(p) => (
           <Field>
             <FieldLabel>비밀번호</FieldLabel>
             <Password
-              placeholder="8자 이상 입력"
+              placeholder="8자 이상"
               value={p.disabled || p.readOnly ? "secret1234" : undefined}
-              errorMessage={p.isError ? "8자 이상 입력해주세요" : undefined}
+              errorMessage={p.isError ? "8자 이상 입력해 주세요" : undefined}
               disabled={p.disabled}
               readOnly={p.readOnly}
             />
           </Field>
         )}
       />
+      <CaseGrid
+        columns={2}
+        caption="isTextInputBlocked — 타이핑만 막는다"
+        code={`<Password value={v} isTextInputBlocked />`}
+      >
+        <Case label="isTextInputBlocked">
+          <Field>
+            <FieldLabel>임시 비밀번호</FieldLabel>
+            <Password value="temp-9f3k" isTextInputBlocked />
+          </Field>
+        </Case>
+        <Case label="isTextInputBlocked + 보임">
+          <Field>
+            <FieldLabel>임시 비밀번호</FieldLabel>
+            <Password
+              value="temp-9f3k"
+              isTextInputBlocked
+              defaultIsPasswordVisible
+            />
+          </Field>
+        </Case>
+      </CaseGrid>
 
       <RHFPasswordDemo />
 

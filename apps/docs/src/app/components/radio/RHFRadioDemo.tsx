@@ -43,7 +43,7 @@ export function RHFRadioDemo() {
             <Controller
               control={control}
               name="plan"
-              rules={{ required: "요금제를 골라 주세요." }}
+              rules={{ required: "요금제를 골라 주세요" }}
               render={({ field, fieldState }) => (
                 <RadioGroup
                   name={field.name}
@@ -51,14 +51,14 @@ export function RHFRadioDemo() {
                   onBlur={field.onBlur}
                 >
                   {PLANS.map((plan) => (
-                    <Field key={plan.value} direction="row" align="center">
+                    <Field.Item key={plan.value}>
                       <Radio
                         value={plan.value}
                         checked={field.value === plan.value}
                         onChange={() => field.onChange(plan.value)}
                       />
                       <Field.Label>{plan.label}</Field.Label>
-                    </Field>
+                    </Field.Item>
                   ))}
                 </RadioGroup>
               )}

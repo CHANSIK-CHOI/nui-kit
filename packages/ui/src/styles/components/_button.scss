@@ -4,11 +4,43 @@
 // Button / IconButton / ButtonLink / ButtonGroup
 //
 // 공개 커스터마이징 훅 (덮어써도 안전)
-//   크기    : --nui-button--lg-height   / -md-height   / -sm-height
-//             --nui-button--lg-padding-x / -md-padding-x / -sm-padding-x
-//             --nui-button--min-width
-//   모양    : --nui-button--radius      / --nui-button--round-radius
-//   선      : --nui-button--border-width
+//
+// ⚠️ 이름은 **컴포넌트 · 옵션 · 속성** 셋으로 끊긴다 (tokens.md §1-3).
+//    옵션 낱말은 **props 값 그대로**다 — `size="large"` 면 `--large-`,
+//    `shape="round"` 면 `--round-`. 소비자가 코드에서 읽은 낱말을 그대로
+//    검색할 수 있어야 한다.
+//
+//   Button · ButtonLink  (`button--`)
+//     크기 : --large-height   --medium-height   --small-height
+//            --large-padding-x --medium-padding-x --small-padding-x
+//            --large-radius    --medium-radius    --small-radius   (둥글기는 크기를 따른다)
+//     모양 : --round-radius
+//     변형 : --text-padding-x --text-padding-y   (세 size 가 한 값 — 아래 이유)
+//
+// ⚠️ text 의 여백을 size 별로 나누지 않는 이유 (2026-09-12 재검토).
+//    tokens.md §1-3 의 「한 이름이 여러 자리에 뚫리면 variant 가 죽는다」는 **높이처럼
+//    크기를 말하는 값**의 이야기다. text 에서 크기를 말하는 것은 글자(18/16/14)와
+//    아이콘(24/20/16)이고 그것들은 훅이 아니다 — 여백을 한 값으로 덮어도 세 size 는
+//    여전히 구분된다. 이 여백이 정하는 것은 hover 면이 글자에 얼마나 가까이 오는가
+//    하나뿐이고, 그 최소 틈은 글자 크기의 함수가 아니다.
+//    면은 이미 크기를 따라간다 — 높이는 행간 + 패딩(35/32/29), 둥글기는 `--large` 의
+//    border-radius 가 text 에도 걸려 8/6/6 이다. 여백까지 묶으면 두 번 커진다.
+//    SEED `text-button.yaml` 도 padding·fontSize 에 size 축을 두지 않는다.
+//     공통 : --min-width  --gap  --border-width
+//
+//   IconButton  (`icon-button--`)
+//     크기 : --large-size  --medium-size  --small-size   (정사각이라 하나로 묶는다)
+//            --large-radius --medium-radius --small-radius
+//     모양 : --round-radius
+//     공통 : --border-width
+//
+// ⚠️ 둥글기가 크기 훅이 된 이유 (2026-09-11): KRDS 산식(높이 × ⅛, 홀수면 위 짝수)으로
+//    large 56 은 8, medium 48 · small 40 은 6 이다. 옛 `--square-radius` 하나로는
+//    세 자리를 한 값으로 덮게 되어 large 만 8 로 둘 수 없었다. `round` 는 크기와
+//    무관하게 `radius-full` 이라 그대로 하나다.
+//
+//   ButtonGroup  (`button-group--`)
+//     공통 : --gap
 //
 // ⚠️ 색 훅은 두지 않는다 (tokens.md §1-2).
 //   배경과 글자는 짝이다. 소비자가 배경만 바꾸면 대비가 깨지는데 **눈에 보이지 않는다**
@@ -16,10 +48,13 @@
 //   한 컴포넌트만 바꿀 때의 className 둘뿐이다. className 이면 배경과 글자를
 //   같은 자리에 쓰게 되므로 짝을 놓치기 어렵다.
 //
-// ⚠️ 크기 훅에 옵션 이름이 붙는 이유:
+// ⚠️ 크기·모양 훅에 옵션 이름이 붙는 이유:
 //   훅 이름을 하나(--nui-button-min-height)만 두면 소비자가 그걸 :root 에 설정한 순간
 //   large/medium/small 세 자리가 전부 같은 높이가 되어 크기 variant 가 죽는다.
 //   (unlayered 선언이 우리 레이어의 variant 규칙보다 항상 우선하므로 막을 수 없다)
+//   `square` 는 기본값이라 옵션 이름을 생략할 수도 있었지만, 그러면 `--radius` 와
+//   `--round-radius` 가 짝으로 안 읽힌다. 기본값에도 이름을 붙인다 — `--medium-height`
+//   와 같은 이유다.
 //
 // 내부 배선 (--nui-_*) 은 덮어쓰지 말 것.
 // ─────────────────────────────────────────────────────────────
@@ -30,26 +65,59 @@
     // hover · pressed 는 같은 색조의 다음 단계다 (KRDS 95~96쪽 · A2). 그림자·떠오름은 쓰지 않는다.
     #{iv("button-main-hover")}: var(#{v("action-neutral-hover")});
     #{iv("button-main-active")}: var(#{v("action-neutral-active")});
+    // 면이 없는 line·text 의 글자. `button-main` 은 채워진 배경 자리(Radix 9단계)라
+    // 배경 없이 글자로 쓰면 대비가 무너진다 — 다크의 primary·secondary·danger 가
+    // 실제로 AA 미달이었다 (design-system.md §2-4-0).
+    #{iv("button-fg-line")}: var(#{v("action-neutral-fg-line")});
+    // 면이 깔린 동안의 글자 — 같은 색조의 다음 단계(11 → 12)
+    #{iv("button-fg-line-strong")}: var(#{v("action-neutral-fg-line-strong")});
+    // line 의 테두리는 **역할색이 아니라 중립 회색**이다 (2026-09-07 · prototype B1).
+    // 근거는 선 색 규칙이다 — 선은 "한 화면에 몇 번 나오나"로 정해지고, 많이 나올수록
+    // 연하다 (design-system.md §2-6). line 버튼은 목록 행마다 반복되는 자리라 그 축의
+    // 위쪽이고, 색 테두리가 세 번 반복되면 화면이 줄무늬가 된다.
+    //
+    // 색은 **글자와 아이콘에만** 남는다 — 삭제 버튼은 여전히 빨간 글자다. 되돌릴 수
+    // 없는 확인은 애초에 solid danger 나 Confirm 이 맡는다 (§2-4-1).
+    //
+    // 누르는 것의 선이라 형태선(border-form)이 아니라 `action-border` 다 —
+    // 배경과 3:1 이 필요하다 (WCAG 1.4.11 · 실측 3.30). `control-border-*` 는
+    // 입력 컨트롤 본체 전용이라 쓰지 않는다 (design-system.md §2-5-1).
+    #{iv("button-line-border")}: var(#{v("action-border")});
+    #{iv("button-line-border-hover")}: var(#{v("action-border-hover")});
+    #{iv("button-line-border-active")}: var(#{v("action-border-active")});
+
+    // soft — 채워져 있지만 조용한 한 단계. 면은 Radix 3, 글자는 11 이다
+    #{iv("button-soft")}: var(#{v("action-neutral-soft")});
+    #{iv("button-soft-hover")}: var(#{v("action-neutral-soft-hover")});
+    #{iv("button-soft-active")}: var(#{v("action-neutral-soft-active")});
 
     // UA 기본 스타일 무력화 (전역 reset 미배포 대응 — 이 셀렉터 안에서만 적용)
     appearance: none;
     margin: 0;
+    font: inherit;
     font-family: var(#{v("font-family-base")});
+    // ButtonLink 는 <a> 라 UA 의 밑줄이 그대로 남아 있었다 (2026-09-11 실측 — 네 variant
+    // 전부 underline). 버튼 모양이 곧 식별자이고 KRDS 498쪽도 용도가 명확한 요소에서는
+    // 인디케이터를 생략할 수 있다고 한다. <button> 은 원래 밑줄이 없어 한 줄로 둘이 같아진다.
+    text-decoration: none;
     cursor: pointer;
+    // 터치의 눌림 표시는 우리 면·배율뿐 — 브라우저 하이라이트·글자 선택을 끈다 (spec §9)
+    @include pressable;
 
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     min-width: #{hook("button--min-width", 7.5rem)}; // 120px
-    // 기본은 md(48px). 위아래로 lg·sm 이 있는 형태가 표준이다.
-    min-height: #{hook("button--md-height", var(#{v("size-control-xl")}))};
-    padding: 0 #{hook("button--md-padding-x", var(#{v("space-6")}))};
+    // 기본은 medium(48px). 위아래로 large·small 이 있는 형태가 표준이다.
+    min-height: #{hook("button--medium-height", var(#{v("size-control-xl")}))};
+    padding: 0 #{hook("button--medium-padding-x", var(#{v("space-5")}))};
     overflow-wrap: initial;
     background: var(#{iv("button-main")});
     border: #{hook("button--border-width", var(#{v("border-width-1")}))} solid
       var(#{iv("button-main")});
-    border-radius: #{hook("button--radius", var(#{v("radius-1_5")}))};
+    // 둥글기는 KRDS 산식(높이 × ⅛, 홀수면 위 짝수) — medium 48 → 6
+    border-radius: #{hook("button--medium-radius", var(#{v("radius-2")}))};
 
     @include motion-press((background-color, border-color, color));
 
@@ -78,13 +146,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: var(#{v("space-1")});
+      gap: #{hook("button--gap", var(#{v("space-1")}))};
       width: 100%;
       height: 100%;
       color: var(#{iv("button-fg")});
       text-align: center;
 
-      @include typo(4, "bold");
+      @include typo(3, "bold");
     }
 
     &__icon {
@@ -95,16 +163,47 @@
     }
 
     // ── size
-    // 옵션 이름은 값의 크기 순서를 따른다 — lg · md(기본) · sm.
-    // lg 와 md 는 지금 같은 여백(24px)이지만 이름을 나눈다. 나중에 따로 조정할 수 있어야 한다.
-    &--large {
-      min-height: #{hook("button--lg-height", var(#{v("size-field")}))};
-      padding: 0 #{hook("button--lg-padding-x", var(#{v("space-6")}))};
+    // 옵션 이름은 prop 값 그대로다 — large · medium(기본) · small.
+    // large 와 medium 은 지금 같은 여백(24px)이지만 이름을 나눈다. 나중에 따로 조정할 수 있어야 한다.
+    //
+    // ⚠️ 높이 · 여백은 `text` 와 `icon` 에 걸지 않는다 — text 는 내용 폭 · `min-height: auto`,
+    //    icon 은 정사각 · `padding: 0` 이 정의다 (design-system.md §7 · §7-2). 예전에는 둘 다
+    //    뒤에 와서 소스 순서로만 이겼는데, text 가 size 를 받게 되면서(2026-09-11) 그 의존을
+    //    `:not()` 으로 명시한다 (styles.md §7). `:not()` 하나로 상세도가 (0,2,0) 이 되므로
+    //    **둘을 함께 열거해야 한다** — `--text` 만 빼면 `--icon` 의 `padding: 0`(0,1,0) 을 새로
+    //    이겨 large · small 아이콘 버튼 안에 좌우 여백이 들어간다(reviewer 가 잡았다).
+    //    타이포 · 아이콘 규칙은 text 에도 걸려야 하므로 안 붙인다.
+    &--large:not(#{cls("button")}--text):not(#{cls("button")}--icon) {
+      min-height: #{hook("button--large-height", var(#{v("size-field")}))};
+      padding: 0 #{hook("button--large-padding-x", var(#{v("space-5")}))};
     }
 
+    // large 56 → 56 × ⅛ = 7 → 8. 입력 컨트롤의 large 와 같은 8 이라 나란히 놓아도 모서리가 맞는다.
+    &--large {
+      border-radius: #{hook("button--large-radius", var(#{v("radius-3")}))};
+    }
+
+    // ⚠️ 글자·아이콘은 `:not()` 없이 건다 — `text` 와 `icon` 에도 걸려야 한다 (2026-09-12).
+    //    그래서 IconButton large 의 아이콘도 24 가 되고(56 정사각 안의 20 은 작았다),
+    //    text 는 여기서 처음 medium 과 갈린다 — 면이 없어 크기를 말할 수단이 글자뿐이라
+    //    높이가 행간 + 패딩으로 35 가 된다. 값은 design-system.md §5 · §5-2 매트릭스가 정한다.
+    &--large &__icon {
+      width: var(#{v("size-icon-3xl")});
+      height: var(#{v("size-icon-3xl")});
+    }
+
+    &--large &__wrap {
+      @include typo(4, "bold");
+    }
+
+    &--small:not(#{cls("button")}--text):not(#{cls("button")}--icon) {
+      min-height: #{hook("button--small-height", var(#{v("size-control-lg")}))};
+      padding: 0 #{hook("button--small-padding-x", var(#{v("space-4")}))};
+    }
+
+    // small 40 → 5 → 6. medium 과 같은 값이지만 자리가 다르므로 이름을 나눈다.
     &--small {
-      min-height: #{hook("button--sm-height", var(#{v("size-control-lg")}))};
-      padding: 0 #{hook("button--sm-padding-x", var(#{v("space-4")}))};
+      border-radius: #{hook("button--small-radius", var(#{v("radius-2")}))};
     }
 
     &--small &__icon {
@@ -113,21 +212,46 @@
     }
 
     &--small &__wrap {
-      @include typo(3, "bold");
+      @include typo(2, "bold");
     }
 
     // ── shape
+    // size 의 radius 규칙(위)과 상세도가 같다 — 뒤에 와서 이긴다. 크기와 무관하게 pill 이다.
     &--round {
       border-radius: #{hook("button--round-radius", var(#{v("radius-full")}))};
     }
 
     // ── color
     // 훅 없이 semantic 을 직접 배선한다. 색은 컴포넌트별로 열지 않는다.
+    //
+    // quiet — neutral 보다 한 단계 낮은 강조 (2026-09-11). 취소 · 닫기 · 목록 행의 부차 액션.
+    // 채움은 gray-11(흰 글자 위 5.87 · 다크 9.11), 면 없는 글자는 gray-11(= text-secondary),
+    // 면이 깔리면 gray-12 — 그 자리가 neutral 의 쉬는 자리다. soft 의 면은 neutral 과 같은
+    // gray-3 이라 둘을 가르는 것은 글자(11 vs 12)뿐이다 (Button.md §9).
+    &--quiet {
+      #{iv("button-main")}: var(#{v("action-quiet")});
+      #{iv("button-fg")}: var(#{v("action-quiet-fg")});
+      #{iv("button-main-hover")}: var(#{v("action-quiet-hover")});
+      #{iv("button-main-active")}: var(#{v("action-quiet-active")});
+      #{iv("button-fg-line")}: var(#{v("action-quiet-fg-line")});
+      #{iv("button-fg-line-strong")}: var(#{v("action-quiet-fg-line-strong")});
+      #{iv("button-soft")}: var(#{v("action-quiet-soft")});
+      #{iv("button-soft-hover")}: var(#{v("action-quiet-soft-hover")});
+      #{iv("button-soft-active")}: var(#{v("action-quiet-soft-active")});
+    }
+
     &--primary {
       #{iv("button-main")}: var(#{v("action-primary")});
       #{iv("button-fg")}: var(#{v("action-primary-fg")});
       #{iv("button-main-hover")}: var(#{v("action-primary-hover")});
       #{iv("button-main-active")}: var(#{v("action-primary-active")});
+      #{iv("button-fg-line")}: var(#{v("action-primary-fg-line")});
+      #{iv("button-fg-line-strong")}: var(
+        #{v("action-primary-fg-line-strong")}
+      );
+      #{iv("button-soft")}: var(#{v("action-primary-soft")});
+      #{iv("button-soft-hover")}: var(#{v("action-primary-soft-hover")});
+      #{iv("button-soft-active")}: var(#{v("action-primary-soft-active")});
     }
 
     // 보조 액션 — 덜 중요한 버튼. KRDS 의 secondary (A1)
@@ -136,6 +260,13 @@
       #{iv("button-fg")}: var(#{v("action-secondary-fg")});
       #{iv("button-main-hover")}: var(#{v("action-secondary-hover")});
       #{iv("button-main-active")}: var(#{v("action-secondary-active")});
+      #{iv("button-fg-line")}: var(#{v("action-secondary-fg-line")});
+      #{iv("button-fg-line-strong")}: var(
+        #{v("action-secondary-fg-line-strong")}
+      );
+      #{iv("button-soft")}: var(#{v("action-secondary-soft")});
+      #{iv("button-soft-hover")}: var(#{v("action-secondary-soft-hover")});
+      #{iv("button-soft-active")}: var(#{v("action-secondary-soft-active")});
     }
 
     // 되돌릴 수 없는 액션 — 삭제 · 탈퇴 · 결제 취소
@@ -144,33 +275,47 @@
       #{iv("button-fg")}: var(#{v("action-danger-fg")});
       #{iv("button-main-hover")}: var(#{v("action-danger-hover")});
       #{iv("button-main-active")}: var(#{v("action-danger-active")});
-    }
-
-    // 주의가 필요한 액션 — 확인 후 진행
-    &--warning {
-      #{iv("button-main")}: var(#{v("action-warning")});
-      // 노랑 배경에 흰 글자는 AA 에 크게 미달한다. 노랑을 어둡게 하면
-      // 갈색이 되어 "주의"의 의미를 잃으므로, 배경을 밝게 두고 글자를 어둡게 한다.
-      #{iv("button-fg")}: var(#{v("action-warning-fg")});
-      #{iv("button-main-hover")}: var(#{v("action-warning-hover")});
-      #{iv("button-main-active")}: var(#{v("action-warning-active")});
+      #{iv("button-fg-line")}: var(#{v("action-danger-fg-line")});
+      #{iv("button-fg-line-strong")}: var(#{v("action-danger-fg-line-strong")});
+      #{iv("button-soft")}: var(#{v("action-danger-soft")});
+      #{iv("button-soft-hover")}: var(#{v("action-danger-soft-hover")});
+      #{iv("button-soft-active")}: var(#{v("action-danger-soft-active")});
     }
 
     // ── variant
-    &--line {
-      #{iv("button-fg")}: var(#{iv("button-main")});
-
-      background-color: transparent;
-      border-color: var(#{iv("button-main")});
+    // 위계는 넷이다 — solid(High) · soft(Medium) · line(Low) · text(Lowest).
+    // soft 는 "눌러야 할 것이 둘일 때 두 번째"의 자리다. solid 를 한 화면에 둘 놓지
+    // 않고도 두 번째 행동을 채워진 면으로 보여준다 (design-system.md §2-4-1).
+    &--soft {
+      #{iv("button-main")}: var(#{iv("button-soft")});
+      #{iv("button-main-hover")}: var(#{iv("button-soft-hover")});
+      #{iv("button-main-active")}: var(#{iv("button-soft-active")});
+      // 연한 면 위의 글자는 채움색(9)이 아니라 저대비 본문(11)이다 — §2-4-0 과 같은 이유
+      #{iv("button-fg")}: var(#{iv("button-fg-line")});
     }
 
-    &--text {
-      #{iv("button-fg")}: var(#{iv("button-main")});
+    &--line {
+      #{iv("button-fg")}: var(#{iv("button-fg-line")});
 
-      display: flex;
-      width: 100%;
+      background-color: transparent;
+      border-color: var(#{iv("button-line-border")});
+    }
+
+    // ⚠️ 폭 규칙의 유일한 예외다 (design-system.md §7).
+    //    나머지 버튼은 부모 폭을 채우지만 `text` 는 **내용 폭**이다. 면도 테두리도
+    //    없어서 폭을 채우면 눌리는 범위만 넓어지고 눈에는 글자 하나로 보인다 —
+    //    문장 안이나 목록 행 안에 놓이는 자리라 옆 글과 같이 흘러야 한다.
+    //    `min-width` 도 함께 푼다. 안 그러면 글자 두 자짜리 버튼이 120px 이 된다.
+    &--text {
+      #{iv("button-fg")}: var(#{iv("button-fg-line")});
+
+      display: inline-flex;
+      width: auto;
+      min-width: auto;
       min-height: auto;
-      padding: var(#{v("space-1")}) var(#{v("space-3")});
+      padding: #{hook("button--text-padding-y", var(#{v("space-1")}))}
+        #{hook("button--text-padding-x", var(#{v("space-2")}))};
+      vertical-align: middle;
       background-color: transparent;
       border: none;
 
@@ -198,6 +343,7 @@
 
       &#{cls("button")}--line {
         #{iv("button-main")}: var(#{v("action-border-disabled")});
+        #{iv("button-line-border")}: var(#{v("action-border-disabled")});
         #{iv("button-fg")}: var(#{v("action-fg-line-disabled")});
       }
     }
@@ -207,49 +353,90 @@
     @include hoverable {
       &--line:not([disabled]):not([aria-busy="true"]):hover {
         background-color: var(#{v("action-bg-hover")});
-        border-color: var(#{iv("button-main")});
+        // 테두리는 중립의 다음 단계로 간다. 글자만 역할색의 다음 단계다
+        border-color: var(#{iv("button-line-border-hover")});
+        #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
       }
 
+      // soft 는 면이 있고 그 면이 한 단계 어두워진다(3 → 4). 글자가 11 에 머물면
+      // 라이트에서 AA 를 놓친다 — 실측 danger hover 4.09 · active 3.70.
+      // §2-4-0 과 같은 처방이다: 면이 깔린 동안의 글자는 12단계.
+      &--soft:not([disabled]):not([aria-busy="true"]):hover {
+        #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
+      }
+
+      // 글자색을 다음 단계로 옮기면 다크에서 오히려 나빠진다(brand 10단계가 2.70).
+      // line 과 같이 **배경만** 반응한다 — 면 전체가 반응하는 부류다 (design-system.md §2-3).
       &--text:not([disabled]):not([aria-busy="true"]):hover {
-        background-color: transparent;
+        background-color: var(#{v("action-bg-hover")});
         border-color: transparent;
-        #{iv("button-fg")}: var(#{iv("button-main-hover")});
+        #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
       }
     }
 
     &--line:not([disabled]):not([aria-busy="true"]):active {
       background-color: var(#{v("action-bg-active")});
-      border-color: var(#{iv("button-main")});
+      // 안쪽 면이 한 단계 더 어두워지므로 선도 한 단계 더 간다 — 안 그러면 2.87 이다
+      border-color: var(#{iv("button-line-border-active")});
+      #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
+    }
+
+    &--soft:not([disabled]):not([aria-busy="true"]):active {
+      #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
     }
 
     &--text:not([disabled]):not([aria-busy="true"]):active {
-      background-color: transparent;
+      background-color: var(#{v("action-bg-active")});
       border-color: transparent;
-      #{iv("button-fg")}: var(#{iv("button-main-active")});
+      #{iv("button-fg")}: var(#{iv("button-fg-line-strong")});
       transform: none;
     }
   }
 
   // ── IconButton (정사각 고정)
-  // 본체와 같은 크기 축을 쓴다 — 기본이 md(48px), 위아래로 lg·sm.
+  // 본체와 같은 크기 축을 쓴다 — 기본이 medium(48px), 위아래로 large·small.
+  //
+  // ⚠️ 훅 이름은 `button--` 이 아니라 **`icon-button--`** 이다. 컴포넌트가 다르면
+  //    이름도 다르다 — 소비자가 `IconButton` 만 손보려는데 `button--medium-height`
+  //    를 덮으면 옆의 `Button` 까지 따라 움직인다.
+  //
+  // ⚠️ 한 이름이 width 와 height 를 함께 먹인다. **정사각을 보장하는 자리**라
+  //    의도해서 묶은 것이다 (tokens.md §1-3 · `checkbox--size` 와 같은 형태).
   #{cls("button")}--icon {
     min-width: auto;
     min-height: auto;
     // 본체의 좌우 여백(24px)을 지운다 — 안 지우면 48px 박스가 여백+테두리로 50px 로 벌어져
-    // 정사각이 깨진다 (md 만 실측 50×48 이었다).
+    // 정사각이 깨진다 (medium 만 실측 50×48 이었다).
     padding: 0;
-    width: var(#{v("size-control-xl")});
-    height: var(#{v("size-control-xl")});
+    width: #{hook("icon-button--medium-size", var(#{v("size-control-xl")}))};
+    height: #{hook("icon-button--medium-size", var(#{v("size-control-xl")}))};
+    border-width: #{hook(
+        "icon-button--border-width",
+        var(#{v("border-width-1")})
+      )};
+    // 둥글기는 크기를 따른다 — Button 과 같은 산식. 본체의 size radius 규칙(0,1,0)을
+    // (0,2,0) 으로 다시 쓴다.
+    border-radius: #{hook("icon-button--medium-radius", var(#{v("radius-2")}))};
 
     &#{cls("button")}--large {
-      width: var(#{v("size-field")});
-      height: var(#{v("size-field")});
+      width: #{hook("icon-button--large-size", var(#{v("size-field")}))};
+      height: #{hook("icon-button--large-size", var(#{v("size-field")}))};
+      border-radius: #{hook("icon-button--large-radius", var(#{v("radius-3")}))};
     }
 
     // small 은 40 — KRDS 버튼 계단(64/48/40)의 막내. 36 은 터치 44 에 너무 멀었다 (D1).
     &#{cls("button")}--small {
-      width: var(#{v("size-control-lg")});
-      height: var(#{v("size-control-lg")});
+      width: #{hook("icon-button--small-size", var(#{v("size-control-lg")}))};
+      height: #{hook("icon-button--small-size", var(#{v("size-control-lg")}))};
+      border-radius: #{hook("icon-button--small-radius", var(#{v("radius-2")}))};
+    }
+
+    // 본체의 `--round` 규칙(0,1,0)을 이겨야 하므로 (0,2,0) 으로 다시 쓴다.
+    &#{cls("button")}--round {
+      border-radius: #{hook(
+          "icon-button--round-radius",
+          var(#{v("radius-full")})
+        )};
     }
   }
 
@@ -261,15 +448,29 @@
 
     &__wrap {
       display: flex;
-      gap: var(#{v("space-2")});
+      gap: #{hook("button-group--gap", var(#{v("space-2")}))};
     }
 
+    // ⚠️ basis 가 같은 훅을 읽는다. `__wrap` 은 `nowrap` 이라 줄이 바뀌지는 않지만,
+    //    간격만 넓히면 basis 합이 부모를 넘어 두 항목이 `flex-shrink` 로 **다른 비율**로
+    //    줄어든다. 한 값으로 묶어야 간격과 무관하게 정확히 반씩 나뉜다.
     &__item {
       flex-grow: 1;
-      flex-basis: calc(50% - var(#{v("space-2")}));
+      flex-basis: calc(
+        50% - #{hook("button-group--gap", var(#{v("space-2")}))}
+      );
     }
 
-    &__item > #{cls("button")} {
+    // ⚠️ `--icon` 과 `--text` 는 빼야 한다. 이 셀렉터가 (0,2,0) 이라 `--icon` 의
+    //    정사각 치수 (0,1,0) 를 이겨서, 아이콘 버튼을 그룹에 넣으면 22×48 로 눌린다.
+    //    셋째 액션을 아이콘으로 접는 것은 우리가 권하는 사용법이다
+    //    (design-system.md §2-4-1). 자기 치수를 갖는 것은 찌그러지지 않는다 (§7).
+    //    `--text` 도 같은 이유다 — 내용 폭이 그 variant 의 정의라 그룹 안에서도
+    //    지켜진다. 칸은 비율대로 나뉘고 글자만 왼쪽에 선다.
+    &__item
+      > #{cls("button")}:not(#{cls("button")}--icon):not(
+        #{cls("button")}--text
+      ) {
       width: 100%;
     }
 
@@ -278,6 +479,32 @@
       flex-basis: auto;
       width: fit-content;
       max-width: 100%;
+    }
+
+    // 첫 항목이 Dismiss(취소 · 닫기 · 초기화)일 때의 3 : 7.
+    // SEED `action-button.mdx` 「Button의 배치」 — 위계를 폭으로도 드러낸다.
+    //
+    // `flex-basis: 0` 으로 두고 `flex-grow` 가 비율을 만든다. 퍼센트 basis 로
+    // 하면 gap 을 빼야 해서 항목 수마다 값이 달라진다 — grow 는 남는 공간을
+    // 나누므로 gap 과 무관하게 정확히 3 : 7 이다.
+    &--ratio-dismiss > #{cls("button-group")}__wrap {
+      > #{cls("button-group")}__item {
+        flex-basis: 0;
+      }
+
+      > #{cls("button-group")}__item:first-child {
+        flex-grow: 3;
+      }
+
+      > #{cls("button-group")}__item:last-child {
+        flex-grow: 7;
+      }
+
+      // 내용 폭을 명시한 항목은 비율 밖이다 — 두 규칙이 부딪히면 명시가 이긴다
+      > #{cls("button-group")}__item--auto {
+        flex-grow: 0;
+        flex-basis: auto;
+      }
     }
   }
 }

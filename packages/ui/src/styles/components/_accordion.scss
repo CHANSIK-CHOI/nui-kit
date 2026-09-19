@@ -2,20 +2,39 @@
 
 // ─────────────────────────────────────────────────────────────
 // Accordion
-// 구조: .nui-accordion > .nui-accordion__item > (head + panel)
-// variant: --box(카드형, 기본) / --line(구분선형)
-// 상태: .nui-is-active (펼쳐진 항목)
+// 구조: .nui-accordion > .nui-accordion__item > (button > head + panel)
+//       `headingLevel` 을 주면 모드 A 는 `__heading`(h2~h6)이 `__button` 을 감싸고,
+//       모드 B 는 `__title-box` 자신이 그 태그가 된다 (spec §6-6)
+// variant: --box(카드 하나 안의 목록, 기본) / --line(구분선형) / --separated(항목마다 카드)
+// 상태: .nui-is-active (펼쳐진 항목) — 제목 색·굵기와 화살표 회전으로 말한다. 선은 반응하지 않는다
 //
-// 공개 훅: --nui-accordion--gap / -radius / -border-width
+// 공개 훅: --nui-accordion--box-radius / --separated-radius / --separated-gap / --border-width
+// 둥글기·간격은 옵션마다 이름을 나눈다 (tokens.md §1-3) — 한 이름이면 소비자가 값을 넣는 순간
+// 카드(12)와 항목(10)이 같아진다. 옵션 없는 `--gap` · `--radius` 는 없다
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("accordion")} {
     width: 100%;
 
     &--box {
+      // 목록 전체가 카드 하나다 (2026-09-13 · spec §4). 항목이 아니라 루트가 면·외곽선·모서리를
+      // 갖는다 — design-system.md §2-5-1 · §2-6 「한 요소에 하나」. 그라디언트·그림자는 쓰지 않는다
+      // (놓여 있는 것은 테두리만 · §2-5-2).
+      // `overflow: hidden` — hover 면이 `__button` 에 있고 항목에는 radius 가 없어 첫·끝 항목의 네모난
+      // 면이 카드 모서리 밖으로 삐져나온다. 여기서 자른다. 항목의 것과 역할이 다르다(포커스 링 · 패널 넘침)
+      overflow: hidden;
+      background: var(#{v("layer-default")});
+      border: #{hook("accordion--border-width", var(#{v("border-width-1")}))}
+        solid var(#{v("border-form")});
+      // 항목 묶음(96 이상)이라 KRDS 산식(높이 × ⅛ · 최대 12)의 답이 12 다 (tokens.md §3-2)
+      border-radius: #{hook("accordion--box-radius", var(#{v("radius-5")}))};
+    }
+
+    // 항목마다 카드 — 루트는 간격만 갖는 세로 컨테이너다 (SEED accordion.yaml `separated` · gap x3)
+    &--separated {
       display: flex;
       flex-direction: column;
-      gap: #{hook("accordion--gap", var(#{v("space-3")}))};
+      gap: #{hook("accordion--separated-gap", var(#{v("space-3")}))};
     }
 
     &--line {
@@ -29,26 +48,7 @@
     &__item {
       position: relative;
       overflow: hidden;
-
-      @include motion((border-color, box-shadow, background-color), "3");
-    }
-
-    &--box &__item {
-      // 카드 표면 — design-system.md §2-5-1. 그라디언트는 쓰지 않는다.
-      background: var(#{v("layer-default")});
-      border: #{hook("accordion--border-width", var(#{v("border-width-1")}))}
-        solid var(#{v("border-form")});
-      border-radius: #{hook("accordion--radius", var(#{v("radius-2_5")}))};
-      box-shadow: var(#{v("shadow-1")});
-    }
-
-    &--box &__item#{state("active")} {
-      border-color: var(#{v("border-brand")});
-      box-shadow: var(#{v("shadow-2")});
-    }
-
-    &--line &__item {
-      background-color: transparent;
+      // 항목 구분선 — 두 variant 공통. 한 화면에 여러 번 나오는 선이라 가장 연하다 (§2-6)
       border-bottom: #{hook(
           "accordion--border-width",
           var(#{v("border-width-1")})
@@ -56,8 +56,38 @@
         solid var(#{v("border-divider")});
     }
 
-    &--line &__item#{state("active")} {
-      border-bottom-color: var(#{v("border-brand")});
+    // 카드 안의 마지막 항목은 카드 외곽선이 선을 대신한다
+    &--box &__item:last-child {
+      border-bottom: 0;
+    }
+
+    // separated — 항목이 카드다. `border` 축약이 공통 구분선(border-bottom)까지 외곽선으로 덮는다.
+    // 닫힌 항목 71px 이라 KRDS 산식의 답은 10 (tokens.md §3-2). hover 면은 `__button` 의
+    // `border-radius: inherit` 로 이 모서리를 따른다. 항목의 `overflow: hidden` 이 이미 자르므로
+    // 루트에는 overflow 가 없다
+    &--separated &__item {
+      background: var(#{v("layer-default")});
+      border: #{hook("accordion--border-width", var(#{v("border-width-1")}))}
+        solid var(#{v("border-form")});
+      border-radius: #{hook(
+          "accordion--separated-radius",
+          var(#{v("radius-4")})
+        )};
+    }
+
+    // 모드 A 의 heading 래퍼 — `headingLevel` 을 줬을 때만 `__item` 과 `__button` 사이에 낀다
+    // (spec §6-6). 버튼 안에는 heading 을 담을 수 없어 바깥을 감싼다.
+    &__heading {
+      // UA 기본 무력화. 안 두면 항목 사이가 heading 의 여백만큼 벌어지고, `__button` 의
+      // `font: inherit` 가 여기의 `1.17em` · bold 를 물려받아 헤더 전체가 커진다 (styles.md §4)
+      margin: 0;
+      font: inherit;
+      font-family: var(#{v("font-family-base")});
+
+      display: block;
+      // ⚠️ `__button` 의 `border-radius: inherit` 사슬이 여기서 끊긴다. 한 칸 이어 주지 않으면
+      //    separated 의 hover 면이 항목 모서리를 잃는다 (spec §9)
+      border-radius: inherit;
     }
 
     &__button {
@@ -67,8 +97,11 @@
       padding: 0;
       background: transparent;
       border: 0;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
+      // 터치의 눌림 표시는 우리 면·배율뿐 (Accordion.md §9). 패널에는 걸지 않는다 — 소비자 본문
+      @include pressable;
 
       display: block;
       width: 100%;
@@ -76,7 +109,9 @@
       text-align: left;
       border-radius: inherit;
 
-      @include motion((background-color, color));
+      // 눌림은 배율·시간·곡선 세 축이 한 세트다 — `transition` 은 한 번만 선언되므로
+      // `motion-press` 로 묶는다 (design-system.md §6-3). `--icon` 도 이 요소라 물려받는다.
+      @include motion-press((background-color, color));
 
       // `overflow: hidden` 항목 안이라 바깥 offset 이 잘린다. 안쪽으로 그리는
       // 문서화된 유일한 예외다 — design-system.md §4-1. 숫자를 적지 않는다.
@@ -85,16 +120,24 @@
         outline-offset: calc(-1 * var(#{v("focus-width")}));
       }
 
+      // 모드 A — hover · active 면의 소유자는 버튼 자신이다 (2026-09-13 · spec §9 「눌림 자리」).
+      // `__head` 에 두면 눌림 배율이 면까지 줄여 카드 테두리와 헤더 사이에 틈이 생긴다.
+      // `:not(--icon)` 을 빼면 모드 B 에서 화살표 버튼 뒤에 헤더 폭 면이 깔린다.
       @include hoverable {
-        &:not(#{cls("accordion")}__button--icon):not(:disabled):hover
-          #{cls("accordion")}__head {
+        &:not(#{cls("accordion")}__button--icon):not(:disabled):hover {
           background-color: var(#{v("control-bg-hover")});
         }
       }
 
+      &:not(#{cls("accordion")}__button--icon):not(:disabled):active {
+        background-color: var(#{v("control-bg-active")});
+      }
+
+      // 줄어드는 것은 내용(`__head`)뿐이다 — 헤더가 카드 테두리에 딱 붙어 폭을 채우므로
+      // 면은 제자리에 둔다 (design-system.md §2-3-1 · SEED accordion-item `scaleScope: content`)
       &:not(#{cls("accordion")}__button--icon):not(:disabled):active
         #{cls("accordion")}__head {
-        background-color: var(#{v("control-bg-active")});
+        transform: scale(var(#{v("scale-98")}));
       }
     }
 
@@ -118,6 +161,11 @@
       width: 100%;
       height: 100%;
       border-radius: var(#{v("radius-full")});
+      // 36px 로 보이지만 44px 을 누른다 (a11y.md §8-1 · 2026-09-09). 헤더가 위아래
+      // 여백 16 을 갖고 있어 이웃 화살표와 68px 떨어진다 — 4px 씩 넓혀도 안 겹친다.
+      // 검사는 `.nui-accordion__button` 의 첫 번째만 재고 있어 이 자리가 한 번도
+      // 측정된 적이 없었다 (spec Accordion.md §13 4번).
+      @include hit-area;
     }
 
     &__head {
@@ -127,18 +175,47 @@
       width: 100%;
       padding: var(#{v("space-panel-compact")}) var(#{v("space-panel-card")});
 
-      @include motion(background-color, "3");
+      // 배경은 `__button` 이 칠한다. 여기는 눌림의 `transform` 축 하나뿐이다 —
+      // 시간·곡선은 눌림 세트(tokens.md §3-11)에서 온다
+      transition: transform var(#{v("duration-pressed")})
+        var(#{v("easing-pressed")});
     }
 
+    // 모드 B 에 `headingLevel` 을 주면 이 상자가 h2~h6 이다 (spec §6-6). 위 `__heading` 과
+    // 같은 이유로 UA 기본을 무력화한다 — 안 두면 `headingLevel` 유무로 제목 크기가 갈린다
     &__title-box {
+      margin: 0;
+      font: inherit;
+      font-family: var(#{v("font-family-base")});
+
       flex: 1;
       min-width: 0;
     }
 
+    // 항목 제목 — regular 가 기본이고 **열리면 bold** (design-system.md §5 「항목 제목」 · 2026-09-13).
+    // 닫힌 항목이 여럿 쌓이는 자리라 전부 bold 면 무겁다(§5-1). 굵기는 400·700 둘뿐이라 열림을
+    // 「한 단계 굵게」로 말하는 길이 이것 하나다. 굵기 전환에는 transition 을 걸지 않는다 — 튄다
     &__title {
       color: var(#{v("text-primary")});
 
-      @include typo(4, "bold");
+      @include typo(3, "regular");
+      @include motion(color, "3");
+    }
+
+    // 열림 — 제목이 bold. 모드 B(`buttonIndex`)는 제목이 버튼의 자손이 아니라 저절로 빠진다.
+    // 굵기는 비활성이어도 그대로다 — 열려 있다는 사실은 남는다 (spec §5)
+    &__item#{state("active")}
+      &__button:not(#{cls("accordion")}__button--icon)
+      &__title {
+      font-weight: var(#{v("font-weight-bold")});
+    }
+
+    // 열림 — 색은 브랜드. `:not(:disabled)` 로 disabled > 열림 을 명시한다 (styles.md §7) —
+    // 없으면 클래스 넷이 비활성 규칙(셋)을 이겨 열린 채 비활성인 제목이 브랜드색이 된다
+    &__item#{state("active")}
+      &__button:not(#{cls("accordion")}__button--icon):not(:disabled)
+      &__title {
+      color: var(#{v("text-brand")});
     }
 
     // 헤더에 폼 컨트롤을 넣는 경우가 있어 폭을 채워준다
@@ -156,39 +233,55 @@
       height: var(#{v("size-control-md")});
       margin-top: 0.0625rem;
       color: var(#{v("text-secondary")});
-      // 카드 위에 얹는 은은한 면 — layer 가 아니라 surface 다 (design-system.md §2-5)
-      background: var(#{v("surface-neutral-soft")});
-      border-radius: var(#{v("radius-full")});
+      // 면이 없다 (2026-09-13 · SEED `suffixIcon` 은 색과 크기뿐 · 토스도 같다). 예전의 회색 원
+      // (`surface-neutral-soft`)은 우리가 더한 것이었다
     }
 
+    // 모드 B — hover · focus · 눌림 어디서도 면을 그리지 않는다 (2026-09-13 사용자 결정 · 요청대로).
+    // 신호는 화살표 색(hover · focus)과 배율(눌림)뿐이다 — 면 없는 `text` 버튼과 같은 꼴(§2-4)
     @include hoverable {
       &__button--icon:not(:disabled):hover {
         color: var(#{v("text-primary")});
-        background: var(#{v("control-bg-hover")});
       }
     }
 
     &__button--icon:not(:disabled):focus-visible {
       color: var(#{v("text-primary")});
-      background: var(#{v("control-bg-hover")});
     }
 
+    // 자기 경계가 있는 개별 버튼이라 버튼 전체가 줄어든다 (design-system.md §2-3-1). 면이 없어
+    // 배율이 유일한 눌림 신호라 `scale-90` — Checkbox ghost 와 같은 줄 (tokens.md §3-10). 보이는 것은
+    // 20px 글리프뿐이라 0.94 로는 1px 남짓이었다(실측 2026-09-13 · 안 읽혔다).
+    // 히트 영역(::before)도 함께 줄지만 타겟 도달은 누르기 전이라 역보정하지 않는다
     &__button--icon:not(:disabled):active {
-      background: var(#{v("control-bg-active")});
+      transform: scale(var(#{v("scale-90")}));
     }
 
     // lucide ChevronDown. 상태·안내 아이콘 자리라 16px 이다 — design-system.md §5-2
     &__arrow-icon {
       display: block;
-      width: var(#{v("size-icon-lg")});
-      height: var(#{v("size-icon-lg")});
+      // 20px — 면 없이 36px 자리에 홀로 서는 화살표라 16 은 작아 보였다 (2026-09-13 · SEED medium 20 ·
+      // design-system.md §5-2 「아코디언 화살표」 줄)
+      width: var(#{v("size-icon-2xl")});
+      height: var(#{v("size-icon-2xl")});
 
-      @include motion(transform, "3");
+      // 패널과 **같은 시계**로 돈다 (2026-09-08 · 07 M6 · 08 A1).
+      //
+      // ⚠️ 두 카드가 다른 값을 적고 있었다 — M6 는 200, A1 은 250 이다.
+      //    **개폐가 비대칭이라 둘 다 반쪽이었다.** 패널은 열림 250(`collapse`) ·
+      //    닫힘 200(`collapseExit`) 이므로 화살표도 그렇게 나눈다. 여기(기본)가
+      //    닫힘이고 `is-active` 가 열림이다 — 전환은 **바뀌는 순간의 값**을 쓴다.
+      //    **곡선도 패널 것이다** — 닫힘 `exit` · 열림 `expand` (2026-09-19 · review-animations).
+      //    기본 `standard` 로 두면 같은 시간 안에서 둘이 다른 진행률로 움직였다.
+      @include motion(transform, "4", "exit");
     }
 
+    // ⚠️ **`will-change` 를 두지 않는다** (2026-09-19 · review-animations · spec §9).
+    //    `height` 는 합성 레이어로 가속되지 않아 힌트가 아무것도 하지 않고, `opacity` 힌트는
+    //    **닫혀 있는 패널까지** 레이어로 붙잡는다. 불투명도 전환은 framer 가 WAAPI 로 돌려
+    //    도는 동안만 브라우저가 알아서 레이어를 올린다.
     &__panel {
       width: 100%;
-      will-change: transform, opacity;
     }
 
     &__panel-box {
@@ -198,14 +291,11 @@
       padding: var(#{v("space-panel-compact")}) var(#{v("space-panel-card")})
         var(#{v("space-panel-card")});
       color: var(#{v("text-secondary")});
-      // 헤더/본문 경계 — 한 화면에 한두 번 나오는 의미경계선 (design-system.md §2-6)
-      border-top: #{hook(
-          "accordion--border-width",
-          var(#{v("border-width-1")})
-        )}
-        solid var(#{v("border-section")});
+      // 헤더와 본문 사이에 선을 두지 않는다 (2026-09-13 사용자 결정). 열린 항목은 제목의 색·굵기와
+      // 화살표가 이미 말하고, 본문은 헤더와 한 항목이다 — 선을 그으면 항목 하나가 둘로 보인다.
+      // 항목 사이는 `__item` 의 `border-divider` 가 가른다
 
-      @include typo(3, "regular");
+      @include typo(2, "regular");
 
       > * {
         margin: 0;
@@ -217,12 +307,11 @@
       padding-left: 0;
     }
 
-    &__item#{state("active")} &__panel-box {
-      border-top-color: var(#{v("border-brand-subtle")});
-    }
-
     &__item#{state("active")} &__arrow-icon {
       transform: rotate(180deg);
+
+      // 열림은 250 · `expand` — 패널의 `collapse` 와 시간도 곡선도 같다
+      @include motion(transform, "5", "expand");
     }
   }
 }

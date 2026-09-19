@@ -18,6 +18,8 @@ const UI = resolve(DOCS_ROOT, "..", "..", "packages", "ui");
 const { generate } = await import(resolve(UI, "scripts/color/generate.mjs"));
 const { contrast } = await import(resolve(UI, "scripts/color/contrast.mjs"));
 const { compositeOver } = await import(resolve(UI, "scripts/color/oklch.mjs"));
+// 9번 재조정 판정 — 프리셋 검사 · CLI 와 같은 기준 한 벌
+const { checkTheme } = await import(resolve(UI, "scripts/color/gates.mjs"));
 
 /**
  * 스와치 위에 얹을 단계 번호의 색.
@@ -74,13 +76,25 @@ const pairWithLabel = (light, dark, bgLight, bgDark) => ({
   td: labelColor(dark, bgDark),
 });
 
+let shiftedL = 0;
+let shiftedD = 0;
 const rows = presets.map((p) => {
   const r = generate(p.hex);
   // 반투명 판정에 쓸 배경 — 각 테마의 layer-default 다.
   const bgL = r.light.background;
   const bgD = r.dark.background;
   const P = (l, d) => pairWithLabel(l, d, bgL, bgD);
+  // 9번이 입력과 다른 테마 — 카드가 배지로 보여준다. 수는 verify.mjs 관문 3 과 같아야 한다
+  const { infos } = checkTheme(r);
+  const shiftOf = (theme) => {
+    const i = infos.find((x) => x.theme === theme);
+    if (!i) return null;
+    if (theme === "light") shiftedL++;
+    else shiftedD++;
+    return { to: i.to, reason: i.reason, deltaE: i.deltaE };
+  };
   return {
+    shift: { l: shiftOf("light"), d: shiftOf("dark") },
     n: p.n,
     hex: p.hex,
     name: p.name,
@@ -148,3 +162,4 @@ writeFileSync(
 const kb = (readFileSync(OUT).length / 1024).toFixed(0);
 console.log(`✅ 프리셋 미리보기 — ${rows.length}색 · ${kb}KB`);
 console.log(`   ${groups.map((g) => `${g.name} ${g.count}`).join(" · ")}`);
+console.log(`   9번 재조정 배지 — 라이트 ${shiftedL} · 다크 ${shiftedD}`);

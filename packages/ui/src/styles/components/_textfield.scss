@@ -5,42 +5,71 @@
 // ─────────────────────────────────────────────────────────────
 // Textfield (Search / Password 파생 포함)
 //
-// 공개 훅: --nui-textfield--height / -radius / -border-width
+// 공개 훅: --nui-textfield--medium-height / --large-height
+//          --nui-textfield--medium-radius / --large-radius / --border-width
+// ⚠️ 옵션 낱말은 prop 값 그대로다(`size="large"` → `--large-`). 한 훅 이름이 두 자리를
+//    덮으면 소비자가 :root 에 값을 넣는 순간 두 단계가 같아진다 (styles.md §3-2).
 // ⚠️ 색 훅은 두지 않는다 (design-plan 2-1) — 배경과 테두리·글자는 짝이라
 //    한쪽만 바꾸면 대비가 보이지 않게 깨진다. 한 개만 바꿀 때는 className 을 쓴다.
+// 크기: .nui-textfield--large (medium 은 기본이라 modifier 없음)
 // 상태: .nui-is-disabled / .nui-is-readonly / .nui-is-error
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("textfield")} {
     width: 100%;
 
+    // ── 상태 색은 여기서 한 번만 해석한다 ★
+    // wrap 의 면 · input 의 글자 · **자동 완성이 칠하는 면**이 같은 변수를 읽는다.
+    // 세 자리에 상태 조합을 따로 쓰면 자동 완성일 때만 어긋나고, 그 어긋남은 실제로
+    // 자동 완성을 해 봐야 드러난다 — 검사 스크립트가 만들 수 없는 상태다.
+    // 상태별 값은 아래 disabled · readonly · error 블록이 덮는다(소스 순서가 우선순위다).
+    #{iv("textfield-surface")}: var(#{v("control-bg")});
+    #{iv("textfield-fg")}: var(#{v("control-text")});
+
     &__wrap {
       display: flex;
       align-items: center;
-      height: #{hook("textfield--height", var(#{v("size-field")}))};
-      background-color: var(#{v("control-bg")});
+      // 기본은 medium(48). Button 의 medium 과 같은 값이라 size 없이 나란히 놓아도 맞는다.
+      height: #{hook("textfield--medium-height", var(#{v("size-control-xl")}))};
+      background-color: var(#{iv("textfield-surface")});
       border: #{hook("textfield--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border")});
-      border-radius: #{hook("textfield--radius", var(#{v("radius-1_5")}))};
+      // 둥글기는 KRDS 산식(높이 × ⅛, 홀수면 위 짝수) — 48 → 6
+      border-radius: #{hook("textfield--medium-radius", var(#{v("radius-2")}))};
 
-      @include motion(
-        (border-color, background-color, box-shadow, border-width),
-        "3"
-      );
+      @include motion((border-color, background-color, box-shadow), "3");
     }
 
+    // ── size
+    // large(56)는 KRDS 산식으로 8 이다(56 × ⅛ = 7 → 8). Button large 도 같은 8.
+    // 글자 · 보조 버튼 · 좌우 여백은 두 단계가 같다 — 바뀌는 것은 높이와 둥글기뿐 (Textfield.md §9).
+    &--large &__wrap {
+      height: #{hook("textfield--large-height", var(#{v("size-field")}))};
+      border-radius: #{hook("textfield--large-radius", var(#{v("radius-3")}))};
+    }
+
+    // `border-radius` 는 그림을 갖지 않는 이 요소에는 보이지 않는다. 자동 완성 면이
+    // `inherit` 로 wrap 의 값까지 닿게 하는 징검다리다 — 끊기면 면이 사각으로 남는다.
     &__input-box {
       flex-grow: 1;
       min-width: 0;
       height: 100%;
+      border-radius: inherit;
     }
 
+    // 담을 것이 없으면 아예 렌더되지 않는다 (Textfield.tsx — Textfield.md §6).
+    // 왼쪽 여백이 `space-1`(4)인 것은 input 의 오른쪽 `space-4`(16)와 짝이다 —
+    // 둘을 더한 20 이 값과 첫 버튼 사이이고, actions 가 없으면 input 의 16 만 남아
+    // 왼쪽과 대칭이 된다. 예전에는 반대(input 4 · actions 16)라 actions 가 없는
+    // 입력의 오른쪽 여백이 4 였다.
     &__actions {
       display: inline-flex;
       flex-shrink: 0;
       align-items: center;
+      // 항목 사이 간격의 단일 주체 — 자식은 margin 을 갖지 않는다
+      gap: var(#{v("space-2")});
       height: 100%;
-      padding: 0 var(#{v("space-4")});
+      padding: 0 var(#{v("space-4")}) 0 var(#{v("space-1")});
     }
 
     // 보조 버튼(지우기 · 눈 · 달력)은 `_textfield-btn.scss` 가 정한다 — 폼 요소 공통.
@@ -57,11 +86,25 @@
 
       width: 100%;
       height: 100%;
-      padding: 0 var(#{v("space-1")}) 0 var(#{v("space-4")});
-      color: var(#{v("control-text")});
+      // 좌우 대칭이다. actions 가 붙으면 그쪽 왼쪽 여백(4)이 더해져 값↔버튼이 20 이 된다.
+      padding: 0 var(#{v("space-4")});
+      color: var(#{iv("textfield-fg")});
+      // caret 은 글자와 갈린다 — error 에서만 `control-text-error` 로 바뀐다(아래).
       caret-color: var(#{v("control-text")});
 
-      @include typo(4, "regular");
+      // 자동 완성 면이 wrap 과 같은 속도로 상태를 따라간다. 안 걸면 wrap 만 150ms 로
+      // 가고 면은 즉시 튀어, 그동안 입력 영역과 버튼 영역이 서로 다른 색이 된다.
+      // ⚠️ `transition` 은 한 번만 선언할 수 있다 — 이 요소에 다른 전환을 더하려면
+      //    여기 목록에 넣는다 (`motion-press` 주석과 같은 이유).
+      @include motion(box-shadow, "3");
+      @include typo(3, "regular");
+
+      // 자동 완성 면 — UA 의 `!important` 배경·글자를 우리 색으로 되돌린다.
+      // 색을 새로 고르지 않고 위에서 해석한 변수를 그대로 읽는다.
+      @include autofill-surface(
+        var(#{iv("textfield-surface")}),
+        var(#{iv("textfield-fg")})
+      );
     }
 
     &__input:focus,
@@ -72,15 +115,15 @@
     &__input::placeholder {
       color: var(#{v("control-text-placeholder")});
 
-      @include typo(4, "regular");
+      @include typo(3, "regular");
     }
 
+    // 간격은 부모(`__actions`)의 gap 이 소유한다 — 자기 margin 을 갖지 않는다.
     &__unit {
-      margin-left: var(#{v("space-2")});
       color: var(#{v("control-text")});
 
       @include motion(color, "3");
-      @include typo(4, "regular");
+      @include typo(3, "regular");
     }
 
     // ── interaction
@@ -93,19 +136,25 @@
     // readonly 도 포커스를 받는다 — 링을 그린다 (design-system.md §3-2).
     // 배경은 뒤의 readonly 규칙이 그대로 남긴다. `disabled` 만 제외한다.
     &:not(#{state("disabled")}):focus-within &__wrap {
+      // ⚠️ **두께는 바꾸지 않는다.** 포커스는 색과 링이 말한다 (design-system.md §4-1).
+      // 예전에는 여기서 1px → 2px 로 굵혔는데 `border-box` 라 안쪽이 1px 줄어
+      // **글자가 밀렸다**(실측 left 1 → 2). 그리고 라이브러리 안에서 두께를 상태로
+      // 바꾸는 곳이 입력 컨트롤 셋뿐이라 선택 컨트롤·버튼과도 어긋나 있었다.
       border-color: var(#{v("focus-color")});
-      border-width: var(#{v("focus-width")});
       box-shadow: var(#{v("focus-ring")});
     }
 
     // ── disabled
+    &#{state("disabled")} {
+      #{iv("textfield-surface")}: var(#{v("control-bg-disabled")});
+      #{iv("textfield-fg")}: var(#{v("control-text-disabled")});
+    }
+
     &#{state("disabled")} &__wrap {
-      background-color: var(#{v("control-bg-disabled")});
       border-color: var(#{v("control-border-disabled")});
     }
 
     &__input[disabled] {
-      color: var(#{v("control-text-disabled")});
       cursor: not-allowed;
     }
 
@@ -114,8 +163,20 @@
     }
 
     // ── readonly
-    &#{state("readonly")} &__wrap {
-      background-color: var(#{v("control-bg-readonly")});
+    // ⚠️ **우선순위는 `:not()` 이 만든다 — 소스 순서가 아니다** (styles.md §7 · 2026-09-12).
+    //    상태 셋이 전부 같은 상세도라 예전에는 소스 순서대로 `error > readonly > disabled`
+    //    였다. 비활성인 에러 칸이 빨간 테두리로, 비활성인 읽기 전용 칸이 읽기 전용 색으로
+    //    보였다. `disabled` 를 빼는 것으로 `disabled > error > readonly` 가 된다.
+    //
+    //    error 에는 `:not(readonly)` 를 달지 않는다 — 아래 error 블록이 **면과 테두리만**
+    //    덮고 글자(`fg`)는 건드리지 않으므로, `readonly + error` 는 규칙대로 테두리가
+    //    빨강이면서 글자는 muted 로 남는다(속성별 합성 · design-system.md §3-2).
+    &#{state("readonly")}:not(#{state("disabled")}) {
+      #{iv("textfield-surface")}: var(#{v("control-bg-readonly")});
+      #{iv("textfield-fg")}: var(#{v("control-text-muted")});
+    }
+
+    &#{state("readonly")}:not(#{state("disabled")}) &__wrap {
       border-color: var(#{v("control-border-disabled")});
 
       // readonly 아이콘은 투명도를 덧칠하지 않는다 (KRDS 101쪽 · A3)
@@ -124,7 +185,6 @@
       }
 
       #{cls("textfield")}__input {
-        color: var(#{v("control-text-muted")});
         cursor: default;
       }
 
@@ -134,16 +194,22 @@
     }
 
     // ── error
-    &#{state("error")} &__wrap {
-      background-color: var(#{v("control-bg")});
+    // 면만 기본으로 되돌린다 — 입력값은 에러여도 빨개지지 않는다 (design-system.md §2-1).
+    // ⚠️ `fg` 를 여기서 선언하면 `readonly + error` 의 글자가 muted 에서 바뀐다.
+    // `:not(disabled)` 는 위 readonly 주석의 이유다 — disabled 가 최우선이다.
+    &#{state("error")}:not(#{state("disabled")}) {
+      #{iv("textfield-surface")}: var(#{v("control-bg")});
+    }
+
+    &#{state("error")}:not(#{state("disabled")}) &__wrap {
       border-color: var(#{v("control-border-error")});
     }
 
-    &#{state("error")} &__input {
+    &#{state("error")}:not(#{state("disabled")}) &__input {
       caret-color: var(#{v("control-text-error")});
     }
 
-    &#{state("error")} &__unit {
+    &#{state("error")}:not(#{state("disabled")}) &__unit {
       color: var(#{v("control-text-error")});
     }
 

@@ -15,7 +15,10 @@ export { default as AccordionHead } from "./AccordionHead.js";
 export type { AccordionHeadProps } from "./AccordionHead.js";
 export { default as AccordionPanel } from "./AccordionPanel.js";
 export type { AccordionPanelProps } from "./AccordionPanel.js";
+// 항목 Context 는 내보내지 않는다 — `Item` → `Button` · `Panel` 을 잇는 내부 배선이다.
+// 여는 것은 non-breaking 이라 닫고 시작한다 (spec §13).
 export {
   useAccordionContext,
   type AccordionContextValue,
+  type AccordionHeadingLevel,
 } from "./Accordion.context.js";

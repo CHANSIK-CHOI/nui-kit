@@ -4,7 +4,12 @@ import { forwardRef, type ButtonHTMLAttributes } from "react";
 import Textfield, { type TextfieldProps } from "./Textfield.js";
 import TextfieldBtn from "./TextfieldBtn.js";
 
-export type SearchProps = Omit<TextfieldProps, "children" | "type"> & {
+export type SearchProps = Omit<
+  TextfieldProps,
+  // `unit` 은 `children` 과 같은 자리다 — actions 슬롯을 이 컴포넌트가 이미 쓰고,
+  // 검색창의 단위는 조합 자체가 성립하지 않는다 (Textfield.md §3-1)
+  "children" | "type" | "unit"
+> & {
   /** 검색 버튼 클릭 핸들러. 주지 않으면 버튼이 submit 으로 동작한다 */
   onSearch?: () => void;
   /** 검색 버튼의 접근 이름 */

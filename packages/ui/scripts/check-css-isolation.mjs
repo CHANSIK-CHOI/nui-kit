@@ -28,8 +28,16 @@ const TAG_SELECTORS =
   "header|footer|section|article|aside|nav|span|div";
 
 const problems = [];
+// 영수증 — 어느 길로 끝나든 마지막 줄. 없으면 끝까지 안 돈 것이다 (2026-09-11 · 품질 게이트 규칙)
+let receiptFiles = 0;
+process.on("exit", (code) =>
+  console.log(
+    `RECEIPT check-css-isolation files=${receiptFiles} problems=${problems.length} exit=${code}`,
+  ),
+);
 
 function check(file, css) {
+  receiptFiles++;
   // 1) 클래스 셀렉터는 전부 프리픽스가 붙어야 한다.
   //    ('.' 앞이 영숫자인 경우는 `@layer nui.tokens` 같은 레이어 이름이므로 제외)
   const classes = new Set();

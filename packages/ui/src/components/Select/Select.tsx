@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useId, useMemo } from "react";
+import { forwardRef, useEffect, useId, useMemo, useState } from "react";
 import type { ForwardRefExoticComponent, RefAttributes } from "react";
 import type {
   ActionMeta,
@@ -10,6 +10,7 @@ import type {
 } from "react-select";
 import ReactSelect from "react-select";
 import { getMergedAriaIds, useFieldContext } from "../Field/Field.context.js";
+import { acquirePortalRoot } from "../../internal/portal.js";
 import SelectAriaContext, {
   DEFAULT_REMOVE_BUTTON_LABEL,
 } from "./Select.context.js";
@@ -19,12 +20,15 @@ import {
   DEFAULT_NO_OPTIONS_MESSAGE,
   selectLoadingMessage,
   selectScreenReaderStatus,
-} from "./Select.locale.js"
+} from "./Select.locale.js";
 import {
   createAriaValueContainer,
   getReadOnlyGuardedProps,
   getResolvedSelectComponents,
   getResolvedSelectStyles,
+  needsSelectPortalRoot,
+  resolveMenuPlacementProps,
+  SELECT_PORTAL_ROOT_ID,
   getResolvedSingleValue,
   toSelectChangeMeta,
 } from "./Select.utils.js";
@@ -75,6 +79,8 @@ const Select: ForwardRefExoticComponent<
       placeholder,
       disabled = false,
       readOnly = false,
+      // 우리가 소비하고 react-select 에는 넘기지 않는다 — DOM 에 `size` 로 새지 않게
+      size = "medium",
       isError = false,
       infoMessage = "",
       errorMessage = "",
@@ -83,14 +89,21 @@ const Select: ForwardRefExoticComponent<
       styles,
       isSearchable = false,
       isClearable = false,
-      hasPortal = false,
       // 라벨·안내 문구에는 마침표를 붙이지 않는다 (SEED writing 규칙과 같다)
       noOptionsMessage = DEFAULT_NO_OPTIONS_MESSAGE,
       // 메뉴 최대 높이는 react-select 이 소유한다 (배치 계산이 이 값을 참조하므로
-      // CSS 의 max-height 로 덮지 않는다). 기본값만 우리 치수에 맞춘다.
-      maxMenuHeight = 240,
+      // CSS 의 max-height 로 덮지 않는다). 기본값만 우리가 정한다 — SEED `select.yaml`
+      // 의 `maxHeight` 와 같은 480 이다 (Select.md §6-7).
+      maxMenuHeight = 480,
       menuIsOpen,
+      // 배치 넷 — 기본은 제자리 `absolute` · 뒤집지 않음 · 페이지를 스크롤하지 않음.
+      // `Datepicker` 와 같은 기본이다. 해석은 `resolveMenuPlacementProps` 한 곳 (Select.md §6-7).
+      hasPortal = false,
       menuPosition,
+      menuPlacement,
+      menuPortalTarget,
+      // react-select 기본(`true`)을 뒤집었다 — 열 때 페이지가 저절로 움직이지 않게
+      menuShouldScrollIntoView = false,
       openMenuOnClick,
       openMenuOnFocus,
       backspaceRemovesValue,
@@ -106,7 +119,12 @@ const Select: ForwardRefExoticComponent<
       inputId: fieldContextId,
       describedByIds: fieldDescribedByIds,
       isError: isFieldError,
+      isRequired: isFieldRequired,
+      footerId: fieldFooterId,
+      registerFooter,
     } = useFieldContext();
+    // Field 안이면 메시지를 Field 의 Footer 로 올린다 (Field.md §6 「Footer 승계」)
+    const isInField = typeof registerFooter === "function";
     const generatedId = useId();
     const generatedMessageId = useId();
     const resolvedId = id ?? fieldContextId ?? generatedId;
@@ -116,8 +134,31 @@ const Select: ForwardRefExoticComponent<
     const resolvedAriaDescribedBy = getMergedAriaIds(
       ariaDescribedBy,
       ...fieldDescribedByIds,
-      hasOwnMessage ? generatedMessageId : null,
+      // Field 안에서는 자체 id 를 만들지 않는다 — Footer 의 id 가 describedByIds 로 들어온다
+      !isInField && hasOwnMessage ? generatedMessageId : null,
     );
+    // Field 안 · 밖에서 에러 문구의 id 가 다르다 — `aria-errormessage` 가 가리킨다
+    const errorMessageId = isInField
+      ? (fieldFooterId ?? undefined)
+      : generatedMessageId;
+
+    useEffect(() => {
+      if (!isInField) return;
+
+      return registerFooter({
+        id: resolvedId,
+        infoMessage,
+        errorMessage,
+        isError: isError || Boolean(errorMessage),
+      });
+    }, [
+      errorMessage,
+      infoMessage,
+      isError,
+      isInField,
+      registerFooter,
+      resolvedId,
+    ]);
 
     // ⚠️ 컴포넌트 함수 identity 는 소비자의 ValueContainer 에만 의존해야 한다.
     //    aria 값을 deps 에 넣으면 값이 바뀔 때마다 input 이 remount 되어
@@ -134,18 +175,52 @@ const Select: ForwardRefExoticComponent<
         }),
       [components, AriaValueContainer],
     );
+    const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
     const resolvedStyles = useMemo(
       () => getResolvedSelectStyles<false>(styles),
       [styles],
+    );
+
+    // ── portal 컨테이너 (Tooltip · Datepicker · ToastHost 와 같은 규칙)
+    //
+    // ⚠️ 마운트 이후에 잡는다. 렌더 중 `document` 를 읽으면 하이드레이션이 어긋난다.
+    //    첫 프레임에는 `portalRoot` 가 없어 메뉴가 제자리로 그려지는데, 메뉴는 열려야
+    //    보이고 그전에 이 effect 가 돈다.
+    //
+    // `hasPortal` 일 때만 잡는다 — 판정은 `needsSelectPortalRoot` 한 곳.
+    const placementInput = {
+      hasPortal,
+      menuPosition,
+      menuPlacement,
+      menuPortalTarget,
+    };
+    const needsPortalRoot = needsSelectPortalRoot(placementInput);
+
+    useEffect(() => {
+      if (!needsPortalRoot) {
+        setPortalRoot(null);
+        return;
+      }
+
+      const { root, release } = acquirePortalRoot(SELECT_PORTAL_ROOT_ID);
+      setPortalRoot(root);
+
+      return release;
+    }, [needsPortalRoot]);
+
+    const menuPlacementProps = resolveMenuPlacementProps(
+      placementInput,
+      portalRoot,
     );
     // 단일 Select 에는 칩이 없다. context 모양을 맞추려고 기본값만 넣는다.
     const ariaContextValue = useMemo(
       () => ({
         describedBy: resolvedAriaDescribedBy,
         readOnly,
+        isRequired: isFieldRequired,
         getRemoveButtonLabel: DEFAULT_REMOVE_BUTTON_LABEL,
       }),
-      [resolvedAriaDescribedBy, readOnly],
+      [resolvedAriaDescribedBy, readOnly, isFieldRequired],
     );
 
     const handleChange = (
@@ -166,12 +241,15 @@ const Select: ForwardRefExoticComponent<
     return (
       <SelectBase
         className={className}
+        size={size}
         disabled={disabled}
         readOnly={readOnly}
         isError={resolvedIsError}
         infoMessage={infoMessage}
         errorMessage={errorMessage}
         messageId={hasOwnMessage ? generatedMessageId : undefined}
+        hasMessage={!isInField}
+        isMenuStatic={menuPosition === "static"}
       >
         <SelectAriaContext.Provider value={ariaContextValue}>
           <ReactSelect<SelectOption, false, GroupBase<SelectOption>>
@@ -210,18 +288,14 @@ const Select: ForwardRefExoticComponent<
             }
             loadingMessage={rest.loadingMessage ?? selectLoadingMessage}
             maxMenuHeight={maxMenuHeight}
-            menuPosition={menuPosition}
-            // 잘리는 조상을 탈출한다. 소비자가 직접 준 값이 우리 기본을 이긴다.
-            // z 는 `getResolvedSelectStyles` 가 `z-portal-menu` 로 올린다.
-            menuPortalTarget={
-              rest.menuPortalTarget ??
-              (hasPortal && typeof document !== "undefined"
-                ? document.body
-                : undefined)
-            }
+            // 배치 prop 은 한자리에서 해석한다 (Select.md §6-7). 기본은 제자리이고
+            // `hasPortal` 이면 body 로 나간다. portal 래퍼의 z 는 `getResolvedSelectStyles` 가
+            // `z-portal-menu` 로 올린다.
+            menuShouldScrollIntoView={menuShouldScrollIntoView}
+            {...menuPlacementProps}
             aria-invalid={ariaInvalid ?? (resolvedIsError || undefined)}
             aria-errormessage={
-              resolvedIsError && errorMessage ? generatedMessageId : undefined
+              resolvedIsError && errorMessage ? errorMessageId : undefined
             }
           />
         </SelectAriaContext.Provider>

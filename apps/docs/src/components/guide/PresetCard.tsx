@@ -9,6 +9,11 @@ export type Preset = {
   group: string;
   merged: number;
   isDefault: boolean;
+  /** 9번이 고른 색과 다른 테마. null 이면 그대로 앉았다 */
+  shift: {
+    l: { to: string; reason: string; deltaE: number } | null;
+    d: { to: string; reason: string; deltaE: number } | null;
+  };
   brand: Pair[];
   secondary: Pair[];
   secondarySolid: Pair;
@@ -84,14 +89,19 @@ export function PresetCard({ p }: { p: Preset }) {
         <strong className="preset-name">{p.name}</strong>
         <code className="preset-hex">{p.hex}</code>
         {p.isDefault && <span className="preset-badge">지금 기본값</span>}
-        {/* 고른 색이 9번에 그대로 앉지 못한 경우에만 알린다 */}
-        {p.hex.toLowerCase() !== p.solid.l.toLowerCase() && (
-          <span
-            className="preset-adjusted"
-            title="9번은 버튼처럼 색으로 꽉 찬 면의 배경이다. 너무 밝으면 그 위에 흰 글자도 검은 글자도 읽히지 않아 어둡게 낮춘다."
-          >
-            밝아서 <code>{p.solid.l}</code> 로 낮춤
-          </span>
+        {/* 고른 색이 9번에 그대로 앉지 못한 테마에만 알린다. 판정은 생성기의 gates 가 한다 */}
+        {(["l", "d"] as const).map(
+          (t) =>
+            p.shift[t] && (
+              <span
+                key={t}
+                className="preset-adjusted"
+                title="9번은 버튼처럼 색으로 꽉 찬 면의 배경이다. 고른 색이 이 테마의 페이지 배경과 구분되지 않아 면이 안 보이므로, 같은 색조의 가장 가까운 채움이 대신 앉는다."
+              >
+                {t === "l" ? "라이트" : "다크"} 9번은 <code>{p.shift[t]!.to}</code>{" "}
+                ({p.shift[t]!.reason})
+              </span>
+            ),
         )}
         <span className="preset-hue">{p.h}°</span>
       </header>
@@ -108,7 +118,7 @@ export function PresetCard({ p }: { p: Preset }) {
       <Scale colors={p.secondary} labels={data.steps} mark={9} />
 
       <pre className="preset-cmd">
-        <code>npm run color:generate -- --preset {p.n}</code>
+        <code>{`import "@nui-kit/react/styles/themes/preset-${p.n}.css";`}</code>
       </pre>
 
       <details className="preset-more">

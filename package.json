@@ -19,13 +19,20 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "verify:pkg": "npm run verify -w @nui-kit/react",
+    "verify:themes": "npm run verify:themes -w @nui-kit/react",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build:ui && npm run verify:pkg && changeset publish",
     "verify:console": "npm run verify:console -w docs",
     "verify:select-rhf": "npm run verify:select-rhf -w docs",
     "verify:datepicker": "npm run verify:datepicker -w docs",
-    "verify:a11y": "npm run verify:a11y -w docs"
+    "verify:popup": "npm run verify:popup -w docs",
+    "verify:feedback": "npm run verify:feedback -w docs",
+    "verify:a11y": "npm run verify:a11y -w docs",
+    "verify:press": "npm run verify:press -w docs",
+    "verify:touch": "npm run verify:touch -w docs",
+    "verify:menu-motion": "npm run verify:menu-motion -w docs",
+    "verify:docs": "npm run verify:docs -w docs"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.1",

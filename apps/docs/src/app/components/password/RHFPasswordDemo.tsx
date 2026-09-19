@@ -17,9 +17,8 @@ export function RHFPasswordDemo() {
     <>
       <h2>react-hook-form</h2>
       <p>
-        <code>RHFPassword</code> 는 <code>/rhf</code> 서브패스에 있다. 표시/숨김
-        토글은 컴포넌트가 갖고, 값과 에러는 RHF 가 갖는다. 지우기 버튼을 누르면
-        값이 비고 표시 상태도 숨김으로 돌아간다.
+        <code>RHFPassword</code> 에서 표시 · 숨김은 컴포넌트가, 값과 에러는 RHF
+        가 갖는다. 지우기를 누르면 RHF 값이 비고 표시도 숨김으로 돌아간다.
       </p>
       <Example
         row={false}
@@ -30,9 +29,8 @@ export function RHFPasswordDemo() {
           onSubmit={handleSubmit(() => window.alert("제출되었습니다."))}
           style={{ maxWidth: 480 }}
         >
-          <Field>
+          <Field infoMessage="8자 이상, 숫자를 하나 이상 넣어 주세요">
             <Field.Label>비밀번호</Field.Label>
-            <Field.Description>8자 이상, 숫자를 하나 이상.</Field.Description>
             <RHFPassword
               control={control}
               name="password"
@@ -65,7 +63,7 @@ export function RHFPasswordDemo() {
             >
               초기화
             </Button>
-            <span style={{ fontSize: "var(--nui-font-size-3)" }}>
+            <span style={{ fontSize: "var(--nui-font-size-2)" }}>
               isValid: {String(formState.isValid)}
             </span>
           </div>

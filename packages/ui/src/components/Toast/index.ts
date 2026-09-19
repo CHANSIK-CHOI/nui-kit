@@ -3,6 +3,7 @@ export { default as ToastHost } from "./ToastHost.js";
 export { default as useToast } from "./useToast.js";
 export { useToastStack, useToastStore } from "./toast.store.js";
 export type {
+  ToastAction,
   ToastProps,
   ToastOpenOptions,
   ToastSharedProps,

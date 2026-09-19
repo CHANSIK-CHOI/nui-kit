@@ -1,4 +1,6 @@
 // → styles/accordion.css  (온디맨드: tokens.css 와 함께 import)
+// 화살표가 `Icon` 을 거치므로 icon 스타일을 함께 포함한다 — 온디맨드로 써도 동작해야 한다.
 @use "abstracts/layer";
 @use "base/normalize";
+@use "components/icon";
 @use "components/accordion";

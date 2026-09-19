@@ -1,30 +1,61 @@
 import Link from "next/link";
-import { GuideHeader, PropsTable } from "@/components/guide";
-import { ConfirmDemo } from "./ConfirmDemo";
+import {
+  GuideHeader,
+  ExceptionBadges,
+  DesignNote,
+  PropsTable,
+} from "@/components/guide";
+import {
+  ConfirmBasicDemo,
+  ConfirmAsyncDemo,
+  ConfirmToneDemo,
+} from "./ConfirmDemo";
 
 export const metadata = { title: "Confirm" };
 
 export default function ConfirmPage() {
   return (
     <>
-      <GuideHeader
-        title="Confirm"
-        named={["useConfirm", "Confirm"]}
-        subpath="popup"
-      >
-        확인과 취소 두 버튼으로 결정을 받는 팝업이다. Alert 과 같이 dim 클릭과
-        ESC 로는 닫히지 않는다. 명령형으로만 쓰고, 결과는 콜백 또는 Promise 로
-        받는다.
-      </GuideHeader>
+      <GuideHeader title="Confirm" named={["useConfirm"]} subpath="popup" />
 
+      <ExceptionBadges items={[{ kind: "cappedWidth", target: "Confirm" }]} />
+
+      <p>
+        결정을 묻는 팝업이다. 취소와 확인 두 버튼이 출구이고 dim 과{" "}
+        <kbd>Esc</kbd> 로는 닫히지 않는다. <code>useConfirm()</code> 으로 열고
+        앱 루트의 <code>PopupHost</code> 가 그린다. 설치는{" "}
+        <Link href="/components/popup">Popup</Link> 에 있다.
+      </p>
+
+      <h2>기본</h2>
+      <p>
+        <code>confirmLabel</code> 은 그 자리의 행동으로 적는다. 되돌릴 수 없는
+        일이면 「삭제」 「탈퇴」처럼 결과가 보이는 동사가 맞다. 「확인」은
+        무엇을 확인하는지 말하지 않는다.
+      </p>
+      <ConfirmBasicDemo />
+
+      <h2>성격 — tone</h2>
+      <p>
+        무엇을 묻는 팝업인지에 따라 아이콘이 바뀌고, <code>danger</code> 일 때만
+        확인 버튼도 함께 빨개진다. 되돌릴 수 없는 일이면 <code>danger</code> 다.
+      </p>
+      <ConfirmToneDemo />
       <div className="doc-note">
-        <code>useConfirm()</code> 은 앱 루트의 <code>PopupHost</code> 가 있어야
-        동작한다. 설치는 <Link href="/components/popup">Popup 개요</Link> 에
-        있다.
+        취소 버튼은 tone 과 무관하게 중립이다. 위험한 색은 위험한 행동에만
+        붙는다. 취소가 빨가면 어느 쪽이 위험한지 뒤집혀 보인다.
       </div>
 
-      <h2>열기</h2>
-      <ConfirmDemo />
+      <h2>답을 Promise 로 받기</h2>
+      <p>
+        <code>openAsync</code> 는 선택을 <code>Promise&lt;boolean&gt;</code>{" "}
+        으로 준다. 확인이면 <code>true</code>, 취소면 <code>false</code> 다.{" "}
+        <code>close()</code> · <code>closeAll()</code> 로 닫혀도{" "}
+        <code>false</code> 로 끝나므로 기다리는 쪽이 멈추지 않는다.{" "}
+        <code>onConfirm</code> · <code>onCancel</code> 을 함께 주면 그것도
+        불린다.
+      </p>
+      <ConfirmAsyncDemo />
 
       <h2>옵션</h2>
       <div className="doc-table-wrap">
@@ -39,30 +70,13 @@ export default function ConfirmPage() {
           <tbody>
             <tr>
               <td>
-                <code>title</code> · <code>description</code> ·{" "}
-                <code>icon</code>
+                <code>hasIcon</code>
               </td>
-              <td>—</td>
-              <td className="doc-wrap">Alert 과 같다</td>
-            </tr>
-            <tr>
               <td>
-                <code>confirmText</code> · <code>cancelText</code>
+                <code>true</code>
               </td>
-              <td>&quot;확인&quot; · &quot;취소&quot;</td>
               <td className="doc-wrap">
-                두 버튼 문구. 되돌릴 수 없는 일이면 &quot;삭제&quot; 처럼 행동을
-                그대로 쓴다
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <code>onConfirm</code> · <code>onCancel</code>
-              </td>
-              <td>—</td>
-              <td className="doc-wrap">
-                각 버튼을 눌렀을 때. <code>openAsync</code> 와 함께 써도 둘 다
-                호출된다
+                <code>false</code> 면 아이콘 자리가 없어진다
               </td>
             </tr>
             <tr>
@@ -74,8 +88,8 @@ export default function ConfirmPage() {
                 <code>true</code>
               </td>
               <td className="doc-wrap">
-                <code>false</code> 면 그 버튼을 눌러도 열려 있다.{" "}
-                <code>close()</code> 로 직접 닫는다
+                <code>false</code> 면 그 버튼을 눌러도 열려 있다. 처리가 끝난 뒤{" "}
+                <code>close()</code> 로 닫는다
               </td>
             </tr>
             <tr>
@@ -84,43 +98,51 @@ export default function ConfirmPage() {
               </td>
               <td>자동 생성</td>
               <td className="doc-wrap">
-                <code>close(id)</code> 로 특정 팝업을 닫을 때
+                <code>close(id)</code> 로 특정 팝업을 닫을 때. 열려 있는 동안
+                같은 id 로 다시 열 수 없다
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div className="doc-note doc-note--warn">
-        <strong>
-          <code>closeAll()</code> 과 <code>close()</code> 는{" "}
-          <code>openAsync</code> 의 Promise 를 <code>false</code> 로 끝낸다.
-        </strong>{" "}
-        기다리는 쪽이 영원히 멈추지 않도록 취소로 정리한다.
-      </div>
+      <DesignNote title="왜 취소가 왼쪽이고 테두리만 있나">
+        <p>
+          취소는 <code>line</code>, 확인은 <code>solid</code> 다. 채워진 면이
+          「여기를 눌러라」를 말하므로 한 화면에 하나만 두고, 색이 안 보여도
+          둘이 구분된다. 순서는 취소가 앞이다. 되돌릴 수 없는 행동에서 손이 먼저
+          닿는 자리가 안전한 쪽이어야 한다.
+        </p>
+      </DesignNote>
+
+      <DesignNote title="왜 dim 과 Esc 로 닫히지 않나">
+        <p>
+          실수로 닫히면 어느 쪽을 골랐는지 모호해진다. 답을 요구하는 팝업은
+          답으로만 닫힌다. Alert 과 같은 이유로 닫기 버튼 · dim · <kbd>Esc</kbd>{" "}
+          셋 다 닫는 길이 아니다.
+        </p>
+      </DesignNote>
 
       <h2>접근성</h2>
       <ul>
         <li>
-          제목이 없으면 <code>aria-label=&quot;Confirm 팝업&quot;</code> 이
-          붙는다
+          제목이 <code>aria-labelledby</code> 로 붙는다. 제목이 없으면{" "}
+          <code>dialogLabel</code> 을 준다. 둘 다 없으면 타입이 막는다
         </li>
         <li>
-          dim 클릭 · ESC 로 닫히지 않는다. 실수로 닫히면 어느 쪽을 골랐는지
-          모호해진다
+          열리면 취소 버튼에 포커스가 간다. 닫히면 열기 전 자리로 돌아간다
         </li>
-        <li>취소는 line, 확인은 solid 버튼이라 색 없이도 구분된다</li>
         <li>
-          포커스 트랩 · 배경 inert · 모션 감소 등 공통 계약은{" "}
-          <Link href="/components/popup">Popup 개요</Link>
+          포커스 트랩 · 배경 inert · 모션 감소는{" "}
+          <Link href="/components/popup">Popup</Link> 과 같다
         </li>
       </ul>
 
       <h2>API</h2>
-      <h3>Confirm</h3>
       <p>
-        <code>PopupHost</code> 가 렌더하는 컴포넌트다. 훅의 옵션이 곧 이 props
-        다.
+        <code>useConfirm().open()</code> · <code>openAsync()</code> 에 넘기는
+        옵션이다. 컴포넌트로는 쓰지 않는다. <code>id</code> 를 주지 않으면
+        만들어 준다.
       </p>
       <PropsTable of="Confirm" />
     </>

@@ -5,8 +5,8 @@ export { default as Field } from "./Field.js";
 export {
   FieldItem,
   FieldGrid,
+  FieldHeader,
   FieldLabel,
-  FieldDescription,
   FieldMessage,
 } from "./Field.js";
 
@@ -14,8 +14,8 @@ export type {
   FieldProps,
   FieldItemProps,
   FieldGridProps,
+  FieldHeaderProps,
   FieldLabelProps,
-  FieldDescriptionProps,
   FieldMessageProps,
 } from "./Field.js";
 
@@ -23,4 +23,5 @@ export {
   useFieldContext,
   getMergedAriaIds,
   type FieldContextValue,
+  type FieldFooterEntry,
 } from "./Field.context.js";

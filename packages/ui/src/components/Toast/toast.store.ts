@@ -38,6 +38,22 @@ function appendToastItem(items: ToastItem[], nextItem: ToastItem) {
   return [...items, nextItem];
 }
 
+/**
+ * 큐의 맨 앞 하나만 화면에 올린다 (TO2).
+ *
+ * 앞의 것이 사라져 배열에서 빠지면 다음 것이 맨 앞이 되고, 여기서 `open` 으로 승격한다.
+ * 나머지는 `queued` 로 되돌린다 — 순서가 바뀌어도 상태가 따라온다.
+ * 이미 `closing` 인 맨 앞은 건드리지 않는다. 나가는 모션이 끝나야 배열에서 빠진다.
+ */
+function syncQueue(items: ToastItem[]): ToastItem[] {
+  return items.map((item, index) => {
+    const next: ToastStatus =
+      index === 0 ? (item.status === "closing" ? "closing" : "open") : "queued";
+
+    return next === item.status ? item : { ...item, status: next };
+  });
+}
+
 export const useToastStore = create<ToastStore>()((set) => ({
   items: [],
   openToast: (options) => {
@@ -45,11 +61,14 @@ export const useToastStore = create<ToastStore>()((set) => ({
 
     set((state) => {
       return {
-        items: appendToastItem(state.items, {
-          id,
-          status: "open",
-          props: options,
-        }),
+        items: syncQueue(
+          appendToastItem(state.items, {
+            id,
+            // 맨 앞이면 syncQueue 가 곧바로 open 으로 올린다
+            status: "queued",
+            props: options,
+          }),
+        ),
       };
     });
 
@@ -57,6 +76,14 @@ export const useToastStore = create<ToastStore>()((set) => ({
   },
   closeToast: (id) => {
     set((state) => {
+      const target = state.items.find((item) => item.id === id);
+
+      // 차례를 기다리던 것은 나가는 모션이 없다 — 화면에 오른 적이 없으므로 그냥 뺀다.
+      // 렌더된 적이 없어 `onCloseComplete` 도 오지 않는다 (spec Toast.md §6-1).
+      if (target?.status === "queued") {
+        return { items: state.items.filter((item) => item.id !== id) };
+      }
+
       return {
         items: state.items.map((item) =>
           item.id === id
@@ -71,18 +98,19 @@ export const useToastStore = create<ToastStore>()((set) => ({
   },
   removeToast: (id) => {
     set((state) => {
+      // 빠지고 나면 다음 것이 맨 앞이 된다 — syncQueue 가 그것을 open 으로 올린다
       return {
-        items: state.items.filter((item) => item.id !== id),
+        items: syncQueue(state.items.filter((item) => item.id !== id)),
       };
     });
   },
   closeAllToasts: () => {
     set((state) => {
+      // 보이는 것만 나가는 모션을 탄다. 기다리던 것들은 그냥 버린다
       return {
-        items: state.items.map((item) => ({
-          ...item,
-          status: "closing",
-        })),
+        items: state.items
+          .filter((item) => item.status !== "queued")
+          .map((item) => ({ ...item, status: "closing" as const })),
       };
     });
   },

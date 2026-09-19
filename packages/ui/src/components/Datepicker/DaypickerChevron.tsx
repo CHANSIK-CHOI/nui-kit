@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { ComponentProps } from "react";
 import type { Chevron } from "react-day-picker";
+import Icon from "../Icon/Icon.js";
 
 type ChevronProps = ComponentProps<typeof Chevron>;
 
@@ -30,6 +31,6 @@ export function DaypickerChevron({
   orientation = "left",
   className,
 }: ChevronProps) {
-  const Icon = BY_ORIENTATION[orientation];
-  return <Icon className={className} aria-hidden="true" />;
+  const Glyph = BY_ORIENTATION[orientation];
+  return <Icon icon={<Glyph />} className={className} />;
 }

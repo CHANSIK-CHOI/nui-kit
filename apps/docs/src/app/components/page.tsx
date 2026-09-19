@@ -13,18 +13,18 @@ const GROUPS = [
       },
       {
         name: "IconButton",
-        href: "/components/button",
+        href: "/components/icon-button",
         desc: "아이콘 전용 정사각 버튼",
       },
       {
         name: "ButtonGroup",
-        href: "/components/button",
+        href: "/components/button-group",
         desc: "버튼 나열 레이아웃. Item 을 함께 쓴다",
       },
       {
         name: "ButtonLink",
-        href: "/components/button",
-        desc: "버튼 모양의 링크 (next/link)",
+        href: "/components/button-link",
+        desc: "버튼 모양의 링크. Next.js 전용 — @nui-kit/react/next",
       },
     ],
   },
@@ -44,12 +44,12 @@ const GROUPS = [
       {
         name: "Textfield",
         href: "/components/textfield",
-        desc: "한 줄 텍스트 입력",
+        desc: "한 줄 텍스트 입력. type 6 · 단위 · 지우기",
       },
       {
         name: "Textarea",
         href: "/components/textarea",
-        desc: "여러 줄 텍스트 입력. 자동 높이 조절",
+        desc: "여러 줄 텍스트 입력. 글자 수 카운터",
       },
       {
         name: "Search",
@@ -60,6 +60,11 @@ const GROUPS = [
         name: "Password",
         href: "/components/password",
         desc: "비밀번호 입력. 표시/숨김 토글",
+      },
+      {
+        name: "Message",
+        href: "/components/message",
+        desc: "입력 아래 한 줄 — 안내 · 에러 · 글자 수",
       },
     ],
   },
@@ -88,7 +93,7 @@ const GROUPS = [
       },
       {
         name: "MultiSelect",
-        href: "/components/select",
+        href: "/components/multi-select",
         desc: "다중 선택 드롭다운. 선택값을 칩으로 표시",
       },
     ],
@@ -103,13 +108,13 @@ const GROUPS = [
       },
       {
         name: "DateRangePicker",
-        href: "/components/datepicker",
-        desc: "시작·종료 기간 선택. 둘 다 정해져야 값이 전달된다",
+        href: "/components/date-range-picker",
+        desc: "시작·종료 기간 선택. 확정 버튼을 눌러야 값이 전달된다",
       },
       {
         name: "DateMultiplePicker",
-        href: "/components/datepicker",
-        desc: "여러 날짜를 개별 선택",
+        href: "/components/date-multiple-picker",
+        desc: "여러 날짜를 개별 선택. 확정 버튼을 눌러야 값이 전달된다",
       },
     ],
   },
@@ -119,7 +124,7 @@ const GROUPS = [
       {
         name: "PopupHost",
         href: "/components/popup",
-        desc: "명령형 팝업이 렌더될 자리. 앱 루트에 한 번 둔다",
+        desc: "팝업이 렌더될 자리. 앱 루트에 한 번 둔다",
       },
       {
         name: "Alert",
@@ -178,6 +183,16 @@ const GROUPS = [
       },
     ],
   },
+  {
+    title: "Icon",
+    items: [
+      {
+        name: "Icon",
+        href: "/components/icon",
+        desc: "컴포넌트가 쓰는 아이콘 아홉과 직접 만든 SVG 를 감싸는 래퍼",
+      },
+    ],
+  },
 ];
 
 export default function ComponentsPage() {
@@ -186,8 +201,8 @@ export default function ComponentsPage() {
       <h1>Components</h1>
       <p className="doc-lead">
         각 페이지의 API 표는 컴포넌트 타입에서 자동 생성된다 — 코드가 바뀌면
-        문서가 따라간다. react-hook-form 래퍼는{" "}
-        <code>@nui-kit/react/rhf</code> 에 있다.
+        문서가 따라간다. react-hook-form 래퍼는 <code>@nui-kit/react/rhf</code>{" "}
+        에 있다.
       </p>
 
       {GROUPS.map((group) => (

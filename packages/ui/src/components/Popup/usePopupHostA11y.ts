@@ -26,6 +26,8 @@ export default function usePopupHostA11y({
   portalRoot,
 }: UsePopupHostA11yParams) {
   const scrollTopRef = useRef(0);
+  /** 잠근 시점의 `location.pathname` — 풀 때 같을 때만 위치를 되돌린다 */
+  const lockedPathnameRef = useRef<string | null>(null);
   const isScrollLockedRef = useRef(false);
   const hasPopupRef = useRef(hasPopup);
   /** inert 를 우리가 건 요소들과, 걸기 전 aria-hidden 원래값 */
@@ -37,8 +39,17 @@ export default function usePopupHostA11y({
 
     document.body.classList.remove(PREVENT_SCROLL_CLASS);
     document.body.style.removeProperty(SCROLL_LOCK_TOP_VAR);
-    window.scrollTo(0, scrollTopRef.current);
+    // ⚠️ **경로가 바뀌었으면 되돌리지 않는다** (LayerPopup.md §6 「스크롤 잠금과 주소」).
+    //    팝업 안 링크로 이동하면 body 가 고정돼 라우터의 「맨 위로」가 효과가 없고, 경로가 바뀌어
+    //    팝업이 닫힐 때 이 줄이 **새 페이지에서** 이전 위치로 되돌렸다 — 문서 사이트 모바일 목차에서
+    //    3000 내린 페이지의 링크를 누르면 새 페이지가 3000 에서 열렸다(2026-09-17 실측).
+    //    search · hash 는 비교하지 않는다 — 필터 시트의 `?color=` · `?modal=1` 처럼 주소와 동기화되는
+    //    팝업이 닫힐 때 맨 위로 튀지 않게. 라우터에 기대지 않고 `location` 만 읽는다
+    if (window.location.pathname === lockedPathnameRef.current) {
+      window.scrollTo(0, scrollTopRef.current);
+    }
     scrollTopRef.current = 0;
+    lockedPathnameRef.current = null;
     isScrollLockedRef.current = false;
   }, []);
 
@@ -88,6 +99,7 @@ export default function usePopupHostA11y({
     if (hasPopup && !isScrollLockedRef.current) {
       scrollTopRef.current =
         window.scrollY || document.documentElement.scrollTop || 0;
+      lockedPathnameRef.current = window.location.pathname;
       document.body.classList.add(PREVENT_SCROLL_CLASS);
       document.body.style.setProperty(
         SCROLL_LOCK_TOP_VAR,

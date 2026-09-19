@@ -8,63 +8,104 @@
 // 공통 골격은 `_choice-base.scss`, 그룹 배치는 `_choice-group.scss` 가 담당한다.
 // 여기에는 체크박스 고유의 표시부만 둔다.
 //
-// 공개 훅: --nui-selector--size (Radio 와 공유)
+// 공개 훅: --nui-checkbox--size · --nui-checkbox--square-radius
+//          --nui-checkbox--border-width
+//
+// 모양(`shape`)이 둘이다 — `square`(기본, 상자 안에 체크) · `ghost`(체크만).
+// ghost 는 상자가 없으므로 면도 테두리도 그리지 않는다 — hover · 눌림에도. 상태(error ·
+// disabled · readonly)는 전부 **표시색**으로, 눌림은 **배율** 하나로 말한다.
 //
 // 중간(indeterminate) 상태는 `.nui-is-*` 클래스가 아니라 네이티브 `:indeterminate`
 // 의사 클래스로 그린다 — DOM 프로퍼티가 진실이고, 사용자가 클릭해 브라우저가
 // 프로퍼티를 내리는 순간까지 CSS 가 정확히 따라간다 (KRDS [체크박스 5]).
+// **ghost 에는 중간 상태가 없다** — 타입이 막고 런타임이 접는다 (`Checkbox.tsx`).
 // ─────────────────────────────────────────────────────────────
 @layer nui.components {
   #{cls("checkbox")} {
+    // 골격은 셋이 나눠 쓰지만 **소비자에게는 컴포넌트 셋**이다 — base 가 읽는 배선을
+    // 여기서 자기 훅으로 채운다 (tokens.md §1-3).
+    #{iv("selector-border-width")}: #{hook(
+        "checkbox--border-width",
+        var(#{v("border-width-1")})
+      )};
+
+    // 선택 · 중간의 채움. 상태가 이것을 갈아끼우고, **면이 없는 모양**(ghost)은
+    // 투명으로 되돌린다.
+    //
+    // ⚠️ 속성이 아니라 변수를 갈아끼우는 이유는 상세도다. `:checked + __control` 은
+    //    클래스 셋인데 모양 modifier 는 루트에 하나라, 속성으로 두면 ghost 가 못 이겨
+    //    **선택하는 순간 진한 상자가 생긴다.** 변수로 두면 겨룸이 루트 셀렉터끼리로 모이고,
+    //    거기서는 ghost 가 클래스 둘(`.nui-checkbox.nui-checkbox--ghost`)이라 이긴다 —
+    //    소스 순서가 아니라 상세도로 이긴다(styles.md §7).
+    #{iv("checkbox-fill")}: var(#{iv("selector-accent")});
+
+    // 한 이름이 width 와 height 를 함께 먹여 **정사각형을 보장**한다. 묶음은
+    // 여기까지 — 한 컴포넌트의 두 속성이다. Radio 까지 묶던 이름을 쪼갰다.
+    width: #{hook("checkbox--size", var(#{v("size-selector")}))};
+    height: #{hook("checkbox--size", var(#{v("size-selector")}))};
+
     &__control {
-      border-radius: var(#{v("radius-1")});
+      // 기본 4px 은 KRDS 형태 표의 값이자 산식(높이 24 × ⅛ = 3 → 위 짝수 4)의 답이다.
+      // 두 근거가 같은 답을 낸다. `50%` 까지 올려도 24×24 정사각이라 **원**이 된다 —
+      // 타원이 되는 자리가 아니다 (tokens.md §3-2).
+      border-radius: #{hook("checkbox--square-radius", var(#{v("radius-1")}))};
     }
 
     // 체크 표시는 두 변(border)만 그린 뒤 45도로 돌려 만든다.
+    //
+    // ⚠️ **상자를 가운데 두면 표시가 가운데로 안 온다.** 두 변의 길이가 달라서
+    //    (가로 6 · 세로 10) 45도로 돌리면 획이 아래로 처진다. 상자는 정확히
+    //    가운데인데 눈에는 내려가 보인다 — 실측으로 획의 세로 중심이 상자 중심보다
+    //    1.41px 아래였다.
+    //
+    //    보정값은 두 변에서 역산한다. 45도에서 세로 쏠림은 `(가로 − 세로) / 2√2` 다.
+    //    (6 − 10) / 2.828 = −1.41px. 상수로 적지 않는 이유는 변의 길이를 바꾸면
+    //    보정도 따라와야 하기 때문이다 — ghost 가 실제로 그 자리다(아래).
+    //
+    //    `translate` 를 목록 **앞**에 둔다 — 뒤에 두면 회전된 좌표계에서 움직여
+    //    대각선으로 밀린다.
     &__indicator {
+      #{iv("check-nudge")}: calc(
+        (var(#{v("size-dot-xs")}) - var(#{v("size-dot-md")})) / 2.828
+      );
+
       width: var(#{v("size-dot-xs")});
       height: var(#{v("size-dot-md")});
       border-right: var(#{v("border-width-2")}) solid currentColor;
       border-bottom: var(#{v("border-width-2")}) solid currentColor;
-      transform: rotate(45deg) scale(0.6);
+      transform: translateY(var(#{iv("check-nudge")})) rotate(45deg) scale(0.6);
       transform-origin: center;
+    }
+
+    // 상태가 채움을 갈아끼운다. 우선순위 `disabled > error` 를 `:not()` 으로 명시해
+    // 소스 순서에 기대지 않는다 (styles.md §7).
+    // `ghost` 는 아래 자기 블록에서 투명으로 되돌린다.
+    &#{state("error")}:not(#{state("disabled")}):not(
+        #{cls("checkbox")}--ghost
+      ) {
+      #{iv("checkbox-fill")}: var(#{v("control-accent-error")});
+    }
+
+    &#{state("disabled")}:not(#{cls("checkbox")}--ghost) {
+      #{iv("checkbox-fill")}: var(#{v("control-selection-disabled")});
     }
 
     // 채움은 선택과 중간이 같다.
     &__input:checked + #{cls("checkbox")}__control,
     &__input:indeterminate + #{cls("checkbox")}__control {
-      background-color: var(#{v("control-accent")});
-      border-color: var(#{v("control-accent")});
-    }
-
-    &#{state("error")}:not(#{state("disabled")})
-      #{cls("checkbox")}__input:checked
-      + #{cls("checkbox")}__control,
-    &#{state("error")}:not(#{state("disabled")})
-      #{cls("checkbox")}__input:indeterminate
-      + #{cls("checkbox")}__control {
-      background-color: var(#{v("control-accent-error")});
-      border-color: var(#{v("control-accent-error")});
-    }
-
-    &#{state("disabled")}
-      #{cls("checkbox")}__input:checked
-      + #{cls("checkbox")}__control,
-    &#{state("disabled")}
-      #{cls("checkbox")}__input:indeterminate
-      + #{cls("checkbox")}__control {
-      background-color: var(#{v("control-selection-disabled")});
-      border-color: var(#{v("control-selection-disabled")});
+      background-color: var(#{iv("checkbox-fill")});
+      border-color: var(#{iv("checkbox-fill")});
     }
 
     &__input:checked
       + #{cls("checkbox")}__control
       #{cls("checkbox")}__indicator {
       opacity: 1;
-      transform: rotate(45deg) scale(1);
+      transform: translateY(var(#{iv("check-nudge")})) rotate(45deg) scale(1);
     }
 
     // 같은 요소를 가로 한 줄로 갈아끼운다. 회전을 풀고 아래 변만 남긴다.
+    // 회전이 없으니 위 광학 보정도 필요 없다 — `transform: none` 이 함께 지운다.
     // ⚠️ 선택 규칙보다 **뒤에** 둔다 — 둘 다 참이면 네이티브처럼 대시가 이긴다.
     &__input:indeterminate
       + #{cls("checkbox")}__control
@@ -75,5 +116,126 @@
       opacity: 1;
       transform: none;
     }
+
+    // ─────────────────────────────────────────────────────────
+    // shape="ghost" — 상자 없이 체크만 ★ (2026-09-12)
+    //
+    // SEED `checkmark.yaml` 의 `variant=ghost`. 필수가 아니고 항목이 셋 이하인
+    // 자리에 쓴다 — 상자가 없어 KRDS 의 「체크박스 외곽선 3:1」을 만족하지 못하므로
+    // 기본은 `square` 다 (spec §9 매트릭스 예외).
+    //
+    // ⚠️ **선택 여부를 색이 말하지 않는다.** brand · error 채움은 미선택 표시(gray-10)와
+    //    밝기가 거의 같아(1.38 · 1.36) 색만으로는 WCAG 1.4.1 을 못 넘는다. 획 두께
+    //    (1 → 2)와 크기(1.15 → 1.35)가 상태를 말하고 색은 보조 채널이다 (spec §7-1).
+    //
+    // ⚠️ ghost 셀렉터에는 **블록 클래스를 한 번 더 붙인다**(`&#{cls("checkbox")}--ghost`).
+    //    base 와 square 의 규칙이 같은 상세도로 서는 자리가 넷이라, 안 올리면 동점이 되어
+    //    소스 순서가 승부를 가른다 — `_checkbox.scss` 안에서 블록을 옮기는 것만으로
+    //    비활성 ghost 에 회색 상자가 돌아온다. Switch 의 readonly 사고와 같은 종류다.
+    // ─────────────────────────────────────────────────────────
+    &#{cls("checkbox")}--ghost {
+      // 선택돼도, 선택된 채로 눌러도 면을 칠하지 않는다 (`_choice-base.scss` 의 두 변수).
+      // 「배경 없이 체크만」이 이 모양의 정의다 — 순간 표현도 예외가 아니다 (spec §5-2).
+      #{iv("checkbox-fill")}: transparent;
+      #{iv("selector-press-fill")}: transparent;
+      // 표시색은 루트에서 정한다. `checked` 는 input 에 붙어 루트로 못 올라오므로
+      // 그것만 아래에서 따로 덮는다.
+      #{iv("ghost-mark")}: var(#{v("control-icon")});
+    }
+
+    // 상태 우선순위 `disabled > error > readonly` 를 `:not()` 으로 명시한다.
+    // 상세도가 뒤집혀 있어(readonly 가 가장 높다) 소스 순서로는 보장되지 않는다 —
+    // 실제로 Switch 에서 readonly 가 error 를 덮은 적이 있다 (styles.md §7).
+    &#{cls("checkbox")}--ghost#{state("readonly")}:not(#{state("error")}):not(
+        #{state("disabled")}
+      ) {
+      #{iv("ghost-mark")}: var(#{v("control-text-muted")});
+    }
+
+    &#{cls("checkbox")}--ghost#{state("error")}:not(#{state("disabled")}) {
+      #{iv("ghost-mark")}: var(#{v("control-accent-error")});
+    }
+
+    &#{cls("checkbox")}--ghost#{state("disabled")} {
+      #{iv("ghost-mark")}: var(#{v("control-icon-disabled")});
+    }
+
+    // ghost 는 **지속적인 면을 갖지 않는다.** base 가 면을 칠하는 자리 셋을 전부
+    // 되돌린다 — 기본 · 비활성 · 읽기 전용.
+    //
+    // ⚠️ 테두리는 색이 아니라 **두께 0** 으로 지운다. base 의 hover · focus 가
+    //    `border-color` 를 건드리는데, 두께가 0 이면 그 색이 무엇이든 보이지 않아
+    //    상세도를 겨룰 일이 없다. `box-sizing: border-box` 라 바깥 치수도 그대로다.
+    &#{cls("checkbox")}--ghost &__control,
+    &#{cls("checkbox")}--ghost#{state("disabled")} &__control,
+    &#{cls("checkbox")}--ghost#{state("readonly")} &__control {
+      color: var(#{iv("ghost-mark")});
+      background-color: transparent;
+      border-width: 0;
+      // 둥글기가 보이는 자리는 포커스 outline 하나다. 훅을 열지 않는다 —
+      // 여는 것은 non-breaking 이라 수요가 생기면 그때 더한다.
+      border-radius: var(#{v("radius-1")});
+    }
+
+    // 눌림 — 면 없이 배율만. base 의 **미선택** `:active` 는 `control-bg-active` 를 리터럴로
+    // 적어 위 변수가 닿지 않으므로 여기서 되돌린다(선택·중간 눌림은 `selector-press-fill` 이
+    // 맡는다). 눌림의 세 축(design-system §6-3)에 면은 없고, motion.md §2 「피드백」의 예가
+    // 「버튼 눌림 scale」이다.
+    //
+    // ⚠️ 배율은 `scale-90` — base 의 `scale-94` 보다 한 단계 더 줄인다. 면이 없어 눌림 신호가
+    //    배율 하나뿐이라 1.44px 로는 읽히지 않았다(qa). 0.94 · 0.92 · 0.90 · 0.88 을 눌러 비교해
+    //    24px 의 10% 를 골랐다 (2026-09-13 · prototype · tokens.md §3-10).
+    //    시간·곡선은 base 의 transition 그대로다 — 세 축 중 배율만 바꾼다.
+    // 블록 클래스를 한 번 더 붙여 base(클래스 여섯)보다 한 단계 높다.
+    &#{cls("checkbox")}--ghost:not(#{state("disabled")}):not(
+        #{state("readonly")}
+      )
+      &__input:active
+      + &__control {
+      background-color: transparent;
+      transform: scale(var(#{v("scale-90")}));
+    }
+
+    // 선택 — 색은 채움색으로 가되 **보조 채널**이다. 상태가 있으면 위 `ghost-mark` 가
+    // 이기도록 `:not()` 으로 비켜선다.
+    &#{cls("checkbox")}--ghost:not(#{state("error")}):not(
+        #{state("disabled")}
+      ):not(#{state("readonly")})
+      &__input:checked
+      + &__control {
+      color: var(#{iv("selector-accent")});
+    }
+
+    // 상자가 없으니 글리프가 크기를 말한다 — SEED 도 square 12 → ghost 14 다.
+    //
+    // ⚠️ 상자(`size-dot-*`)는 square 와 **같게 두고 배율로 키운다.** 14px 짜리 점
+    //    토큰이 없는데 아이콘 토큰을 끌어다 쓰면 「점은 아이콘이 아니다」를 어긴다
+    //    (tokens.md §3-4). 상자가 같으므로 45도 광학 보정식도 그대로 따라온다.
+    &#{cls("checkbox")}--ghost &__indicator {
+      border-right-width: var(#{v("border-width-1")});
+      border-bottom-width: var(#{v("border-width-1")});
+      // ⚠️ 미선택에도 체크를 남긴다. 상자가 없는데 표시까지 사라지면 **컨트롤이
+      //    없는 자리**로 읽힌다 (WCAG 1.4.11 · SEED `variant=ghost` 의 연한 체크).
+      opacity: 1;
+      transform: translateY(var(#{iv("check-nudge")})) rotate(45deg) scale(1.15);
+    }
+
+    // 선택되면 획이 굵어지고 커진다 — 색이 아니라 이 둘이 상태를 말한다 (spec §7-1).
+    &#{cls("checkbox")}--ghost &__input:checked + &__control &__indicator {
+      border-right-width: var(#{v("border-width-2")});
+      border-bottom-width: var(#{v("border-width-2")});
+      transform: translateY(var(#{iv("check-nudge")})) rotate(45deg) scale(1.35);
+    }
+
+    // 테두리가 없으므로 포커스 수단이 outline 이다 — a11y.md §4-1 은 가족이 아니라
+    // **형태**로 수단을 가른다. outline 은 레이아웃을 차지하지 않아 안쪽을 밀지 않는다.
+    &#{cls("checkbox")}--ghost &__input:focus-visible + &__control {
+      outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
+      outline-offset: var(#{v("focus-offset")});
+      box-shadow: none;
+    }
+
+    // hover 규칙은 없다. base 의 hover 는 `border-color` 만 건드리고 ghost 는 두께가 0 이라
+    // 보이지 않는다 — 남는 hover 신호는 커서뿐이다 (spec §5-2 · 사용자 결정 2026-09-13).
   }
 }

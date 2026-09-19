@@ -54,7 +54,7 @@
       position: relative;
       padding: var(#{v("space-2")}) var(#{v("space-3")});
       background-color: var(#{v("layer-inverse")});
-      border-radius: #{hook("tooltip--radius", var(#{v("radius-1_5")}))};
+      border-radius: #{hook("tooltip--radius", var(#{v("radius-2")}))};
       box-shadow: var(#{v("shadow-2")});
     }
 
@@ -64,7 +64,7 @@
       white-space: normal;
       word-break: keep-all;
 
-      @include typo(3, "regular");
+      @include typo(2, "regular");
     }
 
     &__arrow {

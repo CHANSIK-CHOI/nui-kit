@@ -1,152 +1,215 @@
-import { GuideHeader, HookTable } from "@/components/guide";
-import { PropsTable } from "@/components/guide";
-import { SelectDemo } from "./SelectDemo";
+import Link from "next/link";
+import { Field, FieldLabel, Select, type SelectOption } from "@nui-kit/react";
+import {
+  GuideHeader,
+  DesignNote,
+  InputStateCases,
+  HookTable,
+  PropsTable,
+} from "@/components/guide";
+import {
+  SelectBasicDemo,
+  SelectSizeDemo,
+  SelectSearchDemo,
+  SelectOptionsDemo,
+  SelectPlacementDemo,
+  SelectPortalDemo,
+} from "./SelectDemo";
 import { RHFSelectDemo } from "./RHFSelectDemo";
 
 export const metadata = { title: "Select" };
 
-export default function SelectPage() {
-  return (
-    <>
-      <GuideHeader
-        title="Select"
-        named={["Select", "MultiSelect"]}
-        subpath="select"
-      >
-        목록에서 고르는 컨트롤이다. 내부는 <code>react-select</code> 이지만 값은
-        옵션 객체가 아니라 원시값으로 주고받는다. 여러 개를 고르려면{" "}
-        <code>MultiSelect</code> 를 쓴다.
-      </GuideHeader>
-
-      <pre className="doc-code">
-        <code>{`import { Select, MultiSelect } from "@nui-kit/react";
-
-const OPTIONS = [
+/** 상태 격자에 고정으로 보여줄 옵션 */
+const CITIES: SelectOption[] = [
   { label: "서울", value: "seoul" },
   { label: "부산", value: "busan" },
 ];
 
-<Select options={OPTIONS} value={city} onChange={setCity} />
-<MultiSelect options={OPTIONS} value={cities} onChange={setCities} />`}</code>
-      </pre>
+export default function SelectPage() {
+  return (
+    <>
+      <GuideHeader title="Select" named={["Select"]} subpath="select" />
 
+      <p>
+        목록에서 하나를 고르는 입력이다. 값은 옵션 객체가 아니라 옵션의{" "}
+        <code>value</code> 하나이고, <code>value</code> 와 <code>onChange</code>{" "}
+        로 쓰는 쪽이 갖는다. 여러 개를 고르려면{" "}
+        <Link href="/components/multi-select">MultiSelect</Link> 를 쓴다.
+      </p>
+
+      <h2>기본</h2>
+      <SelectBasicDemo />
       <div className="doc-note">
-        <strong>controlled 전용이다.</strong> <code>value</code> 와{" "}
-        <code>onChange</code> 를 소비자가 소유한다. <code>onChange</code> 의 첫
-        인자가 원시값이고, 두 번째·세 번째로 react-select 의 옵션 객체와{" "}
-        <code>actionMeta</code> 가 함께 온다. react-hook-form 을 쓴다면{" "}
-        <code>@nui-kit/react/rhf</code> 의 <code>RHFSelect</code> ·{" "}
-        <code>RHFMultiSelect</code> 를 쓴다.
+        <code>value</code> 는 <code>options</code> 안에 있는 값이어야 한다.
+        옵션을 아직 불러오지 않았을 때처럼 목록에 없는 값을 주면 선택이 보이지
+        않고 placeholder 가 보인다.
       </div>
 
-      <SelectDemo />
+      <DesignNote title="왜 옵션 객체가 아니라 원시값인가">
+        <p>
+          폼 상태에 그대로 넣기 위해서다. 객체를 주고받으면 쓰는 쪽이 저장할
+          때마다 <code>value</code> 를 꺼내고 읽을 때마다 옵션을 다시 찾아야
+          한다. 원시값이면 그 일이 없다. 대신 목록에 없는 값은 화면에 표시할
+          라벨이 없으므로 placeholder 로 남는다.
+        </p>
+      </DesignNote>
+
+      <h2>크기</h2>
+      <p>
+        <code>size</code> 는 <code>medium</code>(48px · 기본)과{" "}
+        <code>large</code>(56px) 둘이다. <code>Button</code> ·{" "}
+        <code>Textfield</code> 의 같은 이름과 같은 높이라 옆에 두면{" "}
+        <code>size</code> 를 안 적어도 맞는다. 메뉴와 옵션은 크기와 무관하다.
+      </p>
+      <SelectSizeDemo />
+
+      <h2>검색과 지우기</h2>
+      <p>
+        <code>isSearchable</code> 은 타이핑으로 목록을 거르고,{" "}
+        <code>isClearable</code> 은 선택을 지우는 버튼을 보인다. 둘 다 기본은
+        꺼짐이다. 거른 결과가 없으면 「선택 가능한 항목이 없습니다」가 보이고{" "}
+        <code>noOptionsMessage</code> 로 바꾼다.
+      </p>
+      <SelectSearchDemo />
+
+      <h2>옵션</h2>
+      <p>
+        <code>options</code> 는 평면 목록 또는{" "}
+        <code>{"{ label, options }"}</code> 묶음이다. 옵션에{" "}
+        <code>isDisabled</code> 를 주면 보이되 고를 수 없다. 불러오는 동안은{" "}
+        <code>isLoading</code> 을 켜면 목록 자리에 「불러오는 중...」이 보인다.
+      </p>
+      <SelectOptionsDemo />
+
+      <h2>상태</h2>
+      <InputStateCases
+        columns={2}
+        caption="readOnly 는 포커스는 받되 메뉴를 열지 않는다. disabled 는 포커스도 받지 않는다"
+        code={`<Select options={OPTIONS} value={city} onChange={setCity} errorMessage="지역을 골라 주세요" />`}
+        render={(p) => (
+          <Field>
+            <FieldLabel>거주 지역</FieldLabel>
+            <Select
+              options={CITIES}
+              placeholder="지역을 고르세요"
+              value={p.disabled || p.readOnly ? "seoul" : null}
+              errorMessage={p.isError ? "지역을 골라 주세요" : undefined}
+              disabled={p.disabled}
+              readOnly={p.readOnly}
+            />
+          </Field>
+        )}
+      />
+
+      <h2>잘리는 상자 안에서</h2>
+      <p>
+        메뉴는 컨트롤 바로 아래 제자리에 뜨고, 스크롤하면 컨트롤과 함께
+        움직인다. 조상에 <code>overflow: hidden</code> 이 있으면 잘린다. 카드나
+        팝업 안에 넣을 때 <code>hasPortal</code> 을 켜면 메뉴가{" "}
+        <code>body</code> 로 나가 잘리지 않는다. <code>Datepicker</code> ·{" "}
+        <code>Tooltip</code> 의 같은 이름 prop 과 한 규칙이다.
+      </p>
+      <p>
+        아래 공간이 모자라면 메뉴가 위로 뒤집힌다. 화면 가장자리와는 8px 를
+        띄운다. 위아래 모두 모자라면 넓은 쪽으로 열리고 높이는 줄지 않는다.
+        페이지는 스크롤하지 않는다. <code>hasPortal</code> 을 켜도 같고,{" "}
+        <code>Datepicker</code> 의 달력과 같은 규칙이다. 방향을 고정하려면{" "}
+        <code>menuPlacement=&quot;bottom&quot;</code> 이나{" "}
+        <code>&quot;top&quot;</code> 을 준다. 메뉴를 문서 흐름 안에 두려면{" "}
+        <code>menuPosition=&quot;static&quot;</code> 을 준다. 메뉴가 열리는 만큼
+        아래 내용이 밀리고, 뒤집히지 않는다.
+      </p>
+      <SelectPortalDemo />
+      <SelectPlacementDemo />
 
       <RHFSelectDemo />
-
-      <h2>스타일 커스터마이징</h2>
-      <p>
-        컨트롤 외형은 공개 CSS 변수로 조정한다. 이 변수들은 라이브러리 레이어(
-        <code>@layer nui.components</code>) 밖에서 선언하면 언제나 우선한다.
-      </p>
-      <p>
-        색은 컴포넌트별로 열지 않는다. 한 곳만 바꾸려면 <code>className</code>{" "}
-        을, 화면 전체를 바꾸려면 브랜드 프리셋을 쓴다.
-      </p>
-      <HookTable group="select" />
-
-      <div className="doc-note doc-note--warn">
-        <strong>
-          react-select 의 <code>styles</code> prop 은 우리 CSS 를 이긴다.
-        </strong>{" "}
-        react-select 은 emotion 으로 스타일을 주입하는데, 그 클래스는 CSS 레이어
-        밖에 있어 <code>@layer nui.components</code> 안의 우리 규칙보다 항상
-        우선한다. 그래서 이 컴포넌트는 <code>unstyled</code> 로 구동하면서{" "}
-        <strong>충돌하는 속성만 emotion 쪽에서 걷어내</strong> CSS 가 책임지게
-        한다. <code>styles</code> prop 을 직접 넘기면 그 정리된 값 위에 얹히므로
-        의도한 대로 덧칠할 수 있다. 반대로 메뉴 최대 높이처럼 react-select 이
-        배치 계산에 쓰는 값은 CSS 가 아니라 <code>maxMenuHeight</code> prop 으로
-        조정해야 한다.
-      </div>
-
-      <div className="doc-note doc-note--warn">
-        <strong>
-          <code>components</code> 는 렌더 밖에서 선언한다.
-        </strong>{" "}
-        매 렌더 새 컴포넌트 함수를 넘기면 react-select 이 내부 input 을 remount
-        해 <strong>포커스와 입력 중이던 검색어가 사라진다.</strong> react-select
-        공식 문서도 같은 것을 권고한다.
-        <pre className="doc-code" style={{ marginTop: 10, marginBottom: 0 }}>
-          <code>{`// ❌ 렌더 안에서 컴포넌트를 새로 만든다
-<Select components={{ Option: (props) => <CustomOption {...props} /> }} />
-
-// ✅ 모듈 스코프에 한 번만 선언한다
-const SELECT_COMPONENTS = { Option: CustomOption };
-<Select components={SELECT_COMPONENTS} />`}</code>
-        </pre>
-        <p style={{ marginBottom: 0 }}>
-          <code>styles</code> 는 컴포넌트가 아니라 함수 객체라 인라인으로 넘겨도
-          remount 되지 않는다.
-        </p>
-      </div>
-
-      <div className="doc-note">
-        <code>value</code> 는 <code>options</code> 안에 존재하는 값이어야 한다.
-        옵션을 비동기로 불러오는 동안처럼 <code>options</code> 에 없는 값을
-        넣으면 선택이 표시되지 않고 placeholder 가 보인다 — 원시값 API 의 구조적
-        특성이다.
-      </div>
 
       <h2>접근성</h2>
       <ul>
         <li>
-          <code>Field</code> 안에서는 라벨의 <code>htmlFor</code> 와 컨트롤의{" "}
-          <code>id</code> 가 자동으로 연결된다
+          <code>Field</code> 안에서는 라벨과 <code>id</code>, 설명 · 에러의{" "}
+          <code>aria-describedby</code> 가 연결된다. 에러면{" "}
+          <code>aria-invalid</code> 가 붙는다
         </li>
         <li>
-          설명·에러 메시지 id 는 <code>aria-describedby</code> 로 중복 없이
-          합쳐진다
+          <code>Field</code> 에 <code>required</code> 를 주면 입력에{" "}
+          <code>aria-required</code> 가 붙는다. <code>MultiSelect</code> 도 같다
         </li>
         <li>
-          에러일 때 <code>aria-invalid</code> 가 붙고, 메시지는 색이 아니라{" "}
-          <strong>아이콘 + 텍스트</strong>로 표시된다
+          <kbd>↑</kbd> <kbd>↓</kbd> 로 옮기고 <kbd>Enter</kbd> 로 고르고{" "}
+          <kbd>Esc</kbd> 로 닫는다
         </li>
         <li>
-          키보드로 조작한다 — <kbd>↑</kbd> <kbd>↓</kbd> 로 이동,{" "}
-          <kbd>Enter</kbd> 로 선택, <kbd>Esc</kbd> 로 닫기
+          스크린리더가 읽는 문구(「7개 중 3번째」 등)는 한국어 기본값이 있다.{" "}
+          <code>ariaLiveMessages</code> · <code>screenReaderStatus</code> 로
+          바꾼다
         </li>
         <li>
-          <code>readOnly</code> 는 포커스는 받되 메뉴를 열지 않는다.{" "}
-          <code>disabled</code> 는 포커스 자체를 받지 않는다
-        </li>
-        <li>
-          <strong>MultiSelect 칩의 × 는 Tab 으로 닿는 버튼이다.</strong> 칩이
-          여럿이면 앞에서부터 하나씩 잡히고, 그다음이 입력창이다.{" "}
-          <kbd>Enter</kbd> 와 <kbd>Space</kbd> 로 지운다. 지우고 나면 포커스가{" "}
-          <strong>이전 칩</strong>으로, 없으면 입력창으로 간다
-        </li>
-        <li>
-          칩 × 의 접근 이름은 기본 &quot;서울 옵션 삭제&quot; 이고{" "}
-          <code>removeButtonLabel</code> 로 바꾼다. 라벨을 끼워 넣는 자리가
-          언어마다 달라서 문자열이 아니라 함수를 받는다
-          <pre className="doc-code" style={{ marginTop: 10, marginBottom: 0 }}>
-            <code>{`<MultiSelect removeButtonLabel={(label) => \`Remove \${label}\`} />`}</code>
-          </pre>
+          <code>readOnly</code> 면 <code>aria-readonly</code> 가 붙고 값을 읽을
+          수 있다
         </li>
       </ul>
 
+      <h2>커스터마이징</h2>
+      <p>
+        치수와 모양을 연다. 아래 변수는 <code>MultiSelect</code> 도 함께 쓴다.
+        색이 바뀌는 창구는{" "}
+        <Link href="/design-system/color">프리셋과 className</Link> 둘뿐이다.
+      </p>
+      <HookTable group="select" />
+      <p>
+        메뉴 최대 높이처럼 react-select 이 배치 계산에 쓰는 값은 CSS 가 아니라{" "}
+        <code>maxMenuHeight</code> 같은 prop 으로 준다. <code>styles</code> 를
+        넘기면 이 라이브러리의 CSS 위에 얹힌다.
+      </p>
+      <div className="doc-note doc-note--warn">
+        <code>components</code> 는 렌더 밖에서 한 번만 만든다. 매 렌더 새 함수를
+        넘기면 react-select 이 입력을 다시 만들어 포커스와 치던 검색어가
+        사라진다.
+      </div>
+      <pre className="doc-code">
+        <code>{`// 모듈 스코프에 한 번
+const SELECT_COMPONENTS = { Option: CustomOption };
+
+<Select components={SELECT_COMPONENTS} />`}</code>
+      </pre>
+
+      <DesignNote title="왜 styles 가 CSS 위에 얹히나">
+        <p>
+          react-select 은 emotion 으로 스타일을 주입한다. 그 클래스는 CSS 레이어
+          밖에 있어 <code>@layer nui.components</code> 안의 규칙보다 항상
+          우선한다. 그래서 이 컴포넌트는 <code>unstyled</code> 로 돌리면서
+          충돌하는 속성만 emotion 쪽에서 걷어내 CSS 가 그리게 한다.{" "}
+          <code>styles</code> 는 그 정리된 값 위에 얹히므로 의도한 대로
+          덧칠된다.
+        </p>
+      </DesignNote>
+
       <h2>API</h2>
       <p>
-        아래 표는 이 라이브러리가 정의한 prop 이다. 여기에 없는{" "}
-        <code>react-select</code> 의 prop(<code>menuPlacement</code>,{" "}
-        <code>maxMenuHeight</code>, <code>closeMenuOnSelect</code> 등)도 그대로
-        전달된다. 단 <code>defaultValue</code>(controlled 전용),{" "}
-        <code>getOptionValue</code>(원시값 매칭이 <code>value</code> 고정),{" "}
-        <code>theme</code>(<code>unstyled</code> 라 효과 없음) 은 받지 않는다.
+        아래 표는 이 라이브러리가 정의한 prop 이다. 여기에 없는 react-select 의
+        prop(<code>menuPlacement</code> · <code>maxMenuHeight</code> ·{" "}
+        <code>isLoading</code> 등)도 그대로 전달된다. <code>defaultValue</code>{" "}
+        · <code>getOptionValue</code> · <code>theme</code> 셋은 받지 않는다.
       </p>
-      <h3>Select</h3>
+      <p>
+        <code>menuPlacement</code> 는 이름과 값이 react-select 그대로지만 뜻이
+        다르다. 기본 <code>&quot;auto&quot;</code> 는 위치 모드와 상관없이 화면
+        기준으로 뒤집고, <code>&quot;bottom&quot;</code> ·{" "}
+        <code>&quot;top&quot;</code> 은 그 방향에 고정한다. 목록 높이는 언제나{" "}
+        <code>maxMenuHeight</code> 까지다.
+      </p>
       <PropsTable of="Select" />
-      <h3>MultiSelect</h3>
-      <PropsTable of="MultiSelect" />
+
+      <DesignNote title="왜 셋을 받지 않나">
+        <p>
+          <code>defaultValue</code> 는 항상 <code>value</code> 를 넘기므로
+          react-select 이 무시한다. <code>getOptionValue</code> 는 바꿔도 값
+          매칭이 <code>option.value</code> 로 고정이라 선택은 되는데 화면에서
+          사라진다. <code>theme</code> 은 <code>unstyled</code> 라 효과가 없다.
+          타입은 통과하는데 동작만 조용히 없는 셋이라 타입에서 뺐다.
+        </p>
+      </DesignNote>
     </>
   );
 }

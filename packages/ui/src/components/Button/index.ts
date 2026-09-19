@@ -15,7 +15,10 @@ export { default as IconButton } from "./IconButton.js";
 export type { IconButtonProps, IconButtonVariant } from "./IconButton.js";
 
 export { default as ButtonGroup, ButtonGroupItem } from "./ButtonGroup.js";
-export type { ButtonGroupProps, ButtonGroupItemProps } from "./ButtonGroup.js";
+export type {
+  ButtonGroupProps,
+  ButtonGroupItemProps,
+  ButtonGroupRatio,
+} from "./ButtonGroup.js";
 
-export { default as ButtonLink } from "./ButtonLink.js";
-export type { ButtonLinkProps } from "./ButtonLink.js";
+// `ButtonLink` 는 여기서 나가지 않는다 — `next/link` 를 쓰므로 `src/next.ts` 로만 나간다.

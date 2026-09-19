@@ -1,7 +1,7 @@
 {
   "name": "@nui-kit/react",
-  "version": "0.1.2",
-  "description": "Next.js App Router 전용 React UI 컴포넌트 라이브러리",
+  "version": "0.2.0",
+  "description": "Next.js 와 React 를 위한 UI 컴포넌트 라이브러리",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CHANSIK-CHOI/nui-kit.git",
@@ -28,6 +28,9 @@
     "**/*.css",
     "**/*.scss"
   ],
+  "bin": {
+    "nui-theme": "./dist/cli.js"
+  },
   "files": [
     "dist",
     "styles",
@@ -43,6 +46,10 @@
     "./rhf": {
       "types": "./dist/rhf.d.ts",
       "default": "./dist/rhf.js"
+    },
+    "./next": {
+      "types": "./dist/next.d.ts",
+      "default": "./dist/next.js"
     },
     "./button": {
       "types": "./dist/button.d.ts",
@@ -108,20 +115,25 @@
     "provenance": true
   },
   "scripts": {
-    "build": "npm run build:js && npm run build:styles",
-    "build:js": "tsup && tsc -p tsconfig.build.json",
+    "build": "npm run build:js && npm run build:styles && npm run build:themes",
+    "build:js": "tsup && tsup --config tsup.cli.config.ts && tsc -p tsconfig.build.json",
     "build:styles": "node -e \"require('node:fs').rmSync('styles',{recursive:true,force:true})\" && sass --no-source-map --style=compressed --load-path=src/styles src/styles/entries:styles",
+    "build:themes": "node scripts/color/build-themes.mjs",
     "dev:styles": "sass --watch --no-source-map --load-path=src/styles src/styles/entries:styles",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run verify:css && npm run verify:tokens && publint --strict && attw --pack . --profile esm-only",
+    "verify": "npm run verify:css && npm run verify:tokens && npm run verify:themes && npm run verify:accordion-index && npm run verify:select-placement && publint --strict && attw --pack . --profile esm-only",
     "prepublishOnly": "npm run build",
     "verify:css": "node scripts/check-css-isolation.mjs",
     "verify:tokens": "node scripts/check-token-layers.mjs",
+    "verify:themes": "node scripts/color/verify-themes.mjs",
     "color:presets": "node scripts/color/build-presets.mjs",
     "color:generate": "node scripts/color/generate.mjs",
-    "color:verify": "node scripts/color/verify.mjs"
+    "color:verify": "node scripts/color/verify.mjs",
+    "verify:accordion-index": "node scripts/check-accordion-index.mjs",
+    "verify:select-placement": "node scripts/check-select-placement.mjs"
   },
   "peerDependencies": {
+    "lucide-react": "^1.39.0",
     "next": ">=14",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
@@ -130,13 +142,15 @@
   "peerDependenciesMeta": {
     "react-hook-form": {
       "optional": true
+    },
+    "next": {
+      "optional": true
     }
   },
   "dependencies": {
     "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.36.0",
-    "lucide-react": "^1.39.0",
     "react-day-picker": "^9.14.0",
     "react-select": "^5.10.2",
     "zustand": "^5.0.11"
@@ -146,6 +160,8 @@
     "@radix-ui/colors": "^3.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "esbuild": "0.27.7",
+    "lucide-react": "^1.39.0",
     "next": "16.3.2",
     "publint": "0.3.24",
     "radix-theme-generator": "^0.1.1",

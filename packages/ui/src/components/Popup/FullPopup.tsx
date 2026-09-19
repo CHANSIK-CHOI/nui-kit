@@ -10,7 +10,6 @@ const block = px("full-popup");
 export default function FullPopup({
   className,
   contentAlign = "left",
-  dialogLabel = "전체 팝업",
   ...props
 }: FullPopupProps) {
   return (
@@ -19,7 +18,6 @@ export default function FullPopup({
       variant="full"
       size={undefined}
       contentAlign={contentAlign}
-      dialogLabel={dialogLabel}
       className={cn(block, className)}
     />
   );

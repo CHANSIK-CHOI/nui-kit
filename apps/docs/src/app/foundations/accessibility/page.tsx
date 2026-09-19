@@ -3,17 +3,37 @@ import { TokenTable } from "@/components/TokenTable";
 
 export const metadata = { title: "접근성" };
 
-/**
- * 실측치다. `npm run verify:a11y` 가 문서 사이트에서 getComputedStyle 로 재고
- * WCAG 2.1 공식으로 계산한다. 손으로 적은 값이 아니다. 2026-09-03 측정.
- */
-const CONTRAST: [string, string, string, string][] = [
-  ["기본 버튼 라벨", "16.17:1", "15.21:1", "4.5"],
-  ["primary 버튼 라벨", "5.30:1", "5.30:1", "4.5"],
-  ["비활성 버튼 라벨", "2.96:1", "3.12:1", "2.0 (하한)"],
-  ["입력 글자", "16.17:1", "15.21:1", "4.5"],
-  ["에러 메시지", "5.11:1", "8.00:1", "4.5"],
-  ["Tooltip · Toast 글자", "16.49:1", "16.24:1", "4.5"],
+/** `npm run verify:a11y` 가 재는 것. 절 이름은 apps/docs/scripts/check-a11y.mjs 와 같다 */
+const CHECKS: [string, string][] = [
+  ["명도 대비", "글자 4.5:1 · 라이트와 다크 두 테마"],
+  [
+    "비텍스트 대비",
+    "입력 테두리 · 스위치 트랙 · 체크박스 외곽선 · 포커스 표시 3:1",
+  ],
+  [
+    "버튼 전수",
+    "variant 4 × color 5 × 기본·비활성 × 두 테마. 글자 4.5 · 테두리 3.0 · 비활성 하한 2.0",
+  ],
+  [
+    "soft · line · text 의 hover · active",
+    "실제로 마우스를 올리고 눌러서 잰 글자 대비",
+  ],
+  ["선택 컨트롤 전수", "tone × 상태 × 두 테마 — 채움 위 표시의 대비"],
+  [
+    "Checkbox shape=ghost",
+    "선택 여부 × tone × 상태 × 두 테마 — 면 없는 체크 표시의 대비",
+  ],
+  ["placeholder", "4.5:1 — placeholder 도 글자다"],
+  ["포커스", "포커스 전후 안쪽 글자의 좌표가 같은가"],
+  [
+    "터치 영역",
+    "실제로 눌리는 범위. 24px 미만 실패 · 이유 없는 44px 미만 경고",
+  ],
+  ["글자 최소", "13px 아래가 없는가"],
+  [
+    "모션 감소",
+    "prefers-reduced-motion 에서 연 직후의 transform 이 정지해 있고 스피너 회전이 꺼지는가",
+  ],
 ];
 
 export default function AccessibilityPage() {
@@ -34,55 +54,41 @@ export default function AccessibilityPage() {
 
       <h2>명도 대비</h2>
       <p>
-        기준은 WCAG 2.1 AA 인 4.5:1 이다. 비활성은 요구에서 빠지지만 2.0:1
-        아래로는 두지 않는다. 아래는 계산값이 아니라 실제 렌더된 화면에서
-        라이트·다크 두 테마로 잰 값이다.
+        기준은 WCAG 2.1 AA 인 4.5:1 이다. 글자가 아닌 것(테두리 · 트랙 · 포커스
+        표시)은 3:1 이다. 비활성은 요구에서 빠지지만 2.0:1 아래로는 두지 않는다
+        — 회색이 배경에 녹으면 비활성이 아니라 없음으로 읽힌다.
+      </p>
+      <p>
+        값은 문서에 적지 않는다. <code>npm run verify:a11y</code> 가 실제 렌더된
+        화면에서 두 테마의 값을 재고 기준에 미달하면 실패시킨다. 재는 것은
+        아래와 같다.
       </p>
       <div className="doc-table-wrap">
         <table className="doc-table">
           <thead>
             <tr>
-              <th>대상</th>
-              <th>라이트</th>
-              <th>다크</th>
-              <th>기준</th>
+              <th>무엇을</th>
+              <th>어떻게</th>
             </tr>
           </thead>
           <tbody>
-            {CONTRAST.map(([target, light, dark, min]) => (
-              <tr key={target}>
+            {CHECKS.map(([what, how]) => (
+              <tr key={what}>
                 <th scope="row" className="doc-wrap">
-                  {target}
+                  {what}
                 </th>
-                <td>
-                  <strong>{light}</strong>
-                </td>
-                <td>
-                  <strong>{dark}</strong>
-                </td>
-                <td className="doc-wrap">{min}</td>
+                <td className="doc-wrap">{how}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-      <p>
-        <code>npm run verify:a11y</code> 가 브라우저에서 두 테마의 값을 다시
-        재고 기준에 미달하면 실패시킨다. 터치 영역도 같이 잰다. 박스가 아니라
-        실제로 눌리는 범위를 재고, 24px 미만은 실패, 이유 없는 44px 미만은
-        경고다.
-      </p>
-      <div className="doc-note">
-        <strong>다크가 이 검사를 만들었다.</strong> 토스트·툴팁의 반전 표면이
-        다크에서 밝아지는데 글자는 흰색으로 남아 대비가 1.16:1 이었다. 라이트만
-        재고 있어서 아무도 몰랐다.
       </div>
 
       <div className="doc-note doc-note--warn">
         <strong>색을 바꾸면 이 보장이 깨질 수 있다.</strong> 배경만 바꾸고
         글자색을 그대로 두면 대비가 무너진다. 무너진 대비는 화면에 드러나지
         않는다. 컴포넌트별 색 변수를 두지 않은 이유다(
-        <Link href="/foundations/color#change">색</Link>).
+        <Link href="/design-system/color">색은 고르는 것이다</Link>).
       </div>
 
       <p>
@@ -186,18 +192,33 @@ export default function AccessibilityPage() {
                 칩이 서로 붙어 있어 44 를 채우면 이웃 칩의 히트를 삼킨다
               </td>
             </tr>
+            <tr>
+              <td className="doc-wrap">
+                Button <code>variant=&quot;text&quot;</code>
+              </td>
+              <td className="doc-wrap">글자 폭 × 29~35px</td>
+              <td>24px (하한)</td>
+              <td className="doc-wrap">
+                문장 안 · 목록 행 안에 놓이는 variant 다. 세로 44 를 채우면 줄
+                간격이 벌어진다
+              </td>
+            </tr>
+            <tr>
+              <td className="doc-wrap">Checkbox · Radio · Switch</td>
+              <td className="doc-wrap">24px · 40×24px</td>
+              <td>
+                <strong>44px</strong>
+              </td>
+              <td className="doc-wrap">
+                보이지 않는 input 을 44×44 로 키웠다. 라벨 없이 단독으로 써도 44
+                다. <code>&lt;label&gt;</code> 로 연결하면 가로가 더 넓어진다
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      <div className="doc-note doc-note--warn">
-        <strong>선택 컨트롤은 예외가 필요하다.</strong> Checkbox 와 Radio 는
-        24px, Switch 는 40×24 라 컨트롤 자체가 44px 보다 작다. 그래서 보이지
-        않는 input 을 44×44 로 키워 두었다. 라벨 없이 단독으로 써도 누르는
-        범위는 44 다.
-      </div>
-
-      <h2>포커스</h2>
+      <h2 id="focus">포커스</h2>
       <p>
         키보드로 이동할 때 지금 위치를 알리는 표시다.{" "}
         <code>:focus-visible</code> 로만 그려서 마우스로 눌렀을 때는 나타나지
@@ -259,7 +280,13 @@ export default function AccessibilityPage() {
         색으로 바꾸고 위 표의 링을 더한다. 테두리 없이 누르는 것(Button ·
         IconButton · 닫기 버튼 · Accordion 헤더)은 <code>outline</code> 하나만
         그린다. 링을 겹치지 않는다. offset 은 <code>--nui-focus-offset</code>{" "}
-        토큰이다.
+        토큰이고, <code>overflow: hidden</code> 안에 있어 바깥이 잘리는 자리
+        (Accordion 헤더 · MultiSelect 칩의 ×)만 <code>--nui-focus-width</code>{" "}
+        만큼 안쪽으로 넣는다.
+      </p>
+      <p>
+        <strong>테두리 두께는 어떤 상태에서도 바뀌지 않는다.</strong> 포커스도
+        에러도 색과 링으로 말한다. 두께가 바뀌면 안쪽 글자가 1px 밀린다.
       </p>
 
       <div className="doc-note doc-note--warn">
@@ -271,7 +298,7 @@ export default function AccessibilityPage() {
       </div>
 
       <p>
-        <code>outline: none</code> 을 쓸 때는 대체 표시를 반드시 준다. 포커스
+        <code>outline: none</code> 을 쓸 때는 대체 표시를 함께 준다. 포커스
         표시를 없애면 키보드 사용자는 자기 위치를 잃는다.
       </p>
 
@@ -304,10 +331,10 @@ export default function AccessibilityPage() {
         설명이고 <code>live</code> 는 지금 바뀌었다는 신호다.
       </p>
       <div className="doc-note doc-note--warn">
-        <strong>live 영역은 요소 밖에 둔다.</strong>{" "}
-        <code>&lt;button&gt;</code> 안의 live 영역은 보조기술이 &quot;live
-        갱신&quot;이 아니라 <strong>버튼 이름의 변경</strong>으로 처리해 대체로
-        무시한다. 그래서 <code>Button</code> 의 로딩 안내는 화면 밖 공용{" "}
+        <strong>live 영역은 요소 밖에 둔다.</strong> <code>&lt;button&gt;</code>{" "}
+        안의 live 영역은 보조기술이 &quot;live 갱신&quot;이 아니라{" "}
+        <strong>버튼 이름의 변경</strong>으로 처리해 대체로 무시한다. 그래서{" "}
+        <code>Button</code> 의 로딩 안내는 화면 밖 공용{" "}
         <code>role=&quot;status&quot;</code> 영역에 놓인다. 그 영역은{" "}
         <strong>문구가 생기기 전에</strong> 문서에 있어야 읽힌다.
         <br />
@@ -328,11 +355,10 @@ export default function AccessibilityPage() {
         사용자에게는 실질적인 입력 보조다.
       </p>
       <div className="doc-note">
-        <strong>컴포넌트가 이것을 기본값으로 막지 않는다.</strong>{" "}
-        <code>Textfield</code> 와 <code>Textarea</code> 가{" "}
-        <code>autoComplete=&quot;off&quot;</code> 를 기본으로 넣고 있었고 뺐다.
-        소비자가 알아채려면 라이브러리 소스를 읽어야 하는 종류의 기본값이었다.
-        끄는 것은 소비자가 명시한다.
+        <strong>컴포넌트가 이것을 기본값으로 끄지 않는다.</strong>{" "}
+        <code>Textfield</code> 와 <code>Textarea</code> 는{" "}
+        <code>autoComplete</code> 를 그대로 넘긴다. 끄는 것은 쓰는 쪽이
+        명시한다.
       </div>
 
       <h2>이미 보장하는 것</h2>
@@ -375,15 +401,34 @@ export default function AccessibilityPage() {
               <th scope="row" className="doc-wrap">
                 아이콘 전용 버튼
               </th>
-              <td className="doc-wrap">sr-only 텍스트로 접근 이름을 준다</td>
+              <td className="doc-wrap">
+                입력 안의 버튼(지우기 · 달력 열기)은 sr-only 문구로, 팝업과
+                토스트의 닫기 버튼은 <code>closeLabel</code> 이{" "}
+                <code>aria-label</code> 로 이름을 갖는다.{" "}
+                <code>IconButton</code> 은 <code>aria-label</code> 또는{" "}
+                <code>aria-labelledby</code> 를 타입으로 요구한다
+              </td>
+            </tr>
+            <tr>
+              <th scope="row" className="doc-wrap">
+                필수 · 선택 표시
+              </th>
+              <td className="doc-wrap">
+                <code>Field required</code> 면 라벨에 6px 점과 sr-only
+                「필수」가 붙고 컨트롤에 <code>aria-required</code> 가 간다.
+                점만으로는 스크린리더에 아무것도 전해지지 않는다. 선택 표시는{" "}
+                <code>optionalLabel</code> 을 준 필드에만 붙는다
+              </td>
             </tr>
             <tr>
               <th scope="row" className="doc-wrap">
                 그룹 컨트롤
               </th>
               <td className="doc-wrap">
-                <code>fieldset</code> + <code>legend</code> 또는{" "}
-                <code>role=&quot;group&quot;</code>
+                <code>CheckboxGroup</code> 은{" "}
+                <code>role=&quot;group&quot;</code>, <code>RadioGroup</code> 은{" "}
+                <code>role=&quot;radiogroup&quot;</code> 이고 <code>Field</code>{" "}
+                라벨이 <code>aria-labelledby</code> 로 이어진다
               </td>
             </tr>
           </tbody>
@@ -398,10 +443,15 @@ export default function AccessibilityPage() {
         </li>
         <li>placeholder 를 라벨 대신 쓰지 않는다. 입력을 시작하면 사라진다</li>
         <li>
-          라이브러리가 정한 기본 문자열은 prop 으로 바꾼다. 지우기 버튼(
-          <code>clearButtonTitle</code>), Password 토글, Accordion 토글(
-          <code>toggleLabel</code>), Popup 닫기, Datepicker 의 요일 이름,
-          Confirm 의 버튼 문구가 여기 해당한다. 다국어 앱이면 교체한다
+          라이브러리가 정한 기본 문자열은 prop 으로 바꾼다. Textfield 지우기(
+          <code>clearButtonTitle</code>), Password 토글(
+          <code>showPasswordTitle</code> · <code>hidePasswordTitle</code>),
+          Accordion 토글(<code>toggleLabel</code>), Popup 닫기(
+          <code>closeLabel</code>), Confirm 의 버튼(<code>confirmLabel</code> ·{" "}
+          <code>cancelLabel</code>), Button 로딩(<code>loadingLabel</code>),
+          Field 의 필수 표시(<code>requiredLabel</code>), Datepicker 의{" "}
+          <code>dayPickerProps.labels</code> 가 여기 해당한다. 다국어 앱이면
+          교체한다
         </li>
         <li>
           번역하면 라벨이 최대 2.5배까지 늘어난다. 자기 치수를 갖는

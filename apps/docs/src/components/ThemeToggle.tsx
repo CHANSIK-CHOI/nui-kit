@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Switch } from "@nui-kit/react";
 
 export const THEME_STORAGE_KEY = "nui-docs-theme";
@@ -13,10 +13,19 @@ export const THEME_STORAGE_KEY = "nui-docs-theme";
  *
  * 초기값은 layout 의 인라인 스크립트가 페인트 전에 이미 정해둔다.
  * 그래서 이 컴포넌트는 마운트 시점에 "지금 무엇인지"를 읽기만 한다.
+ *
+ * 두 자리에 놓인다 — 데스크톱은 우측 상단에 떠 있는 것(`floating`), 모바일은
+ * 헤더 안(`inline`). 둘 다 마운트돼 있고 CSS 가 하나만 보이므로, 한쪽에서 바꾼 값을
+ * 다른 쪽이 `data-theme` 관찰로 따라간다.
  */
-export function ThemeToggle() {
+export function ThemeToggle({
+  variant = "floating",
+}: {
+  variant?: "floating" | "inline";
+}) {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const switchId = useId();
 
   useEffect(() => {
     // 인라인 스크립트가 페인트 전에 이미 적용했더라도 여기서 한 번 더 확정한다.
@@ -38,6 +47,16 @@ export function ThemeToggle() {
     document.documentElement.dataset.theme = theme;
     setIsDark(theme === "dark");
     setMounted(true);
+
+    // 다른 자리의 토글이 바꾼 값을 따라간다
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.dataset.theme === "dark");
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
   }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,12 +74,12 @@ export function ThemeToggle() {
   };
 
   return (
-    <div className="doc-theme-toggle">
-      <label className="doc-theme-toggle__label" htmlFor="doc-theme-switch">
+    <div className={`doc-theme-toggle doc-theme-toggle--${variant}`}>
+      <label className="doc-theme-toggle__label" htmlFor={switchId}>
         {mounted && isDark ? "다크" : "라이트"}
       </label>
       <Switch
-        id="doc-theme-switch"
+        id={switchId}
         checked={isDark}
         onChange={handleChange}
         aria-label="다크 모드"

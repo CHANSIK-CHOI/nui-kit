@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import data from "@/generated/presets.json";
-import { PresetCard, type Preset } from "../PresetCard";
+import { PresetCard, type Preset } from "@/components/guide";
 
 /**
  * 색깔 구간마다 한 페이지. 185색을 한 페이지에 넣으면 2.1MB 가 된다 —

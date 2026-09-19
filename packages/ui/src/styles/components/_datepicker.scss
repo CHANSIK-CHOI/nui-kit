@@ -50,14 +50,38 @@
       min-width: 19.5rem;
       padding: var(#{v("space-4")});
       // 떠 있는 컨테이너의 외곽선 — design-system.md §2-5-1
+      // 가장자리는 반투명 링 + 두 겹 그림자 — design-system.md §2-5-2
       border: #{hook("datepicker--border-width", var(#{v("border-width-1")}))}
-        solid var(#{v("border-form")});
+        solid var(#{v("border-floating")});
       border-radius: #{hook(
           "datepicker--dropdown-radius",
-          var(#{v("radius-3")})
+          var(#{v("radius-5")})
         )};
       background-color: var(#{v("layer-floating")});
       box-shadow: var(#{v("shadow-2")});
+    }
+
+    // 위로 뒤집혔다 — 아래가 모자라면(`internal/dropdownPlacement` · Datepicker.md §6-9).
+    // 간격도 반대쪽으로 간다. 원점과 `translateY` 부호는 `DatepickerBase` 가 인라인으로 뒤집는다.
+    // `Select` 의 `__menu--top` 과 짝이다.
+    // ⚠️ **`__dropdown` 뒤에 둔다** — 상세도가 같아 앞에 두면 `top: calc(…)` 가 이긴다.
+    &__dropdown--top {
+      top: auto;
+      bottom: calc(100% + var(#{v("space-2")}));
+    }
+
+    // 확정 버튼 자리 (2026-09-08 · 08 DP2). range · multiple 에만 있다.
+    // 달력과 경계를 두는 선은 「한 화면에 한두 번」이라 의미경계선이다 —
+    // design-system.md §2-6
+    &__dropdown-foot {
+      display: flex;
+      margin-top: var(#{v("space-3")});
+      padding-top: var(#{v("space-3")});
+      border-top: #{hook(
+          "datepicker--border-width",
+          var(#{v("border-width-1")})
+        )}
+        solid var(#{v("border-section")});
     }
   }
 
@@ -75,7 +99,7 @@
       )};
     #{iv("daypicker-day-radius")}: #{hook(
         "datepicker--day-radius",
-        var(#{v("radius-1_5")})
+        var(#{v("radius-2")})
       )};
 
     color: var(#{v("control-text")});
@@ -108,7 +132,7 @@
     }
 
     &__caption-label {
-      @include typo(4, "bold");
+      @include typo(3, "bold");
     }
 
     &__dropdowns {
@@ -124,6 +148,7 @@
       margin: 0;
       border: none;
       background: transparent;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
 
       position: absolute;
@@ -132,6 +157,8 @@
       width: 100%;
       opacity: 0;
       cursor: pointer;
+      // 터치의 눌림 표시는 우리 면·배율뿐 (Datepicker.md §9)
+      @include pressable;
     }
 
     &__dropdown-root {
@@ -143,7 +170,7 @@
       padding: 0 var(#{v("space-3")});
       border: #{hook("datepicker--border-width", var(#{v("border-width-1")}))}
         solid var(#{v("control-border")});
-      border-radius: var(#{v("radius-1_5")});
+      border-radius: var(#{v("radius-2")});
       background-color: var(#{v("control-bg")});
       color: var(#{v("control-text")});
 
@@ -167,7 +194,7 @@
 
     &__dropdown:focus-visible + &__caption-label {
       outline: none;
-      border-radius: var(#{v("radius-1_5")});
+      border-radius: var(#{v("radius-2")});
       box-shadow: var(#{v("focus-ring-sm")});
     }
 
@@ -178,7 +205,7 @@
       gap: var(#{v("space-2")});
       width: 100%;
 
-      @include typo(3, "bold");
+      @include typo(2, "bold");
     }
 
     // ── 이전/다음 달 네비게이션
@@ -203,8 +230,10 @@
       padding: 0;
       border: 0;
       background: transparent;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
+      @include pressable;
 
       display: inline-flex;
       align-items: center;
@@ -217,7 +246,9 @@
 
       // 보이는 것은 32, 누를 수 있는 것은 44 — a11y.md §8
       @include hit-area;
-      @include motion((background-color, color, opacity), "3");
+      // 눌림은 배율·시간·곡선 세 축이 한 세트다 — `transition` 은 한 번만 선언되므로
+      // `motion-press` 로 묶는다 (design-system.md §6-3 · Datepicker.md §9 「눌림 자리」)
+      @include motion-press((background-color, color, opacity), "3");
     }
 
     @include hoverable {
@@ -235,9 +266,14 @@
       }
     }
 
+    // 월 경계의 비활성은 `aria-disabled` 뿐이라 **브라우저가 `:active` 를 건다** —
+    // 면도 배율도 `:not([aria-disabled="true"])` 아래에 둔다 (design-system.md §3-2).
+    // 둘레가 비어 있으므로 누르는 것 전체가 줄어든다 — 32px 짜리 작은 아이콘 버튼이라
+    // `scale-94` (design-system.md §2-3-1 · tokens.md §3-10)
     &__button-previous:not([aria-disabled="true"]):active,
     &__button-next:not([aria-disabled="true"]):active {
       background-color: var(#{v("control-bg-active")});
+      transform: scale(var(#{v("scale-94")}));
     }
 
     // ⚠️ react-day-picker v9 는 월 경계에서 `disabled` 속성이 아니라
@@ -284,8 +320,10 @@
       // UA 기본 스타일 무력화
       appearance: none;
       padding: 0;
+      font: inherit;
       font-family: var(#{v("font-family-base")});
       cursor: pointer;
+      @include pressable;
 
       display: inline-flex;
       align-items: center;
@@ -303,8 +341,10 @@
 
       // 누를 수 있는 것은 셀(44) 전체다. 보이는 버튼은 36 그대로 — a11y.md §8
       @include hit-area(var(#{iv("daypicker-day-size")}));
-      @include motion((background-color, border-color, color), "3");
-      @include typo(3, "regular");
+      // 눌림 3축을 한 번에 — `transform` 을 따로 더하면 앞 전환이 죽는다
+      // (design-system.md §6-3 · Datepicker.md §9 「눌림 자리」)
+      @include motion-press((background-color, border-color, color), "3");
+      @include typo(2, "regular");
     }
 
     @include hoverable {
@@ -314,9 +354,19 @@
       }
     }
 
+    // 면은 선택 상태를 빼고 그린다 — 선택된 날짜의 `control-accent` 와 기간 중간의
+    // `control-accent-soft` 를 덮지 않는다
     &__day:not(#{cls("daypicker")}__selected)
       &__day-button:active:not(:disabled) {
       background-color: var(#{v("control-bg-active")});
+    }
+
+    // 배율은 **선택 상태에도** 건다 (2026-09-14 결정 · Emil "Applies to any pressable
+    // element"). 선택된 날짜는 면이 이미 깔려 있어 눌림을 말하는 것이 배율뿐이다.
+    // 보이는 버튼(36)이 셀(44) 안에 여백을 가지므로 누르는 것 전체가 줄어든다 —
+    // 중간 크기라 `scale-96` (design-system.md §2-3-1 · tokens.md §3-10)
+    &__day-button:active:not(:disabled) {
+      transform: scale(var(#{v("scale-96")}));
     }
 
     &__day-button:focus-visible {
