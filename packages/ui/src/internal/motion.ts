@@ -194,6 +194,12 @@ export const motionTransition = {
     duration: motionDuration.d5,
     ease: motionEase.enterEmphasized,
   } satisfies Transition,
+  // 퇴장은 등장보다 짧다 (design-system.md §6-2). 예전에는 등장 값 하나로 250/250 이라
+  // 팝업 · 툴팁 · 드롭다운 중 토스트만 대칭이었다 (2026-09-19 · review-animations)
+  toastExit: {
+    duration: motionDuration.d4,
+    ease: motionEase.exit,
+  } satisfies Transition,
 
   // 접힘/펼침 — 높이가 움직이므로 팝업 개폐에 가까운 매크로 모션이다.
   // 크기 변화에는 전용 곡선을 쓴다 — tokens.md §3-6.
@@ -249,7 +255,7 @@ export function reduceMotion<T extends Record<string, unknown>>(
  * 이라 요소가 한 프레임에 나타나고 사라졌다(실측 퇴장 7~21ms · 대장 `sources/emil-apple.md`).
  *
  * **시간은 받은 전환의 것을 그대로 쓴다** — 컴포넌트마다 등장 · 퇴장이 이미 다르다(툴팁 150/100 ·
- * 드롭다운 200/150 · 토스트 250 · 팝업 300/200). 움직임만 빼고 시계는 그대로라 「퇴장이 등장보다
+ * 드롭다운 200/150 · 토스트 250/200 · 팝업 300/200). 움직임만 빼고 시계는 그대로라 「퇴장이 등장보다
  * 짧다」도 그대로 지켜진다(사용자 결정 2026-09-17). 스프링은 튐이 곧 움직임이라 쓰지 않고
  * `visualDuration` 만큼의 페이드가 된다. 시간이 없는 물리 스프링은 `motionDuration.d4` 다.
  *

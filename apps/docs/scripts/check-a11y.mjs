@@ -143,12 +143,9 @@ else {
 // 1-c) Accordion 패널 — 이 라이브러리에서 **높이가 움직이는 유일한 자리**라 위 둘처럼
 //      `transform` 으로는 보이지 않는다. **높이를 두 번 읽어** 전환 중인지 본다.
 //
-//      ⚠️ `will-change` 를 보지 않는 이유 (2026-09-14). 그 값은 `useReducedMotion()` 에서
-//         나오는데 framer-motion 이 그것을 `useState` **초기값으로만** 읽고(소스 주석:
-//         "TODO See if people miss automatically updating"), SSR 은 사용자의 OS 설정을 모른다.
-//         그래서 서버가 이미 열어 보낸 패널은 hydration 직후 `height, opacity` 인 채로 남고
-//         리렌더된 뒤에야 `auto` 가 된다. 성능 힌트라 동작에는 영향이 없다 — 접근성이
-//         보장해야 하는 것은 **움직이지 않는 것**이다.
+//      ⚠️ `will-change` 를 보지 않는다. 패널에는 이제 그 속성이 없다(2026-09-19 · spec §9) —
+//         있어도 성능 힌트라 동작에는 영향이 없다. 접근성이 보장해야 하는 것은
+//         **움직이지 않는 것**이고, 그것은 높이를 두 번 읽어야 보인다.
 //
 //      이 검사가 실제로 잡은 것 — `transition` 을 prop 으로 주면 variant 안의 것이 이겨
 //      **모션 감소가 통째로 무력화**된다. 실측 120ms 사이 74 → 7px (Accordion.md spec §6-3).

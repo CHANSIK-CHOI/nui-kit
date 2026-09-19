@@ -271,26 +271,17 @@
       //    **개폐가 비대칭이라 둘 다 반쪽이었다.** 패널은 열림 250(`collapse`) ·
       //    닫힘 200(`collapseExit`) 이므로 화살표도 그렇게 나눈다. 여기(기본)가
       //    닫힘이고 `is-active` 가 열림이다 — 전환은 **바뀌는 순간의 값**을 쓴다.
-      @include motion(transform, "4");
+      //    **곡선도 패널 것이다** — 닫힘 `exit` · 열림 `expand` (2026-09-19 · review-animations).
+      //    기본 `standard` 로 두면 같은 시간 안에서 둘이 다른 진행률로 움직였다.
+      @include motion(transform, "4", "exit");
     }
 
-    // `will-change` 의 정본은 여기 하나다 (2026-09-14). 예전에는 SCSS 와 인라인 둘이
-    // **서로 다른 속성**(`transform, opacity` ↔ `height, opacity`)을 가리킨 채 인라인이
-    // 언제나 이기고 있었다.
-    //
-    // ⚠️ **모션 감소 분기를 JS 가 아니라 media query 로 둔다.** 인라인으로 두면
-    //    `useReducedMotion()` 값이 들어가는데, framer-motion 이 그것을 `useState`
-    //    **초기값으로만** 읽고 SSR 은 사용자의 OS 설정을 모른다 — 서버가 이미 열어 보낸
-    //    패널은 hydration 직후 `height, opacity` 인 채로 남았다(실측). media query 는
-    //    서버 렌더에서도 맞는다. 전환 자체를 끄는 것은 `reducedPanelVariants` 가 맡는다
-    //    (spec §6-3 · §9)
+    // ⚠️ **`will-change` 를 두지 않는다** (2026-09-19 · review-animations · spec §9).
+    //    `height` 는 합성 레이어로 가속되지 않아 힌트가 아무것도 하지 않고, `opacity` 힌트는
+    //    **닫혀 있는 패널까지** 레이어로 붙잡는다. 불투명도 전환은 framer 가 WAAPI 로 돌려
+    //    도는 동안만 브라우저가 알아서 레이어를 올린다.
     &__panel {
       width: 100%;
-      will-change: height, opacity;
-
-      @media (prefers-reduced-motion: reduce) {
-        will-change: auto;
-      }
     }
 
     &__panel-box {
@@ -319,8 +310,8 @@
     &__item#{state("active")} &__arrow-icon {
       transform: rotate(180deg);
 
-      // 열림은 250 — 패널의 `collapse` 와 끝이 맞는다
-      @include motion(transform, "5");
+      // 열림은 250 · `expand` — 패널의 `collapse` 와 시간도 곡선도 같다
+      @include motion(transform, "5", "expand");
     }
   }
 }

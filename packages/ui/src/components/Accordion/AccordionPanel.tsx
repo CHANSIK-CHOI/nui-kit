@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 import { px } from "../../internal/prefix.js";
 import {
+  motionEase,
   motionTransition,
   reduceMotionTransition,
 } from "../../internal/motion.js";
@@ -73,7 +74,13 @@ const reducedPanelVariants = {
     height: "auto",
     opacity: 1,
     transition: {
-      opacity: reduceMotionTransition(motionTransition.collapse, true),
+      // 시간은 `collapse`(250) 그대로 · **곡선은 `enter`** (2026-09-19 · review-animations).
+      // `collapse` 의 `expand` 는 높이가 아래 항목을 밀 때의 곡선이라 첫 프레임이 13% 다 —
+      // 크기가 변하지 않는 페이드에는 뜸으로 읽힌다. 접힘은 `collapseExit` 의 `exit` 가 이미 같은 값이다
+      opacity: {
+        duration: motionTransition.collapse.duration,
+        ease: motionEase.enter,
+      },
       height: { duration: 0 },
     },
   },

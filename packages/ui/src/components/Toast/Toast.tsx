@@ -172,8 +172,15 @@ export default function Toast({
             { opacity: 1, transform: "translateY(0px) scale(1)" },
             shouldReduceMotion,
           )}
+          // 퇴장은 등장(250)보다 짧다 — `toastExit` 200 (2026-09-19 · review-animations).
+          // `exit` 안에 `transition` 을 넣는다 — 밖의 `transition` prop 은 등장 값이고, `reduceMotion()` 은
+          // 이 키를 남겨 모션 감소에서도 200 페이드가 된다
           exit={reduceMotion(
-            { opacity: 0, transform: "translateY(24px) scale(0.97)" },
+            {
+              opacity: 0,
+              transform: "translateY(24px) scale(0.97)",
+              transition: motionTransition.toastExit,
+            },
             shouldReduceMotion,
           )}
           transition={reduceMotionTransition(
