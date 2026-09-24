@@ -1,0 +1,118 @@
+name: CI
+
+# PR · push 게이트. 배포는 release.yml 이 한다 — 여기서는 「병합해도 되나」만 본다.
+#
+# 잡은 넷이고 **이름이 곧 required status check 이름**이다. 바꾸면 브랜치 보호 설정도 같이 바꾼다.
+#   library    — release.yml 과 **같은 명령**. PR 은 통과했는데 태그에서 깨지는 일을 막는다
+#   docs       — 문서 사이트 타입 + 구조. 라이브러리와 잡을 가른다(아래 주석)
+#   format     — prettier --check
+#   changeset  — 라이브러리 소스가 바뀐 PR 에 changeset 이 있나 (로컬 Stop 훅의 CI 판). PR 에서만 돈다
+#
+# ⚠️ Playwright 계 verify:*(a11y · popup · press · menu-motion …)는 넣지 않았다 — dev 서버 · 브라우저가
+#    필요하고 a11y 하나가 3~4분, 모션 검사는 프레임 타이밍에 기대 공유 러너에서 흔들린다. 근거와 다음 단계는
+#    vault 보고서 project-nui-kit-ci-pr-gate-2026-09-24 에 있다.
+# ⚠️ 루트 scripts/check-*.mjs(check-specs · check-sources …)는 프라이빗 저장소 소관이라 이 체크아웃에 없다.
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+  workflow_dispatch:
+
+# 읽기만 한다. 토큰으로 쓸 것이 없다
+permissions:
+  contents: read
+
+concurrency:
+  # 같은 PR 의 새 커밋이 오면 이전 실행을 취소한다. dev · main push 는 커밋마다 남긴다
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# 공식 actions 도 커밋 SHA 로 고정한다 — 메이저 태그는 옮겨질 수 있다. 주석의 버전은 사람용이다.
+# 올릴 때: git ls-remote https://github.com/actions/<name>.git 'refs/tags/v*' 로 SHA 를 확인한다.
+# (release.yml 은 아직 @v4 태그 · node20 이다 — 이 파일에서 건드리지 않는다)
+
+jobs:
+  library:
+    name: library
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # ↓ release.yml 의 검증 단계와 한 줄씩 같다. 한쪽을 바꾸면 다른 쪽도 바꾼다
+      - run: npm run typecheck -w @nui-kit/react
+      - run: npm run build:ui
+      # verify:pkg = verify:css · verify:tokens · verify:themes · verify:accordion-index ·
+      #              verify:select-placement · publint --strict · attw (dist 를 보므로 build:ui 뒤)
+      - run: npm run verify:pkg
+      - run: npm pack -w @nui-kit/react --dry-run
+
+  # 문서 사이트는 **잡을 가른다.** docs 는 배포 대상이 아니고(private · changeset ignore) dist 와
+  # src/generated/*.json 을 먼저 만들어야 타입이 풀린다. 한 잡에 묶으면 문서 쪽 실패가 라이브러리
+  # 결과를 가리고, 어느 쪽이 깨졌는지 체크 이름만으로 안 보인다. 병렬이라 벽시계도 줄어든다.
+  docs:
+    name: docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # docs 는 @nui-kit/react 를 dist 로 import 한다 (package.json exports). 빼면 TS 오류 130건
+      - run: npm run build:ui
+      # props · 토큰 · 훅 · 프리셋 표 — src/generated/ 는 gitignore 라 체크아웃에 없다. 빼면 TS2307
+      - run: npm run generate -w docs
+      # .next/types/ 를 만든다 — validator.ts 가 페이지·레이아웃의 export 모양을 검사한다.
+      # 없어도 tsc 는 통과해서(부작용 import 는 파일이 없어도 오류가 아니다) `export default 42`
+      # 같은 페이지가 조용히 지나간다 — 있으면 TS2344 로 잡힌다(실측)
+      - run: npx next typegen
+        working-directory: apps/docs
+      - run: npm run typecheck -w docs
+      # nav ↔ 페이지 ↔ 개요 ↔ 검사 경로 · 라벨 (dev 서버 불필요)
+      - run: npm run verify:docs
+
+  format:
+    name: format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+
+  changeset:
+    name: changeset
+    # push 에서는 건너뛴다. 건너뛴 잡은 required check 로 「통과」 처리된다
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # merge-base 를 찾으려면 기준 브랜치 이력이 필요하다
+          fetch-depth: 0
+      # PR 체크아웃의 HEAD 는 병합 커밋이다 — merge-base(기준, HEAD)..HEAD 가 곧 이 PR 의 변경이다
+      # 브랜치 이름은 식(${{ }})으로 run 에 넣지 않고 env 로 넘긴다 — 스크립트 주입 방지
+      - run: bash .github/scripts/check-changeset.sh "origin/$BASE_REF"
+        env:
+          BASE_REF: ${{ github.base_ref }}
