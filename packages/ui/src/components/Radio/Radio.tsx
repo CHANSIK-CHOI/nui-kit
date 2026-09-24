@@ -102,10 +102,11 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
           tone !== "neutral" && `${block}--${tone}`,
           className,
           {
-          [px("is-disabled")]: resolvedDisabled,
-          [px("is-error")]: resolvedIsError,
-          [px("is-readonly")]: resolvedReadOnly,
-        })}
+            [px("is-disabled")]: resolvedDisabled,
+            [px("is-error")]: resolvedIsError,
+            [px("is-readonly")]: resolvedReadOnly,
+          },
+        )}
       >
         <input
           {...rest}

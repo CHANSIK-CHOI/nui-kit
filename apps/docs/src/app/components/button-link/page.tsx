@@ -44,11 +44,12 @@ export default function ButtonLinkPage() {
       </p>
 
       <div className="doc-note">
-        <strong>Next.js 전용이다.</strong> <code>next/link</code> 를 쓰므로 배럴이
-        아니라 <code>@nui-kit/react/next</code> 에서 가져오고, <code>next</code>{" "}
-        는 이 서브패스를 쓸 때만 설치한다(optional peer). Next 가 아닌 환경에서
-        버튼 모양의 링크가 필요하면 <code>getButtonClassName</code> 으로 자기
-        라우터의 Link 에 같은 클래스를 붙인다.
+        <strong>Next.js 전용이다.</strong> <code>next/link</code> 를 쓰므로
+        배럴이 아니라 <code>@nui-kit/react/next</code> 에서 가져오고,{" "}
+        <code>next</code> 는 이 서브패스를 쓸 때만 설치한다(optional peer). Next
+        가 아닌 환경에서 버튼 모양의 링크가 필요하면{" "}
+        <code>getButtonClassName</code> 으로 자기 라우터의 Link 에 같은 클래스를
+        붙인다.
       </div>
       <pre className="doc-code">
         <code>{`import { getButtonClassName } from "@nui-kit/react";

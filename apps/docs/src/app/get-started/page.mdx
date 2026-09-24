@@ -13,10 +13,10 @@ peer dependency 는 `react` · `react-dom` · `lucide-react` 셋이다. `lucide-
 
 ## 어디서 쓸 수 있나
 
-| 환경 | 상태 |
-| --- | --- |
-| Next.js App Router | 이 문서 사이트와 검사가 여기서 돈다 |
-| Next.js Pages Router | 같은 `next/link` · 같은 클라이언트 API 라 막지 않는다. 전역 CSS 는 `_app` 에서 불러온다 |
+| 환경                 | 상태                                                                                                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Next.js App Router   | 이 문서 사이트와 검사가 여기서 돈다                                                                                                                           |
+| Next.js Pages Router | 같은 `next/link` · 같은 클라이언트 API 라 막지 않는다. 전역 CSS 는 `_app` 에서 불러온다                                                                       |
 | 순수 React (Vite 등) | 배럴과 컴포넌트 서브패스는 `next` 없이 설치 · 타입체크된다. `ButtonLink` 만 Next 전용이다. 번들러가 `"use client"` 지시어에 경고를 낼 수 있는데 무시해도 된다 |
 
 ## 스타일 불러오기
@@ -117,24 +117,24 @@ import { ButtonLink } from "@nui-kit/react/next";
 `Search` 와 `Password` 는 서브패스가 따로 없다. `Textfield` 계열이라 `textfield`
 서브패스에 함께 들어 있고 CSS 도 `textfield.css` 하나로 끝난다.
 
-| 서브패스      | 들어 있는 것                                                                                                                        |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `/button`     | `Button` `IconButton` `ButtonGroup` `ButtonGroupItem`                                                                               |
-| `/next`       | `ButtonLink` — Next.js 전용                                                                                                          |
-| `/field`      | `Field` `FieldItem` `FieldGrid` `FieldHeader` `FieldLabel` `FieldMessage` `useFieldContext` `getMergedAriaIds`                      |
-| `/textfield`  | `Textfield` `Search` `Password` `Message`                                                                                           |
-| `/textarea`   | `Textarea`                                                                                                                          |
-| `/checkbox`   | `Checkbox` `CheckboxGroup` `useCheckboxGroupContext`                                                                                |
-| `/radio`      | `Radio` `RadioGroup` `useRadioGroupContext`                                                                                         |
-| `/switch`     | `Switch`                                                                                                                            |
+| 서브패스      | 들어 있는 것                                                                                                                                                                |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/button`     | `Button` `IconButton` `ButtonGroup` `ButtonGroupItem`                                                                                                                       |
+| `/next`       | `ButtonLink` — Next.js 전용                                                                                                                                                 |
+| `/field`      | `Field` `FieldItem` `FieldGrid` `FieldHeader` `FieldLabel` `FieldMessage` `useFieldContext` `getMergedAriaIds`                                                              |
+| `/textfield`  | `Textfield` `Search` `Password` `Message`                                                                                                                                   |
+| `/textarea`   | `Textarea`                                                                                                                                                                  |
+| `/checkbox`   | `Checkbox` `CheckboxGroup` `useCheckboxGroupContext`                                                                                                                        |
+| `/radio`      | `Radio` `RadioGroup` `useRadioGroupContext`                                                                                                                                 |
+| `/switch`     | `Switch`                                                                                                                                                                    |
 | `/popup`      | `LayerPopup` `BottomSheet` `FullPopup` `PopupHost` · 여는 훅 5종(`useAlert` `useConfirm` `useLayerPopup` `useBottomSheet` `useFullPopup`) · `usePopupStack` `usePopupStore` |
-| `/toast`      | `Toast` `ToastHost` `useToast` `useToastStack` `useToastStore`                                                                      |
-| `/tooltip`    | `Tooltip`                                                                                                                           |
-| `/accordion`  | `Accordion` `AccordionItem` `AccordionButton` `AccordionHead` `AccordionPanel` `useAccordionContext`                                |
-| `/select`     | `Select` `MultiSelect`                                                                                                              |
-| `/datepicker` | `Datepicker` `DateRangePicker` `DateMultiplePicker` · 값 포맷 함수 3종(`formatSingleDateValue` 등)                                  |
-| `/icon`       | `Icon` · 프리셋 11종(`DelIcon` `CloseIcon` `SearchIcon` `SpinnerIcon` 등)                                                           |
-| `/rhf`        | RHF 래퍼 전부                                                                                                                       |
+| `/toast`      | `Toast` `ToastHost` `useToast` `useToastStack` `useToastStore`                                                                                                              |
+| `/tooltip`    | `Tooltip`                                                                                                                                                                   |
+| `/accordion`  | `Accordion` `AccordionItem` `AccordionButton` `AccordionHead` `AccordionPanel` `useAccordionContext`                                                                        |
+| `/select`     | `Select` `MultiSelect`                                                                                                                                                      |
+| `/datepicker` | `Datepicker` `DateRangePicker` `DateMultiplePicker` · 값 포맷 함수 3종(`formatSingleDateValue` 등)                                                                          |
+| `/icon`       | `Icon` · 프리셋 11종(`DelIcon` `CloseIcon` `SearchIcon` `SpinnerIcon` 등)                                                                                                   |
+| `/rhf`        | RHF 래퍼 전부                                                                                                                                                               |
 
 ## Server Component
 

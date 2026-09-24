@@ -36,7 +36,10 @@ type SwitchBaseProps = {
 //    `{...rest}` 가 그것을 `<input>` 에 넣어 "input is a void element tag" 가 난다.
 //    라벨은 `Field.Label` 이 붙인다 (a11y.md §1).
 export type SwitchProps = SwitchBaseProps &
-  Omit<InputHTMLAttributes<HTMLInputElement>, "readOnly" | "role" | "type" | "children">;
+  Omit<
+    InputHTMLAttributes<HTMLInputElement>,
+    "readOnly" | "role" | "type" | "children"
+  >;
 
 const Switch = forwardRef<HTMLInputElement, SwitchProps>(
   (
@@ -94,10 +97,11 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           tone !== "neutral" && `${block}--${tone}`,
           className,
           {
-          [px("is-disabled")]: disabled,
-          [px("is-error")]: resolvedIsError,
-          [px("is-readonly")]: readOnly,
-        })}
+            [px("is-disabled")]: disabled,
+            [px("is-error")]: resolvedIsError,
+            [px("is-readonly")]: readOnly,
+          },
+        )}
       >
         <input
           {...rest}
