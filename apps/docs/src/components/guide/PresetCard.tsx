@@ -98,8 +98,8 @@ export function PresetCard({ p }: { p: Preset }) {
                 className="preset-adjusted"
                 title="9번은 버튼처럼 색으로 꽉 찬 면의 배경이다. 고른 색이 이 테마의 페이지 배경과 구분되지 않아 면이 안 보이므로, 같은 색조의 가장 가까운 채움이 대신 앉는다."
               >
-                {t === "l" ? "라이트" : "다크"} 9번은 <code>{p.shift[t]!.to}</code>{" "}
-                ({p.shift[t]!.reason})
+                {t === "l" ? "라이트" : "다크"} 9번은{" "}
+                <code>{p.shift[t]!.to}</code> ({p.shift[t]!.reason})
               </span>
             ),
         )}

@@ -9,13 +9,15 @@ import propsData from "@/generated/props.json";
  * 표 안이라 인라인 코드 하나면 충분하다. 마크다운 전체를 파싱하지 않는다.
  */
 function withInlineCode(text: string): ReactNode {
-  return text.split(/`([^`]+)`/g).map((part, i) =>
-    i % 2 === 1 ? (
-      <code key={i}>{part}</code>
-    ) : (
-      <Fragment key={i}>{part}</Fragment>
-    ),
-  );
+  return text
+    .split(/`([^`]+)`/g)
+    .map((part, i) =>
+      i % 2 === 1 ? (
+        <code key={i}>{part}</code>
+      ) : (
+        <Fragment key={i}>{part}</Fragment>
+      ),
+    );
 }
 
 type PropRow = {

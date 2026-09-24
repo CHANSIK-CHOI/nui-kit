@@ -47,7 +47,9 @@ export function IconRow({
             >
               <code>{label}</code>
               {note ? (
-                <span style={{ color: "var(--nui-text-secondary)" }}>{note}</span>
+                <span style={{ color: "var(--nui-text-secondary)" }}>
+                  {note}
+                </span>
               ) : null}
             </span>
           </div>

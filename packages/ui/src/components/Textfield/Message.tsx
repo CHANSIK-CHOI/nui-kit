@@ -61,10 +61,7 @@ export default function Message({
   const isEmpty = !hasInfoMessage && !hasErrorMessage && !hasCounter;
 
   return (
-    <div
-      id={id}
-      className={cn(block, className, isEmpty && `${block}--empty`)}
-    >
+    <div id={id} className={cn(block, className, isEmpty && `${block}--empty`)}>
       {/*
         ⚠️ `aria-live` 는 **메시지에만** 붙인다. 카운터까지 감싸면 타이핑 한 글자마다
            스크린리더가 숫자를 읽는다 — 사용자가 직접 만드는 변화라 알릴 일이 아니고,

@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { Button, ButtonGroup, ButtonGroupItem, IconButton } from "@nui-kit/react";
+import {
+  Button,
+  ButtonGroup,
+  ButtonGroupItem,
+  IconButton,
+} from "@nui-kit/react";
 import { CloseIcon } from "@nui-kit/react/icon";
 import {
   GuideHeader,
@@ -24,8 +29,8 @@ export default function ButtonGroupPage() {
       <ExceptionBadges items={[{ kind: "rsc", target: "ButtonGroup.Item" }]} />
 
       <p>
-        버튼을 나란히 놓는다. 항목마다{" "}
-        <code>ButtonGroup.Item</code> 으로 감싼다.
+        버튼을 나란히 놓는다. 항목마다 <code>ButtonGroup.Item</code> 으로
+        감싼다.
       </p>
 
       <div className="doc-note doc-note--warn">
@@ -147,13 +152,13 @@ export default function ButtonGroupPage() {
 
       <DesignNote title="왜 셋을 나란히 놓지 않나">
         <p>
-          여러 개를 나란히 두면 각 버튼의 중요도가 비슷해 보여서 사용자가
-          고르기 어려워진다. 고르는 일이 아니라 <strong>읽는 일</strong>이
-          된다.
+          여러 개를 나란히 두면 각 버튼의 중요도가 비슷해 보여서 사용자가 고르기
+          어려워진다. 고르는 일이 아니라 <strong>읽는 일</strong>이 된다.
         </p>
         <p>
           폭도 문제다. 글꼴을 키워 쓰는 사용자나 번역으로 라벨이 길어진 화면에서
-          셋을 나누면 글자가 잘린다. 짧은 라벨은 번역 시 최대 2.5배까지 늘어난다.
+          셋을 나누면 글자가 잘린다. 짧은 라벨은 번역 시 최대 2.5배까지
+          늘어난다.
         </p>
       </DesignNote>
 
