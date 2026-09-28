@@ -131,7 +131,8 @@
     "color:verify": "node scripts/color/verify.mjs",
     "verify:accordion-index": "node scripts/check-accordion-index.mjs",
     "verify:select-placement": "node scripts/check-select-placement.mjs",
-    "verify:cli": "node scripts/check-cli-bundle.mjs"
+    "verify:cli": "node scripts/check-cli-bundle.mjs",
+    "verify:m1": "node scripts/m1/run.mjs"
   },
   "peerDependencies": {
     "lucide-react": "^1.39.0",
