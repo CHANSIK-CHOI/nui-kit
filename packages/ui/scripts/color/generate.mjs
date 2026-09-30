@@ -18,19 +18,15 @@
  * 검증: 우리 브랜드 `#01796f` 로 돌리면 현재 `_seed.scss` 의 brand 12단계가
  * **한 글자도 다르지 않게** 재현된다. 우리 색이 원래 이 도구로 만들어진 값이다.
  *
- * 사용:
- *   node scripts/color/generate.mjs --preset 42
- *   node scripts/color/generate.mjs --accent "#b1002a"
+ * 이 파일은 **라이브러리**다 — import 해도 아무것도 실행하지 않는다. `cli.mjs` 가 이 파일을
+ * import 해 `dist/cli.js` 로 번들되므로, 여기에 「직접 실행되면」 블록을 두면 그 판정이 번들
+ * 안에서 참이 되어 소비자 명령과 함께 돈다(v0.2.0 결함). 명령은 `generate-cmd.mjs` 에 있다:
+ *   node scripts/color/generate-cmd.mjs --preset 42
+ *   node scripts/color/generate-cmd.mjs --accent "#b1002a"
  */
-import { readFileSync, writeFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import { generateRadixColors } from "radix-theme-generator";
 import { hexToOklch, oklchToHex, parseHex, formatHex } from "./oklch.mjs";
 import { contrast, SOLID_TEXT } from "./contrast.mjs";
-
-const HERE = dirname(fileURLToPath(import.meta.url));
-const PRESETS = join(HERE, "..", "..", "presets.json");
 
 /** CSS 변수 접두사. `src/styles/abstracts/_prefix.scss` 와 같아야 한다. */
 const PREFIX = "--nui-";
@@ -248,57 +244,4 @@ ${declarations(result.dark, 4)}
 ${declarations(result.dark, 2)}
 }
 `;
-}
-
-const isMain = fileURLToPath(import.meta.url) === process.argv[1];
-
-if (isMain) {
-  const argv = process.argv.slice(2);
-  const arg = (name) => {
-    const i = argv.indexOf(`--${name}`);
-    return i >= 0 ? argv[i + 1] : undefined;
-  };
-
-  let accent;
-  let preset;
-
-  if (arg("preset")) {
-    const { presets } = JSON.parse(readFileSync(PRESETS, "utf8"));
-    const n = Number(arg("preset"));
-    preset = presets.find((p) => p.n === n);
-    if (!preset) {
-      console.error(
-        `✗ 프리셋 ${n} 번이 없다. 1~${presets.length} 중에서 고른다.`,
-      );
-      process.exit(1);
-    }
-    accent = preset.hex;
-  } else if (arg("accent")) {
-    accent = arg("accent");
-  } else {
-    console.error("✗ --preset <번호> 또는 --accent <#hex> 가 필요하다.");
-    process.exit(1);
-  }
-
-  const result = generate(accent);
-  const out = arg("out") ?? join(HERE, "nui-theme.css");
-  writeFileSync(out, toCss(result, { preset }), "utf8");
-
-  console.log(
-    `✅ 색 102개 생성 — ${accent}${preset ? ` (프리셋 ${preset.n}. ${preset.name})` : ""}`,
-  );
-  for (const theme of ["light", "dark"]) {
-    const t = result[theme];
-    console.log(
-      `   ${theme.padEnd(5)} 9번 ${t.brand[9]} · 글자 ${t.contrast} (${t.contrastRatio}:1)` +
-        ` · 보조 ${t.secondary[9]} · 글자 ${t.secondaryContrast} (${t.secondaryContrastRatio}:1)` +
-        ` · 회색 ${t.gray[9]}`,
-    );
-  }
-  // 기준은 gates.mjs 한 벌 — 프리셋 검사 · CLI 와 같은 것
-  const { checkTheme } = await import("./gates.mjs");
-  const g = checkTheme(result);
-  for (const f of g.fails) console.log(`   ✗ ${f.message}`);
-  for (const i of g.infos) console.log(`   ⓘ ${i.message}`);
-  console.log(`   → ${out.split("/").slice(-2).join("/")}`);
 }

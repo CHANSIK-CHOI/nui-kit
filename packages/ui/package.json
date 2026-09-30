@@ -121,16 +121,18 @@
     "build:themes": "node scripts/color/build-themes.mjs",
     "dev:styles": "sass --watch --no-source-map --load-path=src/styles src/styles/entries:styles",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run verify:css && npm run verify:tokens && npm run verify:themes && npm run verify:accordion-index && npm run verify:select-placement && publint --strict && attw --pack . --profile esm-only",
+    "verify": "npm run verify:css && npm run verify:tokens && npm run verify:themes && npm run verify:accordion-index && npm run verify:select-placement && npm run verify:cli && publint --strict && attw --pack . --profile esm-only",
     "prepublishOnly": "npm run build",
     "verify:css": "node scripts/check-css-isolation.mjs",
     "verify:tokens": "node scripts/check-token-layers.mjs",
     "verify:themes": "node scripts/color/verify-themes.mjs",
     "color:presets": "node scripts/color/build-presets.mjs",
-    "color:generate": "node scripts/color/generate.mjs",
+    "color:generate": "node scripts/color/generate-cmd.mjs",
     "color:verify": "node scripts/color/verify.mjs",
     "verify:accordion-index": "node scripts/check-accordion-index.mjs",
-    "verify:select-placement": "node scripts/check-select-placement.mjs"
+    "verify:select-placement": "node scripts/check-select-placement.mjs",
+    "verify:cli": "node scripts/check-cli-bundle.mjs",
+    "verify:m1": "node scripts/m1/run.mjs"
   },
   "peerDependencies": {
     "lucide-react": "^1.39.0",

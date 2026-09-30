@@ -6,14 +6,31 @@
 //   import "@nui-kit/react/styles/preflight.css";
 //
 // nui.base 레이어 안에 있으므로, 소비자의 레이어 없는 CSS 가 항상 우선한다.
+//
+// 무엇을 넣는 파일인가 — 판단 기준 셋 (2026-09-21)
+//   ① 브라우저 기본값 중 **우리 토큰 체계를 배신하는 것**과 **앱 UI 에서 거의 늘 되돌리게 되는 것**만 넣는다
+//      (브라우저 h1 은 2em 인데 우리 스케일에 32px 이 없다 · 링크 밑줄 · 목록 불릿 · 손가락 커서 · 어절 줄바꿈)
+//   ② 컴포넌트는 여기에 기대지 않는다 — preflight 는 opt-in 이라 안 켠 소비자에게서 사라진다
+//      (word-break: keep-all 은 tooltip · field · toast 가 각자 선언한다 — rules/styles.md §4)
+//   ③ 컴포넌트 소관인 것은 넣지 않는다
+//      (::selection 은 상속돼 소비자 콘텐츠까지 물들인다)
 @use "abstracts/layer";
 @use "abstracts/prefix" as *;
 
 @layer nui.base {
+  // ── 상자 모델 ──────────────────────────────────────────────────
   *,
   *::before,
   *::after {
     box-sizing: border-box;
+  }
+
+  // ── 문서 ──────────────────────────────────────────────────────
+  html {
+    // iOS 가로 모드에서 본문 글자가 제멋대로 커지는 것을 막는다.
+    // 사용자의 브라우저 글자 크기 설정은 막지 않는다(그건 -webkit-text-size-adjust: none 이다).
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -22,13 +39,132 @@
     font-size: var(#{v("font-size-3")});
     line-height: var(#{v("line-height-3")});
     color: var(#{v("text-primary")});
+
+    // 한국어 제품의 기본값이다. 어절 중간에서 끊지 않는다.
+    // 컴포넌트 셋(_tooltip · _field · _toast)은 이것과 별개로 각자 선언한다 — 그쪽은 preflight 없이도 동작해야 한다.
+    // 짝으로 overflow-wrap 을 함께 준다 — keep-all 만 주면 긴 영문 URL 이 컨테이너를 밀어낸다.
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 
+  // ── 여백 ──────────────────────────────────────────────────────
+  // 브라우저 기본 margin 은 스케일 밖의 값이다(h1 0.67em · p 1em).
+  // 간격은 space 토큰으로만 만든다 — 기본 margin 이 남아 있으면
+  // 설계한 리듬에 정체 불명의 값이 더해진다.
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  figure,
+  blockquote,
+  dl,
+  dd,
+  pre {
+    margin: 0;
+  }
+
+  // ⚠️ 제목의 크기·굵기도 지운다.
+  // 우리 스케일은 13 · 14 · 16 · 18 · 20 다섯이고 굵기는 400 · 700 둘이다
+  // (rules/design-system.md §5). 브라우저 h1(2em = 32px)은 스케일에 없는 값이라
+  // 「제목이니까 h1」이 곧 「토큰 밖으로 나감」이 된다.
+  // 의미(문서 구조)는 태그가 갖고, 보이는 크기는 토큰이 정한다.
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  // ── 목록 ──────────────────────────────────────────────────────
+  // 앱 UI 의 ul 은 대부분 「불릿 달린 문단」이 아니라 행 컨테이너다.
+  // ⚠️ list-style: none 은 Safari VoiceOver 가 목록으로 읽지 않게 만든다.
+  //    목록으로 읽혀야 하는 자리에는 마크업에 role="list" 를 붙인다.
+  //    불릿이 필요한 본문은 소비자가 되돌린다(이 레이어는 언제나 진다).
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  // ── 링크 ──────────────────────────────────────────────────────
+  // ⚠️ 밑줄을 지우는 것은 판단이다.
+  //    앱 UI 의 a 는 대부분 행·카드·탭이라 밑줄이 붙으면 의미가 어긋난다.
+  //    반대로 **본문 문단 안의 인라인 링크는 밑줄이 있어야 한다** — 색만으로
+  //    링크를 알리면 WCAG 1.4.1(색에만 의존하지 않기)에 걸린다.
+  //    그 자리는 소비자가 되돌린다: `.prose a { text-decoration: underline }`
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  // ── 폼 ────────────────────────────────────────────────────────
   button,
   input,
   select,
-  textarea {
+  textarea,
+  optgroup {
     font: inherit;
     color: inherit;
+    // Safari 가 폼 요소에 기본 margin 을 준다(입력 필드 2px · button 0).
+    margin: 0;
+  }
+
+  // 누를 수 있는 것은 손가락 커서를 쓴다.
+  // 컴포넌트 CSS 는 이미 각자 선언하고 있고, 이 줄은 소비자 마크업의 raw button 용이다.
+  // :disabled 는 제외한다 — 못 누르는 것에 누를 수 있다고 말하지 않는다.
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
+  fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0; // 브라우저 기본 min-width: min-content 가 flex/grid 안에서 넘친다
+  }
+
+  legend {
+    padding: 0;
+  }
+
+  // ── 미디어 ────────────────────────────────────────────────────
+  // inline 기본값은 글꼴의 baseline 아래 여백(약 4px)을 남긴다 —
+  // 「왜 이미지 밑에 빈 줄이 있나」의 정체다.
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+  }
+
+  // max-width 는 컨테이너를 밀어내는 사고를 막는다.
+  // height: auto 가 짝이다 — HTML height 속성은 CSS 높이로 작동해서, 폭만 줄면 그림이 세로로 찌그러진다.
+  // svg 는 뺀다 — 아이콘은 자리가 크기를 정한다.
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  // ── 그 밖 ─────────────────────────────────────────────────────
+  // 굵기는 400 · 700 둘뿐이다(rules/design-system.md §5).
+  // 기본값 bolder 는 상대값이라 가변 글꼴에서 부모에 따라 다른 굵기가 나온다.
+  b,
+  strong {
+    font-weight: var(#{v("font-weight-bold")});
+  }
+
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
   }
 }
