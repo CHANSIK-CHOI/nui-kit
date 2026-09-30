@@ -26,6 +26,7 @@
 #   - HEAD 에서 packages/ui/package.json 의 version 을 못 읽으면 A1 을 건너뛴다
 #   - 커밋하지 않은 changeset — HEAD 만 본다(CI 는 PR 병합 커밋이 HEAD 다)
 #   - A2 는 부분 문자열이라 `non-breaking` 도 걸린다(받아들인 헛짚기)
+#   - 줄바꿈이 든 파일명 — `ls-tree -z` 뒤 tr 로 줄 단위가 된다
 set -euo pipefail
 
 base="${1:?usage: check-changeset.sh <base-ref>}"
@@ -69,7 +70,9 @@ pkg_json=$(git show HEAD:packages/ui/package.json 2>/dev/null || true)
 version=$(sed -n 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' <<<"$pkg_json")
 version=${version%%$'\n'*}
 
-queue=$(git ls-tree --name-only HEAD .changeset/ | grep -E '^\.changeset/[^/]+\.md$' |
+# -z — 기본 출력은 core.quotepath 로 ASCII 밖 경로를 "\355\225…" 처럼 따옴표 친 8진수로 내서
+# `.changeset/한글이름.md` 가 아래 grep 에 안 맞고 큐에서 빠졌다
+queue=$(git ls-tree -z --name-only HEAD .changeset/ | tr '\0' '\n' | grep -E '^\.changeset/[^/]+\.md$' |
   grep -v '^\.changeset/README\.md$' || true)
 queue_n=$(printf '%s' "$queue" | grep -c . || true)
 
