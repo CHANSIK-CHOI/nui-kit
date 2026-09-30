@@ -632,6 +632,21 @@ import { DateRangePicker, type DateRange } from "@nui-kit/react";
 - 달력 컨트롤의 접근 이름은 한국어가 기본입니다. 다른 언어를 쓰려면
   `dayPickerProps.labels` 와 `calendarLabel` 을 함께 넘깁니다
 
+## 버전 정책
+
+지금은 0.x 입니다. 0.x 동안은 이렇게 올립니다.
+
+- 0.y.z 의 z(patch) — 고친 것과 문서만. 화면 · 타입 · 공개 CSS 변수 · CLI 가 하는 일을 바꾸지 않습니다.
+  `npm install` 이 적는 `^0.y.z` 는 patch 만 받으므로, patch 는 여러분 모르게 들어가도 안전해야 합니다.
+- 0.y 의 y(minor) — 깨지는 변경(BREAKING)이 들어갈 수 있습니다. CHANGELOG 의 **BREAKING** 표기와 옮기는 방법을
+  함께 적습니다. `^0.2.0` 은 0.3.0 을 받지 않으니, 올릴 때는 CHANGELOG 를 읽고 직접 올려 주세요.
+- 공개 CSS 변수의 이름을 바꾸면 옛 이름은 **다음 minor 까지** 그대로 동작합니다.
+- 공개 API 는 이것뿐입니다 — `exports` 에 적힌 경로 · 그 타입 · 공개 CSS 변수(문서 사이트 「커스터마이징」의
+  전체 목록) · `nui-theme` 명령과 옵션 · 그 명령이 만드는 `nui-theme.css` 의 형식. `--nui-_*` 내부 변수는
+  공개 API 가 아니며 예고 없이 바뀝니다. `nui-` 클래스 이름을 바꿀 때는 CHANGELOG 에 **BREAKING** 으로 적습니다.
+- 컴포넌트마다 버전을 따로 두지 않습니다. 킷 전체가 버전 하나입니다.
+- 1.0 부터는 semver 를 그대로 따릅니다 — 깨지는 변경은 major 에서만.
+
 ## 라이선스
 
 MIT
