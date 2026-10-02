@@ -1,17 +1,24 @@
 #!/usr/bin/env bash
-# 라이브러리 소스가 바뀐 PR 에 changeset 이 있는지 본다 — 로컬 Stop 훅 `changeset-reminder` 의 CI 판.
+# 라이브러리 소스 · 빌드 · CLI 가 바뀐 PR 에 changeset 이 있는지 본다 — 로컬 Stop 훅 `changeset-reminder` 의 CI 판.
 #
 #   bash .github/scripts/check-changeset.sh <base-ref>     # 예: origin/dev
 #
-# 대상은 로컬 훅과 같다 — `packages/ui/src/**` · `packages/ui/package.json`.
+# 대상은 로컬 훅과 같다 — `packages/ui/src/**` · `packages/ui/package.json` · `packages/ui/scripts/**` ·
+# `packages/ui/tsup*.config.ts` · `packages/ui/tsconfig.build.json` · `packages/ui/presets.json`.
+#   scripts 는 `tsup.cli.config.ts` 가 `dist/cli.js`(bin `nui-theme`)로 묶고, presets.json 은 `files` 로
+#   배포되며 `build:themes` 의 입력이고, tsconfig.build.json 은 `.d.ts` 를 만든다 — 셋 다 소비자에게
+#   나간다(2026-10-02 넓힘).
+#   검사 · 하네스(`scripts/check-*.mjs` · `scripts/m1/`)만 바꾼 PR 도 빈 changeset(`npx changeset --empty`)
+#   한 장을 남긴다 — 배포되는 파일만 고르는 목록은 import 가 늘 때마다 늙어서 버렸다.
 # 통과 조건(셋 중 하나):
 #   1. 대상 파일이 안 바뀌었다
 #   2. `.changeset/*.md` 가 추가·수정됐다 (README.md 제외). 릴리스 노트가 필요 없는 변경은
 #      `npx changeset --empty` 로 빈 changeset 을 남긴다 — 「일부러 안 남겼다」가 기록된다
 #   3. `packages/ui/CHANGELOG.md` 가 바뀌었다 — `changeset version` 이 changeset 을 소비한 릴리스 PR 이다
 #
-# ⚠️ `changeset status --since` 를 쓰지 않는 이유 — 패키지 폴더의 **어느 파일이든**(scripts · README ·
-#    tsup 설정) 바뀌면 changeset 을 요구하고, 릴리스 PR(changeset 을 이미 소비함)에서 실패한다.
+# ⚠️ `changeset status --since` 를 쓰지 않는 이유 — 패키지 폴더의 **어느 파일이든**(README · 문서까지)
+#    바뀌면 changeset 을 요구하고, 릴리스 PR(changeset 을 이미 소비함)에서 실패한다.
+#    scripts · tsup 설정은 이제 위 대상에 일부러 넣는다.
 #
 # 대기 큐 검사 — 위 판정과 따로 돈다(라이브러리 소스가 안 바뀐 PR 도). PR 에 새로 든 것만 보면 이름만 바꾼(R)
 # changeset 이 비켜 가므로 HEAD 의 큐 전부를 본다.
@@ -46,7 +53,8 @@ set -euo pipefail
 base="${1:?usage: check-changeset.sh <base-ref>}"
 merge_base=$(git merge-base "$base" HEAD)
 
-lib=$(git diff --name-only "$merge_base" HEAD -- packages/ui/src packages/ui/package.json)
+# 대상은 머리 주석 「대상」과 같다
+lib=$(git diff --name-only "$merge_base" HEAD -- packages/ui/src packages/ui/package.json packages/ui/scripts 'packages/ui/tsup*.config.ts' packages/ui/tsconfig.build.json packages/ui/presets.json)
 lib_n=$(printf '%s' "$lib" | grep -c . || true)
 
 sets=$(git diff --name-only --diff-filter=AM "$merge_base" HEAD -- '.changeset/*.md' |
@@ -56,11 +64,11 @@ sets_n=$(printf '%s' "$sets" | grep -c . || true)
 changelog_n=$(git diff --name-only "$merge_base" HEAD -- packages/ui/CHANGELOG.md | grep -c . || true)
 
 echo "base=$base merge-base=${merge_base:0:7}"
-echo "라이브러리 소스 변경 ${lib_n}건 · changeset 추가·수정 ${sets_n}건 · CHANGELOG 변경 ${changelog_n}건"
+echo "라이브러리 소스 · 빌드 · CLI 변경 ${lib_n}건 · changeset 추가·수정 ${sets_n}건 · CHANGELOG 변경 ${changelog_n}건"
 
 status=0
 if [ "$lib_n" -eq 0 ]; then
-  echo "✅ 라이브러리 소스가 안 바뀌었다 — changeset 불필요"
+  echo "✅ 라이브러리 소스 · 빌드 · CLI 가 안 바뀌었다 — changeset 불필요"
 elif [ "$sets_n" -gt 0 ]; then
   echo "✅ changeset 있음:"
   printf '   %s\n' $sets
@@ -68,13 +76,13 @@ elif [ "$changelog_n" -gt 0 ]; then
   echo "✅ 릴리스 PR — packages/ui/CHANGELOG.md 가 바뀌었다 (changeset version 이 소비함)"
 else
   status=1
-  echo "❌ 라이브러리 소스가 바뀌었는데 changeset 이 없다:"
+  echo "❌ 라이브러리 소스 · 빌드 · CLI 가 바뀌었는데 changeset 이 없다:"
   printf '   %s\n' $lib | head -20
   echo
   echo "   npm run changeset 으로 남긴다. 릴리스 노트가 필요 없는 변경이면 npx changeset --empty"
   # GitHub Actions 주석 — PR 화면에 뜬다
   if [ -n "${GITHUB_ACTIONS:-}" ]; then
-    echo "::error title=changeset 없음::packages/ui 소스가 ${lib_n}건 바뀌었는데 .changeset/*.md 가 없다 — npm run changeset (필요 없으면 npx changeset --empty)"
+    echo "::error title=changeset 없음::packages/ui 소스 · 빌드 · CLI 가 ${lib_n}건 바뀌었는데 .changeset/*.md 가 없다 — npm run changeset (필요 없으면 npx changeset --empty)"
   fi
 fi
 
