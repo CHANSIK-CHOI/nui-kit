@@ -2,15 +2,16 @@ name: CI
 
 # PR · push 게이트. 배포는 release.yml 이 한다 — 여기서는 「병합해도 되나」만 본다.
 #
-# 잡은 넷이고 **이름이 곧 required status check 이름**이다. 바꾸면 브랜치 보호 설정도 같이 바꾼다.
+# 잡은 다섯이고 **이름이 곧 required status check 이름**이다. 바꾸면 브랜치 보호 설정도 같이 바꾼다.
 #   library    — release.yml 과 **같은 명령**. PR 은 통과했는데 태그에서 깨지는 일을 막는다
 #   docs       — 문서 사이트 타입 + 구조. 라이브러리와 잡을 가른다(아래 주석)
 #   format     — prettier --check
+#   portal-inert — M1 하네스의 R5 하나(팝업이 열려도 portal 표식은 inert 가 아님). Chromium 을 받는다
 #   changeset  — 라이브러리 소스가 바뀐 PR 에 changeset 이 있나 (로컬 Stop 훅의 CI 판). PR 에서만 돈다
 #
 # ⚠️ Playwright 계 verify:*(a11y · popup · press · menu-motion …)는 넣지 않았다 — dev 서버 · 브라우저가
 #    필요하고 a11y 하나가 3~4분, 모션 검사는 프레임 타이밍에 기대 공유 러너에서 흔들린다. 근거와 다음 단계는
-#    vault 보고서 project-nui-kit-ci-pr-gate-2026-09-24 에 있다.
+#    vault 보고서 project-nui-kit-ci-pr-gate-2026-09-24 에 있다. 예외 하나 — `portal-inert`(아래 잡 주석)
 # ⚠️ 루트 scripts/check-*.mjs(check-specs · check-sources …)는 프라이빗 저장소 소관이라 이 체크아웃에 없다.
 
 on:
@@ -98,6 +99,30 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run format:check
+
+  # M1 하네스(packages/ui/scripts/m1)의 R5 하나만 판정한다 — 팝업이 열려도 body 직계 portal 표식
+  # (data-nui-portal-root · 토스트 · 툴팁 · Select 메뉴) 은 inert 가 아니고 나머지 body 직계는 inert 다
+  # (usePopupHostA11y 의 PORTAL_ROOT_ATTRIBUTE 예외). 이것이 깨지면 팝업 안에서 띄운 토스트가 보이는데
+  # 눌리지 않는다. 하네스 전체(--only 없이)는 능력 검사 C1~C5 가 M1 전이라 FAIL 이 정상이라 넣지 않는다.
+  # 브라우저를 띄우지만 dev 서버는 없고(esbuild 번들 + file://) 프레임 타이밍을 재지 않는 DOM 속성 판정이다 —
+  # 위 ⚠️ 의 「흔들림」 사유에 걸리지 않는다. 기준선은 npm 의 @nui-kit/react@0.2.0 tarball 을 받는다
+  portal-inert:
+    name: portal-inert
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # 브라우저는 lockfile 의 playwright 버전에 맞는 chromium 하나만
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build:ui
+      - run: npm run verify:m1 -w @nui-kit/react -- --only R5-portal-inert
 
   changeset:
     name: changeset
