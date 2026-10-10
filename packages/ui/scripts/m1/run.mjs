@@ -1,15 +1,17 @@
 #!/usr/bin/env node
 // M1 검증 하네스 — 기준선(@nui-kit/react@0.2.0 npm tarball) 대 후보 패키지를 브라우저의 계산된 스타일로 비교한다.
 //
-//   node packages/ui/scripts/m1/run.mjs [--base <dir|0.2.0>] [--cand <dir>] [--scope <json>] [--self]
+//   node packages/ui/scripts/m1/run.mjs [--base <dir|0.2.0>] [--cand <dir>] [--scope <json>] [--self] [--only <검사 id,…>]
 //
 //   --base  기준선 패키지 디렉터리. 기본은 `npm pack @nui-kit/react@0.2.0` 을 .m1-cache 에 풀어 쓴다(git 태그 v0.2.0 은 없다)
 //   --cand  후보 패키지 디렉터리. 기본은 packages/ui (build:ui 를 먼저 돌린다)
 //   --scope M1 에서 의도적으로 발자국을 바꾼 훅 목록 { "<hook>": { "cells": ["LayerPopup|*", ...] } } — M0 목록에서 온다
 //   --self  기준선 대 기준선(자기 대조). 회귀 검사(R*)는 전부 PASS, 능력 검사(C*)는 0.2.0 이 못 하므로 전부 FAIL 이어야
 //           exit 0 이다 — 능력 검사가 살아 있다는 검출력 시험을 겸한다
+//   --only  적은 검사만 판정에 센다. 나머지는 측정은 그대로 하되 SKIP 으로 찍고 pass · fail 에 넣지 않는다.
+//           없는 id 를 적거나 센 것이 0 이면 실패다. CI 의 portal-inert 잡이 `--only R5-portal-inert` 로 부른다
 //
-// 마지막 줄: RECEIPT m1-harness cells= nodes= hooks= pass= fail= exit=   (rules/scripts.md §1)
+// 마지막 줄: RECEIPT m1-harness mode= cells= nodes= hooks= skip= pass= fail= exit=   (rules/scripts.md §1)
 import { execFileSync } from "node:child_process";
 import {
   existsSync,
@@ -34,15 +36,22 @@ const opt = (k) => {
   return i < 0 ? undefined : args[i + 1];
 };
 const SELF = args.includes("--self");
+const ONLY = opt("--only")
+  ? opt("--only")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+  : null;
 
 let cells = 0,
   nodes = 0,
   hookCount = 0,
+  skip = 0,
   pass = 0,
   fail = 0;
 process.on("exit", (code) =>
   console.log(
-    `RECEIPT m1-harness mode=${SELF ? "self" : "cand"} cells=${cells} nodes=${nodes} hooks=${hookCount} pass=${pass} fail=${fail} exit=${code}`,
+    `RECEIPT m1-harness mode=${SELF ? "self" : "cand"} cells=${cells} nodes=${nodes} hooks=${hookCount} skip=${skip} pass=${pass} fail=${fail} exit=${code}`,
   ),
 );
 
@@ -503,11 +512,28 @@ try {
 }
 
 for (const r of results) {
+  if (ONLY && !ONLY.includes(r.id)) {
+    console.log(`SKIP  ${r.id.padEnd(28)} [${r.kind}] ${r.spec} — ${r.detail}`);
+    skip++;
+    continue;
+  }
   const expected = SELF && r.kind === "capability" ? !r.ok : r.ok;
   const tag = r.ok ? "PASS" : "FAIL";
   console.log(
     `${tag}  ${r.id.padEnd(28)} [${r.kind}${SELF && r.kind === "capability" ? " · 0.2.0 기대 FAIL" : ""}] ${r.spec} — ${r.detail}`,
   );
   expected ? pass++ : fail++;
+}
+// --only 의 오타가 「센 것 0 · 실패 0」으로 초록이 되지 않게 — 없는 id 는 실패로 센다
+if (ONLY)
+  for (const id of ONLY)
+    if (!results.some((r) => r.id === id)) {
+      console.log(`FAIL  ${id} — --only 에 적었지만 이 하네스에 없는 검사`);
+      fail++;
+    }
+// `--only ","` 처럼 id 가 비면 위 줄에 안 걸린다 — 센 것 0 은 실패다 (rules/scripts.md §2)
+if (ONLY && pass + fail === 0) {
+  console.log(`FAIL  --only — 판정에 센 검사 0`);
+  fail++;
 }
 process.exit(fail === 0 ? 0 : 1);
