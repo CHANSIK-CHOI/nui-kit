@@ -20,6 +20,8 @@
     "format:check": "prettier --check .",
     "lint": "biome lint",
     "lint:changed": "bash .github/scripts/lint-changed.sh",
+    "knip": "knip",
+    "knip:changed": "node .github/scripts/knip-changed.mjs",
     "verify:pkg": "npm run verify -w @nui-kit/react",
     "verify:themes": "npm run verify:themes -w @nui-kit/react",
     "changeset": "changeset",
@@ -39,6 +41,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.6.3",
     "@changesets/cli": "3.0.1",
+    "knip": "6.43.0",
     "prettier": "3.9.6",
     "typescript": "7.0.2"
   }

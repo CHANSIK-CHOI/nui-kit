@@ -1,0 +1,26 @@
+// knip — 안 쓰는 export · 파일 · 의존. 트리 전체는 `npm run knip`, PR 은 CI lint 잡이 바뀐 파일만 경고로 본다
+// (.github/scripts/knip-changed.mjs). 입구를 적지 않으면 knip 이 못 따라가는 자리를 「안 쓴다」로 헛짚는다
+// (설정 없이 96 건 가운데 49 건이 헛짚기, 2026-10-27 origin/dev 7b7cdde).
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    "packages/ui": {
+      "entry": [
+        // package.json exports 의 소스 엔트리 17 — tsup.config.ts entry 와 같다. 여기서 나가는 export 는 공개 API 라 세지 않는다
+        "src/{index,rhf,next,button,field,textfield,textarea,checkbox,radio,switch,popup,toast,tooltip,accordion,select,datepicker,icon}.ts",
+        // check-select-placement.mjs 가 esbuild stdin 문자열로 가져온다 — import 문이 없어 knip 이 못 본다
+        "src/internal/dropdownPlacement.tsx",
+        // 손으로 돌리는 자기 시험(package.json 에 없음)
+        "scripts/color/gates-selftest.mjs",
+        // m1/run.mjs 가 esbuild entryPoints · alias 로 경로를 넘긴다
+        "scripts/m1/fixture.jsx",
+        "scripts/m1/next-link-shim.jsx",
+      ],
+      // scss 는 뺀다 — sass 가 entries 폴더째 묶어(build:styles) knip 이 @use 를 따라가지 못한다
+      "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{mjs,jsx}", "*.config.ts"],
+    },
+    "apps/docs": {
+      "project": ["src/**/*.{ts,tsx,mdx}", "scripts/**/*.mjs", "*.{mjs,ts}"],
+    },
+  },
+}
