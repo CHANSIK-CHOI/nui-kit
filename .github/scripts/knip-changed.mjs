@@ -18,15 +18,12 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { onExitReceipt, repoRoot } from "./lib/script-kit.mjs";
 
 const CODE_FILE = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$|(^|\/)package\.json$/;
 const receipt = { mode: "base:?", files: 0, issues: 0 };
 
-process.on("exit", (code) => {
-  console.log(
-    `RECEIPT knip-changed mode=${receipt.mode} files=${receipt.files} issues=${receipt.issues} exit=${code}`,
-  );
-});
+onExitReceipt("knip-changed", () => receipt);
 
 function fail(message) {
   console.error(`❌ ${message}`);
@@ -82,7 +79,7 @@ if (flag !== "--base" || !ref || rest.length > 0)
   fail("usage: knip-changed.mjs --base <ref>");
 receipt.mode = `base:${ref}`;
 
-const root = git(["rev-parse", "--show-toplevel"]);
+const root = repoRoot();
 process.chdir(root);
 const files = changedFiles(ref);
 receipt.files = files.length;
