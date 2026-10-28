@@ -19,7 +19,8 @@
 #   추적 파일뿐이라 무시 목록이 필요 없다.
 # 영수증 — 마지막 줄 `RECEIPT lint-changed mode=… files=N exit=N`. 목록이 0 이면 Biome 을 부르지 않고
 #   `files=0 exit=0` 으로 통과한다 — 「수 0 이면 실패」의 예외다. 코드 파일이 안 바뀐 커밋 · PR 은 정상이다.
-# exit — Biome 의 것을 그대로(오류가 있으면 1, 경고만이면 0). 인자가 틀렸거나 Biome 이 없으면 2.
+# exit — Biome 의 것을 그대로(오류가 있으면 1, 경고만이면 0). 인자가 틀렸거나 Biome 이 없거나 임시 폴더를
+#   못 만들면 2.
 # 못 보는 것 — package.json 에서 의존을 빼는 커밋은 그 의존을 가져오는 파일이 안 바뀌면
 #   noUndeclaredDependencies 가 못 본다. library 잡이 깨지는 쪽으로 드러난다.
 # BIOME_BIN — 저장소 밖에서 시험할 때 바이너리를 바꿔 끼우는 자리다.
@@ -79,7 +80,12 @@ echo "바뀐 코드 파일 ${n}개 (${mode})"
 
 extra=()
 if [ "$mode" = "staged" ]; then
-  tmp=$(mktemp -d)
+  # 템플릿을 꼭 준다 — macOS mktemp 는 템플릿이 없으면 TMPDIR 을 보지 않고 /var/folders/…/T 에 만든다.
+  #   쓰기 범위를 좁힌 sandbox 셸은 그 자리를 막고 쓸 수 있는 TMPDIR 을 준다(2026-10-28 실측 — 템플릿 없이는 mkdtemp 거부).
+  tmp=$(mktemp -d "${TMPDIR:-/tmp}/lint-changed.XXXXXX") || {
+    echo "❌ 임시 폴더를 만들지 못했다 (${TMPDIR:-/tmp})" >&2
+    exit 2
+  }
   trap 'rm -rf "$tmp"' EXIT
   git checkout-index -a --prefix="$tmp/"
   cd "$tmp"
