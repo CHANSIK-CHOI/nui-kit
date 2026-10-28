@@ -1,0 +1,110 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "dev"
+  },
+  "files": {
+    "includes": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.mts",
+      "**/*.cts",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.mjs",
+      "**/*.cjs"
+    ]
+  },
+  "formatter": { "enabled": false },
+  "assist": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "none",
+      "style": {
+        "useNamingConvention": {
+          "level": "error",
+          "options": {
+            "strictCase": false,
+            "conventions": [
+              {
+                "selector": { "kind": "objectLiteralProperty" },
+                "match": "_*(.+)",
+                "formats": ["camelCase", "PascalCase"]
+              },
+              {
+                "selector": { "kind": "typeProperty" },
+                "match": "NODE_ENV|(.+)"
+              },
+              {
+                "selector": { "kind": "enumMember" },
+                "formats": ["CONSTANT_CASE"]
+              }
+            ]
+          }
+        },
+        "noExcessiveLinesPerFile": {
+          "level": "warn",
+          "options": { "maxLines": 300 }
+        }
+      },
+      "correctness": {
+        "noUnusedImports": "warn",
+        "noUnusedVariables": "warn",
+        "noUnusedFunctionParameters": "warn",
+        "noUndeclaredDependencies": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noImportCycles": "error"
+      },
+      "complexity": {
+        "noExcessiveLinesPerFunction": {
+          "level": "warn",
+          "options": { "maxLines": 50 }
+        },
+        "noExcessiveCognitiveComplexity": {
+          "level": "warn",
+          "options": { "maxAllowedComplexity": 20 }
+        },
+        "useMaxParams": { "level": "warn", "options": { "max": 3 } }
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "packages/ui/src/*.ts",
+        "packages/ui/src/components/*/index.ts"
+      ],
+      "linter": { "rules": { "style": { "noDefaultExport": "error" } } }
+    },
+    {
+      "includes": ["packages/ui/src/components/*/index.ts"],
+      "linter": { "rules": { "performance": { "noReExportAll": "error" } } }
+    },
+    {
+      "includes": ["packages/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["**/apps/**", "docs", "docs/**"],
+                    "message": "라이브러리는 문서 사이트를 가져오지 않는다"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

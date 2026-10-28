@@ -18,6 +18,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "lint": "biome lint",
+    "lint:changed": "bash .github/scripts/lint-changed.sh",
     "verify:pkg": "npm run verify -w @nui-kit/react",
     "verify:themes": "npm run verify:themes -w @nui-kit/react",
     "changeset": "changeset",
@@ -35,6 +37,7 @@
     "verify:docs": "npm run verify:docs -w docs"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.6.3",
     "@changesets/cli": "3.0.1",
     "prettier": "3.9.6",
     "typescript": "7.0.2"
