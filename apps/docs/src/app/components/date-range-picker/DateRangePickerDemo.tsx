@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DateRangePicker, Field } from "@nui-kit/react";
-import type { DateRange } from "react-day-picker";
+import { DateRangePicker, Field, type DateRange } from "@nui-kit/react";
 import { Case, CaseGrid, Example } from "@/components/guide";
 
 function formatRange(range: DateRange | undefined) {

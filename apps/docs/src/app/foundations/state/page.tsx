@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { TokenTable } from "@/components/TokenTable";
 
 export const metadata = { title: "상태" };
 
