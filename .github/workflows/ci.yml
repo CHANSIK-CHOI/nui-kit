@@ -7,7 +7,7 @@ name: CI
 #   docs       — 문서 사이트 타입 + 구조. 라이브러리와 잡을 가른다(아래 주석)
 #   format     — prettier --check
 #   portal-inert — M1 하네스의 R5 하나(팝업이 열려도 portal 표식은 inert 가 아님). Chromium 을 받는다
-#   lint       — PR 이 바꾼 코드 파일에만 Biome 린트. PR 에서만 돈다
+#   lint       — PR 이 바꾼 코드 파일에만 Biome 린트(오류는 막음)와 knip(경고만). PR 에서만 돈다
 #   changeset  — 라이브러리 소스가 바뀐 PR 에 changeset 이 있나 (로컬 Stop 훅의 CI 판). PR 에서만 돈다
 #
 # ⚠️ Playwright 계 verify:*(a11y · popup · press · menu-motion …)는 넣지 않았다 — dev 서버 · 브라우저가
@@ -146,6 +146,10 @@ jobs:
       - run: npm ci
       # 브랜치 이름은 식(${{ }})으로 run 에 넣지 않고 env 로 넘긴다 — 스크립트 주입 방지
       - run: bash .github/scripts/lint-changed.sh --base "origin/$BASE_REF"
+        env:
+          BASE_REF: ${{ github.base_ref }}
+      # 안 쓰는 export · 파일 · 의존(knip) — 바뀐 파일에 걸린 것만 경고로 보인다. 막지 않는다(헛짚기 때문, 스크립트 머리말)
+      - run: node .github/scripts/knip-changed.mjs --base "origin/$BASE_REF"
         env:
           BASE_REF: ${{ github.base_ref }}
 
