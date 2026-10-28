@@ -1,0 +1,15 @@
+// 스크립트 폴더의 .mjs 가 끝날 때 훅(process.on("exit") 등)을 직접 걸면 오류 — 영수증 훅은 공통 모듈 한 곳에 둔다.
+// 고치는 법: .github/scripts/lib/script-kit.mjs 의 onExitReceipt(name, () => ({ … })) 한 줄로 바꾼다.
+// 영수증이 아닌 끝 처리(정리)라 직접 걸어야 하면 그 줄 위에 `// biome-ignore lint/plugin: <이유>` 를 단다.
+// 범위와 근거: biome.json overrides, 규칙 문서 scripts.md §11.
+// 못 보는 것: process 를 다른 이름에 담아 거는 꼴(const p = process; p.on("exit")).
+language js
+
+`process.$method($event, $handler)` where {
+  $method <: or { `on`, `once`, `addListener`, `prependListener`, `prependOnceListener` },
+  $event <: or { `"exit"`, `'exit'`, r"`exit`" },
+  register_diagnostic(
+    span = $event,
+    message = "끝날 때 훅을 직접 걸지 않는다 — .github/scripts/lib/script-kit.mjs 의 onExitReceipt 를 쓴다 (scripts.md §11)"
+  )
+}

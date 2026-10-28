@@ -77,6 +77,15 @@
   "overrides": [
     {
       "includes": [
+        "packages/*/scripts/**/*.mjs",
+        "apps/*/scripts/**/*.mjs",
+        ".github/scripts/**/*.mjs",
+        "!.github/scripts/lib/script-kit.mjs"
+      ],
+      "plugins": [".github/lint/no-direct-exit-hook.grit"]
+    },
+    {
+      "includes": [
         "packages/ui/src/*.ts",
         "packages/ui/src/components/*/index.ts"
       ],

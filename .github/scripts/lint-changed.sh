@@ -10,7 +10,9 @@
 #   규칙(안 쓴 import · 변수 · 인자, 선언 안 한 의존)은 경고, 크기 넷은 경고. 예외로 지금 위반 0 인 공개 계약
 #   규칙(noExplicitAny · noImportCycles · 공개 엔트리 default export · 컴포넌트 index.ts 의 export * ·
 #   라이브러리→문서 import)은 오류 — 0 건이라 지금 막히는 커밋이 없고, 경고로 두면 공개 API 경계가 새는 것을
-#   못 막는다.
+#   못 막는다. 예외 둘째 — 스크립트 폴더 .mjs 의 끝날 때 훅 직접 쓰기(플러그인 .github/lint/no-direct-exit-hook.grit)
+#   는 지금 13 곳이 있어도 오류다. 고치는 법이 한 줄로 정해져 있어(script-kit 의 onExitReceipt) 그 파일을 고치는
+#   PR 이 함께 옮긴다(규칙 문서 scripts.md §11).
 # 왜 index 를 꺼내나 — Biome 의 `--staged` 는 작업 트리 내용을 읽는다(실측: index 에 위반을 넣고 작업 트리를
 #   고치면 통과한다). 그래서 index 를 통째로 임시 폴더에 꺼내 거기서 목록을 넘긴다. 한 파일만 꺼내면 순환 ·
 #   의존 검사에 쓸 나머지 파일이 없다. 임시 폴더엔 .git 이 없어 `--vcs-enabled=false` 를 준다 — 꺼낸 것이 이미
