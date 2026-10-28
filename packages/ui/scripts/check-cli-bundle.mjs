@@ -19,11 +19,14 @@
  *    ■ 정적 — 번들에 `process.argv[1]` 비교와 `--self-test` 판정이 없다
  *    ■ 실행 — 실제 경로 · 심볼릭 링크 두 꼴로 `--preset` · `--accent` 를 부른다. 셋을 본다:
  *      exit 0 · 기본 출력 `./nui-theme.css` 가 생겼다 · **패키지 폴더에 새 파일이 없다**
+ *    ■ 종료 코드 — README 「버전 정책」의 명령 약속. 성공, 잘못된 인자, 없는 파일 꼴을 불러 단언 일곱을 본다.
+ *      단언과 사례는 `cli-contract.mjs`(① exit 0 · 1 · 2 ② 실패면 stdout 이 빔 … ⑦ stderr 에 스택 없음)
  *
  * 검출력 시험: `node scripts/check-cli-bundle.mjs --selftest`
  */
 import { spawnSync } from "node:child_process";
 import {
+  copyFileSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -35,6 +38,8 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { onExitReceipt } from "../../../.github/scripts/lib/script-kit.mjs";
+import { CONTRACT_RUNS, JUDGE_SELFTEST, judge } from "./cli-contract.mjs";
 
 const PKG = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLI = join(PKG, "dist", "cli.js");
@@ -44,11 +49,12 @@ let checks = 0;
 let failures = 0;
 let runs = 0;
 let pkgWrites = 0;
-process.on("exit", (code) => {
-  console.log(
-    `RECEIPT check-cli-bundle${SELFTEST ? "-selftest" : ""} checks=${checks} runs=${runs} pkgWrites=${pkgWrites} failures=${failures} exit=${code}`,
-  );
-});
+onExitReceipt(`check-cli-bundle${SELFTEST ? "-selftest" : ""}`, () => ({
+  checks,
+  runs,
+  pkgWrites,
+  failures,
+}));
 
 const ok = (msg) => {
   checks += 1;
@@ -102,6 +108,15 @@ if (SELFTEST) {
     got === want
       ? ok(`${name} — 걸림 ${got}/${want}`)
       : bad(`${name} — 걸림 ${got}/${want}`);
+  }
+
+  console.log("■ 검출력 — 명령 약속 단언(합성 실행 결과, cli-contract.mjs)");
+  for (const { name, want, r, expect } of JUDGE_SELFTEST) {
+    const got = judge(want, r).map((b) => b[0]);
+    const same = got.join("") === expect.join("");
+    (same ? ok : bad)(
+      `${name} — 걸림 [${got.join(" ")}] 기대 [${expect.join(" ")}]`,
+    );
   }
   process.exit(failures ? 1 : 0);
 }
@@ -203,6 +218,30 @@ try {
     } else {
       ok(`${label} — exit 0 · ./nui-theme.css 확인`);
     }
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  console.log(
+    "■ 종료 코드 — 성공 · 잘못된 인자 · 없는 파일 (README 「버전 정책」)",
+  );
+  // 설치가 깨진 꼴 — 번들만 있고 패키지의 styles/themes 가 없다
+  const broken = join(work, "broken", "dist", "cli.js");
+  mkdirSync(dirname(broken), { recursive: true });
+  copyFileSync(CLI, broken);
+  CONTRACT_RUNS.forEach(({ kind, args, want, broken: fromBroken }, i) => {
+    const cwd = join(work, `contract-${i}`);
+    mkdirSync(cwd);
+    const at = args.indexOf("--out");
+    const out = join(cwd, at >= 0 ? args[at + 1] : "nui-theme.css");
+    const bin = fromBroken ? broken : CLI;
+    const r = spawnSync(process.execPath, [bin, ...args], {
+      cwd,
+      encoding: "utf8",
+    });
+    runs += 1;
+    const broke = judge(want, { ...r, outMade: existsSync(out) });
+    const label = `${kind} · ${args.join(" ") || "(인자 없음)"} — exit ${r.status}`;
+    broke.length ? bad(`${label}: ${broke.join(" · ")}`) : ok(label);
   });
 } finally {
   const after = listPkg();

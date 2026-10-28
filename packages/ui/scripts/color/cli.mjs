@@ -11,6 +11,12 @@
  * 실패 — `gates.mjs` 의 기준(프리셋 검사와 같은 것)을 하나라도 못 넘으면 이유와 수치를 찍고
  *        exit 1. **파일도 layout 도 손대지 않는다.** 이전에 성공한 상태가 그대로 남는다.
  *
+ * 종료 코드와 출력 자리는 공개 API 다(README 「버전 정책」). `verify:cli` 의 ■종료 코드 절이 지킨다.
+ *   0 성공(`--help` 포함) · 1 이 입력으로는 만들 수 없다(명령 줄이 틀림, 없는 프리셋, 기준 미달)
+ *   2 파일을 읽거나 쓰지 못했다(`--out` 자리, layout, 설치가 깨짐)
+ *   결과(만든 파일, 넣은 import, `--no-apply` 의 넣을 줄)는 stdout, 오류와 경고는 stderr.
+ *   실패 꼴이 늘면 값을 더하고, 있는 값의 뜻은 바꾸지 않는다.
+ *
  * 프리셋을 계산하지 않고 **복사**하는 이유 — 문서 사이트의 미리보기와 같은 빌드에서 나온
  * 파일이 패키지에 들어 있다. 여기서 다시 계산하면 이 번들의 생성기 버전이 그 파일과
  * 어긋날 수 있다. 계산은 목록에 없는 색에만 쓴다.
@@ -18,7 +24,13 @@
  * tsup 이 `dist/cli.js` 로 번들한다(`tsup.cli.config.ts`). 생성기와 그 의존성이 전부
  * 안에 들어가므로 소비자 node_modules 에는 아무것도 더 깔리지 않는다.
  */
-import { copyFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  accessSync,
+  constants,
+  existsSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { generate, themeFileName, toCss } from "./generate.mjs";
@@ -53,16 +65,47 @@ const usage = `nui-theme — @nui-kit/react 브랜드 색 고르기
 성공하면 파일을 만들고 app/layout 에 import 한 줄을 넣는다 (예: import "../nui-theme.css").
 기준에 못 미치는 색이면 이유를 찍고 아무것도 바꾸지 않는다.`;
 
+/** 종료 코드 — 값의 뜻은 공개 API 라 바꾸지 않는다. 새 실패 꼴은 새 값으로 더한다. */
+const EXIT_INPUT = 1;
+const EXIT_FILE = 2;
+
+/** 이 입력으로는 만들 수 없다 — 명령 줄을 고치거나 다른 색을 고르면 된다 */
 function fail(message) {
   console.error(`✗ ${message}`);
-  process.exit(1);
+  process.exit(EXIT_INPUT);
 }
 
-if (flag("help") || argv.length === 0) {
-  console.log(usage);
-  process.exit(argv.length === 0 ? 1 : 0);
+/** 파일을 읽거나 쓰지 못했다 — 입력이 아니라 자리(폴더, 권한, 설치)를 고치면 된다 */
+function failFile(message, error) {
+  console.error(`✗ ${message}${error?.code ? ` (${error.code})` : ""}`);
+  process.exit(EXIT_FILE);
 }
-if (!PKG_ROOT) fail("패키지 안의 styles/themes 를 찾지 못했다. 설치가 깨졌다.");
+
+if (flag("help")) {
+  console.log(usage);
+  process.exit(0);
+}
+if (argv.length === 0) {
+  console.error(usage);
+  process.exit(EXIT_INPUT);
+}
+
+// 모르는 옵션은 지금처럼 무시하되 알린다 — 오타 난 `--no-aply` 가 조용히 layout 을 고치지 않게.
+// 실패로 바꾸면 되던 명령이 멈추므로, 바꾸려면 한 판 앞서 이 경고에 예고를 싣는다(README 「버전 정책」).
+const VALUED = new Set(["--preset", "--accent", "--out"]);
+const KNOWN = new Set([...VALUED, "--no-apply", "--help"]);
+const unknown = argv.filter(
+  (a, i) => !KNOWN.has(a) && !(i > 0 && VALUED.has(argv[i - 1])),
+);
+if (unknown.length > 0) {
+  console.error(
+    `⚠ 모르는 옵션이라 무시했다: ${unknown.join(" ")}. --help 로 사용법을 본다.`,
+  );
+}
+
+if (!PKG_ROOT) {
+  failFile("패키지 안의 styles/themes 를 찾지 못했다. 설치가 깨졌다.");
+}
 
 const out = resolve(arg("out") ?? "nui-theme.css");
 const presetArg = arg("preset");
@@ -134,13 +177,7 @@ if (presetArg) {
   );
 }
 
-// ── 2. 파일 ────────────────────────────────────────────────────────────────────
-const existed = existsSync(out);
-writeFileSync(out, css, "utf8");
-console.log(`✅ ${summary} → ${out}${existed ? " (덮어썼다)" : ""}`);
-for (const line of notes) console.log(line);
-
-// ── 3. 루트 layout 에 import ───────────────────────────────────────────────────
+// ── 2. layout 계획 — 쓰기 전에 읽고, 쓸 수 있는지까지 본다. 여기서 실패하면 아무것도 쓰지 않는다 ──
 const INDEX_IMPORT = `import "@nui-kit/react/styles/index.css";`;
 const importLine = (from) => {
   let rel = relative(dirname(from), out).split("\\").join("/");
@@ -160,45 +197,77 @@ function findRootLayouts() {
 }
 
 const layouts = findRootLayouts();
-if (flag("no-apply")) {
-  // 넣지는 않되 경로는 정확히 — layout 이 하나면 그 파일 기준의 상대 경로다
-  const line =
-    layouts.length === 1
-      ? importLine(layouts[0])
-      : `import "./${basename(out)}";`;
-  console.log(
-    `\n루트 layout 에서 라이브러리 CSS 뒤에 불러온다${layouts.length === 1 ? ` (${relative(process.cwd(), layouts[0])} 기준)` : ""}.\n  ${INDEX_IMPORT}\n  ${line}`,
-  );
-} else {
-  if (layouts.length !== 1) {
-    console.log(
-      layouts.length === 0
-        ? "\n루트 layout(app/layout.tsx · src/app/layout.tsx)을 찾지 못해 import 를 넣지 않았다. 직접 넣는다."
-        : `\n루트 layout 이 ${layouts.length}개라 어느 것인지 몰라 넣지 않았다 (${layouts.map((l) => relative(process.cwd(), l)).join(", ")}). 직접 넣는다.`,
+const noApply = flag("no-apply");
+const layout = layouts.length === 1 ? layouts[0] : undefined;
+const line = layout ? importLine(layout) : `import "./${basename(out)}";`;
+const shown = layout ? relative(process.cwd(), layout) : "";
+/** layout 에 쓸 새 내용. 넣지 않거나 이미 있으면 undefined */
+let layoutNext;
+if (!noApply && layout) {
+  let src;
+  try {
+    src = readFileSync(layout, "utf8");
+    accessSync(layout, constants.W_OK);
+  } catch (error) {
+    failFile(
+      `${shown} 을 읽거나 쓸 수 없어 멈췄다. 아무것도 바꾸지 않았다. --no-apply 로 부르면 테마 파일만 만든다.`,
+      error,
     );
-    console.log(`  ${INDEX_IMPORT}\n  import "./${basename(out)}";`);
-  } else {
-    const layout = layouts[0];
-    const line = importLine(layout);
-    const src = readFileSync(layout, "utf8");
-    const shown = relative(process.cwd(), layout);
-    if (src.includes(line)) {
-      console.log(`\n${shown} 에 import 가 이미 있다. 그대로 둔다.`);
+  }
+  if (!src.includes(line)) {
+    if (src.includes(INDEX_IMPORT)) {
+      layoutNext = src.replace(INDEX_IMPORT, `${INDEX_IMPORT}\n${line}`);
     } else {
-      let next;
-      if (src.includes(INDEX_IMPORT)) {
-        next = src.replace(INDEX_IMPORT, `${INDEX_IMPORT}\n${line}`);
-      } else {
-        // 라이브러리 CSS import 가 없으면 둘 다 마지막 import 뒤에 둔다
-        const imports = [...src.matchAll(/^import[^\n]*\n/gm)];
-        const at = imports.length
-          ? imports[imports.length - 1].index +
-            imports[imports.length - 1][0].length
-          : 0;
-        next = `${src.slice(0, at)}${INDEX_IMPORT}\n${line}\n${src.slice(at)}`;
-      }
-      writeFileSync(layout, next, "utf8");
-      console.log(`\n${shown} 에 import 를 넣었다.\n  ${line}`);
+      // 라이브러리 CSS import 가 없으면 둘 다 마지막 import 뒤에 둔다
+      const imports = [...src.matchAll(/^import[^\n]*\n/gm)];
+      const at = imports.length
+        ? imports[imports.length - 1].index +
+          imports[imports.length - 1][0].length
+        : 0;
+      layoutNext = `${src.slice(0, at)}${INDEX_IMPORT}\n${line}\n${src.slice(at)}`;
     }
   }
+}
+
+// ── 3. 쓴다 ────────────────────────────────────────────────────────────────────
+const existed = existsSync(out);
+try {
+  writeFileSync(out, css, "utf8");
+} catch (error) {
+  failFile(
+    `${out} 에 쓰지 못했다. 폴더가 있는지, 쓸 수 있는지 본다. 아무것도 바꾸지 않았다.`,
+    error,
+  );
+}
+if (layoutNext !== undefined) {
+  try {
+    writeFileSync(layout, layoutNext, "utf8");
+  } catch (error) {
+    // 2 에서 쓸 수 있음을 봤으니 그 사이에 바뀐 경우뿐이다. 테마 파일은 이미 썼다
+    failFile(
+      `${shown} 에 쓰지 못해 import 를 넣지 않았다. 테마 파일 ${out} 은 만들었다. 직접 넣는다: ${line}`,
+      error,
+    );
+  }
+}
+
+// ── 4. 알린다 — 한 일과 넣을 줄은 stdout, 하려다 못 한 일은 stderr(경고, exit 0) ──────────
+console.log(`✅ ${summary} → ${out}${existed ? " (덮어썼다)" : ""}`);
+for (const note of notes) console.log(note);
+if (noApply) {
+  // 넣지는 않되 경로는 정확히 — layout 이 하나면 그 파일 기준의 상대 경로다
+  console.log(
+    `\n루트 layout 에서 라이브러리 CSS 뒤에 불러온다${layout ? ` (${shown} 기준)` : ""}.\n  ${INDEX_IMPORT}\n  ${line}`,
+  );
+} else if (!layout) {
+  console.error(
+    layouts.length === 0
+      ? "\n루트 layout(app/layout.tsx · src/app/layout.tsx)을 찾지 못해 import 를 넣지 않았다. 직접 넣는다."
+      : `\n루트 layout 이 ${layouts.length}개라 어느 것인지 몰라 넣지 않았다 (${layouts.map((l) => relative(process.cwd(), l)).join(", ")}). 직접 넣는다.`,
+  );
+  console.error(`  ${INDEX_IMPORT}\n  ${line}`);
+} else if (layoutNext === undefined) {
+  console.log(`\n${shown} 에 import 가 이미 있다. 그대로 둔다.`);
+} else {
+  console.log(`\n${shown} 에 import 를 넣었다.\n  ${line}`);
 }
