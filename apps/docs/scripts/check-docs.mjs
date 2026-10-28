@@ -380,11 +380,11 @@ console.log("\n■ 문서가 적은 토큰 · 값 · export 가 생성물과 같
     icon: "Icon",
   };
   const exportsOf = (dir) => {
-    const UI_SRC = join(DOCS, "..", "..", "packages", "ui", "src");
+    const uiSrc = join(DOCS, "..", "..", "packages", "ui", "src");
     const file =
       typeof dir === "string"
-        ? join(UI_SRC, "components", dir, "index.ts")
-        : join(UI_SRC, dir.entry);
+        ? join(uiSrc, "components", dir, "index.ts")
+        : join(uiSrc, dir.entry);
     const src = read(file).replace(/export\s+type\s*\{[^}]*\}[^;]*;/g, ""); // 타입은 값이 아니다
     const names = new Set();
     for (const m of src.matchAll(/export\s*\{([^}]*)\}/g))

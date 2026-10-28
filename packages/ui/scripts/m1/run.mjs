@@ -25,6 +25,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { build } from "esbuild";
 import { chromium } from "playwright";
+import { onExitReceipt } from "../../../../.github/scripts/lib/script-kit.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const UI = resolve(HERE, "../..");
@@ -49,11 +50,15 @@ let cells = 0,
   skip = 0,
   pass = 0,
   fail = 0;
-process.on("exit", (code) =>
-  console.log(
-    `RECEIPT m1-harness mode=${SELF ? "self" : "cand"} cells=${cells} nodes=${nodes} hooks=${hookCount} skip=${skip} pass=${pass} fail=${fail} exit=${code}`,
-  ),
-);
+onExitReceipt("m1-harness", () => ({
+  mode: SELF ? "self" : "cand",
+  cells,
+  nodes,
+  hooks: hookCount,
+  skip,
+  pass,
+  fail,
+}));
 
 function baselineDir() {
   const d = join(CACHE, "base-0.2.0", "package");
@@ -160,7 +165,7 @@ const PROPS = [
   "opacity",
   "display",
 ];
-function measure(PROPS) {
+function measure(props) {
   const cellsOf = () => {
     const out = [];
     for (const el of document.querySelectorAll("[data-h]"))
@@ -177,7 +182,7 @@ function measure(PROPS) {
     const walk = (el, path) => {
       const cs = getComputedStyle(el);
       const v = {};
-      for (const p of PROPS) v[p] = cs.getPropertyValue(p);
+      for (const p of props) v[p] = cs.getPropertyValue(p);
       const cls = [...el.classList]
         .filter((c) => c.startsWith("nui-"))
         .join(".");
@@ -186,7 +191,7 @@ function measure(PROPS) {
         const ps = getComputedStyle(el, pe);
         if (ps.getPropertyValue("content") === "none") continue;
         const pv = {};
-        for (const p of PROPS) pv[p] = ps.getPropertyValue(p);
+        for (const p of props) pv[p] = ps.getPropertyValue(p);
         snap[`${key}/${path}${pe}`] = { tag: pe, cls, v: pv };
       }
       [...el.children].forEach((c, i) => walk(c, `${path}>${i}`));
@@ -237,18 +242,18 @@ async function open(browser, url, css = "", hash = "") {
 // 훅마다 발자국: 표식 값 둘(길이 · 수)을 :root 에 선언했을 때 바뀌는 (셀 · 노드 · 속성)
 async function footprints(page, hooks) {
   return page.evaluate(
-    async ({ hooks, PROPS, measureSrc }) => {
+    async ({ hooks, props, measureSrc }) => {
       const measure = new Function(`return (${measureSrc})`)();
       const st = document.getElementById("m1-consumer");
-      const base = measure(PROPS);
+      const base = measure(props);
       const res = {};
       for (const h of hooks) {
         const ch = new Set();
         for (const val of ["137px", "901"]) {
           st.textContent = `:root{${h}:${val}}`;
-          const s = measure(PROPS);
+          const s = measure(props);
           for (const k of Object.keys(base))
-            for (const p of PROPS)
+            for (const p of props)
               if (s[k] && s[k].v[p] !== base[k].v[p]) ch.add(`${k}#${p}`);
         }
         st.textContent = "";
@@ -256,7 +261,7 @@ async function footprints(page, hooks) {
       }
       return res;
     },
-    { hooks, PROPS, measureSrc: measure.toString() },
+    { hooks, props: PROPS, measureSrc: measure.toString() },
   );
 }
 

@@ -406,7 +406,7 @@ async function run(targets) {
     if (current !== t.page || t.opener) {
       try {
         await page.goto(BASE + t.page, { waitUntil: "networkidle" });
-      } catch (e) {
+      } catch {
         bad(`${t.label}: 페이지를 못 열었다 — ${t.page}`);
         continue;
       }
