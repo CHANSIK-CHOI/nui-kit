@@ -78,6 +78,7 @@ import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright";
+import { onExitReceipt } from "../../../.github/scripts/lib/script-kit.mjs";
 
 const BASE = `http://localhost:${process.env.PORT ?? 3000}`;
 const SELFTEST = process.argv.includes("--selftest");
@@ -323,14 +324,14 @@ const sections = {
   fixedPlacement: 0,
 };
 
-process.on("exit", (code) => {
-  console.log(
-    `RECEIPT check-menu-motion targets=${targetsSeen.size} checks=${checks} inPlace=${sections.inPlace} reduced=${sections.reduced} overflow=${sections.overflow} portalTrack=${sections.portalTrack} fixedPlacement=${sections.fixedPlacement} failures=${failures}` +
-      (SELFTEST ? ` detected=${detected}` : "") +
-      ` scope=${SCOPE ? [...SCOPE].join(",") : "all"}` +
-      ` exit=${code}`,
-  );
-});
+onExitReceipt("check-menu-motion", () => ({
+  targets: targetsSeen.size,
+  checks,
+  ...sections,
+  failures,
+  ...(SELFTEST ? { detected } : {}),
+  scope: SCOPE ? [...SCOPE].join(",") : "all",
+}));
 
 function expect(pass, label, detail) {
   checks += 1;
@@ -800,14 +801,14 @@ async function run() {
       const midPointer = await rm.evaluate(() => window.__nuiMidPointer);
       // 문턱은 `EXIT_MS × ⅔`(100ms) — 예전 `duration: 0` 은 7~21ms 에 DOM 을 뺐고, 150ms 페이드는
       // 그보다 빨리 빠질 수 없다. 둘 사이가 넓어 부하에 흔들리지 않는다.
-      const REDUCED_EXIT_MIN = Math.round((EXIT_MS * 2) / 3);
-      const fades = exitMs !== null && exitMs >= REDUCED_EXIT_MIN;
+      const reducedExitMin = Math.round((EXIT_MS * 2) / 3);
+      const fades = exitMs !== null && exitMs >= reducedExitMin;
       expect(
         fades === E.reducedExitFades,
         `${t.label} 모션 감소 — 퇴장이 페이드로 걸린다 (${exitMs === null ? "-" : exitMs.toFixed(0)}ms)`,
         exitMs === null
           ? `${EXIT_MS + 300}ms 가 지나도 DOM 에 남아 있다`
-          : `${exitMs.toFixed(0)}ms — ${REDUCED_EXIT_MIN}ms 이상이어야 한다 (0 이 아니다)`,
+          : `${exitMs.toFixed(0)}ms — ${reducedExitMin}ms 이상이어야 한다 (0 이 아니다)`,
       );
       // 퇴장 중 포인터 차단 — 모션 감소에서도 페이드 150ms 동안 옵션 · 날짜가 눌리면 안 된다
       const blocked = midPointer === "none";

@@ -18,6 +18,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { onExitReceipt } from "../../../../.github/scripts/lib/script-kit.mjs";
 import { generate, themeFileName } from "./generate.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -27,12 +28,7 @@ const DIR = join(ROOT, "styles", "themes");
 const SELF_TEST = process.argv.includes("--self-test");
 const receipt = { files: 0, values: 0, selectors: 0, decls: 0, problems: 0 };
 // 자기 시험은 자기 영수증을 찍는다 — 본 검사의 영수증이 겹쳐 찍히면 어느 쪽 수인지 모른다
-if (!SELF_TEST)
-  process.on("exit", (code) =>
-    console.log(
-      `RECEIPT verify-themes files=${receipt.files} values=${receipt.values} selectors=${receipt.selectors} decls=${receipt.decls} problems=${receipt.problems} exit=${code}`,
-    ),
-  );
+if (!SELF_TEST) onExitReceipt("verify-themes", () => receipt);
 
 const ALLOWED_SELECTORS = new Set([
   ":root",
@@ -100,17 +96,17 @@ export function checkValues(file, css, hex) {
 
 /** 검출력 시험 — 합성 사례 다섯 (rules/scripts.md §4). */
 function selfTest() {
-  const HEAD = "/* @nui-kit/react@0.0.0 — 시험 */\n";
-  const ok = `${HEAD}:root{--nui-color-brand-1: #fff;}\n@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--nui-color-brand-1: #000;}}\n:root[data-theme="dark"]{--nui-color-brand-1: #000;}\n`;
+  const head = "/* @nui-kit/react@0.0.0 — 시험 */\n";
+  const ok = `${head}:root{--nui-color-brand-1: #fff;}\n@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--nui-color-brand-1: #000;}}\n:root[data-theme="dark"]{--nui-color-brand-1: #000;}\n`;
   const cases = [
     [
       "위반 1 · @layer 안",
-      `${HEAD}@layer nui.tokens{:root{--nui-color-brand-1: #fff;}}`,
+      `${head}@layer nui.tokens{:root{--nui-color-brand-1: #fff;}}`,
       2,
     ],
     [
       "위반 2 · 클래스 셀렉터 · 색 아닌 선언",
-      `${HEAD}:root{--nui-color-brand-1: #fff;}.foo{--nui-space-1: 4px;}`,
+      `${head}:root{--nui-color-brand-1: #fff;}.foo{--nui-space-1: 4px;}`,
       2,
     ],
     ["통과 1 · 최소 파일", ok, 0],

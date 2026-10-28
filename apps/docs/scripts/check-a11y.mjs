@@ -1040,14 +1040,14 @@ const SELECTION_PROBE = ({ tones, states }) => {
   document.body.appendChild(host);
 
   // [이름, 블록 클래스, 표시 클래스, 표시의 색이 실린 속성]
-  const KINDS = [
+  const kinds = [
     ["Checkbox", "nui-checkbox", "nui-checkbox__indicator", "borderRightColor"],
     ["Radio", "nui-radio", "nui-radio__indicator", "backgroundColor"],
     ["Switch", "nui-switch", "nui-switch__thumb", "backgroundColor"],
   ];
 
   const rows = [];
-  for (const [kind, blockClass, markClass, markProp] of KINDS) {
+  for (const [kind, blockClass, markClass, markProp] of kinds) {
     for (const [tone, toneMod] of tones) {
       for (const [state, stateClass, inputAttr] of states) {
         host.innerHTML =
@@ -1572,12 +1572,12 @@ const TOUCH_TARGETS = [
       };
       // 중심에서 한 방향으로 히트가 이어지는 길이. 뷰포트 끝까지 본다.
       // 요소가 0.5px 좌표에 놓일 수 있어 반 픽셀씩 나간다 — 정수로 나가면 1px 더 센다.
-      const STEP = 0.5;
+      const step = 0.5;
       const limit = Math.max(window.innerWidth, window.innerHeight);
       const extent = (dx, dy) => {
         let d = 0;
-        while (d < limit && hits(cx + dx * (d + STEP), cy + dy * (d + STEP)))
-          d += STEP;
+        while (d < limit && hits(cx + dx * (d + step), cy + dy * (d + step)))
+          d += step;
         return d;
       };
       return {
