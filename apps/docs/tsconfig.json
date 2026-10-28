@@ -5,7 +5,6 @@
     "allowJs": true,
     "incremental": true,
     "verbatimModuleSyntax": false,
-    "noUnusedLocals": false,
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./src/*"]

@@ -1,9 +1,8 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Button, ButtonGroup, Field } from "@nui-kit/react";
+import { Button, ButtonGroup, Field, type DateRange } from "@nui-kit/react";
 import { RHFDateRangePicker } from "@nui-kit/react/rhf";
-import type { DateRange } from "react-day-picker";
 import { Example } from "@/components/guide";
 
 type FormValues = { stay: DateRange | undefined };
