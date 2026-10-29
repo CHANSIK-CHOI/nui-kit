@@ -10,6 +10,7 @@ export { default as LayerPopup } from "./LayerPopup.js";
 export { default as BottomSheet } from "./BottomSheet.js";
 export { default as FullPopup } from "./FullPopup.js";
 export { default as PopupHost } from "./PopupHost.js";
+export type { PopupHostProps } from "./PopupHost.js";
 
 export { default as useAlert } from "./useAlert.js";
 export { default as useConfirm } from "./useConfirm.js";
