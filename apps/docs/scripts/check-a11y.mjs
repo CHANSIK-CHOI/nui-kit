@@ -40,6 +40,7 @@ function fontTooSmall(px, min = FONT_MIN_PX) {
  * 1-b 의 판정 — 움직임 줄이기에서 스피너는 회전 대신 투명도가 1초 안팎으로 옅어졌다 짙어진다
  * (design.md MO16 (2026-11-19)). 「1초 안팎」은 한 번 옅어졌다 다시 짙어지는 한 바퀴다 —
  * 한 바퀴 = duration × (direction 이 alternate 꼴이면 2, 아니면 1).
+ * opacity 가 주기 안에서 실제로 바뀌어야 한다(최소 폭은 아직 정하지 않음).
  * 받는 것은 computed animation 목록 `[{ name, durationS, direction, frames }, …]` 이고
  * frames 는 그 이름의 @keyframes cssText(못 찾으면 null). 위반 까닭 문자열 또는 null.
  */
@@ -50,8 +51,19 @@ function spinnerCycleS({ durationS, direction }) {
   return /^alternate/.test(direction) ? durationS * 2 : durationS;
 }
 
-/** keyframes 의 처음(0% · from)과 끝(100% · to) opacity. 선택자가 `0%, 100%` 처럼 여럿이어도 읽는다 */
+/** keyframes 의 처음(0% · from)과 끝(100% · to) opacity */
 function keyframeEdgeOpacity(frames) {
+  const byOffset = keyframeOpacityByOffset(frames);
+  return { start: byOffset.get("0%"), end: byOffset.get("100%") };
+}
+
+/** keyframes 의 프레임별 opacity 값 전부(처음 · 끝의 기본값 1 포함) */
+function keyframeOpacities(frames) {
+  return [...keyframeOpacityByOffset(frames).values()];
+}
+
+/** 프레임 위치(`0%` · `50%` · `100%` …) → opacity. 선택자가 `0%, 100%` 처럼 여럿이어도 읽는다 */
+function keyframeOpacityByOffset(frames) {
   const byOffset = new Map();
   const body = frames.replace(/^[^{]*\{/, "").replace(/\}\s*$/, "");
   for (const [, selector, block] of body.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
@@ -63,7 +75,9 @@ function keyframeEdgeOpacity(frames) {
     }
   }
   // 처음이나 끝 프레임에 opacity 가 없으면 요소 기본값 1 로 친다(스피너에 opacity 를 따로 주지 않는다는 가정)
-  return { start: byOffset.get("0%") ?? 1, end: byOffset.get("100%") ?? 1 };
+  if (!byOffset.has("0%")) byOffset.set("0%", 1);
+  if (!byOffset.has("100%")) byOffset.set("100%", 1);
+  return byOffset;
 }
 
 /** animation 하나의 위반 까닭 또는 null */
@@ -72,6 +86,10 @@ function oneSpinnerAnimationProblem(animation) {
   if (frames == null) return `keyframes '${name}' 을 못 찾았다`;
   if (/rotate|transform/.test(frames)) return "reduce 인데 회전이 남았다";
   if (!/opacity/.test(frames)) return "투명도 애니메이션이 없다";
+  const opacities = keyframeOpacities(frames);
+  const isOpacityFixed = Math.min(...opacities) === Math.max(...opacities);
+  if (isOpacityFixed)
+    return `투명도가 바뀌지 않는다(늘 ${opacities[0]}) — 흐려지지 않는다`;
   const cycleS = spinnerCycleS(animation);
   if (
     cycleS < SPINNER_REDUCE_PERIOD_S.min ||
@@ -107,6 +125,9 @@ if (process.argv.includes("--selftest")) {
     "@keyframes nui-spin-fade { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }";
   const framesRotate =
     "@keyframes nui-spin { 100% { transform: rotate(360deg); } }";
+  // Flat — opacity 글자는 있지만 늘 1 이라 흐려지지 않는다
+  const framesFlat =
+    "@keyframes nui-spin-fade { 0% { opacity: 1; } 100% { opacity: 1; } }";
   const isSpinnerHit = (animations) => spinnerReduceProblem(animations) != null;
   const cases = [
     ["위반 글자 11px", () => fontTooSmall(11), true],
@@ -262,6 +283,45 @@ if (process.argv.includes("--selftest")) {
           },
         ]),
       false,
+    ],
+    [
+      "위반 스피너 opacity 늘 1 (처음 = 끝), 1s normal",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 1,
+            direction: "normal",
+            frames: framesFlat,
+          },
+        ]),
+      true,
+    ],
+    [
+      "위반 스피너 opacity 늘 1, 0.5s alternate",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 0.5,
+            direction: "alternate",
+            frames: framesFlat,
+          },
+        ]),
+      true,
+    ],
+    [
+      "위반 스피너 opacity 한 프레임 1 뿐(처음, 끝은 기본값 1)",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 1,
+            direction: "normal",
+            frames: "@keyframes nui-spin-fade { 50% { opacity: 1; } }",
+          },
+        ]),
+      true,
     ],
   ];
   let failed = 0;

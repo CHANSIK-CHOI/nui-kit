@@ -318,11 +318,55 @@ function layoutTransitions(code) {
 
 /**
  * 6-j) `infinite` 반복은 스피너 keyframes 만 (design.md MO1 — 2초 넘게 이어지는 움직임은 없다, 예외 스피너).
- * `animation:` 단축이면 그 값에, `animation-iteration-count:` 롱핸드면 그 선언이 든 블록에
- * `kf("spin")` 또는 `kf("spin-<낱말>")` 이 있어야 한다. `toast-spin` · `spinner` 처럼 spin 이 머리가 아닌 이름은 안 된다.
+ * 항목마다 따로 본다 — infinite 인 항목은 모두 spin keyframes(`kf("spin")` · `kf("spin-<낱말>")`)여야 한다.
+ * 롱핸드는 같은 블록의 `animation-name` 과 `animation-iteration-count` 를 i % 길이로 짝짓는다.
+ * `toast-spin` · `spinner` 처럼 spin 이 머리가 아닌 이름은 안 된다.
  * 보간 `#{…}` 은 6-b 처럼 `«…»` 로 평탄화해 블록 경계로 잡히지 않게 한다. 주석은 걷은 code 를 받는다.
  */
 const SPIN_KEYFRAMES = /kf\(\s*"spin(-[a-z0-9-]+)?"\s*\)/;
+const INFINITE = /\binfinite\b/;
+
+/** 쉼표 목록을 최상위 쉼표로만 나눈다 — 괄호(`cubic-bezier(0.4, 0, 0.2, 1)`)와 보간(«…») 안 쉼표는 경계가 아니다 */
+function splitTopLevelList(value) {
+  const items = [];
+  let depth = 0;
+  let current = "";
+  for (const ch of value) {
+    if (ch === "(" || ch === "«") depth += 1;
+    if (ch === ")" || ch === "»") depth -= 1;
+    if (ch === "," && depth === 0) {
+      items.push(current);
+      current = "";
+    } else current += ch;
+  }
+  items.push(current);
+  return items.map((s) => s.trim()).filter(Boolean);
+}
+
+/** `animation:` 단축 — infinite 가 든 항목에 spin keyframes 가 없으면 true */
+function hasNonSpinInfiniteItem(value) {
+  return splitTopLevelList(value).some(
+    (item) => INFINITE.test(item) && !SPIN_KEYFRAMES.test(item),
+  );
+}
+
+/**
+ * `animation-iteration-count:` 롱핸드 — 블록의 `animation-name`(없으면 `animation:` 단축의 항목)과 짝지어
+ * count 가 infinite 인 이름이 spin 이 아니면 true. 짝지을 이름이 없으면 스피너임을 보일 수 없어 true.
+ */
+function hasNonSpinInfiniteName(countValue, block) {
+  const declared =
+    /(?<![a-z-])animation-name\s*:([^;{}]*)/.exec(block) ??
+    /(?<![a-z-])animation\s*:([^;{}]*)/.exec(block);
+  if (!declared) return true;
+  const names = splitTopLevelList(declared[1]);
+  const counts = splitTopLevelList(countValue);
+  return names.some(
+    (name, i) =>
+      INFINITE.test(counts[i % counts.length]) && !SPIN_KEYFRAMES.test(name),
+  );
+}
+
 function infiniteProblems(code) {
   const flat = code.replace(/#\{([^{}]*)\}/g, "«$1»");
   const out = [];
@@ -330,23 +374,22 @@ function infiniteProblems(code) {
     /(?<![a-z-])(animation-iteration-count|animation)\s*:([^;{}]*)/g,
   )) {
     const value = m[2];
-    if (!/\binfinite\b/.test(value)) continue;
-    const scope =
+    if (!INFINITE.test(value)) continue;
+    const blockEnd = flat.indexOf("}", m.index);
+    const block = flat.slice(
+      flat.lastIndexOf("{", m.index) + 1,
+      blockEnd === -1 ? flat.length : blockEnd,
+    );
+    const isBad =
       m[1] === "animation"
-        ? value
-        : flat.slice(
-            flat.lastIndexOf("{", m.index) + 1,
-            flat.indexOf("}", m.index) === -1
-              ? flat.length
-              : flat.indexOf("}", m.index),
-          );
-    if (!SPIN_KEYFRAMES.test(scope))
-      out.push(value.replace(/\s+/g, " ").trim());
+        ? hasNonSpinInfiniteItem(value)
+        : hasNonSpinInfiniteName(value, block);
+    if (isBad) out.push(value.replace(/\s+/g, " ").trim());
   }
   return out;
 }
 
-// 검출력 시험 — `--selftest` (scripts.md §4). 위반 7 · 함정 4 · 통과 9 (20 사례). 하나라도 어긋나면 exit 1.
+// 검출력 시험 — `--selftest` (scripts.md §4). 위반 9 · 함정 5 · 통과 11 (25 사례). 하나라도 어긋나면 exit 1.
 // 사례 꼴 [label, fn, input, want] — want 는 검출 수(배열이면 길이, 문자열이면 1, null 이면 0).
 if (process.argv.includes("--selftest")) {
   const cases = [
@@ -446,6 +489,36 @@ if (process.argv.includes("--selftest")) {
       "통과 spin 여러 줄",
       infiniteProblems,
       'a {\n  animation: #{kf("spin")}\n    1s linear infinite;\n}',
+      0,
+    ],
+    [
+      "위반 목록 둘 — spin 옆 pulse infinite",
+      infiniteProblems,
+      'a { animation: #{kf("spin")} 1s linear infinite, #{kf("pulse")} 2s ease infinite; }',
+      1,
+    ],
+    [
+      "위반 롱핸드 목록 — 이름 둘, infinite 하나가 되풀이돼 둘 다에 걸림",
+      infiniteProblems,
+      'a { animation-name: #{kf("spin")}, #{kf("pulse")}; animation-iteration-count: infinite; }',
+      1,
+    ],
+    [
+      "통과 목록 둘 — spin 만 infinite, fade-in 은 한 번",
+      infiniteProblems,
+      'a { animation: #{kf("spin")} 1s linear infinite, #{kf("fade-in")} 0.2s ease; }',
+      0,
+    ],
+    [
+      "통과 롱핸드 목록 — infinite 는 spin 짝, pulse 는 1",
+      infiniteProblems,
+      'a { animation-name: #{kf("spin")}, #{kf("pulse")}; animation-iteration-count: infinite, 1; }',
+      0,
+    ],
+    [
+      "함정 cubic-bezier 안 쉼표는 목록 경계가 아님",
+      infiniteProblems,
+      'a { animation: #{kf("spin-fade")} 0.5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate; }',
       0,
     ],
   ];
