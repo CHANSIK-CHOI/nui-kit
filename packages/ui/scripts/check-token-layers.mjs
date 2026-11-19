@@ -439,7 +439,7 @@ if (process.argv.includes("--selftest")) {
     [
       "통과 spin-fade (MO16 페이드 꼴)",
       infiniteProblems,
-      'a { animation: #{kf("spin-fade")} 1s ease-in-out infinite alternate; }',
+      'a { animation: #{kf("spin-fade")} 0.5s ease-in-out infinite alternate; }',
       0,
     ],
     [

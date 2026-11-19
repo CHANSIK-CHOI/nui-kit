@@ -38,28 +38,76 @@ function fontTooSmall(px, min = FONT_MIN_PX) {
 
 /**
  * 1-b 의 판정 — 움직임 줄이기에서 스피너는 회전 대신 투명도가 1초 안팎으로 옅어졌다 짙어진다
- * (design.md MO16 (2026-11-19)). frames 는 그 animation-name 의 @keyframes cssText(못 찾으면 null).
- * 위반 까닭 문자열 또는 null.
+ * (design.md MO16 (2026-11-19)). 「1초 안팎」은 한 번 옅어졌다 다시 짙어지는 한 바퀴다 —
+ * 한 바퀴 = duration × (direction 이 alternate 꼴이면 2, 아니면 1).
+ * 받는 것은 computed animation 목록 `[{ name, durationS, direction, frames }, …]` 이고
+ * frames 는 그 이름의 @keyframes cssText(못 찾으면 null). 위반 까닭 문자열 또는 null.
  */
 const SPINNER_REDUCE_PERIOD_S = { min: 0.5, max: 1.5 };
-function spinnerReduceProblem({ name, durationS, frames }) {
-  if (name === "none")
-    return "멈춤만이다 — MO16 은 회전 대신 투명도 애니메이션";
+
+/** 한 바퀴(초) — alternate 꼴이면 갔다 오는 데 duration 두 번이 든다 */
+function spinnerCycleS({ durationS, direction }) {
+  return /^alternate/.test(direction) ? durationS * 2 : durationS;
+}
+
+/** keyframes 의 처음(0% · from)과 끝(100% · to) opacity. 선택자가 `0%, 100%` 처럼 여럿이어도 읽는다 */
+function keyframeEdgeOpacity(frames) {
+  const byOffset = new Map();
+  const body = frames.replace(/^[^{]*\{/, "").replace(/\}\s*$/, "");
+  for (const [, selector, block] of body.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const opacity = /opacity\s*:\s*([0-9.]+)/.exec(block);
+    if (!opacity) continue;
+    for (const raw of selector.split(",")) {
+      const key = { from: "0%", to: "100%" }[raw.trim()] ?? raw.trim();
+      byOffset.set(key, parseFloat(opacity[1]));
+    }
+  }
+  // 처음이나 끝 프레임에 opacity 가 없으면 요소 기본값 1 로 친다(스피너에 opacity 를 따로 주지 않는다는 가정)
+  return { start: byOffset.get("0%") ?? 1, end: byOffset.get("100%") ?? 1 };
+}
+
+/** animation 하나의 위반 까닭 또는 null */
+function oneSpinnerAnimationProblem(animation) {
+  const { name, frames, direction } = animation;
   if (frames == null) return `keyframes '${name}' 을 못 찾았다`;
   if (/rotate|transform/.test(frames)) return "reduce 인데 회전이 남았다";
   if (!/opacity/.test(frames)) return "투명도 애니메이션이 없다";
+  const cycleS = spinnerCycleS(animation);
   if (
-    durationS < SPINNER_REDUCE_PERIOD_S.min ||
-    SPINNER_REDUCE_PERIOD_S.max < durationS
+    cycleS < SPINNER_REDUCE_PERIOD_S.min ||
+    SPINNER_REDUCE_PERIOD_S.max < cycleS
   )
-    return `주기 ${durationS}s — 1초 안팎(0.5~1.5s)이 아니다`;
+    return `한 바퀴 ${cycleS}s — 1초 안팎(0.5~1.5s)이 아니다`;
+  if (/^alternate/.test(direction)) return null;
+  const { start, end } = keyframeEdgeOpacity(frames);
+  return start === end
+    ? null
+    : `처음과 끝 opacity 가 다르다(${start} → ${end}) — 짙어지지 않고 툭 되돌아간다`;
+}
+
+function spinnerReduceProblem(animations) {
+  const running = [...animations.entries()].filter(
+    ([, a]) => a.name !== "none",
+  );
+  if (running.length === 0)
+    return "멈춤만이다 — MO16 은 회전 대신 투명도 애니메이션";
+  for (const [i, animation] of running) {
+    const why = oneSpinnerAnimationProblem(animation);
+    if (why) return `${i + 1}번째 animation '${animation.name}': ${why}`;
+  }
   return null;
 }
 
 // 검출력 시험 — `--selftest` (scripts.md §4). dev 서버 없이 돈다 — BASE 접속 확인 앞에 둔다.
 if (process.argv.includes("--selftest")) {
-  const spinFadeFrames =
+  // A — 옅어지기만 한다(처음 1 · 끝 0.4) · B — 옅어졌다 다시 짙어진다(처음 1 · 끝 1)
+  const framesA =
     "@keyframes nui-spin-fade { 0% { opacity: 1; } 100% { opacity: 0.4; } }";
+  const framesB =
+    "@keyframes nui-spin-fade { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }";
+  const framesRotate =
+    "@keyframes nui-spin { 100% { transform: rotate(360deg); } }";
+  const isSpinnerHit = (animations) => spinnerReduceProblem(animations) != null;
   const cases = [
     ["위반 글자 11px", () => fontTooSmall(11), true],
     [
@@ -72,49 +120,147 @@ if (process.argv.includes("--selftest")) {
     [
       "위반 스피너 reduce 에서 rotate 남음",
       () =>
-        spinnerReduceProblem({
-          name: "nui-spin",
-          durationS: 1,
-          frames: "@keyframes nui-spin { 100% { transform: rotate(360deg); } }",
-        }) != null,
+        isSpinnerHit([
+          {
+            name: "nui-spin",
+            durationS: 1,
+            direction: "normal",
+            frames: framesRotate,
+          },
+        ]),
       true,
     ],
     [
       "위반 스피너 멈춤만 (animation: none)",
       () =>
-        spinnerReduceProblem({ name: "none", durationS: 0, frames: null }) !=
-        null,
+        isSpinnerHit([
+          { name: "none", durationS: 0, direction: "normal", frames: null },
+        ]),
       true,
     ],
     [
       "함정 스피너 투명도와 회전이 같이",
       () =>
-        spinnerReduceProblem({
-          name: "nui-spin-fade",
-          durationS: 1,
-          frames:
-            "@keyframes nui-spin-fade { 0% { opacity: 1; transform: rotate(0deg); } 100% { opacity: 0.4; transform: rotate(360deg); } }",
-        }) != null,
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 1,
+            direction: "normal",
+            frames:
+              "@keyframes nui-spin-fade { 0% { opacity: 1; transform: rotate(0deg); } 100% { opacity: 0.4; transform: rotate(360deg); } }",
+          },
+        ]),
       true,
     ],
     [
       "위반 스피너 주기 3s",
       () =>
-        spinnerReduceProblem({
-          name: "nui-spin-fade",
-          durationS: 3,
-          frames: spinFadeFrames,
-        }) != null,
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 3,
+            direction: "normal",
+            frames: framesA,
+          },
+        ]),
       true,
     ],
     [
-      "통과 스피너 투명도 1s",
+      "위반 스피너 1s normal, 처음과 끝 opacity 다름(툭 되돌아감)",
       () =>
-        spinnerReduceProblem({
-          name: "nui-spin-fade",
-          durationS: 1,
-          frames: spinFadeFrames,
-        }) != null,
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 1,
+            direction: "normal",
+            frames: framesA,
+          },
+        ]),
+      true,
+    ],
+    [
+      "위반 스피너 1s alternate (한 바퀴 2s)",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 1,
+            direction: "alternate",
+            frames: framesA,
+          },
+        ]),
+      true,
+    ],
+    [
+      "위반 스피너 1.5s alternate (한 바퀴 3s)",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 1.5,
+            direction: "alternate",
+            frames: framesA,
+          },
+        ]),
+      true,
+    ],
+    [
+      "위반 스피너 목록 둘 — 첫째는 페이드, 둘째가 돈다",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 0.5,
+            direction: "alternate",
+            frames: framesA,
+          },
+          {
+            name: "nui-spin",
+            durationS: 1,
+            direction: "normal",
+            frames: framesRotate,
+          },
+        ]),
+      true,
+    ],
+    [
+      "통과 스피너 0.5s alternate (한 바퀴 1s)",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 0.5,
+            direction: "alternate",
+            frames: framesA,
+          },
+        ]),
+      false,
+    ],
+    [
+      "통과 스피너 1s normal, 옅어졌다 짙어짐(처음 = 끝)",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 1,
+            direction: "normal",
+            frames: framesB,
+          },
+        ]),
+      false,
+    ],
+    [
+      "함정 스피너 선택자 여럿(0%, 100%) 1s normal",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 1,
+            direction: "normal",
+            frames:
+              "@keyframes nui-spin-fade { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }",
+          },
+        ]),
       false,
     ],
   ];
@@ -224,6 +370,7 @@ for (const [label, url, open, panel] of [
 
 // 1-b) 로딩 스피너 — 회전 duration 이 스케일 밖(1s 고정)이라 1ms 무력화를 타지 않는다.
 //      움직임 줄이기에서는 회전 대신 투명도가 1초 안팎으로 옅어졌다 짙어진다 — design.md MO16 (2026-11-19).
+//      한 바퀴 = duration × (alternate 면 2). computed animation 목록을 전부 본다.
 //      판정은 위 spinnerReduceProblem() 과 --selftest.
 if (!inScope("/components/button")) skipped("Button 로딩 스피너");
 else {
@@ -237,14 +384,24 @@ else {
   if ((await spinner.count()) === 0) {
     bad("Button 로딩 스피너: 요소를 찾지 못했다 (.nui-icon--spin)");
   } else {
-    const seen = await spinner.evaluate((el) => {
+    const animations = await spinner.evaluate((el) => {
       const cs = getComputedStyle(el);
-      const name = cs.animationName.split(",")[0].trim();
-      const first = cs.animationDuration.split(",")[0].trim();
-      const durationS = first.endsWith("ms")
-        ? parseFloat(first) / 1000
-        : parseFloat(first);
-      let frames = null;
+      const list = (value) => value.split(",").map((s) => s.trim());
+      const names = list(cs.animationName);
+      const durations = list(cs.animationDuration);
+      const directions = list(cs.animationDirection);
+      const toSeconds = (t) =>
+        t.endsWith("ms") ? parseFloat(t) / 1000 : parseFloat(t);
+      // 이름의 keyframes cssText — 같은 이름이 여럿이면 처음 찾은 것
+      const framesByName = new Map();
+      const walk = (rules) => {
+        for (const rule of rules) {
+          if (rule instanceof CSSKeyframesRule) {
+            if (names.includes(rule.name) && !framesByName.has(rule.name))
+              framesByName.set(rule.name, rule.cssText);
+          } else if (rule.cssRules) walk(rule.cssRules); // @layer · @media 안
+        }
+      };
       for (const sheet of document.styleSheets) {
         let rules;
         try {
@@ -252,24 +409,26 @@ else {
         } catch {
           continue;
         }
-        const walk = (list) => {
-          for (const rule of list) {
-            if (frames) return;
-            if (rule instanceof CSSKeyframesRule && rule.name === name)
-              frames = rule.cssText;
-            else if (rule.cssRules) walk(rule.cssRules); // @layer · @media 안
-          }
-        };
         walk(rules);
-        if (frames) break;
       }
-      return { name, durationS, frames };
+      // CSS 규칙대로 duration · direction 목록이 짧으면 처음부터 되풀이해 짝짓는다
+      return names.map((name, i) => ({
+        name,
+        durationS: toSeconds(durations[i % durations.length]),
+        direction: directions[i % directions.length],
+        frames: framesByName.get(name) ?? null,
+      }));
     });
-    const problem = spinnerReduceProblem(seen);
+    const problem = spinnerReduceProblem(animations);
+    const names = animations.map((a) => a.name).join(", ");
+    const cycles = animations
+      .filter((a) => a.name !== "none")
+      .map((a) => `${spinnerCycleS(a)}s`)
+      .join(", ");
     problem
-      ? bad(`Button 로딩 스피너: ${problem} (animation-name: ${seen.name})`)
+      ? bad(`Button 로딩 스피너: ${problem} (animation-name: ${names})`)
       : ok(
-          `Button 로딩 스피너 — reduce 에서 회전 없이 투명도 ${seen.durationS}s`,
+          `Button 로딩 스피너 — reduce 에서 회전 없이 투명도 · 한 바퀴 ${cycles}`,
         );
   }
   await ctx.close();
