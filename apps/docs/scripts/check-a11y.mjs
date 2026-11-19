@@ -22,10 +22,116 @@
  * 3. 터치 영역 — 누를 수 있는 것의 히트 영역 실측 (a11y.md §8)
  *    박스가 아니라 `elementFromPoint` 로 실제 눌리는 범위를 잰다.
  *    24px 미만은 실패, 44px 미만은 경고. 이유가 적힌 예외는 통과.
+ * 4. 글자 최소 12px — `.nui-*` 의 직접 텍스트 (design.md TY5)
  *
  * 사용: dev server 기동 후  node scripts/check-a11y.mjs [baseUrl]
+ *       node scripts/check-a11y.mjs --selftest   검출력 시험(dev 서버 없이)
  */
 import { chromium } from "playwright";
+
+// 글자 최소 — design.md TY5 (2026-11-19) — 12px 은 칩과 배지 자리.
+// 12px 의 자리 판정(칩, 배지)은 안 본다 — 자리 목록이 생기면 더한다.
+const FONT_MIN_PX = 12;
+function fontTooSmall(px, min = FONT_MIN_PX) {
+  return px < min;
+}
+
+/**
+ * 1-b 의 판정 — 움직임 줄이기에서 스피너는 회전 대신 투명도가 1초 안팎으로 옅어졌다 짙어진다
+ * (design.md MO16 (2026-11-19)). frames 는 그 animation-name 의 @keyframes cssText(못 찾으면 null).
+ * 위반 까닭 문자열 또는 null.
+ */
+const SPINNER_REDUCE_PERIOD_S = { min: 0.5, max: 1.5 };
+function spinnerReduceProblem({ name, durationS, frames }) {
+  if (name === "none")
+    return "멈춤만이다 — MO16 은 회전 대신 투명도 애니메이션";
+  if (frames == null) return `keyframes '${name}' 을 못 찾았다`;
+  if (/rotate|transform/.test(frames)) return "reduce 인데 회전이 남았다";
+  if (!/opacity/.test(frames)) return "투명도 애니메이션이 없다";
+  if (
+    durationS < SPINNER_REDUCE_PERIOD_S.min ||
+    SPINNER_REDUCE_PERIOD_S.max < durationS
+  )
+    return `주기 ${durationS}s — 1초 안팎(0.5~1.5s)이 아니다`;
+  return null;
+}
+
+// 검출력 시험 — `--selftest` (scripts.md §4). dev 서버 없이 돈다 — BASE 접속 확인 앞에 둔다.
+if (process.argv.includes("--selftest")) {
+  const spinFadeFrames =
+    "@keyframes nui-spin-fade { 0% { opacity: 1; } 100% { opacity: 0.4; } }";
+  const cases = [
+    ["위반 글자 11px", () => fontTooSmall(11), true],
+    [
+      "함정 글자 11.5px (반올림하면 12 로 보인다)",
+      () => fontTooSmall(11.5),
+      true,
+    ],
+    ["통과 글자 12px (칩, 배지)", () => fontTooSmall(12), false],
+    ["통과 글자 13px", () => fontTooSmall(13), false],
+    [
+      "위반 스피너 reduce 에서 rotate 남음",
+      () =>
+        spinnerReduceProblem({
+          name: "nui-spin",
+          durationS: 1,
+          frames: "@keyframes nui-spin { 100% { transform: rotate(360deg); } }",
+        }) != null,
+      true,
+    ],
+    [
+      "위반 스피너 멈춤만 (animation: none)",
+      () =>
+        spinnerReduceProblem({ name: "none", durationS: 0, frames: null }) !=
+        null,
+      true,
+    ],
+    [
+      "함정 스피너 투명도와 회전이 같이",
+      () =>
+        spinnerReduceProblem({
+          name: "nui-spin-fade",
+          durationS: 1,
+          frames:
+            "@keyframes nui-spin-fade { 0% { opacity: 1; transform: rotate(0deg); } 100% { opacity: 0.4; transform: rotate(360deg); } }",
+        }) != null,
+      true,
+    ],
+    [
+      "위반 스피너 주기 3s",
+      () =>
+        spinnerReduceProblem({
+          name: "nui-spin-fade",
+          durationS: 3,
+          frames: spinFadeFrames,
+        }) != null,
+      true,
+    ],
+    [
+      "통과 스피너 투명도 1s",
+      () =>
+        spinnerReduceProblem({
+          name: "nui-spin-fade",
+          durationS: 1,
+          frames: spinFadeFrames,
+        }) != null,
+      false,
+    ],
+  ];
+  let failed = 0;
+  for (const [label, run, want] of cases) {
+    const got = run();
+    const isOk = got === want;
+    if (!isOk) failed += 1;
+    console.log(
+      `  ${isOk ? "✅" : "❌"} ${label} — 검출 ${got ? 1 : 0} (기대 ${want ? 1 : 0})`,
+    );
+  }
+  console.log(
+    `RECEIPT check-a11y selftest cases=${cases.length} failed=${failed} exit=${failed ? 1 : 0}`,
+  );
+  process.exit(failed ? 1 : 0);
+}
 
 const BASE =
   process.argv.slice(2).find((a) => !a.startsWith("--")) ??
@@ -117,7 +223,8 @@ for (const [label, url, open, panel] of [
 }
 
 // 1-b) 로딩 스피너 — 회전 duration 이 스케일 밖(1s 고정)이라 1ms 무력화를 타지 않는다.
-//      `animation: none` 으로 직접 멈춰야 한다 (a11y.md §6 · Button.md spec §7).
+//      움직임 줄이기에서는 회전 대신 투명도가 1초 안팎으로 옅어졌다 짙어진다 — design.md MO16 (2026-11-19).
+//      판정은 위 spinnerReduceProblem() 과 --selftest.
 if (!inScope("/components/button")) skipped("Button 로딩 스피너");
 else {
   const ctx = await browser.newContext({
@@ -130,12 +237,40 @@ else {
   if ((await spinner.count()) === 0) {
     bad("Button 로딩 스피너: 요소를 찾지 못했다 (.nui-icon--spin)");
   } else {
-    const name = await spinner.evaluate(
-      (el) => getComputedStyle(el).animationName,
-    );
-    name === "none"
-      ? ok("Button 로딩 스피너 — reduce 에서 회전 없음")
-      : bad(`Button 로딩 스피너: reduce 인데 돈다 (animation-name: ${name})`);
+    const seen = await spinner.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      const name = cs.animationName.split(",")[0].trim();
+      const first = cs.animationDuration.split(",")[0].trim();
+      const durationS = first.endsWith("ms")
+        ? parseFloat(first) / 1000
+        : parseFloat(first);
+      let frames = null;
+      for (const sheet of document.styleSheets) {
+        let rules;
+        try {
+          rules = sheet.cssRules; // 교차 출처 시트는 읽기에서 던진다 — 건너뛴다
+        } catch {
+          continue;
+        }
+        const walk = (list) => {
+          for (const rule of list) {
+            if (frames) return;
+            if (rule instanceof CSSKeyframesRule && rule.name === name)
+              frames = rule.cssText;
+            else if (rule.cssRules) walk(rule.cssRules); // @layer · @media 안
+          }
+        };
+        walk(rules);
+        if (frames) break;
+      }
+      return { name, durationS, frames };
+    });
+    const problem = spinnerReduceProblem(seen);
+    problem
+      ? bad(`Button 로딩 스피너: ${problem} (animation-name: ${seen.name})`)
+      : ok(
+          `Button 로딩 스피너 — reduce 에서 회전 없이 투명도 ${seen.durationS}s`,
+        );
   }
   await ctx.close();
 }
@@ -1598,11 +1733,11 @@ const TOUCH_TARGETS = [
   await ctx.close();
 }
 
-// 글자 최소 13px (KRDS 서체 스케일 최소 · tokens.md §3-3) — 2026-09-11.
-// 토큰은 13 아래가 없지만 소비자 글꼴 축소·em 자식·인라인 스타일이 들어올 수 있어 렌더로 잰다.
+// 글자 최소 12px — design.md TY5 (2026-11-19) — 12px 은 칩과 배지 자리. 하한은 위 FONT_MIN_PX · fontTooSmall().
+// 소비자 글꼴 축소·em 자식·인라인 스타일이 들어올 수 있어 렌더로 잰다.
 // 라이브러리 요소(.nui-*)의 직접 텍스트만 본다 — 문서 사이트 자체의 캡션은 대상이 아니다.
 {
-  console.log("\n■ 글자 최소 13px (.nui-* 의 직접 텍스트)");
+  console.log(`\n■ 글자 최소 ${FONT_MIN_PX}px (.nui-* 의 직접 텍스트)`);
   const pages = [
     ...new Set([...CONTRAST_TARGETS, ...TOUCH_TARGETS].map((t) => t[1])),
   ].filter(inScope);
@@ -1611,7 +1746,8 @@ const TOUCH_TARGETS = [
   let seen = 0;
   for (const url of pages) {
     await page.goto(BASE + url, { waitUntil: "networkidle" });
-    const small = await page.evaluate(() => {
+    // evaluate 안에서는 바깥 함수를 못 부르므로 하한 숫자를 넘겨 같은 비교(px < min)를 쓴다
+    const small = await page.evaluate((min) => {
       const out = [];
       let n = 0;
       for (const el of document.querySelectorAll(
@@ -1630,17 +1766,19 @@ const TOUCH_TARGETS = [
           continue;
         n++;
         const px = parseFloat(cs.fontSize);
-        if (px < 13) out.push(`${el.className.split(" ")[0]} ${px}px`);
+        if (px < min) out.push(`${el.className.split(" ")[0]} ${px}px`);
       }
       return { n, out };
-    });
+    }, FONT_MIN_PX);
     seen += small.n;
-    for (const s of small.out) bad(`${url} — ${s} (13px 미만)`);
+    for (const s of small.out) bad(`${url} — ${s} (${FONT_MIN_PX}px 미만)`);
   }
-  if (pages.length === 0) skipped("글자 최소 13px");
+  if (pages.length === 0) skipped(`글자 최소 ${FONT_MIN_PX}px`);
   else
     seen > 0
-      ? ok(`${pages.length}페이지 · 텍스트 요소 ${seen}개 · 13px 미만 없음`)
+      ? ok(
+          `${pages.length}페이지 · 텍스트 요소 ${seen}개 · ${FONT_MIN_PX}px 미만 없음`,
+        )
       : bad("텍스트 요소를 하나도 못 셌다 — 셀렉터가 늙었다");
   await ctx.close();
 }
@@ -1660,6 +1798,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 console.log(
-  "\n✅ 접근성 검사 통과 — 모션 감소 대응 · 명도 대비(라이트·다크) · 터치 영역 · 글자 최소",
+  "\n✅ 접근성 검사 통과 — 모션 감소 대응 · 명도 대비(라이트·다크) · 터치 영역 · 글자 최소 12px",
 );
 console.log(receipt(0));

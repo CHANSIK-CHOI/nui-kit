@@ -79,9 +79,13 @@ const HOVER_BG_FORBIDDEN = new Set([
  */
 const COLOR_HOOK = /-(bg|dim|color)$/;
 
-/** 훅 이름의 속성 부분. **긴 것부터** 매칭한다(`max-width` 가 `width` 보다 먼저) */
+/**
+ * 훅 이름의 속성 부분. **긴 것부터** 매칭한다(`max-width` 가 `width` 보다 먼저)
+ * `font-weight` · `shadow` · `blur` — design.md OV5 · CP4 · EL6 (2026-11-19)
+ */
 const HOOK_PROPS = [
   "border-width",
+  "font-weight",
   "min-height",
   "min-width",
   "max-width",
@@ -89,9 +93,11 @@ const HOOK_PROPS = [
   "padding-y",
   "padding",
   "height",
+  "shadow",
   "width",
   "radius",
   "size",
+  "blur",
   "gap",
 ];
 
@@ -140,6 +146,15 @@ function checkHookName(name) {
   if (sep <= 0 || name.indexOf("--", sep + 2) !== -1) {
     return "컴포넌트 이름 뒤에 대시 두 개가 정확히 한 번 와야 한다 (`button--medium-height`)";
   }
+  // `button-medium--height` 는 `button-medium` 을 컴포넌트 이름으로 읽어 통과하고 있었다.
+  // 컴포넌트 이름의 대시(`icon-button`)는 그대로 두고, 옵션 낱말이 대시 둘 앞에 있는 것만 잡는다.
+  const misplaced = name
+    .slice(0, sep)
+    .split("-")
+    .find((w) => HOOK_OPTIONS.has(w));
+  if (misplaced) {
+    return `옵션 '${misplaced}' 이 대시 둘 앞에 있다 — 옵션은 대시 둘 바로 뒤 (button--medium-height)`;
+  }
   const rest = name.slice(sep + 2);
   const prop = HOOK_PROPS.find((p) => rest === p || rest.endsWith(`-${p}`));
   if (!prop) {
@@ -156,6 +171,18 @@ function checkHookName(name) {
     return `옵션 '${parts[optionAt]}' 은 컴포넌트 이름 바로 뒤에 와야 한다`;
   }
   return null;
+}
+
+/** 3) 절의 판정 — 색 훅이면 색 문구, 아니면 이름 문구. 문제가 없으면 null (파일 이름은 부르는 쪽이 붙인다) */
+function hookProblem(name) {
+  if (COLOR_HOOK.test(name)) {
+    return (
+      `색 훅 '${name}' — 색은 컴포넌트별로 열지 않는다. ` +
+      `창구는 브랜드 색 프리셋과 className 뿐이다 (tokens.md §6-1)`
+    );
+  }
+  const bad = checkHookName(name);
+  return bad ? `훅 이름 '${name}' — ${bad} (design-plan 2-3)` : null;
 }
 
 /**
@@ -175,8 +202,8 @@ const DEPRECATED = {
   "letter-spacing-6": "letter-spacing-5",
   // 둥근 정도 최대 12 (KRDS C1) — 16 · 24 는 지웠다
   "radius-6": "(삭제 — 최대 12 · radius-5)",
-  // 굵기 두 단계 (KRDS B1, 2026-09-04)
-  "font-weight-medium": "font-weight-regular",
+  // semi-bold 는 bold 로 (KRDS B1, 2026-09-04)
+  // font-weight-medium 은 2026-11-19 design.md TY4(굵기 셋 400 · 500 · 700)로 되살아나 경고에서 뺐다
   "font-weight-semi-bold": "font-weight-bold",
   // 상태를 투명도로 표현하지 않는다 (KRDS A3)
   "opacity-icon-disabled": "control-icon-disabled",
@@ -248,6 +275,25 @@ const DEPRECATED_SCALE = {
   motion: { quick: "2", fast: "3", base: "4", slow: "5", deliberate: "6" },
 };
 
+/** 5) 절의 판정 — 구 이름 사용 목록 (`'<옛>' → '<새>'` 꼴, 파일 이름은 부르는 쪽이 붙인다) */
+function deprecatedHits(css) {
+  const out = [];
+  // ⚠️ 문자 클래스에 `_` 가 있어야 한다 — 없으면 `radius-1_5` 같은 옛 이름을 영원히 못 잡는다 (리뷰 2026-09-11)
+  for (const m of css.matchAll(/v\("([a-z0-9_-]+)"\)/g)) {
+    const next = DEPRECATED[m[1]];
+    if (next) out.push(`'${m[1]}' → '${next}'`);
+  }
+  for (const m of css.matchAll(/@include typo\(\s*"([a-z-]+)"/g)) {
+    const next = DEPRECATED_SCALE.typo[m[1]];
+    if (next) out.push(`typo("${m[1]}", …) → typo("${next}", …)`);
+  }
+  for (const m of css.matchAll(/@include motion\([^)]*?"([a-z]+)"\s*\)/g)) {
+    const next = DEPRECATED_SCALE.motion[m[1]];
+    if (next) out.push(`motion(…, "${m[1]}") → motion(…, "${next}")`);
+  }
+  return out;
+}
+
 /**
  * 6-i) 전환 목록의 layout 속성 (motion.md §4) — `transform` 과 `opacity` 만 움직인다.
  * width · height · margin · padding · top · left 는 layout + paint 를 부른다. Accordion 의 height 는
@@ -270,34 +316,143 @@ function layoutTransitions(code) {
   return out;
 }
 
-// 검출력 시험 — `--selftest` (scripts.md §4). 위반 2 · 함정 1 · 통과 2. 하나라도 어긋나면 exit 1.
+/**
+ * 6-j) `infinite` 반복은 스피너 keyframes 만 (design.md MO1 — 2초 넘게 이어지는 움직임은 없다, 예외 스피너).
+ * `animation:` 단축이면 그 값에, `animation-iteration-count:` 롱핸드면 그 선언이 든 블록에
+ * `kf("spin")` 또는 `kf("spin-<낱말>")` 이 있어야 한다. `toast-spin` · `spinner` 처럼 spin 이 머리가 아닌 이름은 안 된다.
+ * 보간 `#{…}` 은 6-b 처럼 `«…»` 로 평탄화해 블록 경계로 잡히지 않게 한다. 주석은 걷은 code 를 받는다.
+ */
+const SPIN_KEYFRAMES = /kf\(\s*"spin(-[a-z0-9-]+)?"\s*\)/;
+function infiniteProblems(code) {
+  const flat = code.replace(/#\{([^{}]*)\}/g, "«$1»");
+  const out = [];
+  for (const m of flat.matchAll(
+    /(?<![a-z-])(animation-iteration-count|animation)\s*:([^;{}]*)/g,
+  )) {
+    const value = m[2];
+    if (!/\binfinite\b/.test(value)) continue;
+    const scope =
+      m[1] === "animation"
+        ? value
+        : flat.slice(
+            flat.lastIndexOf("{", m.index) + 1,
+            flat.indexOf("}", m.index) === -1
+              ? flat.length
+              : flat.indexOf("}", m.index),
+          );
+    if (!SPIN_KEYFRAMES.test(scope))
+      out.push(value.replace(/\s+/g, " ").trim());
+  }
+  return out;
+}
+
+// 검출력 시험 — `--selftest` (scripts.md §4). 위반 7 · 함정 4 · 통과 9 (20 사례). 하나라도 어긋나면 exit 1.
+// 사례 꼴 [label, fn, input, want] — want 는 검출 수(배열이면 길이, 문자열이면 1, null 이면 0).
 if (process.argv.includes("--selftest")) {
   const cases = [
-    ["위반 transition height", "a { transition: height 1s; }", 1],
+    [
+      "위반 transition height",
+      layoutTransitions,
+      "a { transition: height 1s; }",
+      1,
+    ],
     [
       "위반 motion width (여러 줄)",
+      layoutTransitions,
       'a {\n  @include motion(\n    (width, color),\n    "3"\n  );\n}',
       1,
     ],
     [
       "함정 border-width · background-color",
+      layoutTransitions,
       "a { transition: border-width 1s, background-color 1s; }",
       0,
     ],
     [
       "통과 transform · opacity",
+      layoutTransitions,
       "a { @include motion-press((background-color, color)); transition: transform 1s, opacity 1s; }",
       0,
     ],
     [
       "통과 motion 색만",
+      layoutTransitions,
       'a { @include motion((background-color, border-color, color), "3"); }',
+      0,
+    ],
+    // hookProblem — design.md OV5 · CP4 · EL6
+    ["위반 색 훅", hookProblem, "popup--backdrop-color", 1],
+    ["위반 옵션이 대시 둘 앞", hookProblem, "button-medium--height", 1],
+    [
+      "함정 그림자 낱말이 있어도 색 훅이 먼저",
+      hookProblem,
+      "select--shadow-color",
+      1,
+    ],
+    [
+      "함정 컴포넌트 이름의 대시는 옵션이 아님",
+      hookProblem,
+      "icon-button--large-size",
+      0,
+    ],
+    ["통과 팝업 딤 흐림", hookProblem, "popup--backdrop-blur", 0],
+    ["통과 굵기", hookProblem, "button--medium-font-weight", 0],
+    ["통과 그림자 단계", hookProblem, "select--shadow", 0],
+    // deprecatedHits — design.md TY4
+    [
+      "통과 font-weight-medium (TY4 로 되살아남)",
+      deprecatedHits,
+      'a { font-weight: var(#{v("font-weight-medium")}); }',
+      0,
+    ],
+    [
+      "위반(경고) font-weight-semi-bold — 경고 길이 살아 있나",
+      deprecatedHits,
+      'a { font-weight: var(#{v("font-weight-semi-bold")}); }',
+      1,
+    ],
+    // infiniteProblems — design.md MO1 · MO16
+    [
+      "위반 토스트 infinite",
+      infiniteProblems,
+      'a { animation: #{kf("toast-in")} 2s ease infinite; }',
+      1,
+    ],
+    [
+      "위반 롱핸드 infinite",
+      infiniteProblems,
+      'a { animation-name: #{kf("pulse")}; animation-iteration-count: infinite; }',
+      1,
+    ],
+    [
+      "함정 toast-spin (spin 이 머리가 아님)",
+      infiniteProblems,
+      'a { animation: #{kf("toast-spin")} 1s linear infinite; }',
+      1,
+    ],
+    [
+      "통과 spin (_icon.scss 꼴)",
+      infiniteProblems,
+      'a { animation: #{kf("spin")} 1s linear infinite; }',
+      0,
+    ],
+    [
+      "통과 spin-fade (MO16 페이드 꼴)",
+      infiniteProblems,
+      'a { animation: #{kf("spin-fade")} 1s ease-in-out infinite alternate; }',
+      0,
+    ],
+    [
+      "통과 spin 여러 줄",
+      infiniteProblems,
+      'a {\n  animation: #{kf("spin")}\n    1s linear infinite;\n}',
       0,
     ],
   ];
   let bad = 0;
-  for (const [label, code, want] of cases) {
-    const got = layoutTransitions(code).length;
+  for (const [label, fn, input, want] of cases) {
+    const result = fn(input);
+    const got = Array.isArray(result) ? result.length : result == null ? 0 : 1;
     const ok = got === want;
     if (!ok) bad += 1;
     console.log(`  ${ok ? "✅" : "❌"} ${label} — 검출 ${got} (기대 ${want})`);
@@ -339,20 +494,8 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
 
   // 3) 공개 훅 — 색은 열지 않는다 · 이름은 {컴포넌트}--{옵션?}-{속성}
   for (const m of css.matchAll(/hook\(\s*"([a-z0-9-]+)"/g)) {
-    const name = m[1];
-
-    if (COLOR_HOOK.test(name)) {
-      problems.push(
-        `${file}: 색 훅 '${name}' — 색은 컴포넌트별로 열지 않는다. ` +
-          `창구는 브랜드 색 프리셋과 className 뿐이다 (tokens.md §6-1)`,
-      );
-      continue;
-    }
-
-    const bad = checkHookName(name);
-    if (bad) {
-      problems.push(`${file}: 훅 이름 '${name}' — ${bad} (design-plan 2-3)`);
-    }
+    const bad = hookProblem(m[1]);
+    if (bad) problems.push(`${file}: ${bad}`);
   }
 
   // 4) 표면 hover 배경은 control-bg-hover 로 통일
@@ -480,6 +623,14 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
       `${file}: '${prop}' 을 전환한다 — transform · opacity 만 움직인다. layout 속성은 매 프레임 재배치를 부른다 (motion.md §4)`,
     );
   }
+
+  // 6-j) infinite 반복은 스피너만 (design.md MO1) — 위 infiniteProblems() 와 --selftest
+  ruleChecks += 1;
+  for (const value of infiniteProblems(code)) {
+    problems.push(
+      `${file}: '${value}' — infinite 반복은 스피너(kf("spin…"))만. 2초 넘게 이어지는 움직임은 없다 (design.md MO1)`,
+    );
+  }
 }
 
 // 6-g · 6-h) TSX 쪽 — autoComplete="off" 기본값 금지 (a11y.md §7) · 16 미만 아이콘 금지 (design-system.md §5-2)
@@ -527,21 +678,7 @@ for (const file of readdirSync(COMPONENTS_DIR).filter((f) =>
   f.endsWith(".scss"),
 )) {
   const css = readFileSync(join(COMPONENTS_DIR, file), "utf8");
-
-  // ⚠️ 문자 클래스에 `_` 가 있어야 한다 — 없으면 `radius-1_5` 같은 옛 이름을 영원히 못 잡는다 (리뷰 2026-09-11)
-  for (const m of css.matchAll(/v\("([a-z0-9_-]+)"\)/g)) {
-    const next = DEPRECATED[m[1]];
-    if (next) warnings.push(`${file}: '${m[1]}' → '${next}'`);
-  }
-  for (const m of css.matchAll(/@include typo\(\s*"([a-z-]+)"/g)) {
-    const next = DEPRECATED_SCALE.typo[m[1]];
-    if (next) warnings.push(`${file}: typo("${m[1]}", …) → typo("${next}", …)`);
-  }
-  for (const m of css.matchAll(/@include motion\([^)]*?"([a-z]+)"\s*\)/g)) {
-    const next = DEPRECATED_SCALE.motion[m[1]];
-    if (next)
-      warnings.push(`${file}: motion(…, "${m[1]}") → motion(…, "${next}")`);
-  }
+  for (const hit of deprecatedHits(css)) warnings.push(`${file}: ${hit}`);
 }
 
 // 영수증 — 마지막 줄. 이 줄이 없으면 스크립트가 끝까지 돌지 않은 것이다 (출력 잘림 · 타임아웃 · 중간 크래시).
