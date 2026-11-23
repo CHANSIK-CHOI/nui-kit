@@ -40,11 +40,13 @@ function fontTooSmall(px, min = FONT_MIN_PX) {
  * 1-b 의 판정 — 움직임 줄이기에서 스피너는 회전 대신 투명도가 1초 안팎으로 옅어졌다 짙어진다
  * (design.md MO16 (2026-11-19)). 「1초 안팎」은 한 번 옅어졌다 다시 짙어지는 한 바퀴다 —
  * 한 바퀴 = duration × (direction 이 alternate 꼴이면 2, 아니면 1).
- * opacity 가 주기 안에서 실제로 바뀌어야 한다(최소 폭은 아직 정하지 않음).
+ * opacity 가 주기 안에서 실제로 바뀌고, 가장 옅을 때 0.6 이하여야 한다(MO16, 2026-11-19).
  * 받는 것은 computed animation 목록 `[{ name, durationS, direction, frames }, …]` 이고
  * frames 는 그 이름의 @keyframes cssText(못 찾으면 null). 위반 까닭 문자열 또는 null.
  */
 const SPINNER_REDUCE_PERIOD_S = { min: 0.5, max: 1.5 };
+// design.md MO16 — 가장 옅을 때 opacity 가 이 값 이하여야 흐려짐이 보인다(이하라 0.6 은 통과)
+const SPINNER_REDUCE_FADE_MIN = 0.6;
 
 /** 한 바퀴(초) — alternate 꼴이면 갔다 오는 데 duration 두 번이 든다 */
 function spinnerCycleS({ durationS, direction }) {
@@ -90,6 +92,9 @@ function oneSpinnerAnimationProblem(animation) {
   const isOpacityFixed = Math.min(...opacities) === Math.max(...opacities);
   if (isOpacityFixed)
     return `투명도가 바뀌지 않는다(늘 ${opacities[0]}) — 흐려지지 않는다`;
+  const minOpacity = Math.min(...opacities);
+  if (SPINNER_REDUCE_FADE_MIN < minOpacity)
+    return `가장 옅을 때 opacity ${minOpacity} — ${SPINNER_REDUCE_FADE_MIN} 이하로 옅어져야 흐려짐이 보인다(MO16)`;
   const cycleS = spinnerCycleS(animation);
   if (
     cycleS < SPINNER_REDUCE_PERIOD_S.min ||
@@ -322,6 +327,48 @@ if (process.argv.includes("--selftest")) {
           },
         ]),
       true,
+    ],
+    [
+      "위반 스피너 가장 옅을 때 0.99, 0.5s alternate (한 바퀴 1s)",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 0.5,
+            direction: "alternate",
+            frames:
+              "@keyframes nui-spin-fade { 0% { opacity: 1; } 100% { opacity: 0.99; } }",
+          },
+        ]),
+      true,
+    ],
+    [
+      "위반 스피너 가장 옅을 때 0.61 (경계 바로 위), 1s normal",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 1,
+            direction: "normal",
+            frames:
+              "@keyframes nui-spin-fade { 0% { opacity: 1; } 50% { opacity: 0.61; } 100% { opacity: 1; } }",
+          },
+        ]),
+      true,
+    ],
+    [
+      "통과 스피너 가장 옅을 때 0.6 (경계는 통과), 1s normal",
+      () =>
+        isSpinnerHit([
+          {
+            name: "nui-spin-fade",
+            durationS: 1,
+            direction: "normal",
+            frames:
+              "@keyframes nui-spin-fade { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }",
+          },
+        ]),
+      false,
     ],
   ];
   let failed = 0;
