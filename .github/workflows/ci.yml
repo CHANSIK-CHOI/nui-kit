@@ -6,7 +6,7 @@ name: CI
 #   library    — release.yml 과 **같은 명령**. PR 은 통과했는데 태그에서 깨지는 일을 막는다
 #   docs       — 문서 사이트 타입 + 구조. 라이브러리와 잡을 가른다(아래 주석)
 #   format     — prettier --check
-#   portal-inert — M1 하네스의 R5 하나(팝업이 열려도 portal 표식은 inert 가 아님). Chromium 을 받는다
+#   portal-inert — M1 하네스의 R5 하나(팝업이 열려도 portal 표식은 inert 가 아님). Chromium 만 받고 apt 는 부르지 않는다
 #   lint       — PR 이 바꾼 코드 파일에만 Biome 린트(오류는 막음)와 knip(경고만). PR 에서만 돈다
 #   changeset  — 라이브러리 소스가 바뀐 PR 에 changeset 이 있나 (로컬 Stop 훅의 CI 판). PR 에서만 돈다
 #
@@ -120,8 +120,13 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      # 브라우저는 lockfile 의 playwright 버전에 맞는 chromium 하나만
-      - run: npx playwright install --with-deps chromium
+      # 브라우저는 lockfile 의 playwright 버전에 맞는 chromium 하나만. --with-deps(apt)는 쓰지 않는다 —
+      # 러너 이미지에 chromium 이 쓰는 라이브러리가 이미 있고 --with-deps 가 더 까는 것은 글꼴뿐인데,
+      # R5 는 DOM 속성 판정이라 글꼴이 필요 없다. Ubuntu 저장소가 빠진 이미지 빌드에서 이 단계가
+      # apt exit 100 으로 깨졌다(2026-11-24, ubuntu-26.04 20261116.88.1). 라이브러리가 빠진 이미지면
+      # 브라우저를 띄울 때 Playwright 가 빠진 패키지 목록을 내고 실패한다. 화면이나 글자를 비교하는
+      # 검사를 이 잡에 더할 때는 글꼴이 필요하니 --with-deps 를 되살린다
+      - run: npx playwright install chromium
       - run: npm run build:ui
       - run: npm run verify:m1 -w @nui-kit/react -- --only R5-portal-inert
 
