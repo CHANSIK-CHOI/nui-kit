@@ -105,7 +105,8 @@
       @include motion-press(color);
 
       &:focus-visible {
-        outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
+        outline: var(#{v("focus-width")}) solid
+          var(#{v("focus-color-on-inverse")});
         outline-offset: var(#{v("focus-offset")});
         border-radius: var(#{v("radius-1")});
       }
@@ -141,7 +142,8 @@
       }
 
       &:focus-visible {
-        outline: var(#{v("focus-width")}) solid var(#{v("focus-color")});
+        outline: var(#{v("focus-width")}) solid
+          var(#{v("focus-color-on-inverse")});
         outline-offset: var(#{v("focus-offset")});
       }
 
